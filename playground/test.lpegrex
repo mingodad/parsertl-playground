@@ -1,0 +1,51 @@
+-- lpegrex in lpeg
+pattern         <- exp !.
+exp             <- S (grammar / alternative)
+
+alternative     <- seq ('/' S seq)*
+seq             <- prefix*
+prefix          <- '&' S prefix / '!' S prefix / suffix
+suffix          <- primary S (([+*?] S
+                            / '^' (
+				[-+]? num  -- (exactly n / at (least / most) n repetitions
+				/ name -- Syntax of relabel module. The pattern p^l is equivalent to p + lpeglabel.T(l).
+				)
+                            / '->' S (string / pcap / name / num)  -- capture
+                            / '=>' S name) S)* -- match time capture
+
+primary         <- '(' exp  ')' S / string / keyword / class / defined
+                 / '{:' (name ':')? exp ':}' S  -- (named or anonymous) group capture
+                 / '=' name           -- back reference
+                 / '@' exp   -- for throwing labels errors on failure of expected matches
+                 / pcap
+                 / '{~' exp '~}' S  -- substitution capture
+                 / '{|' exp '|}' S  -- table capture
+                 / '{' exp '}' S    -- simple capture
+		 / '~?' S             -- optional capture
+		 / '~>' S ( 'foldleft' / 'foldright' / 'rfoldleft' / 'rfoldright' / name ) S -- fold capture
+		 / '$' (string / name / num / pcap)
+                 / '.' S
+                 / name S !(asttag / arrow )
+                 / '<' S name '>' S    -- old-style non terminals
+		 / '%{' S name '}' S   -- Syntax of relabel module. Equivalent to lpeglabel.T(l)
+
+grammar         <- definition+
+definition      <- name S asttag? arrow exp
+
+class           <- '[' '^'? item (!']' item)* ']' S
+item            <- defined / range / .
+range           <- . '-' [^\]]
+
+S               <- (%s / '--' [^%nl]*)*   -- spaces and comments
+name            <- [A-Za-z_]([A-Za-z0-9_] / '-' !'>' )* S
+arrow           <- (  '<--'    -- rule
+                    / '<=='    -- for rules that capture AST Nodes
+		    / '<-|'    -- for rules that capture tables
+		    / '<-'
+		    ) S
+num             <- [0-9]+ S
+string          <- ('"' [^"]* '"' / "'" [^']* "'") S
+defined         <- '%' name  -- pattern defs[name] or a pre-defined pattern
+keyword         <- '`' [^`]+ '`' S  -- tokens/keywords with automatic skipping
+asttag          <- ':' S name  -- Capture tagged node rule
+pcap            <- '{}' S -- position capture

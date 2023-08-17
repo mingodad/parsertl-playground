@@ -1,0 +1,74 @@
+#From: https://piumarta.com/software/peg/peg.1.html
+
+grammar =       -
+	   ( declaration | definition )+
+	   trailer? end-of-file
+
+declaration =   '%{' < ( !'%}' . )* > RPERCENT
+
+trailer =       '%%' < .* >
+
+definition =    identifier EQUAL expression SEMICOLON?
+
+expression =    sequence ( BAR sequence )*
+
+sequence =      error+
+
+error =         prefix ( TILDE action )?
+
+prefix =        AND action
+|               ( AND | NOT )? suffix
+
+suffix =        primary ( QUERY | STAR | PLUS )?
+
+primary =       identifier COLON identifier !EQUAL
+|               identifier !EQUAL
+|               OPEN expression CLOSE
+|               literal
+|               class
+|               DOT
+|               action
+|               BEGIN
+|               END
+
+identifier =    < [-a-zA-Z_][-a-zA-Z_0-9]* > -
+
+literal =       ['] < ( !['] char )* > ['] -
+|               ["] < ( !["] char )* > ["] -
+
+class =         '[' < ( !']' range )* > ']' -
+
+range =         char '-' char | char
+
+char =          '\\' [abefnrtv'"\[\]\\]
+|               '\\' [0-3][0-7][0-7]
+|               '\\' [0-7][0-7]?
+|               !'\\' .
+
+action =        '{' < braces* > '}' -
+
+braces =        '{' braces* '}'
+|               !'}' .
+
+EQUAL =         '=' -
+COLON =         ':' -
+SEMICOLON =     ';' -
+BAR =           '|' -
+AND =           '&' -
+NOT =           '!' -
+QUERY =         '?' -
+STAR =          '*' -
+PLUS =          '+' -
+OPEN =          '(' -
+CLOSE =         ')' -
+DOT =           '.' -
+BEGIN =         '<' -
+END =           '>' -
+TILDE =         '~' -
+RPERCENT =      '%}' -
+
+- =             ( space | comment )*
+space =         ' ' | '\t' | end-of-line
+comment =       '#' ( !end-of-line . )* end-of-line
+end-of-line =   '\r\n' | '\n' | '\r'
+end-of-file =   !.

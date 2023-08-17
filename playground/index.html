@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>ParserTL playground</title>
+<link rel="stylesheet" href="style.css" media="all">
+</head>
+<body onload="doFinalSettings()">
+<noscript>This application need WASM and JavaScript !</noscript>
+<div id="main">
+  <div class="editor-container">
+    <ul class="editor-header">
+      <li><span><span id="grammar-validation" class="validation"></span></span></li>
+      <li><span>Grammar</span></li>
+      <li class="editor-options">
+        <ul class="editor-header-options">
+          <li class="option"><label>Examples </label>
+            <select id="opt-samples" onchange="loadLalr_sample(this)">
+              <option>choose</option>
+            </select>
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <pre id="grammar-editor" class="editor-area">{{syntax}}</pre>
+    <div id="grammar-info" class="editor-info"></div>
+  </div>
+  <div class="editor-container">
+    <ul class="editor-header">
+      <li><span><span id="code-validation" class="validation"></span></span></li>
+      <li><span>Input source</span></li>
+      <li class="editor-options">
+        <ul class="editor-header-options">
+	<!--
+	  <li class="option"><label><input id="errorRecoveryOff" type="checkbox">ErrorOff</label></li>
+	-->
+          <li class="option"><label>Generate </label>
+            <select id="generate-action">
+              <option>none</option>
+              <option value="ebnf">EBNF grammar</option>
+              <option value="yacc">YACC grammar</option>
+              <!--<option value="yacc_html">HTML YACC grammar</option>-->
+	  </select></li>
+          <!--<li class="option"><label><input id="auto-refresh" type="checkbox">Auto Refresh</label></li>-->
+          <li class="option"><button id="parse" class="parse">Parse</button></li>
+        </ul>
+      </li>
+    </ul>
+    <pre id="code-editor" class="editor-area">{{source}}</pre>
+    <div class="editor-sub-header"><label><input id="show-dbg" class="show-toggle" type="checkbox">Debug</label>&nbsp;&nbsp;&nbsp;&nbsp;
+      mode:&nbsp;<select id="dbg-mode">
+		<option value="iptree">Input parse tree</option>
+		<option value="il">Input lexer</option>
+		<option value="iptrace">Input parse trace</option>
+		<option value="gptree">Grammar parse tree</option>
+		<option value="gl">Grammar lexer</option>
+		<option value="gptrace">Grammar parse trace</option>
+		<option value="glsm">Grammar lexer state machine</option>
+		<option value="ggsm">Grammar parser state machine</option>
+		</select>
+    </div>
+    <pre id="code-dbg" class="editor-area"></pre>
+
+    <div id="code-info" class="editor-info"></div>
+  </div>
+</div>
+<div id="overlay"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.2/ace.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<!--
+<script src="ajax/libs/ace/1.4.2/ace.js"></script>
+<script src="ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+-->
+<script src="index.js"></script>
+<script src="parsertl_playground.js"></script>
+</body>
+</html>

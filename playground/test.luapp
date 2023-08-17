@@ -1,0 +1,14 @@
+class Triangle {
+  base: number,
+  height: number,
+
+  constructor(base: number, height: number)
+    self.base, self.height = base, height
+  end,
+
+  function area(): number
+    return self.base * self.height / 2
+  end
+}
+
+print(Triangle(3, 4).area())
