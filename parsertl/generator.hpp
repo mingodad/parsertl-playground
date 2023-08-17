@@ -710,8 +710,13 @@ namespace parsertl
 #else
             const std::size_t size_ = lhs_.size();
             bool progress_ = false;
+#ifdef PARSERTL_WITH_BOOLSET
+            char_vector& lhs_ptr_ = lhs_;
+            const char_vector& rhs_ptr_ = rhs_;
+#else
             char* lhs_ptr_ = &lhs_.front();
             const char* rhs_ptr_ = &rhs_.front();
+#endif
 
             for (std::size_t i_ = 0; i_ < size_; i_++)
             {

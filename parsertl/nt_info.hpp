@@ -95,7 +95,11 @@ namespace parsertl
 
     using char_vector = bit_set_t;
 #else
+#ifdef PARSERTL_WITH_BOOLSET
+    using char_vector = std::vector<bool>;
+#else
     using char_vector = std::vector<char>;
+#endif
 #endif //PARSERTL_WITH_BITSET
 
     struct nt_info
