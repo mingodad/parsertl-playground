@@ -90,7 +90,8 @@ struct GlobalState
     uint16_t token_Name = 0;
     uint16_t token_Literal = 0;
     uint16_t token_Skip = 0;
-    std::string group_State;
+    std::vector<std::string> group_State;
+    std::string group_State_str;
     
     GlobalState():
         dumpAsEbnfRR(0)
@@ -787,8 +788,8 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         const std::string regex = state.dollar(1);
         const token& token = state.dollar_token(2);
         
-        const char* start_state = state.gs.group_State.empty() 
-                        ? initial_state_str : state.gs.group_State.c_str();
+        const char* start_state = state.gs.group_State_str.empty()
+                        ? initial_state_str : state.gs.group_State_str.c_str();
 
         if(token.id == state.gs.token_Number)
         {
@@ -901,8 +902,8 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         const std::string exit_state = state.dollar(2, 1, -1);
         const token& token = state.dollar_token(3);
         
-        const char* start_state = state.gs.group_State.empty() 
-                        ? initial_state_str : state.gs.group_State.c_str();
+        const char* start_state = state.gs.group_State_str.empty()
+                        ? initial_state_str : state.gs.group_State_str.c_str();
 
         if(token.id == state.gs.token_Number)
         {
@@ -985,7 +986,15 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         [](BuildUserParser& state)
     {
         const std::string start_state = state.dollar(0, 1, -1);
-        state.gs.group_State = start_state;
+        state.gs.group_State.push_back(start_state);
+        if(state.gs.group_State_str.empty())
+        {
+            state.gs.group_State_str = start_state;
+        }
+        else
+        {
+            state.gs.group_State_str += "," + start_state;
+        }
     };
     gs.master_parser.actions[grules.push(
             "rx_group_end", "rx_rules '}'")] =
@@ -995,7 +1004,19 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         {
             throw std::runtime_error("No start state to close in rxrule");
         }
-        state.gs.group_State.clear();
+        state.gs.group_State.pop_back();
+        if(state.gs.group_State.empty())
+        {
+            state.gs.group_State_str.clear();
+        }
+        else
+        {
+            state.gs.group_State_str = state.gs.group_State[0];
+            for(size_t idx = 1; idx < state.gs.group_State.size(); ++idx)
+            {
+                state.gs.group_State_str += "," + state.gs.group_State[idx];
+            }
+        }
     };
 
     // Regex
