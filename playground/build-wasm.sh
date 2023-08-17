@@ -18,7 +18,8 @@ emsdk-env em++  \
 	-I.. \
 	$main_cpp \
 	-DWASM_PLAYGROUND \
-	-DPARSERTL_WITH_BITSETx \
+	-DPARSERTL_WITH_BITSET \
+	-DPARSERTL_WITH_BOOLSETx \
 	-DPARSERTL_WITH_BUILD_TABLE_INDEX \
 	-o $output_fn
 
