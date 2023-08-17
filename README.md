@@ -16,6 +16,7 @@ Related projects:
 - Pest https://pest.rs/
 - Ohm https://ohmjs.org/editor/
 - Owl https://ianh.github.io/owl/try/#example
+- Nearley Parser https://omrelli.ug/nearley-playground/
 - Lalrpop http://lalrpop.github.io/lalrpop/
 - Lezer https://lezer.codemirror.net/
 - Syntax https://github.com/DmitrySoshnikov/syntax
@@ -31,4 +32,4 @@ Related projects:
 - Reflex https://www.genivia.com/doc/reflex/html/
 - Bison https://www.gnu.org/software/bison/
 - Flex https://github.com/westes/flex
-- Byacc https://www.invisible-island.net/byacc/byacc.html 
+- Byacc https://www.invisible-island.net/byacc/byacc.html
