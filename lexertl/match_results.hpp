@@ -29,21 +29,21 @@ namespace lexertl
 
         id_type id = 0;
         id_type user_id = npos();
+        id_type state = 0;
+        bool bol = true;
         iter_type first = iter_type();
         iter_type second = iter_type();
         iter_type eoi = iter_type();
-        bool bol = true;
-        id_type state = 0;
 
         match_results() = default;
 
         match_results(const iter_type& start_, const iter_type& end_,
             const bool bol_ = true, const id_type state_ = 0) :
+            state(state_),
+            bol(bol_),
             first(start_),
             second(start_),
-            eoi(end_),
-            bol(bol_),
-            state(state_)
+            eoi(end_)
         {
         }
 
