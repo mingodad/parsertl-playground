@@ -89,6 +89,7 @@ struct GlobalState
     uint16_t token_Number = 0;
     uint16_t token_Name = 0;
     uint16_t token_Literal = 0;
+    uint16_t token_Reject = 0;
     uint16_t token_Skip = 0;
     std::vector<std::string> group_State;
     std::string group_State_str;
@@ -635,6 +636,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     gs.token_Name = grules.one_token("Name");
     gs.token_Literal = grules.one_token("Literal");
     gs.token_Skip = grules.one_token("Skip");
+    gs.token_Reject = grules.one_token("Reject");
 
     grules.push("start", "file");
     grules.push("file",
@@ -841,6 +843,12 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
                         regex, lexertl::rules::skip(),
                         exit_state.c_str());
                 }
+                else if(token.id == state.gs.token_Reject)
+                {
+                    state.gs.user_parser.lrules.push(start_state.c_str(),
+                        regex, lexertl::rules::reject(),
+                        exit_state.c_str());
+                }
                 else if(token.id == state.gs.token_Literal 
                         || token.id == state.gs.token_Name)
                 {
@@ -917,6 +925,12 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
                 regex, lexertl::rules::skip(),
                 exit_state.c_str());
         }
+        else if(token.id == state.gs.token_Reject)
+        {
+            state.gs.user_parser.lrules.push(start_state,
+                regex, lexertl::rules::reject(),
+                exit_state.c_str());
+        }
         else if(token.id == state.gs.token_Literal 
                 || token.id == state.gs.token_Name)
         {
@@ -975,7 +989,13 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         "rx_rules regex ExitState Skip")] =
         regex_exit_state_token_action_token;
     gs.master_parser.actions[grules.push("rx_rules",
+        "rx_rules regex ExitState Reject")] =
+        regex_exit_state_token_action_token;
+    gs.master_parser.actions[grules.push("rx_rules",
         "rx_rules StartState regex ExitState Skip")] =
+        start_end_state_action_token;
+    gs.master_parser.actions[grules.push("rx_rules",
+        "rx_rules StartState regex ExitState Reject")] =
         start_end_state_action_token;
     gs.master_parser.actions[grules.push("rx_rules",
         "rx_rules StartState regex ExitState")] =
@@ -1142,8 +1162,8 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     lrules.push("RULE", "<([.]|<|>?{state_name})>",
         grules.token_id("ExitState"), "ID");
     lrules.push("RULE,ID", "\n|\r\n", lexertl::rules::skip(), "RULE");
-    lrules.push("ID", "skip\\s*[(]\\s*[)]",
-        gs.token_Skip, "RULE");
+    lrules.push("ID", "skip\\s*[(]\\s*[)]", gs.token_Skip, "RULE");
+    lrules.push("ID", "reject\\s*[(]\\s*[)]", gs.token_Reject, "RULE");
     lexertl::generator::build(lrules, gs.master_parser.lsm);
     //gs.master_parser.lsm.minimise ();
     if(dumpGrammar)

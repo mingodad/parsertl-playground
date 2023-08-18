@@ -89,6 +89,11 @@ namespace lexertl
             return static_cast<id_type>(~1);
         }
 
+        static id_type reject()
+        {
+            return static_cast<id_type>(~2);
+        }
+
         void swap(basic_state_machine& rhs_) noexcept
         {
             _internals.swap(rhs_._internals);

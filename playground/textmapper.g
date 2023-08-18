@@ -1,3 +1,5 @@
+/*%s initial afterID afterColonOrEq afterGT*/
+%x afterGT
 
 /*Tokens*/
 
@@ -8,12 +10,12 @@
 %token INVALID_TOKEN
 %token SCON
 %token ICON
-//%token TEMPLATES
+%token TEMPLATES
 //%token WHITESPACE
 //%token COMMENT
 //%token MULTILINECOMMENT
 %token REM
-%token COLONCOLON
+//%token COLONCOLON
 %token ASSIGN
 %token ASSIGNASSIGN
 %token EXCLASSIGN
@@ -65,47 +67,52 @@
 %token LANGUAGE
 %token LAYOUT
 %token LEFT
-%token LEXER
+//%token LEXER
+%token LEXER_SECTION
 %token LOOKAHEAD
 %token NOMINUSEOI
 %token NONASSOC
 %token NONEMPTY
 %token PARAM
-%token PARSER
+//%token PARSER
+%token PARSER_SECTION
 %token PREC
 %token RIGHT
-//%token CHAR_S
+%token CHAR_S
 %token SHIFT
 %token SPACE
-//%token CHAR_X
+%token CHAR_X
 %token CODE
 %token LBRACE
 %token REGEXP
 %token DIV
-
-%token REM_CHAR_S REM_CHAR_X
 
 %left /*1*/ OR
 %left /*2*/ AND
 %left /*3*/ OROR
 %left /*4*/ ANDAND
 
-%start file
+%start YY_PARSE_file
 
 %%
 
-/*
+
 YY_PARSE_file :
 	file
+	| file TEMPLATES
 	;
-
+/*
 YY_PARSE_nonterm :
 	nonterm //YYEOF
 	;
 */
 identifier :
 	ID
-	| BRACKETS
+	| identifier_soft_Keywords
+	;
+
+identifier_soft_Keywords :
+	BRACKETS
 	| INLINE
 	| PREC
 	| SHIFT
@@ -123,8 +130,8 @@ identifier :
 	| PARAM
 	| FLAG
 	| NOMINUSEOI
-	| REM_CHAR_S
-	| REM_CHAR_X
+	| CHAR_S
+	| CHAR_X
 	| EXPECT
 	| EXPECTMINUSRR
 	| CLASS
@@ -135,8 +142,8 @@ identifier :
 	| LAYOUT
 	| LANGUAGE
 	| LALR
-	| LEXER
-	| PARSER
+	//| LEXER
+	//| PARSER
 	;
 
 identifier_Keywords :
@@ -207,11 +214,13 @@ header :
 	;
 
 lexer_section :
-	COLONCOLON LEXER lexer_parts
+	//COLONCOLON /*.recoveryScope*/ LEXER lexer_parts
+	LEXER_SECTION lexer_parts
 	;
 
 parser_section :
-	COLONCOLON PARSER grammar_parts
+	//COLONCOLON /*.recoveryScope*/ PARSER grammar_parts
+	PARSER_SECTION grammar_parts
 	;
 
 import_ :
@@ -261,7 +270,7 @@ named_pattern :
 	;
 
 start_conditions_scope :
-	start_conditions LBRACE lexer_parts RBRACE
+	start_conditions LBRACE /*.recoveryScope*/ lexer_parts RBRACE
 	;
 
 start_conditions :
@@ -329,8 +338,8 @@ lexeme_attribute :
 
 lexer_directive :
 	REM BRACKETS symref symref SEMICOLON
-	| REM_CHAR_S lexer_state_list_Comma_separated SEMICOLON
-	| REM_CHAR_X lexer_state_list_Comma_separated SEMICOLON
+	| REM CHAR_S lexer_state_list_Comma_separated SEMICOLON
+	| REM CHAR_X lexer_state_list_Comma_separated SEMICOLON
 	;
 
 lexer_state_list_Comma_separated :
@@ -547,17 +556,17 @@ listSeparator :
 
 rhsPrimary :
 	symref_Args
-	| LPAREN rules RPAREN
-	| LPAREN rhsParts listSeparator RPAREN PLUS
-	| LPAREN rhsParts listSeparator RPAREN MULT
+	| LPAREN /*.recoveryScope*/ rules RPAREN
+	| LPAREN /*.recoveryScope*/ rhsParts listSeparator RPAREN PLUS
+	| LPAREN /*.recoveryScope*/ rhsParts listSeparator RPAREN MULT
 	| rhsPrimary PLUS
 	| rhsPrimary MULT
-	| DOLLAR LPAREN rules RPAREN
+	| DOLLAR LPAREN /*.recoveryScope*/ rules RPAREN
 	| rhsSet
 	;
 
 rhsSet :
-	SET LPAREN setExpression RPAREN
+	SET LPAREN /*.recoveryScope*/ setExpression RPAREN
 	;
 
 setPrimary :
@@ -674,9 +683,15 @@ rawTypeopt :
 %%
 /*Macros*/
 
+reClass	\[([^\n\r\]\\]|\\.)*\]
+reFirst	[^\n\r\*\[\\\/]|\\.|{reClass}
+reChar	{reFirst}|\*
+
 SPACES	[ \t\r\n]+
 COMMENT	#[^\r\n]*
 C_STYLE_COMMENT [/][*](?s:.)*?[*][/]
+
+ID  [a-zA-Z_]([a-zA-Z_\-0-9]*[a-zA-Z_0-9])?|'(\\.|[^'\n\r\\])*'
 
 %%
 /*Lexer*/
@@ -707,8 +722,8 @@ C_STYLE_COMMENT [/][*](?s:.)*?[*][/]
 "param"	PARAM
 "flag"	FLAG
 "no-eoi"	NOMINUSEOI
-"%s"	REM_CHAR_S
-"x"	REM_CHAR_X
+"s"	CHAR_S
+"x"	CHAR_X
 "expect"	EXPECT
 "expect-rr"	EXPECTMINUSRR
 "class"	CLASS
@@ -719,8 +734,10 @@ C_STYLE_COMMENT [/][*](?s:.)*?[*][/]
 "layout"	LAYOUT
 "language"	LANGUAGE
 "lalr"	LALR
-"lexer"	LEXER
-"parser"	PARSER
+/*"lexer"	LEXER*/
+"::"[ \t]*"lexer"   LEXER_SECTION
+/*"parser"	PARSER*/
+"::"[ \t]*"parser"   PARSER_SECTION
 "true"	TRUE
 "false"	FALSE
 "separator"	SEPARATOR
@@ -730,13 +747,13 @@ C_STYLE_COMMENT [/][*](?s:.)*?[*][/]
 "("	LPAREN
 ")"	RPAREN
 ";"	SEMICOLON
-"::"	COLONCOLON
+/*"::"	COLONCOLON*/
 "="	ASSIGN
 "{"	LBRACE
 "}"	RBRACE
 "<"	LT
 "*"	MULT
-">"	GT
+">"<afterGT>	GT
 ","	COMMA
 ":"	COLON
 "%"	REM
@@ -758,12 +775,17 @@ C_STYLE_COMMENT [/][*](?s:.)*?[*][/]
 
 "xerror"	ERROR /*TODO fix bug with 'error' as reserved keyword*/
 
+<afterGT>[ \t]+"{"\n<INITIAL> LBRACE /* onlyc accept a '{' folllowed by '\n' */
+<afterGT>\n|.<INITIAL> reject()
+
 /* Order matter if identifier comes before keywords they are classified as identifier */
-[a-zA-Z_]([a-zA-Z_\-0-9]*[a-zA-Z_0-9])?|'([^\n\']|\.)*'	ID
+{ID}	ID
 -?[0-9]+	ICON
 \"(\\.|[^\"\n\r\\])*\"	SCON
 \/(\\.|[^/\n])+\/	REGEXP
-\{[^}]*\}	CODE
+\{(?s:[^}])+\}	CODE
+
+\%\%(?s:.)+ TEMPLATES
 
 .	INVALID_TOKEN
 

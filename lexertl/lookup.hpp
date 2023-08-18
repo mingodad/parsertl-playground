@@ -381,6 +381,8 @@ namespace lexertl
             using id_type = typename sm_type::id_type;
             const auto& internals_ = sm_.data();
             auto end_token_ = results_.second;
+            auto saved_curr_ = results_.second;
+            auto saved_bol_ = results_.bol;
         skip:
             auto curr_ = results_.second;
 
@@ -394,6 +396,7 @@ namespace lexertl
                 return;
             }
 
+        reject:
             lookup_state<typename sm_type::internals, id_type,
                 typename results::index_type, flags> lu_state_
                 (internals_, results_.bol, results_.state);
@@ -443,6 +446,13 @@ namespace lexertl
                 results_.second = end_token_;
 
                 if (lu_state_._id == sm_.skip()) goto skip;
+                if (lu_state_._id == sm_.reject())
+                {
+                    curr_ = results_.second = results_.first = saved_curr_;
+                    results_.bol = saved_bol_;
+                    results_.id = results::npos();
+                    goto reject;
+                }
 
                 if (lu_state_.is_id_eoi(internals_._eoi, results_, recursive_))
                 {

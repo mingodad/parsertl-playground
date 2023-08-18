@@ -1,7 +1,7 @@
 //Directives
 
 %token Charset ExitState Literal Macro MacroName Name NL
-%token Number Repeat StartState String Skip
+%token Number Repeat StartState String Skip Reject
 
 %x OPTION GRULE MACRO REGEX RULE ID
 
@@ -49,8 +49,10 @@ rx_rules : rx_rules StartState regex rx_return ;
 rx_rules : rx_rules regex ExitState  rx_return ;
 rx_rules : rx_rules StartState regex ExitState rx_return ;
 rx_rules : rx_rules StartState regex ExitState ;
+rx_rules : rx_rules StartState regex ExitState Reject ;
 rx_rules : rx_rules StartState '{' rx_rules '}' ;
 rx_rules : rx_rules regex ExitState ;
+rx_rules : rx_rules regex ExitState Reject;
 rx_return : Number | Literal | Name | Skip ;
 // Regex
 regex : rx | '^' rx | rx '$' | '^' rx '$' ;
@@ -133,5 +135,6 @@ state_name [A-Z_a-z][0-9A-Z_a-z]*
 <RULE><([.]|<|>?{state_name})><ID>	ExitState
 <RULE,ID>\n|\r\n<RULE>	skip()
 <ID>skip\s*[(]\s*[)]<RULE>	Skip
+<ID>reject\s*[(]\s*[)]<RULE>	Reject
 
 %%

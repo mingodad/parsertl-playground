@@ -113,11 +113,6 @@ namespace lexertl
             return _flags;
         }
 
-        static id_type skip()
-        {
-            return static_cast<id_type>(~1);
-        }
-
         id_type eoi() const
         {
             return 0;
@@ -126,6 +121,16 @@ namespace lexertl
         static id_type npos()
         {
             return static_cast<id_type>(~0);
+        }
+
+        static id_type skip()
+        {
+            return static_cast<id_type>(~1);
+        }
+
+        static id_type reject()
+        {
+            return static_cast<id_type>(~2);
         }
 
         std::locale imbue(const std::locale& locale_)
@@ -285,6 +290,10 @@ namespace lexertl
             if (id_ == skip())
             {
                 _features.front() |= *feature_bit::skip;
+            }
+            else if (id_ == reject())
+            {
+                _features.front() |= *feature_bit::reject;
             }
             else if (id_ == eoi())
             {
@@ -978,6 +987,10 @@ namespace lexertl
                 if (id_ == skip())
                 {
                     _features[curr_] |= *feature_bit::skip;
+                }
+                else if (id_ == reject())
+                {
+                    _features[curr_] |= *feature_bit::reject;
                 }
                 else if (id_ == eoi())
                 {

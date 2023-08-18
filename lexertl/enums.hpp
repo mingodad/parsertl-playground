@@ -25,7 +25,8 @@ namespace lexertl
     enum class feature_bit
     {
         bol = 1, eol = 2, skip = 4, again = 8,
-        multi_state = 16, recursive = 32, advance = 64
+        multi_state = 16, recursive = 32, advance = 64,
+        reject = 128
     };
     // End state flags:
     enum class state_bit
