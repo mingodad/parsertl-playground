@@ -1,5 +1,5 @@
 /*%s initial afterID afterColonOrEq afterGT*/
-%x afterGT
+%x afterGT afterID CODE_ST
 
 /*Tokens*/
 
@@ -749,7 +749,6 @@ ID  [a-zA-Z_]([a-zA-Z_\-0-9]*[a-zA-Z_0-9])?|'(\\.|[^'\n\r\\])*'
 ";"	SEMICOLON
 /*"::"	COLONCOLON*/
 "="	ASSIGN
-"{"	LBRACE
 "}"	RBRACE
 "<"	LT
 "*"	MULT
@@ -775,15 +774,22 @@ ID  [a-zA-Z_]([a-zA-Z_\-0-9]*[a-zA-Z_0-9])?|'(\\.|[^'\n\r\\])*'
 
 "xerror"	ERROR /*TODO fix bug with 'error' as reserved keyword*/
 
-<afterGT>[ \t]+"{"\n<INITIAL> LBRACE /* onlyc accept a '{' folllowed by '\n' */
+<afterGT>[ \t]+"{"\n<INITIAL> LBRACE /* only accept a '{' folllowed by '\n' */
 <afterGT>\n|.<INITIAL> reject()
 
+<afterID>"/"<INITIAL> DIV
+<afterID>"/*"<INITIAL> reject()
+<afterID>\n|.<INITIAL> reject()
+
 /* Order matter if identifier comes before keywords they are classified as identifier */
-{ID}	ID
+{ID}<afterID>	ID
 -?[0-9]+	ICON
 \"(\\.|[^\"\n\r\\])*\"	SCON
 \/(\\.|[^/\n])+\/	REGEXP
-\{(?s:[^}])+\}	CODE
+/*\{(?s:[^}])+\}	CODE*/
+<INITIAL,CODE_ST>"{"<>CODE_ST>
+<CODE_ST>(?s:[^}])<.>
+<CODE_ST>"}"<<> CODE
 
 \%\%(?s:.)+ TEMPLATES
 

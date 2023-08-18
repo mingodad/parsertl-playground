@@ -54,6 +54,8 @@ struct GlobalState;
 struct ParserRT;
 
 using config_actions_map = std::map<uint16_t, void(*)(BuildUserParser& state)>;
+using play_iterator = lexertl::criterator;
+using play_match_results = parsertl::match_results;
 
 struct ParserRT
 {
@@ -166,7 +168,7 @@ static void parser_throw_error(const char* msg, const IT& iter_lex, const char* 
     throw std::runtime_error(ss.str());
 }
 
-static void dump_lexer(lexertl::citerator& iter_lex, const parsertl::rules& grules, const char* input)
+static void dump_lexer(play_iterator& iter_lex, const parsertl::rules& grules, const char* input)
 {
     std::cout << "line:column:state:token:value\n";
     while(iter_lex->id != 0) {
@@ -179,7 +181,7 @@ static void dump_lexer(lexertl::citerator& iter_lex, const parsertl::rules& grul
     }
 }
 #if 0
-static void dump_lexer2(lexertl::citerator& iter_lex, const parsertl::rules& grules, const char* input)
+static void dump_lexer2(play_iterator& iter_lex, const parsertl::rules& grules, const char* input)
 {
     std::cout << "line:column:state:token:value\n";
     size_t line_offset = 0, input_offset = 0, last_line = 0, curr_line;
@@ -250,8 +252,8 @@ static void dump_parse_tree(const char* data_start, const char* data_end,
     parsertl::rules::string_vector symbols;
     grules.terminals(symbols);
     grules.non_terminals(symbols);
-    lexertl::citerator iter_lex(data_start, data_end, lsm);
-    parsertl::match_results results(iter_lex->id, gsm);
+    play_iterator iter_lex(data_start, data_end, lsm);
+    play_match_results results(iter_lex->id, gsm);
     std::vector<ParseTreeUserData> syn_tree;
     bool parse_done=false;
     for(;;)
@@ -337,8 +339,8 @@ static void dump_parse_trace(const char* data_start, const char* data_end,
     parsertl::rules::string_vector symbols;
     grules.terminals(symbols);
     grules.non_terminals(symbols);
-    lexertl::citerator iter_lex(data_start, data_end, lsm);
-    parsertl::match_results results(iter_lex->id, gsm);
+    play_iterator iter_lex(data_start, data_end, lsm);
+    play_match_results results(iter_lex->id, gsm);
     bool parse_done=false;
     std::cout << "== action | param:stack.size | data\n";
     for(;;)
@@ -405,7 +407,7 @@ struct BuildUserParser
 {
     GlobalState& gs;
     token::token_vector productions;
-    parsertl::match_results results;
+    play_match_results results;
 
     BuildUserParser(GlobalState& pgs): gs(pgs)
     {}
@@ -436,7 +438,7 @@ struct BuildUserParser
 
     bool build()
     {
-        lexertl::citerator iter_lex;
+        play_iterator iter_lex;
 
         if(gs.dump_grammar_parse_tree)
         {
@@ -473,7 +475,7 @@ struct BuildUserParser
                     *lexertl::regex_flags::dot_not_cr_lf);
         }
 
-        iter_lex = lexertl::citerator(gs.grammar_data,
+        iter_lex = play_iterator(gs.grammar_data,
             gs.grammar_data + gs.grammar_data_size, gs.master_parser.lsm);
         results.reset(iter_lex->id, gs.master_parser.gsm);
 
@@ -1190,9 +1192,9 @@ int main_base(int argc, char* argv[], GlobalState& gs)
         build_master_parser(gs);
         showDiffTime("build master parser");
 
-        lexertl::citerator iter_lexg(gs.grammar_data,
+        play_iterator iter_lexg(gs.grammar_data,
                 gs.grammar_data + gs.grammar_data_size, gs.master_parser.lsm);
-        parsertl::match_results resultsg(iter_lexg->id, gs.master_parser.gsm);
+        play_match_results resultsg(iter_lexg->id, gs.master_parser.gsm);
 
         bool success = parsertl::parse(iter_lexg, gs.master_parser.gsm, resultsg);
         showDiffTime("parse user grammar");
@@ -1252,7 +1254,7 @@ int main_base(int argc, char* argv[], GlobalState& gs)
             showDiffTime("dump input parser trace");
             return -1;
         }
-        lexertl::citerator iter_lexi(gs.input_data,
+        play_iterator iter_lexi(gs.input_data,
                 gs.input_data + gs.input_data_size, gs.user_parser.lsm);
         if(gs.dump_input_lexer)
         {
@@ -1266,7 +1268,7 @@ int main_base(int argc, char* argv[], GlobalState& gs)
 #ifdef WASM_PLAYGROUND
         switch_output("parse_stats");
 #endif
-        parsertl::match_results resultsi(iter_lexi->id, gs.user_parser.gsm);
+        play_match_results resultsi(iter_lexi->id, gs.user_parser.gsm);
 
         success = parsertl::parse(iter_lexi, gs.user_parser.gsm, resultsi);
         showDiffTime("parse input");
