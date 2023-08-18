@@ -1216,7 +1216,8 @@ int main_base(int argc, char* argv[], GlobalState& gs)
             return -1;
         }
         showDiffTime("build user parser");
-        std::cerr << "Productions " << gs.user_parser.grules.grammar().size() << ".\n";
+        size_t productions_count = gs.user_parser.grules.grammar().size();
+        std::cerr << "Productions " << productions_count << ".\n";
         std::cerr << "Terminals " << gs.user_parser.grules.terminals_count() << ".\n";
         std::cerr << "NonTerminals " << gs.user_parser.grules.non_terminals_count() << ".\n";
         std::cerr << "States " << gs.user_parser.gsm._rows << ".\n";
@@ -1226,7 +1227,7 @@ int main_base(int argc, char* argv[], GlobalState& gs)
         std::cerr << "Reduce/Reduce conflicts resolved " << gs.user_parser.grules.reduce_reduce_count << ".\n";
         //std::cerr << "dumpAsEbnfRR = " << gs.dumpAsEbnfRR << "\n";
         
-        if(gs.dump_input_parse_tree)
+        if(gs.dump_input_parse_tree && productions_count)
         {
 #ifdef WASM_PLAYGROUND
         switch_output("parse_debug");
@@ -1240,7 +1241,7 @@ int main_base(int argc, char* argv[], GlobalState& gs)
             showDiffTime("dump input parser tree");
             return -1;
         }
-        if(gs.dump_input_parse_trace)
+        if(gs.dump_input_parse_trace && productions_count)
         {
 #ifdef WASM_PLAYGROUND
         switch_output("parse_debug");
@@ -1268,18 +1269,20 @@ int main_base(int argc, char* argv[], GlobalState& gs)
 #ifdef WASM_PLAYGROUND
         switch_output("parse_stats");
 #endif
-        play_match_results resultsi(iter_lexi->id, gs.user_parser.gsm);
-
-        success = parsertl::parse(iter_lexi, gs.user_parser.gsm, resultsi);
-        showDiffTime("parse input");
-        if (resultsi.entry.action == parsertl::action::error)
+        if(productions_count)
         {
-            parser_throw_error("parsing the input", iter_lexi, gs.input_data);
-        }
-#ifndef WASM_PLAYGROUND
-        else std::cout << "Parser input success: " << success << "\n";
-#endif
+            play_match_results resultsi(iter_lexi->id, gs.user_parser.gsm);
 
+            success = parsertl::parse(iter_lexi, gs.user_parser.gsm, resultsi);
+            showDiffTime("parse input");
+            if (resultsi.entry.action == parsertl::action::error)
+            {
+                parser_throw_error("parsing the input", iter_lexi, gs.input_data);
+            }
+#ifndef WASM_PLAYGROUND
+            else std::cout << "Parser input success: " << success << "\n";
+#endif
+        }
     }
     catch (const std::exception &e)
     {
