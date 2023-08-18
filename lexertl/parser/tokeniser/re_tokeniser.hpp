@@ -373,13 +373,11 @@ namespace lexertl
                         case 'i':
                             if (negate_)
                             {
-                                state_._flags = state_._flags &
-                                    ~*regex_flags::icase;
+                                state_._flags &= ~*regex_flags::icase;
                             }
                             else
                             {
-                                state_._flags = state_._flags |
-                                    *regex_flags::icase;
+                                state_._flags |= *regex_flags::icase;
                             }
 
                             negate_ = false;
@@ -387,7 +385,7 @@ namespace lexertl
                         case 's':
                             if (negate_)
                             {
-                                state_._flags = state_._flags |
+                                state_._flags |=
 #ifdef _WIN32
                                     *regex_flags::dot_not_cr_lf;
 #else
@@ -396,7 +394,7 @@ namespace lexertl
                             }
                             else
                             {
-                                state_._flags = state_._flags &
+                                state_._flags &=
 #ifdef _WIN32
                                     ~*regex_flags::dot_not_cr_lf;
 #else
@@ -409,13 +407,11 @@ namespace lexertl
                         case 'x':
                             if (negate_)
                             {
-                                state_._flags = state_._flags &
-                                    ~*regex_flags::skip_ws;
+                                state_._flags &= ~*regex_flags::skip_ws;
                             }
                             else
                             {
-                                state_._flags = state_._flags |
-                                    *regex_flags::skip_ws;
+                                state_._flags |= *regex_flags::skip_ws;
                             }
 
                             negate_ = false;
