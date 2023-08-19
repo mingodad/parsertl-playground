@@ -192,7 +192,7 @@ namespace parsertl
                 if (seen_.find(iter_->_lhs) == seen_.end())
                 {
                     auto lhs_iter_ = iter_;
-                    std::size_t index_ = lhs_iter_ - grammar_.begin();
+                    prod_size_t index_ = lhs_iter_ - grammar_.begin();
 
                     stream_ << symbols_[terminals_ + lhs_iter_->_lhs];
                     if(asEbnfRR)
@@ -210,7 +210,7 @@ namespace parsertl
                         static_cast<char_type>('\t') <<
                         static_cast<char_type>(' ');
 
-                    while (index_ != static_cast<std::size_t>(~0))
+                    while (index_ != static_cast<prod_size_t>(~0))
                         dump_production(grammar_, lhs_iter_, symbols_,
                             terminals_, index_, stream_, asEbnfRR);
 
@@ -230,7 +230,7 @@ namespace parsertl
         static void dump_production(const production_vector& grammar_,
             typename production_vector::const_iterator& lhs_iter_,
             const string_vector& symbols_, const std::size_t terminals_,
-            std::size_t& index_, ostream& stream_, bool asEbnfRR = false)
+            prod_size_t& index_, ostream& stream_, bool asEbnfRR = false)
         {
             if (lhs_iter_->_rhs.first.empty())
             {
@@ -268,7 +268,7 @@ namespace parsertl
 
             index_ = lhs_iter_->_next_lhs;
 
-            if (index_ != static_cast<std::size_t>(~0))
+            if (index_ != static_cast<prod_size_t>(~0))
             {
                 //const string& lhs_ =
                 //    symbols_[terminals_ + lhs_iter_->_lhs];
