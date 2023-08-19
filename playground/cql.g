@@ -1551,7 +1551,6 @@ FALSE	FALSE_
 CONST	CONST
 @FILE	AT_FILE
 @PROC	AT_PROC
-BLOBLIT	BLOBLIT
 RAISE	RAISE
 DISTINCT	DISTINCT
 @RC	AT_RC
@@ -1721,6 +1720,7 @@ COLLATE	COLLATE
 ([0-9]+\.[0-9]*|\.[0-9]+)([Ee](\+|\-)?[0-9]+)?	REALLIT
 [0-9]+	INTLIT
 [0-9]+L	LONGLIT
+X'([0-9a-fA-F][0-9a-fA-F])*'	BLOBLIT
 /* Order matter if identifier comes before keywords they are classified as identifier */
 [_a-zA-Z][a-zA-Z0-9_]*	ID
 
