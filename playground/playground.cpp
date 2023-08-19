@@ -1333,6 +1333,23 @@ extern "C" int main_playground(
 }
 
 #ifndef WASM_PLAYGROUND
+
+static void showHelp(const char* prog_name)
+{
+    std::cout << "usage: " << prog_name << " [options] grammar_fname input_fname\n"
+            "options can be:\n"
+            "-dumpil        Dump input lexer\n"
+            "-dumpiptree    Dump input parser tree\n"
+            "-dumpiptrace   Dump input parser trace\n"
+            "-dumpgl        Dump grammar lexer\n"
+            "-dumpgptree    Dump grammar parser tree\n"
+            "-dumpgptrace   Dump grammar parser trace\n"
+            "-dumpglsm      Dump grammar lexer state machine\n"
+            "-dumpgsm       Dump grammar parser state machine\n"
+            "-dumpAsEbnfRR  Dump grammar as EBNF for railroad diagram\n"
+            ;
+}
+
 int main(int argc, char *argv[])
 {
     GlobalState gs;
@@ -1344,11 +1361,72 @@ int main(int argc, char *argv[])
     //gs.dump_input_parse_trace = true;
     if(argc < 3)
     {
-        std::cout << "usage: " << argv[0] << " grammar_fname input_fname\n";
+        showHelp(argv[0]);
         return 1;
     }
-    const char* grammar_pathname = argv[1];
-    const char* input_pathname = argv[2];
+
+    int idx_argc = 1;
+    for (; idx_argc < argc; ++idx_argc)
+    {
+        const char* param = argv[idx_argc];
+
+        if (strcmp("-dumpgl", param) == 0)
+        {
+            gs.dump_grammar_lexer = true;
+        }
+        else if (strcmp("-dumpglsm", param) == 0)
+        {
+            gs.dump_grammar_lsm = true;
+        }
+        else if (strcmp("-dumpgsm", param) == 0)
+        {
+            gs.dump_grammar_gsm = true;
+        }
+        else if (strcmp("-dumpgptree", param) == 0)
+        {
+            gs.dump_grammar_parse_tree = true;
+        }
+        else if (strcmp("-dumpgptrace", param) == 0)
+        {
+            gs.dump_grammar_parse_trace = true;
+        }
+        else if (strcmp("-dumpil", param) == 0)
+        {
+            gs.dump_input_lexer = true;
+        }
+        else if (strcmp("-dumpiptree", param) == 0)
+        {
+            gs.dump_input_parse_tree = true;
+        }
+        else if (strcmp("-dumpiptrace", param) == 0)
+        {
+            gs.dump_input_parse_trace = true;
+        }
+        else if (strcmp("-dumpAsEbnfRR", param) == 0)
+        {
+            gs.dumpAsEbnfRR = true;
+        }
+        else if(param[0] == '-')
+        {
+            std::cout << "Unknown option: " << param << std::endl;
+            showHelp(argv[0]);
+            return 1;
+        }
+        else
+        {
+            //now the grammar and input file need be next
+            break;
+        }
+    }
+
+    if((argc - idx_argc) < 2)
+    {
+        showHelp(argv[0]);
+        return 1;
+    }
+
+    const char* grammar_pathname = argv[idx_argc];
+    const char* input_pathname = argv[idx_argc+1];
 
     showDiffTime("Starting");
     try
