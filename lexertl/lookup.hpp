@@ -445,7 +445,11 @@ namespace lexertl
                     (flags & +feature_bit::bol) != 0>());
                 results_.second = end_token_;
 
-                if (lu_state_._id == sm_.skip()) goto skip;
+                if (lu_state_._id == sm_.skip())
+                {
+                    saved_curr_ = curr_;
+                    goto skip;
+                }
                 if (lu_state_._id == sm_.reject())
                 {
                     curr_ = results_.second = results_.first = saved_curr_;
