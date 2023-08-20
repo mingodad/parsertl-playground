@@ -839,6 +839,7 @@ namespace lexertl
             const bool dot_ = *new_dfa_ == '.' && *(new_dfa_ + 1) == 0;
             const bool push_ = *new_dfa_ == '>';
             const rules_char_type* push_dfa_ = nullptr;
+            const rules_char_type* saved_curr_dfa_ = curr_dfa_;
             const bool pop_ = *new_dfa_ == '<';
 
             if (push_ || pop_)
@@ -961,6 +962,30 @@ namespace lexertl
                         throw runtime_error(ss_.str());
                     }
 
+                    auto found = std::find(next_dfas_.begin(), next_dfas_.end(), iter_->second);
+                    if(found != next_dfas_.end())
+                    {
+                        std::ostringstream ss_;
+
+                        ss_ << "Repeated state name '";
+                        curr_dfa_ = next_dfa_.c_str();
+                        narrow(curr_dfa_, ss_);
+                        ss_ << "'.";
+                        throw runtime_error(ss_.str());
+                    }
+
+                    //FIXME strcmp probably is not good for rules_char_type
+                    if (id_ == reject() && strcmp(next_dfa_.c_str(), new_dfa_) == 0)
+                    {
+                        std::ostringstream ss_;
+
+                        ss_ << "When 'reject()' is used the exit state '";
+                        narrow(new_dfa_, ss_);
+                        ss_ <<  "' should not be equal or in the start state '";
+                        narrow(saved_curr_dfa_, ss_);
+                        ss_ << "'.";
+                        throw runtime_error(ss_.str());
+                    }
                     next_dfas_.push_back(iter_->second);
                 }
             }
