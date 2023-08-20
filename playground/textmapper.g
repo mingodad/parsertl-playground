@@ -759,7 +759,6 @@ ID  [a-zA-Z_]([a-zA-Z_\-0-9]*[a-zA-Z_0-9])?|'(\\.|[^'\n\r\\])*'
 "["	LBRACK
 "]"	RBRACK
 "->"	MINUSGT
-"/"	DIV
 "(?="	LPARENQUESTASSIGN
 "!"	EXCL
 "."	DOT
