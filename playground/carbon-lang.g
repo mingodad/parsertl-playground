@@ -72,7 +72,7 @@
 %token NOT
 %token NOT_EQUAL
 %token OR
-%token OR_EQUAL
+//%token OR_EQUAL
 %token PACKAGE
 %token PERCENT
 %token PERCENT_EQUAL
@@ -104,7 +104,7 @@
 %token VIRTUAL
 %token WHERE
 %token WHILE
-%token FNARROW
+//%token FNARROW
 %token UNARY_STAR
 %token PREFIX_STAR
 %token POSTFIX_STAR
@@ -113,12 +113,12 @@
 %token ILLEGAL_CHARACTER
 
 /* Lexing a token immediately after consuming some whitespace. */
-%s AFTER_WHITESPACE
+%x AFTER_WHITESPACE
 /*
  * Lexing a token immediately after consuming an operand-ending token:
  * a closing bracket, identifier, or literal.
  */
-%s AFTER_OPERAND
+%x AFTER_OPERAND AFTER_OPERAND_BACKTRACK
 
 %start input
 
@@ -755,7 +755,7 @@ intrinsic_identifier  (Print|__intrinsic_[A-Za-z0-9_]*)
 sized_type_literal    [iuf][1-9][0-9]*
 integer_literal       [0-9]+
 horizontal_whitespace [ \t\r]
-whitespace            [ \t\r\n]
+whitespace            {horizontal_whitespace}|[\n]
 one_line_comment      \/\/[^\n]*\n
 operand_start         [(A-Za-z0-9_\"]
 
@@ -884,7 +884,9 @@ operand_start         [(A-Za-z0-9_\"]
  /* `*` operator case 1: */
 <AFTER_WHITESPACE>"*"{whitespace}+<.> BINARY_STAR
  /* `*` operator case 2: */
-<AFTER_OPERAND>"*"/{operand_start}<.>	BINARY_STAR
+/*<AFTER_OPERAND>"*"/{operand_start}<INITIAL>	BINARY_STAR*/
+<AFTER_OPERAND>"*"{operand_start}<AFTER_OPERAND_BACKTRACK>	reject()
+<AFTER_OPERAND_BACKTRACK>"*"<INITIAL>	BINARY_STAR
  /* `*` operator case 3: */
 <AFTER_WHITESPACE>"*"<.>	PREFIX_STAR
  /* `*` operator case 4: */
@@ -892,6 +894,9 @@ operand_start         [(A-Za-z0-9_\"]
 
  /* `*` operator case 5: */
 <INITIAL,AFTER_OPERAND>"*"<INITIAL>	UNARY_STAR
+
+/*Exit state*/
+<AFTER_WHITESPACE,AFTER_OPERAND>(?s:[^*])<INITIAL> reject()
 
 <INITIAL>{sized_type_literal}<AFTER_OPERAND>	sized_type_literal
 
@@ -901,14 +906,15 @@ operand_start         [(A-Za-z0-9_\"]
 
 <INITIAL>{integer_literal}<AFTER_OPERAND>	integer_literal
 
-#*\"
+/*#*\"*/
+\"(\\.|[^\"\r\n\\])*\" string_literal
 
-#*\'\'\'
+/*#*\'\'\'*/
+'''(\\.|[^'\\])+''' string_literal
 
 {one_line_comment}	skip()
 
-<INITIAL>{horizontal_whitespace}+<AFTER_WHITESPACE>
-<INITIAL>\n+<AFTER_WHITESPACE>
+<INITIAL>{whitespace}+<AFTER_WHITESPACE> skip()
 
 .	ILLEGAL_CHARACTER
 

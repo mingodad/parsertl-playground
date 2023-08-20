@@ -33,6 +33,7 @@ const sampleList = [
 	["GramGrep parser", "grammar.g", "calculator.g", "ace/mode/yaml"],
 	["Cql parser", "cql.g", "test.cql", "ace/mode/sql"],
 	["Postgresql parser (be patient)", "postgres16.g", "test.sql", "ace/mode/sql"],
+	["Carbon parser (need review of '*')", "carbon-lang.g", "prelude.carbon", "ace/mode/typescript"],
 	["Java11 parser", "java11.g", "test.java", "ace/mode/java"],
 	["Json parser", "json.g", "test.json.txt", "ace/mode/json"],
 	["Json5 parser", "json5.g", "test.json5.txt", "ace/mode/json"],
