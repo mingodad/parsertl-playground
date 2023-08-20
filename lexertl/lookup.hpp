@@ -381,10 +381,12 @@ namespace lexertl
             using id_type = typename sm_type::id_type;
             const auto& internals_ = sm_.data();
             auto end_token_ = results_.second;
-            auto saved_curr_ = results_.second;
             auto saved_bol_ = results_.bol;
         skip:
             auto curr_ = results_.second;
+            /* adjust saved_curr_ after skip to prevent infinty loop
+             * when using reject() */
+            auto saved_curr_ = results_.second;
 
             results_.first = curr_;
 
@@ -445,11 +447,7 @@ namespace lexertl
                     (flags & +feature_bit::bol) != 0>());
                 results_.second = end_token_;
 
-                if (lu_state_._id == sm_.skip())
-                {
-                    saved_curr_ = curr_;
-                    goto skip;
-                }
+                if (lu_state_._id == sm_.skip()) goto skip;
                 if (lu_state_._id == sm_.reject())
                 {
                     curr_ = results_.second = results_.first = saved_curr_;
