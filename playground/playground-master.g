@@ -1,7 +1,7 @@
 //Directives
 
 %token Charset ExitState Literal Macro MacroName Name NL
-%token Number Repeat StartState String Skip
+%token Number Repeat StartState String Skip Reject
 
 %x OPTION GRULE MACRO REGEX RULE ID
 
@@ -44,15 +44,29 @@ rx_macros : %empty ;
 rx_macros : rx_macros MacroName regex ;
 // Tokens
 rx_rules : %empty ;
+rx_rules: rx_rules regex ExitState ;
 rx_rules : rx_rules regex Number ;
+rx_rules : rx_rules StartState regex Number ;
+rx_rules : rx_rules regex ExitState Number ;
 rx_rules : rx_rules StartState regex ExitState Number ;
 rx_rules : rx_rules regex Literal ;
+rx_rules : rx_rules StartState regex Literal ;
+rx_rules : rx_rules regex ExitState Literal;
 rx_rules : rx_rules StartState regex ExitState Literal ;
 rx_rules : rx_rules regex Name ;
+rx_rules : rx_rules StartState regex Name ;
+rx_rules : rx_rules regex ExitState Name ;
 rx_rules : rx_rules StartState regex ExitState Name ;
 rx_rules : rx_rules regex Skip ;
+rx_rules : rx_rules StartState regex Skip ;
+rx_rules : rx_rules regex ExitState Skip ;
+rx_rules : rx_rules regex ExitState Reject ;
 rx_rules : rx_rules StartState regex ExitState Skip ;
+rx_rules : rx_rules StartState regex ExitState Reject ;
 rx_rules : rx_rules StartState regex ExitState ;
+rx_rules : rx_rules rx_group_start rx_group_end ;
+rx_group_start : StartState '{' ;
+rx_group_end : rx_rules '}' ;
 // Regex
 regex : rx | '^' rx | rx '$' | '^' rx '$' ;
 rx : sequence | rx '|' sequence ;
@@ -112,6 +126,8 @@ state_name [A-Z_a-z][0-9A-Z_a-z]*
 <REGEX>[ \t]+<.>	skip()
 <RULE>^[ \t]+({c_comment}([ \t]+|{c_comment})*)?<.>	skip()
 <RULE>^<([*]|{state_name}(,{state_name})*)><.>	StartState
+<RULE>[ \t]*\{<.> '{'
+<RULE>\}<.> '}'
 <REGEX,RULE>\^<.>	'^'
 <REGEX,RULE>\$<.>	'$'
 <REGEX,RULE>[|]<.>	'|'
@@ -133,5 +149,6 @@ state_name [A-Z_a-z][0-9A-Z_a-z]*
 <RULE><>{state_name}:{state_name}><ID>	ExitState
 <RULE,ID>\n|\r\n<RULE>	skip()
 <ID>skip\s*[(]\s*[)]<RULE>	Skip
+<ID>reject\s*[(]\s*[)]<RULE>	Reject
 
 %%

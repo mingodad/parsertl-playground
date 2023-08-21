@@ -910,43 +910,59 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     {
         const std::string regex = state.dollar(1);
         const std::string exit_state = state.dollar(2, 1, -1);
-        const token& token = state.dollar_token(3);
         
         const char* start_state = state.gs.group_State_str.empty()
                         ? initial_state_str : state.gs.group_State_str.c_str();
 
-        if(token.id == state.gs.token_Number)
+        switch(state.dollar_argc())
         {
-            state.gs.user_parser.lrules.push(start_state,
-                regex, static_cast<uint16_t>(atoi(token.str().c_str())),
-                exit_state.c_str());
-        }
-        else if(token.id == state.gs.token_Skip)
-        {
-            state.gs.user_parser.lrules.push(start_state,
-                regex, lexertl::rules::skip(),
-                exit_state.c_str());
-        }
-        else if(token.id == state.gs.token_Reject)
-        {
-            state.gs.user_parser.lrules.push(start_state,
-                regex, lexertl::rules::reject(),
-                exit_state.c_str());
-        }
-        else if(token.id == state.gs.token_Literal 
-                || token.id == state.gs.token_Name)
-        {
-            state.gs.user_parser.lrules.push(start_state,
-                regex, state.gs.user_parser.grules.token_id(token.str()),
-                exit_state.c_str());
-        }
-        else
-        {
-            throw std::runtime_error("Unexpected token id in rxrule");
+            case 4: /* with return value */
+            {
+                const token& token = state.dollar_token(3);
+                if(token.id == state.gs.token_Number)
+                {
+                    state.gs.user_parser.lrules.push(start_state,
+                        regex, static_cast<uint16_t>(atoi(token.str().c_str())),
+                        exit_state.c_str());
+                }
+                else if(token.id == state.gs.token_Skip)
+                {
+                    state.gs.user_parser.lrules.push(start_state,
+                        regex, lexertl::rules::skip(),
+                        exit_state.c_str());
+                }
+                else if(token.id == state.gs.token_Reject)
+                {
+                    state.gs.user_parser.lrules.push(start_state,
+                        regex, lexertl::rules::reject(),
+                        exit_state.c_str());
+                }
+                else if(token.id == state.gs.token_Literal
+                        || token.id == state.gs.token_Name)
+                {
+                    state.gs.user_parser.lrules.push(start_state,
+                        regex, state.gs.user_parser.grules.token_id(token.str()),
+                        exit_state.c_str());
+                }
+                else
+                {
+                    throw std::runtime_error("Unexpected token id in rxrule");
+                }
+            }
+            break;
+            case 3:/* no return value */
+                state.gs.user_parser.lrules.push(start_state, regex,
+                        exit_state.c_str());
+                break;
+            default:
+                    throw std::runtime_error("Unexpected number of productions in rxrule");
         }
     };
     
     grules.push("rx_rules", "%empty");
+    gs.master_parser.actions[grules.push("rx_rules",
+        "rx_rules regex ExitState")] =
+        regex_exit_state_token_action_token;
     gs.master_parser.actions[grules.push("rx_rules",
         "rx_rules regex Number")] =
         regex_token_action_token;
