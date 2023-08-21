@@ -529,17 +529,8 @@ namespace lexertl
                         const token& first_ = iter_->second[1];
                         const token& second_ =
                             iter_->second[iter_->second.size() - 2];
-                        const bool bol_ = tokens_.size() == 1 &&
-                            first_._type == detail::token_type::CHARSET &&
-                            first_._str.size() == 1 &&
-                            first_._str._ranges[0] ==
-                            typename token::string_token::range('^', '^');
-                        const bool eol_ = state_._end == regex_.c_str() +
-                            regex_.size() &&
-                            second_._type == detail::token_type::CHARSET &&
-                            second_._str.size() == 1 &&
-                            second_._str._ranges[0] ==
-                            typename token::string_token::range('$', '$');
+                        const bool bol_ = first_._type == detail::token_type::BOL;
+                        const bool eol_ = second_._type == detail::token_type::EOL;
 
                         if (diff_)
                         {
