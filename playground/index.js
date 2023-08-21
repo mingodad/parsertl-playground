@@ -44,8 +44,11 @@ const sampleList = [
 	["XML parser", "xml.g", "test.xml.txt", "ace/mode/xml"],
 	["Lua parser", "lua.g", "test.lua", "ace/mode/lua"],
 	["Lua-5.3 parser", "lua-5.3.g", "test.lua", "ace/mode/lua"],
+	["Lua2ljs parser", "lua2ljs.g", "test.lua", "ace/mode/lua"],
 	["JavascriptCore parser", "javascript-core.g", "test.js.txt", "ace/mode/javascript"],
 	["Ansi C parser", "cparser.g", "test.c", "ace/mode/c_cpp"],
+	["PnetC parser", "pnet-c.g", "test.c", "ace/mode/c_cpp"],
+	["PnetCSHarp parser", "pnet-cs.g", "test.cs", "ace/mode/c_cpp"],
 	["Rust parser", "rust.g", "test.rs.txt", "ace/mode/rust"], /*github send ext '.rs' as application/rls-services+xml */
 	["Ada parser", "ada-adayacc.g", "test.adb", "ace/mode/ada"],
 	["Souffle parser", "souffle.g", "test.souffle", "ace/mode/prolog"],
