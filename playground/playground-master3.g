@@ -133,6 +133,7 @@ state_name [A-Z_a-z][0-9A-Z_a-z]*
 
 <RULE,ID>[ \t]+({c_comment}([ \t]+|{c_comment})*)?<ID>	skip()
 <RULE><([.]|<|>?{state_name})><ID>	ExitState
+<RULE><>{state_name}:{state_name}><ID>	ExitState
 <RULE,ID>\n|\r\n<RULE>	skip()
 <ID>skip\s*[(]\s*[)]<RULE>	Skip
 <ID>reject\s*[(]\s*[)]<RULE>	Reject

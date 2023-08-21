@@ -36,6 +36,7 @@ const sampleList = [
 	["Carbon parser (need review of '*')", "carbon-lang.g", "prelude.carbon", "ace/mode/typescript"],
 	["Java11 parser", "java11.g", "test.java", "ace/mode/java"],
 	["Json parser", "json.g", "test.json.txt", "ace/mode/json"],
+	["Json lexer", "json-lexer.g", "test.json.txt", "ace/mode/json"],
 	["Json5 parser", "json5.g", "test.json5.txt", "ace/mode/json"],
 	["Ispc parser", "ispc.g", "test.ispc", "ace/mode/c_cpp"],
 	["Linden Script parser", "lsl_ext.g", "test.lsl", "ace/mode/text"],
@@ -72,6 +73,7 @@ const sampleList = [
 	["Preprocessor parser (not working)", "pp.g", "test.pp", "ace/mode/c_cpp"],
 	["Mulang parser (not working)", "mulang.g", "test.mulang", "ace/mode/text"],
 	["Braille parser (not working)", "braille.g", "test.braille", "ace/mode/text"],
+	["Minizinc parser (not working)", "minizinc.g", "test.mzn", "ace/mode/text"],
 ];
 
 function loadLalr_sample(self) {

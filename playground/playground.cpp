@@ -1163,6 +1163,8 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         lexertl::rules::skip(), "ID");
     lrules.push("RULE", "<([.]|<|>?{state_name})>",
         grules.token_id("ExitState"), "ID");
+    lrules.push("RULE", "<>{state_name}:{state_name}>",
+        grules.token_id("ExitState"), "ID");
     lrules.push("RULE,ID", "\n|\r\n", lexertl::rules::skip(), "RULE");
     lrules.push("ID", "skip\\s*[(]\\s*[)]", gs.token_Skip, "RULE");
     lrules.push("ID", "reject\\s*[(]\\s*[)]", gs.token_Reject, "RULE");

@@ -125,6 +125,7 @@ state_name [A-Z_a-z][0-9A-Z_a-z]*
 [ \t]*[{]<.>	'{'
 [}]<.>	'}'
 <([.]|<|>?{state_name})><ID>	ExitState
+<>{state_name}:{state_name}><ID>	ExitState
 }
 <REGEX>[ \t]+	skip()
 <REGEX,RULE> {
