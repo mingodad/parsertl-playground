@@ -48,6 +48,8 @@ const sampleList = [
 	["JavascriptCore parser", "javascript-core.g", "test.js.txt", "ace/mode/javascript"],
 	["Ansi C parser", "cparser.g", "test.c", "ace/mode/c_cpp"],
 	["PnetC parser", "pnet-c.g", "test.c", "ace/mode/c_cpp"],
+	["PnetJava parser", "pnet-java.g", "test.java", "ace/mode/java"],
+	["PnetVBasic parser", "pnet-vb.g", "test.vb", "ace/mode/vbscript"],
 	["PnetCSHarp parser", "pnet-cs.g", "test.cs", "ace/mode/c_cpp"],
 	["Rust parser", "rust.g", "test.rs.txt", "ace/mode/rust"], /*github send ext '.rs' as application/rls-services+xml */
 	["Ada parser", "ada-adayacc.g", "test.adb", "ace/mode/ada"],
