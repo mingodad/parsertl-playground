@@ -650,8 +650,6 @@ ERRCHAR
    ;
 */
 
-.	ILLEGAL_CHARACTHER
-
 /*
 //======================================================
 // Lexer modes
@@ -747,5 +745,8 @@ channels { OFF_CHANNEL , COMMENT }
 {ID}	TOKEN_REF
 {ID}	RULE_REF
 {LBrack}([^\]\\]|{EscAny})+{RBrack}	LEXER_CHAR_SET
+
+/* Order matter if ILLEGAL_CHARACTHER comes before identifier one letter identifer is classified as ILLEGAL_CHARACTHER */
+.	ILLEGAL_CHARACTHER
 
 %%
