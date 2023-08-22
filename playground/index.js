@@ -57,6 +57,7 @@ const sampleList = [
 	["Souffle parser", "souffle.g", "test.souffle", "ace/mode/prolog"],
 	["Chapel parser", "chapel.g", "test.chapel", "ace/mode/c_cpp"],
 	["Textmapper parser", "textmapper.g", "test.tm", "ace/mode/yaml"],
+	["Antlr4.5 parser", "antlr-v4.5.g", "test.antlr", "ace/mode/yaml"],
 	["HTML parser", "html-parser.g", "index.html", "ace/mode/html"],
 	["Lark parser", "lark.g", "test.lark", "ace/mode/yaml"],
 	["MSTA parser", "msta.g", "test.msta", "ace/mode/yaml"],
