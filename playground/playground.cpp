@@ -1104,6 +1104,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     lrules.insert_macro("posix", "\\[:{posix_name}:\\]");
     lrules.insert_macro("state_name", "[A-Z_a-z][0-9A-Z_a-z]*");
     lrules.insert_macro("NL", "\n|\r\n");
+    lrules.insert_macro("literal_common", "\\\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\\d+)");
 
     lrules.push("INITIAL,OPTION", "[ \t]+", lexertl::rules::skip(), ".");
     lrules.push("{NL}", grules.token_id("NL"));
@@ -1136,8 +1137,8 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     // Bison supports single line comments
     lrules.push("INITIAL,GRULE", "[/][/].*", lexertl::rules::skip(), ".");
     lrules.push("INITIAL,GRULE,ID",
-        "'(\\\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\\d+)|[^'\\\\])+'|"
-        "[\"](\\\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\\d+)|[^\"\\\\])+[\"]",
+        "'({literal_common}|[^'\\\\])+'|"
+        "[\"]({literal_common}|[^\"\\\\])+[\"]",
         grules.token_id("Literal"), ".");
     lrules.push("INITIAL,GRULE,ID", "[.A-Z_a-z][-.0-9A-Z_a-z]*",
         grules.token_id("Name"), ".");

@@ -89,6 +89,8 @@ posix \[:{posix_name}:\]
 state_name [A-Z_a-z][0-9A-Z_a-z]*
 NL  \n|\r\n
 
+literal_common	\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\d+)
+
 %%
 
 <INITIAL,OPTION>[ \t]+	skip()
@@ -127,7 +129,8 @@ NL  \n|\r\n
     "//".*	skip()
 }
 <INITIAL,GRULE,ID> {
-    '(\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\d+)|[^'\\])+'|["](\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\d+)|[^"\\])+["]	Literal
+    '({literal_common}|[^'\\])+'	Literal
+    ["]({literal_common}|[^"\\])+["]	Literal
     [.A-Z_a-z][-.0-9A-Z_a-z]*	Name
 }
 <ID>[1-9][0-9]*	Number

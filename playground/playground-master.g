@@ -88,6 +88,7 @@ posix_name alnum|alpha|blank|cntrl|digit|graph|lower|print|punct|space|upper|xdi
 posix \[:{posix_name}:\]
 state_name [A-Z_a-z][0-9A-Z_a-z]*
 NL  \n|\r\n
+literal_common	\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\d+)
 
 %%
 
@@ -121,7 +122,7 @@ NL  \n|\r\n
 <INITIAL,GRULE>{c_comment}	skip()
 /* Bison supports single line comments */
 <INITIAL,GRULE>"//".*	skip()
-<INITIAL,GRULE,ID>'(\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\d+)|[^'\\])+'|["](\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\d+)|[^"\\])+["]	Literal
+<INITIAL,GRULE,ID>'({literal_common}|[^'\\])+'|["]({literal_common}|[^"\\])+["]	Literal
 <INITIAL,GRULE,ID>[.A-Z_a-z][-.0-9A-Z_a-z]*	Name
 <ID>[1-9][0-9]*	Number
 
