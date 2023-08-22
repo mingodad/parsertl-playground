@@ -1097,15 +1097,16 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     lrules.push_state("REGEX");
     lrules.push_state("RULE");
     lrules.push_state("ID");
-    lrules.insert_macro("c_comment", "[/]{2}.*|[/][*](?s:.)*?[*][/]");
+    lrules.insert_macro("c_comment", "[/][*](?s:.)*?[*][/]");
     lrules.insert_macro("escape", "\\\\(.|x[0-9A-Fa-f]+|c[@a-zA-Z])");
     lrules.insert_macro("posix_name", "alnum|alpha|blank|cntrl|digit|graph|"
         "lower|print|punct|space|upper|xdigit");
     lrules.insert_macro("posix", "\\[:{posix_name}:\\]");
     lrules.insert_macro("state_name", "[A-Z_a-z][0-9A-Z_a-z]*");
+    lrules.insert_macro("NL", "\n|\r\n");
 
     lrules.push("INITIAL,OPTION", "[ \t]+", lexertl::rules::skip(), ".");
-    lrules.push("\n|\r\n", grules.token_id("NL"));
+    lrules.push("{NL}", grules.token_id("NL"));
     lrules.push("%left", grules.token_id("'%left'"));
     lrules.push("%nonassoc", grules.token_id("'%nonassoc'"));
     lrules.push("%precedence", grules.token_id("'%precedence'"));
@@ -1128,7 +1129,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     lrules.push("GRULE", "[+]", grules.token_id("'+'"), ".");
     lrules.push("GRULE", "[|]", grules.token_id("'|'"), ".");
     lrules.push("GRULE", ";", grules.token_id("';'"), ".");
-    lrules.push("GRULE", "[ \t]+|\n|\r\n", lexertl::rules::skip(), ".");
+    lrules.push("GRULE", "[ \t]+|{NL}", lexertl::rules::skip(), ".");
     lrules.push("GRULE", "%empty", grules.token_id("'%empty'"), ".");
     lrules.push("GRULE", "%%", grules.token_id("'%%'"), "MACRO");
     lrules.push("INITIAL,GRULE", "{c_comment}", lexertl::rules::skip(), ".");
@@ -1145,14 +1146,16 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     lrules.push("MACRO,RULE", "%%", grules.token_id("'%%'"), "RULE");
     lrules.push("MACRO", "[A-Z_a-z][0-9A-Z_a-z]*",
         grules.token_id("MacroName"), "REGEX");
-    lrules.push("MACRO,REGEX", "\n|\r\n", lexertl::rules::skip(), "MACRO");
+    lrules.push("MACRO,REGEX", "{NL}", lexertl::rules::skip(), "MACRO");
 
     lrules.push("MACRO,RULE", "{c_comment}",
         lexertl::rules::skip(), ".");
+    lrules.push("RULE", "^[ \t]+({c_comment}([ \t]+|{c_comment})*)?",
+        lexertl::rules::skip(), ".");
     lrules.push("RULE", "^<([*]|{state_name}(,{state_name})*)>",
         grules.token_id("StartState"), ".");
-    lrules.push("RULE", "[ \t]*\\{", grules.token_id("'{'"), ".");
-    lrules.push("RULE", "\\}", grules.token_id("'}'"), ".");
+    lrules.push("RULE", "[ \t]*[{]{NL}", grules.token_id("'{'"), ".");
+    lrules.push("RULE", "[}]{NL}", grules.token_id("'}'"), ".");
     lrules.push("REGEX", "[ \t]+", lexertl::rules::skip(), ".");
     lrules.push("REGEX,RULE", "\\^", grules.token_id("'^'"), ".");
     lrules.push("REGEX,RULE", "\\$", grules.token_id("'$'"), ".");
@@ -1166,7 +1169,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     lrules.push("REGEX,RULE", "[*][?]", grules.token_id("'*?'"), ".");
     lrules.push("REGEX,RULE", "[+]", grules.token_id("'+'"), ".");
     lrules.push("REGEX,RULE", "[+][?]", grules.token_id("'+?'"), ".");
-    lrules.push("REGEX,RULE", "{escape}|(\\[^?({escape}|{posix}|"
+    lrules.push("REGEX,RULE", "{escape}|(\\[\\^?({escape}|{posix}|"
         "[^\\\\\\]])*\\])|[^\\s]", grules.token_id("Charset"), ".");
     lrules.push("REGEX,RULE", "[{][A-Z_a-z][-0-9A-Z_a-z]*[}]",
         grules.token_id("Macro"), ".");
@@ -1181,7 +1184,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         grules.token_id("ExitState"), "ID");
     lrules.push("RULE", "<>{state_name}:{state_name}>",
         grules.token_id("ExitState"), "ID");
-    lrules.push("RULE,ID", "\n|\r\n", lexertl::rules::skip(), "RULE");
+    lrules.push("RULE,ID", "{NL}", lexertl::rules::skip(), "RULE");
     lrules.push("ID", "skip\\s*[(]\\s*[)]", gs.token_Skip, "RULE");
     lrules.push("ID", "reject\\s*[(]\\s*[)]", gs.token_Reject, "RULE");
     lexertl::generator::build(lrules, gs.master_parser.lsm);

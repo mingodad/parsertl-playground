@@ -29,7 +29,7 @@ const sampleList = [
 	//title, grammar, input, input ace syntax
 	["Calculator parser", "calculator.g", "test-calc.txt", "ace/mode/text"],
 	["Playground parser", "playground-master.g", "calculator.g", "ace/mode/yaml"],
-	["Playground3 parser", "playground-master3.g", "playground-master3.g.test", "ace/mode/yaml"],
+	["Playground3 parser", "playground-master3.g", "playground-master3.g", "ace/mode/yaml"],
 	["GramGrep parser", "grammar.g", "calculator.g", "ace/mode/yaml"],
 	["Cql parser", "cql.g", "test.cql", "ace/mode/sql"],
 	["Postgresql parser (be patient)", "postgres16.g", "test.sql", "ace/mode/sql"],
@@ -51,6 +51,7 @@ const sampleList = [
 	["PnetJava parser", "pnet-java.g", "test.java", "ace/mode/java"],
 	["PnetVBasic parser", "pnet-vb.g", "test.vb", "ace/mode/vbscript"],
 	["PnetCSHarp parser", "pnet-cs.g", "test.cs", "ace/mode/c_cpp"],
+	["PnetDPas parser", "pnet-dpas.g", "test.dpas", "ace/mode/pascal"],
 	["Rust parser", "rust.g", "test.rs.txt", "ace/mode/rust"], /*github send ext '.rs' as application/rls-services+xml */
 	["Ada parser", "ada-adayacc.g", "test.adb", "ace/mode/ada"],
 	["Souffle parser", "souffle.g", "test.souffle", "ace/mode/prolog"],
