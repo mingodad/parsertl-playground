@@ -968,7 +968,7 @@ _                  MZN_UNDERSCORE
 "any"              MZN_ANY
 "array"            MZN_ARRAY
 "bool"             MZN_BOOL
-//"case"             MZN_CASE
+/*"case"             MZN_CASE*/
 "constraint"       MZN_CONSTRAINT
 "default"          MZN_DEFAULT
 "div"              MZN_IDIV
@@ -1020,7 +1020,7 @@ _                  MZN_UNDERSCORE
 "union"            MZN_UNION
 "'union'"          MZN_UNION_QUOTED
 "var"              MZN_VAR
-//"variant_record"   MZN_VARIANT_RECORD
+/*"variant_record"   MZN_VARIANT_RECORD*/
 "where"            MZN_WHERE
 "xor"              MZN_XOR
 "'xor'"            MZN_XOR_QUOTED

@@ -205,7 +205,7 @@ STRINGDQ  \"(\\.|[^\"\n\r\\])*\"
 IDENTIFIER {L}({L}|{D})*
 
 COMMENT	"--"[^\n\r]*
-//comment : LONGCOMMENT ;
+/*comment : LONGCOMMENT ;*/
 
 %%
 
