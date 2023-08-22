@@ -305,16 +305,6 @@ static void dump_parse_tree(const char* data_start, const char* data_end,
             case parsertl::action::go_to:
                 break;
             case parsertl::action::accept:
-                for(;;) //do a hack cleanup
-                {
-                    ParseTreeUserData& ud = syn_tree.back();
-                    if(ud.children.size() == 0 && syn_tree.size() > 1)
-                    {
-                        syn_tree.pop_back();
-                        continue;
-                    }
-                    break;
-                }
                 parse_done = true;
                 break;
         }
@@ -324,7 +314,7 @@ static void dump_parse_tree(const char* data_start, const char* data_end,
 
     if (!syn_tree.empty())
     {
-        print_parsetree(syn_tree.back(), symbols, 0);
+        print_parsetree(syn_tree.front(), symbols, 0);
     }
 }
 
