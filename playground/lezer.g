@@ -8,11 +8,11 @@
 %precedence namespace
 %precedence call
 
-%start lezer
+%start Grammar
 
 %%
 
-lezer :
+Grammar :
 	declaration*
 	;
 
