@@ -140,6 +140,7 @@ literal_common	\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\d+)
 <MACRO,RULE> {
     "%%"<RULE>	'%%'
     {c_comment}	skip()
+    ^[ \t]+{c_comment}	skip()
 }
 
 <RULE> {

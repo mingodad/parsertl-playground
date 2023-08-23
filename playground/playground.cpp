@@ -1088,7 +1088,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     lrules.push_state("REGEX");
     lrules.push_state("RULE");
     lrules.push_state("ID");
-    lrules.insert_macro("c_comment", "[/][*](?s:.)*?[*][/]");
+    lrules.insert_macro("c_comment", "[/]{2}.*|[/][*](?s:.)*?[*][/]");
     lrules.insert_macro("escape", "\\\\(.|x[0-9A-Fa-f]+|c[@a-zA-Z])");
     lrules.insert_macro("posix_name", "alnum|alpha|blank|cntrl|digit|graph|"
         "lower|print|punct|space|upper|xdigit");
@@ -1141,6 +1141,8 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     lrules.push("MACRO,REGEX", "{NL}", lexertl::rules::skip(), "MACRO");
 
     lrules.push("MACRO,RULE", "{c_comment}",
+        lexertl::rules::skip(), ".");
+    lrules.push("MACRO,RULE", "^[ \t]+{c_comment}",
         lexertl::rules::skip(), ".");
     lrules.push("RULE", "^[ \t]+({c_comment}([ \t]+|{c_comment})*)?",
         lexertl::rules::skip(), ".");
