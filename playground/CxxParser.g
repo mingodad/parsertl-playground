@@ -1,5 +1,23 @@
 //From: http://www.computing.surrey.ac.uk/research/dsrg/fog/v/CxxGrammar.y
 
+/* This is a yacc-able parser for the entire ISO C++ grammar with no unresolved conflicts. */
+/* The parse is SYNTACTICALLY consistent and requires no template or type name assistance.
+ * The grammar in the C++ standard notes that its grammar is a superset of the true
+ * grammar requiring semantic constraints to resolve ambiguities. This grammar is a really big
+ * superset unifying expressions and declarations, eliminating the type/non-type distinction,
+ * and iterating to find a consistent solution to the template/arith,metoic < ambiguity.
+ * As a result the grammar is much simpler, but requires the missing semantic constraints to be
+ * performed in a subsequent semantic pass, which is of course where they belong. This grammar will
+ * support conversion of C++ tokens into an Abstract Syntax Tree. A lot of further work is required to
+ * make that tree useful.
+ *
+ * The principles behind this grammar are described in my thesis on Meta-Compilation for C++, which
+ * may be found via http://www.computing.surrey.ac.uk/research/dsrg/fog/FogThesis.html.
+ *
+ *  Author:         E.D.Willink             Ed.Willink@rrl.co.uk
+ *  Date:           15-Jun-2001
+ */
+
 /*Tokens*/
 %token '+'
 %token '-'
@@ -524,8 +542,8 @@ looping_statement :
 
 looped_statement :
 	statement
-	| advance_search '+' /*2N*/ looped_statement
-	| advance_search '-' /*2N*/
+	//| advance_search '+' /*2N*/ looped_statement
+	//| advance_search '-' /*2N*/
 	;
 
 statement :
@@ -612,8 +630,8 @@ looping_declaration :
 
 looped_declaration :
 	declaration
-	| advance_search '+' /*2N*/ looped_declaration
-	| advance_search '-' /*2N*/
+	//| advance_search '+' /*2N*/ looped_declaration
+	//| advance_search '-' /*2N*/
 	;
 
 declaration :
@@ -1039,8 +1057,8 @@ looping_initializer_clause :
 
 looped_initializer_clause :
 	initializer_clause
-	| advance_search '+' /*2N*/ looped_initializer_clause
-	| advance_search '-' /*2N*/
+	//| advance_search '+' /*2N*/ looped_initializer_clause
+	//| advance_search '-' /*2N*/
 	;
 
 colon_mark :
@@ -1082,8 +1100,8 @@ looping_member_declaration :
 
 looped_member_declaration :
 	member_declaration
-	| advance_search '+' /*2N*/ looped_member_declaration
-	| advance_search '-' /*2N*/
+	//| advance_search '+' /*2N*/ looped_member_declaration
+	//| advance_search '-' /*2N*/
 	;
 
 member_declaration :
@@ -1321,9 +1339,9 @@ type_id_list :
 	| type_id_list ',' type_id
 	;
 
-advance_search :
+//advance_search :
 	//error
-	;
+//	;
 
 //bang :
 //	/*empty*/
@@ -1350,6 +1368,20 @@ util :
 	;
 
 %%
+
+/*
+ *	  Title:			Miniature lexer for C++ parser.
+ *
+ *	  File Name:		CxxLexer.l
+ *
+ *	  Author:			E.D.Willink
+ *
+ *	This is a complete lexer for C++, intended for use with CxxParser.y.
+ *	All actions are done by macros, so that there is some chance that customisation
+ *	can be performed within the bounds of the CxxLexing.hxx and CxxLexing.cxx
+ *	include files.
+ *END
+ */
 
 ws								[ \f\v\t]
 
