@@ -1,0 +1,14 @@
+@precedence { times @left, plus @left }
+
+@top Program { expression }
+
+expression { Number | BinaryExpression }
+
+BinaryExpression {
+  expression !times "*" expression |
+  expression !plus "+" expression
+}
+
+@tokens {
+  Number { @digit+ }
+}

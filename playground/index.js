@@ -70,6 +70,7 @@ const sampleList = [
 	["Openscad parser (partially working)", "openscad.g", "test.openscad", "ace/mode/text"],
 	["LuaPP parser (partially working)", "luapp.g", "test.luapp", "ace/mode/lua"],
 	["Bison parser (partially working)", "bison.g", "carbon-lang.y", "ace/mode/yaml"],
+	["Lezer parser (partially working)", "lezer.g", "expression.lezer", "ace/mode/yaml"],
 	["Blawn parser", "blawn-parser.g", "test.blawn", "ace/mode/python"],
 	["Tameparse parser (not working)", "tameparser.g", "test.tameparser", "ace/mode/yaml"],
 	["LPython parser (not working)", "lpython.g", "test.python", "ace/mode/python"],
