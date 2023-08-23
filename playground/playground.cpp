@@ -332,7 +332,8 @@ static void dump_parse_trace(const char* data_start, const char* data_end,
     play_iterator iter_lex(data_start, data_end, lsm);
     play_match_results results(iter_lex->id, gsm);
     bool parse_done=false;
-    std::cout << "== action | param:stack.size | data\n";
+    std::cout << "*  action | param:stack.size | data\n";
+    std::cout << "-----------------------------------\n";
     for(;;)
     {
         const auto& sm_entry = results.entry;
@@ -348,7 +349,7 @@ static void dump_parse_trace(const char* data_start, const char* data_end,
             case parsertl::action::shift:
             {
                 const std::string str(iter_lex->first, iter_lex->second);
-                std::cout << "shift " << sm_entry.param << ":" <<
+                std::cout << "\n<- shift " << sm_entry.param << ":" <<
                         results.stack.size() << " <- " << 
                         (str == "\n" ? "\\n" : str) << '\n';
                 break;
@@ -358,7 +359,7 @@ static void dump_parse_trace(const char* data_start, const char* data_end,
                 const parsertl::state_machine::id_type_vector_pair &idv_pair =
                     gsm._rules[sm_entry.param];
 
-                std::cout << "reduce " << sm_entry.param << ":" <<
+                std::cout << "-> reduce " << sm_entry.param << ":" <<
                         results.stack.size() << " by " << 
                         symbols[idv_pair.first] << " ->";
 
@@ -379,11 +380,11 @@ static void dump_parse_trace(const char* data_start, const char* data_end,
                 break;
             }
             case parsertl::action::go_to:
-                std::cout << "goto " << sm_entry.param << ":" <<
+                std::cout << "=> goto " << sm_entry.param << ":" <<
                         results.stack.size() << '\n';
                 break;
             case parsertl::action::accept:
-                std::cout << "accept " << sm_entry.param << ":" <<
+                std::cout << "<> accept " << sm_entry.param << ":" <<
                         results.stack.size() << "\n";
                 parse_done = true;
                 break;
