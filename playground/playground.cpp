@@ -781,28 +781,28 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         [](BuildUserParser& state)
     {
         const std::string regex = state.dollar(1);
-        const token& token = state.dollar_token(2);
+        const token& rc_token = state.dollar_token(2);
         
         const char* start_state = state.gs.group_State_str.empty()
                         ? initial_state_str : state.gs.group_State_str.c_str();
 
-        if(token.id == state.gs.token_Number)
+        if(rc_token.id == state.gs.token_Number)
         {
             state.gs.user_parser.lrules.push(start_state,
-                regex, static_cast<uint16_t>(atoi(token.str().c_str())),
+                regex, static_cast<uint16_t>(atoi(rc_token.str().c_str())),
                 current_state_str);
         }
-        else if(token.id == state.gs.token_Skip)
+        else if(rc_token.id == state.gs.token_Skip)
         {
             state.gs.user_parser.lrules.push(start_state,
                 regex, lexertl::rules::skip(),
                 current_state_str);
         }
-        else if(token.id == state.gs.token_Literal 
-                || token.id == state.gs.token_Name)
+        else if(rc_token.id == state.gs.token_Literal
+                || rc_token.id == state.gs.token_Name)
         {
             state.gs.user_parser.lrules.push(start_state,
-                regex, state.gs.user_parser.grules.token_id(token.str()),
+                regex, state.gs.user_parser.grules.token_id(rc_token.str()),
                 current_state_str);
         }
         else
@@ -822,31 +822,31 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         {
             case 5: /* with return value */
             {
-                const token& token = state.dollar_token(4);
+                const token& rc_token = state.dollar_token(4);
 
-                if(token.id == state.gs.token_Number)
+                if(rc_token.id == state.gs.token_Number)
                 {
                     state.gs.user_parser.lrules.push(start_state.c_str(),
-                        regex, static_cast<uint16_t>(atoi(token.str().c_str())),
+                        regex, static_cast<uint16_t>(atoi(rc_token.str().c_str())),
                         exit_state.c_str());
                 }
-                else if(token.id == state.gs.token_Skip)
+                else if(rc_token.id == state.gs.token_Skip)
                 {
                     state.gs.user_parser.lrules.push(start_state.c_str(),
                         regex, lexertl::rules::skip(),
                         exit_state.c_str());
                 }
-                else if(token.id == state.gs.token_Reject)
+                else if(rc_token.id == state.gs.token_Reject)
                 {
                     state.gs.user_parser.lrules.push(start_state.c_str(),
                         regex, lexertl::rules::reject(),
                         exit_state.c_str());
                 }
-                else if(token.id == state.gs.token_Literal 
-                        || token.id == state.gs.token_Name)
+                else if(rc_token.id == state.gs.token_Literal
+                        || rc_token.id == state.gs.token_Name)
                 {
                     state.gs.user_parser.lrules.push(start_state.c_str(),
-                        regex, state.gs.user_parser.grules.token_id(token.str()),
+                        regex, state.gs.user_parser.grules.token_id(rc_token.str()),
                         exit_state.c_str());
                 }
                 else
@@ -869,25 +869,25 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     {
         const std::string start_state = state.dollar(1, 1, -1);
         const std::string regex = state.dollar(2);
-        const token& token = state.dollar_token(3);
+        const token& rc_token = state.dollar_token(3);
 
-        if(token.id == state.gs.token_Number)
+        if(rc_token.id == state.gs.token_Number)
         {
             state.gs.user_parser.lrules.push(start_state.c_str(),
-                regex, static_cast<uint16_t>(atoi(token.str().c_str())),
+                regex, static_cast<uint16_t>(atoi(rc_token.str().c_str())),
                 current_state_str);
         }
-        else if(token.id == state.gs.token_Skip)
+        else if(rc_token.id == state.gs.token_Skip)
         {
             state.gs.user_parser.lrules.push(start_state.c_str(),
                 regex, lexertl::rules::skip(),
                 current_state_str);
         }
-        else if(token.id == state.gs.token_Literal 
-                || token.id == state.gs.token_Name)
+        else if(rc_token.id == state.gs.token_Literal
+                || rc_token.id == state.gs.token_Name)
         {
             state.gs.user_parser.lrules.push(start_state.c_str(),
-                regex, state.gs.user_parser.grules.token_id(token.str()),
+                regex, state.gs.user_parser.grules.token_id(rc_token.str()),
                 current_state_str);
         }
         else
@@ -909,30 +909,30 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         {
             case 4: /* with return value */
             {
-                const token& token = state.dollar_token(3);
-                if(token.id == state.gs.token_Number)
+                const token& rc_token = state.dollar_token(3);
+                if(rc_token.id == state.gs.token_Number)
                 {
                     state.gs.user_parser.lrules.push(start_state,
-                        regex, static_cast<uint16_t>(atoi(token.str().c_str())),
+                        regex, static_cast<uint16_t>(atoi(rc_token.str().c_str())),
                         exit_state.c_str());
                 }
-                else if(token.id == state.gs.token_Skip)
+                else if(rc_token.id == state.gs.token_Skip)
                 {
                     state.gs.user_parser.lrules.push(start_state,
                         regex, lexertl::rules::skip(),
                         exit_state.c_str());
                 }
-                else if(token.id == state.gs.token_Reject)
+                else if(rc_token.id == state.gs.token_Reject)
                 {
                     state.gs.user_parser.lrules.push(start_state,
                         regex, lexertl::rules::reject(),
                         exit_state.c_str());
                 }
-                else if(token.id == state.gs.token_Literal
-                        || token.id == state.gs.token_Name)
+                else if(rc_token.id == state.gs.token_Literal
+                        || rc_token.id == state.gs.token_Name)
                 {
                     state.gs.user_parser.lrules.push(start_state,
-                        regex, state.gs.user_parser.grules.token_id(token.str()),
+                        regex, state.gs.user_parser.grules.token_id(rc_token.str()),
                         exit_state.c_str());
                 }
                 else
