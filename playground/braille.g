@@ -19,7 +19,7 @@ ther in a spirit of brotherhood.
 // exclusive start conditions
 %x letters numbers
 
-%token ILLEGAL_CHARACTHER
+%token ILLEGAL_CHARACTER
 
 %token "a"
 %token "b"
@@ -521,6 +521,6 @@ la [\u{2800} \t\n\r⠖⠦⠶⠴⠄⠤]
 /* OTHER BRAILLE LIGATURES */
 /*<*>\p{Braille}<.>     emit(text());*/
 
-<*>.<.>            ILLEGAL_CHARACTHER
+<*>.<.>            ILLEGAL_CHARACTER
 
 %%

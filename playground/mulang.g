@@ -1,6 +1,6 @@
 //From: https://github.com/AcademySoftwareFoundation/OpenRV/blob/main/src/lib/mu/MuLang/Grammar.y
 
-%token ILLEGAL_CHARACTHER
+%token ILLEGAL_CHARACTER
 
 %x COMMENT
 %x STRING
@@ -969,6 +969,6 @@ BOM                     \xef\xbb\xbf
 
 {Identifier}		MU_IDENTIFIER
 
-.			ILLEGAL_CHARACTHER
+.			ILLEGAL_CHARACTER
 
 %%

@@ -1,6 +1,6 @@
 //From: https://github.com/luapp-org/luapp/blob/master/src/compiler/src/lexer.l
 
-%token ILLEGAL_CHARACTHER
+%token ILLEGAL_CHARACTER
 
 %x LCOMMENT
 %x COMMENT
@@ -416,6 +416,6 @@ lstring         \[\[(.*?|\n|\r)\]\]
 
 {newline}           skip()
 {ws}                skip()
-.                   ILLEGAL_CHARACTHER
+.                   ILLEGAL_CHARACTER
 
 %%

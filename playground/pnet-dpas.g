@@ -20,7 +20,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-%token ILLEGAL_CHARACTHER
+%token ILLEGAL_CHARACTER
 
 /*Tokens*/
 %token IDENTIFIER
@@ -674,6 +674,6 @@ WHITE					[ \t\v\r\f]
 "{".*?"}"								skip()
 "(*"(?s:.)*?"*)"							skip()
 
-.								ILLEGAL_CHARACTHER
+.								ILLEGAL_CHARACTER
 
 %%

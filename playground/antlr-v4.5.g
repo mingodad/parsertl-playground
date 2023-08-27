@@ -42,7 +42,7 @@
 
 //options { tokenVocab = ANTLRv4Lexer; }
 
-%token ILLEGAL_CHARACTHER
+%token ILLEGAL_CHARACTER
 %token INT STRING_LITERAL RBRACE SEMI ASSIGN DOT
 %token BEGIN_ACTION BEGIN_ARGUMENT STRING_LITERAL
 %token TOKENS OPTIONS CHANNELS IMPORT FRAGMENT LEXER
@@ -746,7 +746,7 @@ channels { OFF_CHANNEL , COMMENT }
 {ID}	RULE_REF
 {LBrack}([^\]\\]|{EscAny})+{RBrack}	LEXER_CHAR_SET
 
-/* Order matter if ILLEGAL_CHARACTHER comes before identifier one letter identifer is classified as ILLEGAL_CHARACTHER */
-.	ILLEGAL_CHARACTHER
+/* Order matter if ILLEGAL_CHARACTER comes before identifier one letter identifer is classified as ILLEGAL_CHARACTER */
+.	ILLEGAL_CHARACTER
 
 %%

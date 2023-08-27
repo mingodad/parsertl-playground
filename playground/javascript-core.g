@@ -85,7 +85,7 @@
 %token '='
 %token ';'
 
-%token ILLEGAL_CHARACTHER
+%token ILLEGAL_CHARACTER
 
 %nonassoc /*1*/ IF_WITHOUT_ELSE
 %nonassoc /*2*/ ELSE
@@ -1179,6 +1179,6 @@ C_STYLE_COMMENT [/][*](?s:.)*?[*][/]
 0[xX][a-fA-F0-9]+|[0-9]+([Ee][+-]?[0-9]+)?|[0-9]*\.[0-9]+([Ee][+-]?[0-9]+)?	NUMBER
 \"(\\.|[^\"\n\r\\])*\"|'(\\.|[^'\n\r\\])*'	STRING
 
-.	ILLEGAL_CHARACTHER
+.	ILLEGAL_CHARACTER
 
 %%

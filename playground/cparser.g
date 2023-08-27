@@ -83,7 +83,7 @@
 %token '{'
 %token '}'
 
-%token ILLEGAL_CHARACTHER
+%token ILLEGAL_CHARACTER
 
 %start translation_unit
 
@@ -543,7 +543,7 @@ C_STYLE_COMMENT [/][*](?s:.)*?[*][/]
 '([^'\n]|\\[^\n])'|0[xX][a-fA-F0-9]+|[0-9]+([Ee][+-]?[0-9]+)?|[0-9]*\\.[0-9]+([Ee][+-]?[0-9]+)?	CONSTANT
 \"([^\"\n]|\\[^\n])*\"	STRING_LITERAL
 
-.	ILLEGAL_CHARACTHER
+.	ILLEGAL_CHARACTER
 
 %%
 

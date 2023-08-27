@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
- %token ILLEGAL_CHARACTHER
+ %token ILLEGAL_CHARACTER
 
 /*Tokens*/
 %token IDENTIFIER
@@ -1489,6 +1489,6 @@ DECIMAL_CONSTANT	DECIMAL_CONSTANT
 '.*\n? skip()
 #.*\n?  skip()
 
-.								ILLEGAL_CHARACTHER
+.								ILLEGAL_CHARACTER
 
 %%

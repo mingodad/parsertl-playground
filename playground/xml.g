@@ -1,5 +1,5 @@
 %token name value
-%token ILLEGALL_CHARACTHER
+%token ILLEGAL_CHARACTER
 
 %left '<' '>'
 %left name
@@ -32,6 +32,6 @@ whitespace	[ \t\r\n]+
 "</"	'</'
 =	'='
 
-.	ILLEGALL_CHARACTHER
+.	ILLEGAL_CHARACTER
 
 %%

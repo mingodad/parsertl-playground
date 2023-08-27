@@ -128,7 +128,7 @@
 %token '~'
 %token '$'
 
-%token ILLEGAL_CHARACTHER
+%token ILLEGAL_CHARACTER
 
 %precedence /*1*/ PRECLOW
 %precedence /*2*/ LAMBDA
@@ -1887,7 +1887,7 @@ LIT_STR_RAW	LIT_STR_RAW
 LIT_BYTE_STR	LIT_BYTE_STR
 LIT_BYTE_STR_RAW	LIT_BYTE_STR_RAW
 
-.	ILLEGAL_CHARACTHER
+.	ILLEGAL_CHARACTER
 
 //
 // TODO: parse generic parameter that end in ">>"

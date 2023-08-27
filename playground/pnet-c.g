@@ -18,7 +18,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
- %token ILLEGAL_CHARACTHER
+ %token ILLEGAL_CHARACTER
 
 /*Tokens*/
 %token IDENTIFIER
@@ -1008,7 +1008,6 @@ L'(\\.|[^\\'])+'				INTEGER_CONSTANT
 
 l'(\\.|[^\\'])+'				INTEGER_CONSTANT
 
-{IDALPHA}({DIGIT}|{IDALPHA})*	IDENTIFIER
 TYPE_NAME	TYPE_NAME
 NAMESPACE_NAME	NAMESPACE_NAME
 			/* Use the scope to determine if this is a typedef'ed name */
@@ -1027,6 +1026,7 @@ NAMESPACE_NAME	NAMESPACE_NAME
 				RETURNTOK(IDENTIFIER);
 			}
 */
+{IDALPHA}({DIGIT}|{IDALPHA})*	IDENTIFIER
 
 {DIGIT}+{EXPONENT}{FTYPE}?		FLOAT_CONSTANT
 {DIGIT}*"."{DIGIT}+({EXPONENT})?{FTYPE}?	FLOAT_CONSTANT
@@ -1069,6 +1069,6 @@ NAMESPACE_NAME	NAMESPACE_NAME
 "{"	'{'
 "}"	'}'
 
-.								ILLEGAL_CHARACTHER
+.								ILLEGAL_CHARACTER
 
 %%

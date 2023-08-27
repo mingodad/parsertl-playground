@@ -1,6 +1,6 @@
 //From: https://github.com/MiniZinc/libminizinc/blob/master/lib/parser.yxx
 
-%token ILLEGAL_CHARACTHER
+%token ILLEGAL_CHARACTER
 
 %x string
 %x string_quote
@@ -1129,6 +1129,6 @@ _?[A-Za-z][A-Za-z0-9_]*  MZN_IDENTIFIER
 
 `[A-Za-z][A-Za-z0-9_]*`  MZN_QUOTED_IDENTIFIER
 
-.                 ILLEGAL_CHARACTHER
+.                 ILLEGAL_CHARACTER
 
 %%

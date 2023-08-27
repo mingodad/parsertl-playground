@@ -53,7 +53,7 @@
 %x      ModuleName
 %x      ModuleImport
 
-%token ILLEGAL_CHARACTHER
+%token ILLEGAL_CHARACTER
 
 %%
 %%
@@ -404,6 +404,6 @@ ENDQopt ("const"|"volatile"|"sealed"|"override")({BN}+("const"|"volatile"|"seale
 <*>")"|"]"<.>                              //yyextra->theCallContext.popScope(yyextra->name, yyextra->type);
 <*>\n                                   skip()
 <*>[\x80-\xFF]*<.> // keep utf8 characters together...
-<*>.                                    ILLEGAL_CHARACTHER
+<*>.                                    ILLEGAL_CHARACTER
 
 %%

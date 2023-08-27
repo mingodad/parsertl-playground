@@ -21,7 +21,7 @@
 
  %x COMMENT
 
- %token ILLEGAL_CHARACTHER
+ %token ILLEGAL_CHARACTER
 
 /*Tokens*/
 %token INTEGER_LITERAL
@@ -962,6 +962,6 @@ WHITE			[ \t\r\f\v\032]
 
 \n					skip()
 
-.					ILLEGAL_CHARACTHER
+.					ILLEGAL_CHARACTER
 
 %%

@@ -4,7 +4,7 @@
 // Derived from http://json.org
 //grammar JSON;
 
-%token STRING NUMBER ILLEGAL_CHARACTHER
+%token STRING NUMBER ILLEGAL_CHARACTER
 
 %%
 
@@ -46,6 +46,6 @@ true	'true'
 false	'false'
 null	'null'
 
-.	ILLEGAL_CHARACTHER
+.	ILLEGAL_CHARACTER
 
 %%

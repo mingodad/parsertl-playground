@@ -180,7 +180,7 @@
 %token TUMINUS
 %token TLNOT
 
-%token ILLEGAL_CHARACTHER
+%token ILLEGAL_CHARACTER
 
 %left /*1*/ TNOELSE
 %left /*2*/ TELSE TTHROWS
@@ -1761,6 +1761,6 @@ c{sq_string}             CSTRINGLITERAL
 \n               skip()
 
 [ \t\r\f]        skip()
-.                ILLEGAL_CHARACTHER
+.                ILLEGAL_CHARACTER
 
 %%

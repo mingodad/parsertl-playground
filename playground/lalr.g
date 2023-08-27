@@ -2,7 +2,7 @@
 //%error_recovery_show;
 
 %token match_identifier match_literal match_regex match_error
-%token ILLEGAL_CHARACTHER
+%token ILLEGAL_CHARACTER
 
 %%
 
@@ -140,6 +140,6 @@ C_STYLE_COMMENT [/][*](?s:.)*?[*][/]
 '(\\.|[^'\n\r\\])+'	match_literal
 \"(\\.|[^\"\n\r\\])+\"	match_regex
 
-.	ILLEGAL_CHARACTHER
+.	ILLEGAL_CHARACTER
 
 %%

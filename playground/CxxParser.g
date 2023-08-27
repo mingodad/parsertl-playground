@@ -147,7 +147,7 @@
 %token REDUCE_HERE_MOSTLY
 //%token '#'
 
-%token ILLEGAL_CHARACTHER
+%token ILLEGAL_CHARACTER
 
 %nonassoc /*1*/ SHIFT_THERE
 %nonassoc /*2*/ '+' '-' '*' '&' '<' ':' '[' '{' DEC INC SCOPE ELSE StringLiteral
@@ -1425,10 +1425,9 @@ float           {float1}|{float2}|{float3}
 
 %%
 
-"//"[^\n\r]*             skip()
-"/*"(?s:.)*?"*/"             skip()
-/*"//".*    skip()*/ /* Line comment */
-/*^.*\n							{ LEX_SAVE_LINE(yytext, yyleng); REJECT; }*/
+\n|\r|{ws}+						skip() /* Throw away whitespace */
+"//".*                          skip()	/* Line comment */
+"/*"(?s:.)*?"*/"                skip()
 ^{ws}*"#".*						skip() /* Throw away preprocessor lines - hopefully only #line and equivalent. */
 
 {character_lit}	CharacterLiteral
@@ -1564,16 +1563,13 @@ float           {float1}|{float2}|{float3}
 ";"	';'
 ","	','
 
-/*{pp_number}	NumberLiteral					{ LEX_NUMBER_TOKEN(yytext, yyleng); }*/
+{float}	                        FloatingLiteral
+{integer_s}	                    IntegerLiteral
 
-{float}	FloatingLiteral
-{integer_s}	IntegerLiteral
+{identifier}	                Identifier
 
-{identifier}	Identifier				/*{ LEX_IDENTIFIER_TOKEN(yytext, yyleng); }*/
+{escape_sequence}|{universal_character_name}		CharacterLiteral
 
-/*{escape_sequence}|{universal_character_name}		{ LEX_ESCAPED_TOKEN(yytext, yyleng); }*/
-
-\n|\r|{ws}+							skip() /* Throw away whitespace */
-.								ILLEGAL_CHARACTHER
+.								ILLEGAL_CHARACTER
 
 %%

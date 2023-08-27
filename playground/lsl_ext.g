@@ -80,7 +80,7 @@
 %token '.'
 %token ']'
 
-%token ILLEGAL_CHARACTHER
+%token ILLEGAL_CHARACTER
 
 %nonassoc /*1*/ LOWER_THAN_ELSE
 %nonassoc /*2*/ ELSE
@@ -442,7 +442,7 @@ C_STYLE_COMMENT [/][*](?s:.)*?[*][/]
 ([0-9]+\.[0-9]*|\.[0-9]+)([Ee](\+|\-)?[0-9]+)?	FLOAT_CONSTANT
 \"(\\.|[^\"\n\r\\])*\"	STRING_CONSTANT
 
-.	ILLEGAL_CHARACTHER
+.	ILLEGAL_CHARACTER
 
 %%
 

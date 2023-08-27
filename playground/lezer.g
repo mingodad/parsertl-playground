@@ -1,4 +1,4 @@
-%token ILLEGAL_CHARACTHER
+%token ILLEGAL_CHARACTER
 
 %token name AtName Literal CharSet InvertedCharSet AnyChar
 
@@ -311,6 +311,6 @@ InvertedCharSet "!["([^\\\]]|\\.)*"]"
 
 {name}  name
 
-.	ILLEGAL_CHARACTHER
+.	ILLEGAL_CHARACTER
 
 %%

@@ -56,7 +56,7 @@
 %token '{'
 %token '}'
 
-%token ILLEGAL_CHARACTHER
+%token ILLEGAL_CHARACTER
 
 //declared to eliminate/silence the 2 shift reduce conflicts
 %right '('
@@ -397,6 +397,6 @@ while	WHILE
 \"(\\.|[^\"\n\r\\])*\"|'(\\.|[^'\n\r\\])*'	STRING
 "--@"	SPECIAL
 
-.	ILLEGAL_CHARACTHER
+.	ILLEGAL_CHARACTER
 
 %%
