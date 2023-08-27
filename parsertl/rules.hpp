@@ -46,7 +46,7 @@ namespace parsertl
 
         struct symbol
         {
-            enum type:id_type { TERMINAL, NON_TERMINAL };
+            enum class type:id_type { TERMINAL, NON_TERMINAL };
 
             type _type;
             id_type _id;
