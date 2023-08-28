@@ -888,7 +888,7 @@ operand_start         [(A-Za-z0-9_\"]
 <AFTER_OPERAND>"*"{operand_start}<AFTER_OPERAND_BACKTRACK>	reject()
 <AFTER_OPERAND_BACKTRACK>"*"<INITIAL>	BINARY_STAR
  /* `*` operator case 3: */
-<AFTER_WHITESPACE>"*"<.>	PREFIX_STAR
+<AFTER_WHITESPACE>"*"<INITIAL>	PREFIX_STAR
  /* `*` operator case 4: */
 <INITIAL,AFTER_OPERAND>"*"{whitespace}+<AFTER_WHITESPACE>	POSTFIX_STAR
 
