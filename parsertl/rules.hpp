@@ -612,6 +612,27 @@ namespace parsertl
                 _non_terminals.find(_start)->second;
         }
 
+        id_type indent_token(const string& name)
+        {
+            validate(name.c_str());
+            _indent_token = one_token(name);
+            return _indent_token;
+        }
+
+        id_type dedent_token(const string& name)
+        {
+            validate(name.c_str());
+            _dedent_token = one_token(name);
+            return _dedent_token;
+        }
+
+        id_type symbol_table_token(const string& name)
+        {
+            validate(name.c_str());
+            _symbol_table_token = one_token(name);
+            return _symbol_table_token;
+        }
+
         void validate()
         {
             if (_grammar.empty())
@@ -830,6 +851,9 @@ namespace parsertl
         std::map<string, std::size_t> _new_rule_ids;
         std::set<string> _generated_rules;
         string _start;
+        id_type _symbol_table_token = _token_lexer.npos();
+        id_type _indent_token = _token_lexer.npos();
+        id_type _dedent_token = _token_lexer.npos();
         production_vector _grammar;
         captures_vector _captures;
 
