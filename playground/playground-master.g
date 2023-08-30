@@ -1,7 +1,7 @@
 //Directives
 
 %token Charset ExitState Literal Macro MacroName Name NL
-%token Number Repeat StartState String Skip Reject
+%token Number Repeat StartState String Skip Reject SymbolTable IndentTrack
 
 %x OPTION GRULE MACRO REGEX RULE ID
 
@@ -31,6 +31,12 @@ directive : '%option' 'caseless' NL ;
 // Read and store %x entries
 directive : '%x' names NL ;
 names : Name | names Name ;
+// Read and store %token_indent entry
+directive : '%token_indent' Name NL ;
+// Read and store %token_dedent entry
+directive : '%token_dedent' Name NL ;
+// Read and store %token_symbol_table entry
+directive : '%token_symbol_table' Name NL ;
 
 // Grammar rules
 grules : %empty | grules grule ;
@@ -64,8 +70,16 @@ rx_rules : rx_rules StartState regex ExitState Name ;
 rx_rules : rx_rules regex Skip ;
 rx_rules : rx_rules StartState regex Skip ;
 rx_rules : rx_rules regex ExitState Skip ;
-rx_rules : rx_rules regex ExitState Reject ;
 rx_rules : rx_rules StartState regex ExitState Skip ;
+rx_rules : rx_rules regex SymbolTable ;
+rx_rules : rx_rules StartState regex SymbolTable ;
+rx_rules : rx_rules regex ExitState SymbolTable ;
+rx_rules : rx_rules StartState regex ExitState SymbolTable ;
+rx_rules : rx_rules regex IndentTrack ;
+rx_rules : rx_rules StartState regex IndentTrack ;
+rx_rules : rx_rules regex ExitState IndentTrack ;
+rx_rules : rx_rules StartState regex ExitState IndentTrack ;
+rx_rules : rx_rules regex ExitState Reject ;
 rx_rules : rx_rules StartState regex ExitState Reject ;
 rx_rules : rx_rules StartState regex ExitState ;
 rx_rules : rx_rules rx_group_start rx_group_end ;
@@ -100,6 +114,9 @@ literal_common	\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\d+)
 "%right"	'%right'
 "%start"	'%start'
 "%token"	'%token'
+"%token_symbol_table"	'%token_symbol_table'
+"%token_indent"	'%token_indent'
+"%token_dedent"	'%token_dedent'
 "%x"	'%x'
 <INITIAL>"%option"<OPTION>	'%option'
 <OPTION>"caseless"<INITIAL>	'caseless'
@@ -159,5 +176,7 @@ literal_common	\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\d+)
 <RULE,ID>{NL}<RULE>	skip()
 <ID>skip\s*[(]\s*[)]<RULE>	Skip
 <ID>reject\s*[(]\s*[)]<RULE>	Reject
+<ID>symbol_table\s*[(]\s*[)]<RULE>	SymbolTable
+<ID>indent_track\s*[(]\s*[)]<RULE>	IndentTrack
 
 %%

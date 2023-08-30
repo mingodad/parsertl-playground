@@ -1,5 +1,9 @@
 //From: https://github.com/lcompilers/lpython/blob/main/src/lpython/parser/parser.yy
 
+%x ST_INDENT ST_INDENT2
+%token_indent TK_INDENT
+%token_dedent TK_DEDENT
+
 /*Tokens*/
 %token END_OF_FILE
 %token TK_NEWLINE
@@ -11,11 +15,11 @@
 %token TK_IMAG_NUM
 %token TK_PLUS
 %token TK_MINUS
-%token TK_STAR
+//%token TK_STAR
 %token TK_SLASH
-%token TK_COLON
+//%token TK_COLON
 %token TK_SEMICOLON
-%token TK_COMMA
+//%token TK_COMMA
 %token TK_EQUAL
 //%token TK_LPAREN
 //%token TK_RPAREN
@@ -23,10 +27,10 @@
 //%token TK_RBRACKET
 //%token TK_LBRACE
 //%token TK_RBRACE
-%token TK_PERCENT
+//%token TK_PERCENT
 %token TK_VBAR
 %token TK_AMPERSAND
-%token TK_DOT
+//%token TK_DOT
 %token TK_TILDE
 %token TK_CARET
 %token TK_AT
@@ -55,7 +59,7 @@
 %token TK_RIGHTSHIFT_EQUAL
 %token TK_POW_EQUAL
 %token TK_DOUBLESLASH_EQUAL
-%token TK_EQ
+//%token TK_EQ
 %token TK_NE
 %token TK_LT
 %token TK_LE
@@ -112,18 +116,18 @@
 %left /*4*/ TK_OR
 %left /*5*/ TK_AND
 %precedence /*6*/ TK_NOT
-%left /*7*/ TK_EQ TK_NE TK_LT TK_LE TK_GT TK_GE TK_IS_NOT TK_NOT_IN KW_IN KW_IS
+%left /*7*/ "=" TK_NE TK_LT TK_LE TK_GT TK_GE TK_IS_NOT TK_NOT_IN KW_IN KW_IS
 %precedence /*8*/ FOR
 %left /*9*/ TK_VBAR
 %left /*10*/ TK_CARET
 %left /*11*/ TK_AMPERSAND
 %left /*12*/ TK_RIGHTSHIFT TK_LEFTSHIFT
 %left /*13*/ TK_PLUS TK_MINUS
-%left /*14*/ TK_STAR TK_SLASH TK_PERCENT TK_AT TK_FLOOR_DIV
+%left /*14*/ "*" TK_SLASH "%" TK_AT TK_FLOOR_DIV
 %precedence /*15*/ UNARY
 %right /*16*/ TK_POW
 %precedence /*17*/ AWAIT
-%precedence /*18*/ TK_DOT
+%precedence /*18*/ "."
 
 %start units
 
@@ -148,6 +152,11 @@ sep_statements :
 	sep statements
 	| type_ignore_sep statements
 	;
+
+func_body_stmts:
+    TK_COMMENT TK_NEWLINE body_stmts
+    | body_stmts
+    ;
 
 body_stmts :
 	single_line_statements
@@ -617,8 +626,8 @@ comma_opt :
 	;
 
 function_def :
-	decorators_opt KW_DEF id "(" parameter_list_opt ")" ":" body_stmts
-	| decorators_opt KW_DEF id "(" parameter_list_opt ")" "->" expr ":" body_stmts
+	decorators_opt KW_DEF id "(" parameter_list_opt ")" ":" func_body_stmts
+	| decorators_opt KW_DEF id "(" parameter_list_opt ")" "->" expr ":" func_body_stmts
 	| decorators_opt KW_DEF id "(" parameter_list_opt ")" ":" TK_TYPE_COMMENT sep statements
 	| decorators_opt KW_DEF id "(" parameter_list_opt ")" "->" expr ":" TK_TYPE_COMMENT sep statements
 	| decorators_opt KW_DEF id "(" parameter_list_opt ")" ":" sep TK_TYPE_COMMENT sep statements
@@ -631,10 +640,10 @@ class_def :
 	;
 
 async_func_def :
-	decorators KW_ASYNC KW_DEF id "(" parameter_list_opt ")" ":" body_stmts
-	| decorators KW_ASYNC KW_DEF id "(" parameter_list_opt ")" "->" expr ":" body_stmts
-	| KW_ASYNC KW_DEF id "(" parameter_list_opt ")" ":" body_stmts
-	| KW_ASYNC KW_DEF id "(" parameter_list_opt ")" "->" expr ":" body_stmts
+	decorators KW_ASYNC KW_DEF id "(" parameter_list_opt ")" ":" func_body_stmts
+	| decorators KW_ASYNC KW_DEF id "(" parameter_list_opt ")" "->" expr ":" func_body_stmts
+	| KW_ASYNC KW_DEF id "(" parameter_list_opt ")" ":" func_body_stmts
+	| KW_ASYNC KW_DEF id "(" parameter_list_opt ")" "->" expr ":" func_body_stmts
 	| decorators KW_ASYNC KW_DEF id "(" parameter_list_opt ")" ":" TK_TYPE_COMMENT sep statements
 	| decorators KW_ASYNC KW_DEF id "(" parameter_list_opt ")" "->" expr ":" TK_TYPE_COMMENT sep statements
 	| KW_ASYNC KW_DEF id "(" parameter_list_opt ")" ":" TK_TYPE_COMMENT sep statements
@@ -911,11 +920,11 @@ expr :
 	| expr ">=" /*7L*/ expr
 	| expr "is" /*7L*/ expr
 	| expr "is not" /*7L*/ expr
-	| expr "in" /*7L*/ expr
+	| expr KW_IN /*7L*/ expr
 	| expr "not in" /*7L*/ expr
-	| expr "and" /*5L*/ expr
-	| expr "or" /*4L*/ expr
-	| "not" /*6P*/ expr
+	| expr TK_AND /*5L*/ expr
+	| expr TK_OR /*4L*/ expr
+	| TK_NOT /*6P*/ expr
 	| comprehension
 	| ternary_if_statement
 	| lambda_expression
@@ -978,6 +987,19 @@ ws_comment  {whitespace}?{comment}?{newline}
 
 %%
 
+{whitespace} skip()
+{newline}<ST_INDENT> TK_NEWLINE
+<ST_INDENT> {
+    {newline}{newline}<ST_INDENT2>  reject()
+    {newline}  TK_NEWLINE
+    [ ]+    indent_track()
+    .<INITIAL> reject()
+}
+<ST_INDENT2> {
+    {newline}<INITIAL>  indent_track()
+}
+{string3}   TK_COMMENT
+
 // Keywords
 "as"       KW_AS
 "assert"   KW_ASSERT
@@ -1024,16 +1046,16 @@ ws_comment  {whitespace}?{comment}?{newline}
 "-"	"-"	/*TK_MINUS*/
 "="	"="	/*TK_EQUAL*/
 
-":"	TK_COLON
+":"	":" //TK_COLON
 
 ";" TK_SEMICOLON
 "/" TK_SLASH
-"%" TK_PERCENT
-"," TK_COMMA
-"*" TK_STAR
+"%" "%" //TK_PERCENT
+"," "," //TK_COMMA
+"*" "*" //TK_STAR
 "|" TK_VBAR
 "&" TK_AMPERSAND
-"." TK_DOT
+"." "." //TK_DOT
 "~" TK_TILDE
 "^" TK_CARET
 "@" TK_AT
@@ -1061,7 +1083,7 @@ ws_comment  {whitespace}?{comment}?{newline}
 "//=" TK_DOUBLESLASH_EQUAL
 
 // Relational operators
-"=="   TK_EQ
+"=="   "==" //TK_EQ
 "!="   TK_NE
 "<"    TK_LT
 "<="   TK_LE

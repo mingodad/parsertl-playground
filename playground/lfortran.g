@@ -9,29 +9,29 @@
 %token TK_LABEL
 %token TK_REAL
 %token TK_BOZ_CONSTANT
-//%token TK_PLUS
-//%token TK_MINUS
-//%token TK_STAR
-//%token TK_SLASH
-//%token TK_COLON
-//%token TK_SEMICOLON
-//%token TK_COMMA
-//%token TK_EQUAL
+%token TK_PLUS
+%token TK_MINUS
+%token TK_STAR
+%token TK_SLASH
+%token TK_COLON
+%token TK_SEMICOLON
+%token TK_COMMA
+%token TK_EQUAL
 //%token TK_LPAREN
 //%token TK_RPAREN
 %token TK_LBRACKET
 //%token TK_RBRACKET
 //%token TK_RBRACKET_OLD
-//%token TK_PERCENT
+%token TK_PERCENT
 //%token TK_VBAR
 %token TK_STRING
 %token TK_COMMENT
 %token TK_EOLCOMMENT
 %token TK_DBL_DOT
-//%token TK_DBL_COLON
-//%token TK_POW
-//%token TK_CONCAT
-//%token TK_ARROW
+%token TK_DBL_COLON
+%token TK_POW
+%token TK_CONCAT
+%token TK_ARROW
 %token TK_EQ
 %token TK_NE
 %token TK_LT
@@ -174,7 +174,7 @@
 %token KW_MEMORY
 %token KW_MODULE
 %token KW_MOLD
-%token KW_NAME
+//%token KW_NAME
 %token KW_NAMELIST
 %token KW_NEW_INDEX
 %token KW_NOPASS
@@ -251,11 +251,11 @@
 %left /*4*/ TK_AND
 %precedence /*5*/ TK_NOT
 %left /*6*/ TK_EQ TK_NE TK_LT TK_LE TK_GT TK_GE
-%left /*7*/ "//"
-%left /*8*/ "+" "-"
-%left /*9*/ "*" "/"
+%left /*7*/ TK_CONCAT
+%left /*8*/ TK_PLUS TK_MINUS
+%left /*9*/ TK_STAR TK_SLASH
 %precedence /*10*/ UMINUS
-%right /*11*/ "**"
+%right /*11*/ TK_POW
 
 %start units
 
@@ -290,7 +290,7 @@ module :
 
 submodule :
 	KW_SUBMODULE "(" id ")" id sep use_statement_star implicit_statement_star decl_star contains_block_opt end_submodule sep
-	| KW_SUBMODULE "(" id ":" id ")" id sep use_statement_star implicit_statement_star decl_star contains_block_opt end_submodule sep
+	| KW_SUBMODULE "(" id TK_COLON id ")" id sep use_statement_star implicit_statement_star decl_star contains_block_opt end_submodule sep
 	;
 
 block_data :
@@ -305,7 +305,7 @@ interface_decl :
 interface_stmt :
 	KW_INTERFACE
 	| KW_INTERFACE id
-	| KW_INTERFACE KW_ASSIGNMENT "(" "=" ")"
+	| KW_INTERFACE KW_ASSIGNMENT "(" TK_EQUAL ")"
 	| KW_INTERFACE KW_OPERATOR "(" operator_type ")"
 	| KW_INTERFACE KW_OPERATOR "(" "/)"
 	| KW_INTERFACE KW_OPERATOR "(" TK_DEF_OP /*1L*/ ")"
@@ -317,7 +317,7 @@ interface_stmt :
 endinterface :
 	endinterface0
 	| endinterface0 id
-	| endinterface0 KW_ASSIGNMENT "(" "=" ")"
+	| endinterface0 KW_ASSIGNMENT "(" TK_EQUAL ")"
 	| endinterface0 KW_OPERATOR "(" operator_type ")"
 	| endinterface0 KW_OPERATOR "(" "/)"
 	| endinterface0 KW_OPERATOR "(" TK_DEF_OP /*1L*/ ")"
@@ -335,9 +335,9 @@ interface_body :
 
 interface_item :
 	fn_mod_plus KW_PROCEDURE id_list sep
-	| fn_mod_plus KW_PROCEDURE "::" id_list sep
+	| fn_mod_plus KW_PROCEDURE TK_DBL_COLON id_list sep
 	| KW_PROCEDURE id_list sep
-	| KW_PROCEDURE "::" id_list sep
+	| KW_PROCEDURE TK_DBL_COLON id_list sep
 	| subroutine
 	| function
 	;
@@ -357,7 +357,7 @@ enum_var_modifiers :
 	;
 
 derived_type_decl :
-	KW_TYPE "," KW_DEFERRED "::" id sep
+	KW_TYPE TK_COMMA KW_DEFERRED TK_DBL_COLON id sep
 	| KW_TYPE var_modifiers id sep var_decl_star derived_type_contains_opt end_type sep
 	| KW_TYPE var_modifiers id "(" id_list ")" sep var_decl_star derived_type_contains_opt end_type sep
 	;
@@ -376,7 +376,7 @@ requires_decl :
 
 instantiate :
 	KW_INSTANTIATE id "(" use_symbol_list ")" sep
-	| KW_INSTANTIATE id "(" use_symbol_list ")" "," KW_ONLY ":" use_symbol_list sep
+	| KW_INSTANTIATE id "(" use_symbol_list ")" TK_COMMA KW_ONLY TK_COLON use_symbol_list sep
 	;
 
 end_type :
@@ -398,40 +398,40 @@ procedure_list :
 procedure_decl :
 	KW_PROCEDURE proc_modifiers use_symbol_list sep
 	| KW_PROCEDURE "(" id ")" proc_modifiers use_symbol_list sep
-	| KW_GENERIC access_spec_list KW_OPERATOR "(" operator_type ")" "=>" id_list sep
-	| KW_GENERIC access_spec_list KW_OPERATOR "(" "/)" "=>" id_list sep
-	| KW_GENERIC access_spec_list KW_OPERATOR "(" TK_DEF_OP /*1L*/ ")" "=>" id_list sep
-	| KW_GENERIC access_spec_list KW_ASSIGNMENT "(" "=" ")" "=>" id_list sep
-	| KW_GENERIC access_spec_list id "=>" id_list sep
-	| KW_GENERIC access_spec_list KW_WRITE "(" id ")" "=>" id_list sep
-	| KW_GENERIC access_spec_list KW_READ "(" id ")" "=>" id_list sep
-	| KW_FINAL "::" id sep
+	| KW_GENERIC access_spec_list KW_OPERATOR "(" operator_type ")" TK_ARROW id_list sep
+	| KW_GENERIC access_spec_list KW_OPERATOR "(" "/)" TK_ARROW id_list sep
+	| KW_GENERIC access_spec_list KW_OPERATOR "(" TK_DEF_OP /*1L*/ ")" TK_ARROW id_list sep
+	| KW_GENERIC access_spec_list KW_ASSIGNMENT "(" TK_EQUAL ")" TK_ARROW id_list sep
+	| KW_GENERIC access_spec_list id TK_ARROW id_list sep
+	| KW_GENERIC access_spec_list KW_WRITE "(" id ")" TK_ARROW id_list sep
+	| KW_GENERIC access_spec_list KW_READ "(" id ")" TK_ARROW id_list sep
+	| KW_FINAL TK_DBL_COLON id sep
 	| KW_PRIVATE sep
 	;
 
 access_spec_list :
-	"::"
-	| access_spec "::"
+	TK_DBL_COLON
+	| access_spec TK_DBL_COLON
 	;
 
 access_spec :
-	"," KW_PRIVATE
-	| "," KW_PUBLIC
+	TK_COMMA KW_PRIVATE
+	| TK_COMMA KW_PUBLIC
 	;
 
 operator_type :
-	"+" /*8L*/
-	| "-" /*8L*/
-	| "*" /*9L*/
-	| "/" /*9L*/
-	| "**" /*11R*/
+	TK_PLUS /*8L*/
+	| TK_MINUS /*8L*/
+	| TK_STAR /*9L*/
+	| TK_SLASH /*9L*/
+	| TK_POW /*11R*/
 	| TK_EQ /*6L*/
 	| TK_NE /*6L*/
 	| TK_GT /*6L*/
 	| TK_GE /*6L*/
 	| TK_LT /*6L*/
 	| TK_LE /*6L*/
-	| "//" /*7L*/
+	| TK_CONCAT /*7L*/
 	| TK_NOT /*5P*/
 	| TK_AND /*4L*/
 	| TK_OR /*3L*/
@@ -442,13 +442,13 @@ operator_type :
 
 proc_modifiers :
 	/*empty*/
-	| "::"
-	| proc_modifier_list "::"
+	| TK_DBL_COLON
+	| proc_modifier_list TK_DBL_COLON
 	;
 
 proc_modifier_list :
-	proc_modifier_list "," proc_modifier
-	| "," proc_modifier
+	proc_modifier_list TK_COMMA proc_modifier
+	| TK_COMMA proc_modifier
 	;
 
 proc_modifier :
@@ -619,14 +619,14 @@ sub_args :
 	;
 
 id_or_star_list :
-	id_or_star_list "," id_or_star
+	id_or_star_list TK_COMMA id_or_star
 	| id_or_star
 	| /*empty*/
 	;
 
 id_or_star :
 	id
-	| "*" /*9L*/
+	| TK_STAR /*9L*/
 	;
 
 bind_opt :
@@ -656,23 +656,23 @@ implicit_statement :
 	KW_IMPLICIT KW_NONE sep
 	| KW_IMPLICIT KW_NONE "(" implicit_none_spec_list ")" sep
 	| KW_IMPLICIT KW_INTEGER "(" letter_spec_list ")" sep
-	| KW_IMPLICIT KW_INTEGER "*" /*9L*/ TK_INTEGER "(" letter_spec_list ")" sep
+	| KW_IMPLICIT KW_INTEGER TK_STAR /*9L*/ TK_INTEGER "(" letter_spec_list ")" sep
 	| KW_IMPLICIT KW_INTEGER "(" TK_INTEGER ")" "(" letter_spec_list ")" sep
 	| KW_IMPLICIT KW_INTEGER "(" letter_spec_list ")" "(" letter_spec_list ")" sep
 	| KW_IMPLICIT KW_CHARACTER "(" letter_spec_list ")" sep
-	| KW_IMPLICIT KW_CHARACTER "*" /*9L*/ TK_INTEGER "(" letter_spec_list ")" sep
+	| KW_IMPLICIT KW_CHARACTER TK_STAR /*9L*/ TK_INTEGER "(" letter_spec_list ")" sep
 	| KW_IMPLICIT KW_CHARACTER "(" TK_INTEGER ")" "(" letter_spec_list ")" sep
 	| KW_IMPLICIT KW_CHARACTER "(" letter_spec_list ")" "(" letter_spec_list ")" sep
 	| KW_IMPLICIT KW_REAL "(" letter_spec_list ")" sep
-	| KW_IMPLICIT KW_REAL "*" /*9L*/ TK_INTEGER "(" letter_spec_list ")" sep
+	| KW_IMPLICIT KW_REAL TK_STAR /*9L*/ TK_INTEGER "(" letter_spec_list ")" sep
 	| KW_IMPLICIT KW_REAL "(" TK_INTEGER ")" "(" letter_spec_list ")" sep
 	| KW_IMPLICIT KW_REAL "(" letter_spec_list ")" "(" letter_spec_list ")" sep
 	| KW_IMPLICIT KW_COMPLEX "(" letter_spec_list ")" sep
-	| KW_IMPLICIT KW_COMPLEX "*" /*9L*/ TK_INTEGER "(" letter_spec_list ")" sep
+	| KW_IMPLICIT KW_COMPLEX TK_STAR /*9L*/ TK_INTEGER "(" letter_spec_list ")" sep
 	| KW_IMPLICIT KW_COMPLEX "(" TK_INTEGER ")" "(" letter_spec_list ")" sep
 	| KW_IMPLICIT KW_COMPLEX "(" letter_spec_list ")" "(" letter_spec_list ")" sep
 	| KW_IMPLICIT KW_LOGICAL "(" letter_spec_list ")" sep
-	| KW_IMPLICIT KW_LOGICAL "*" /*9L*/ TK_INTEGER "(" letter_spec_list ")" sep
+	| KW_IMPLICIT KW_LOGICAL TK_STAR /*9L*/ TK_INTEGER "(" letter_spec_list ")" sep
 	| KW_IMPLICIT KW_LOGICAL "(" TK_INTEGER ")" "(" letter_spec_list ")" sep
 	| KW_IMPLICIT KW_LOGICAL "(" letter_spec_list ")" "(" letter_spec_list ")" sep
 	| KW_IMPLICIT KW_DOUBLE KW_PRECISION "(" letter_spec_list ")" sep
@@ -682,7 +682,7 @@ implicit_statement :
 	;
 
 implicit_none_spec_list :
-	implicit_none_spec_list "," implicit_none_spec
+	implicit_none_spec_list TK_COMMA implicit_none_spec
 	| implicit_none_spec
 	;
 
@@ -692,13 +692,13 @@ implicit_none_spec :
 	;
 
 letter_spec_list :
-	letter_spec_list "," letter_spec
+	letter_spec_list TK_COMMA letter_spec
 	| letter_spec
 	;
 
 letter_spec :
 	id
-	| id "-" /*8L*/ id
+	| id TK_MINUS /*8L*/ id
 	;
 
 use_statement_star :
@@ -712,9 +712,9 @@ use_statement :
 
 use_statement1 :
 	KW_USE use_modifiers id
-	| KW_USE use_modifiers id "," KW_ONLY ":" use_symbol_list
-	| KW_USE use_modifiers id "," KW_ONLY ":"
-	| KW_USE use_modifiers id "," use_symbol_list
+	| KW_USE use_modifiers id TK_COMMA KW_ONLY TK_COLON use_symbol_list
+	| KW_USE use_modifiers id TK_COMMA KW_ONLY TK_COLON
+	| KW_USE use_modifiers id TK_COMMA use_symbol_list
 	;
 
 import_statement_star :
@@ -725,38 +725,38 @@ import_statement_star :
 import_statement :
 	KW_IMPORT sep
 	| KW_IMPORT id_list sep
-	| KW_IMPORT "::" id_list sep
-	| KW_IMPORT "," KW_ONLY ":" id_list sep
-	| KW_IMPORT "," KW_NONE sep
-	| KW_IMPORT "," KW_ALL sep
+	| KW_IMPORT TK_DBL_COLON id_list sep
+	| KW_IMPORT TK_COMMA KW_ONLY TK_COLON id_list sep
+	| KW_IMPORT TK_COMMA KW_NONE sep
+	| KW_IMPORT TK_COMMA KW_ALL sep
 	;
 
 use_symbol_list :
-	use_symbol_list "," use_symbol
+	use_symbol_list TK_COMMA use_symbol
 	| use_symbol
 	;
 
 use_symbol :
 	id
-	| id "=>" id
-	| KW_ASSIGNMENT "(" "=" ")"
+	| id TK_ARROW id
+	| KW_ASSIGNMENT "(" TK_EQUAL ")"
 	| KW_OPERATOR "(" operator_type ")"
 	| KW_OPERATOR "(" "/)"
 	| KW_OPERATOR "(" TK_DEF_OP /*1L*/ ")"
-	| KW_OPERATOR "(" TK_DEF_OP /*1L*/ ")" "=>" KW_OPERATOR "(" TK_DEF_OP /*1L*/ ")"
+	| KW_OPERATOR "(" TK_DEF_OP /*1L*/ ")" TK_ARROW KW_OPERATOR "(" TK_DEF_OP /*1L*/ ")"
 	| KW_WRITE "(" id ")"
 	| KW_READ "(" id ")"
 	;
 
 use_modifiers :
 	/*empty*/
-	| "::"
-	| use_modifier_list "::"
+	| TK_DBL_COLON
+	| use_modifier_list TK_DBL_COLON
 	;
 
 use_modifier_list :
-	use_modifier_list "," use_modifier
-	| "," use_modifier
+	use_modifier_list TK_COMMA use_modifier
+	| TK_COMMA use_modifier
 	;
 
 use_modifier :
@@ -773,15 +773,15 @@ var_decl :
 	var_type var_modifiers var_sym_decl_list sep
 	| var_modifier sep
 	| var_modifier var_sym_decl_list sep
-	| var_modifier "::" var_sym_decl_list sep
+	| var_modifier TK_DBL_COLON var_sym_decl_list sep
 	| KW_PARAMETER "(" named_constant_def_list ")" sep
-	| KW_NAMELIST "/" /*9L*/ id "/" /*9L*/ id_list sep
+	| KW_NAMELIST TK_SLASH /*9L*/ id TK_SLASH /*9L*/ id_list sep
 	| KW_COMMON common_block_list sep
 	| KW_EQUIVALENCE equivalence_set_list sep
 	;
 
 equivalence_set_list :
-	equivalence_set_list "," equivalence_set
+	equivalence_set_list TK_COMMA equivalence_set
 	| equivalence_set
 	;
 
@@ -790,35 +790,35 @@ equivalence_set :
 	;
 
 named_constant_def_list :
-	named_constant_def_list "," named_constant_def
+	named_constant_def_list TK_COMMA named_constant_def
 	| named_constant_def
 	;
 
 named_constant_def :
-	id "=" expr
+	id TK_EQUAL expr
 	;
 
 common_block_list :
-	common_block_list "," common_block
+	common_block_list TK_COMMA common_block
 	| common_block
 	;
 
 common_block :
-	"/" /*9L*/ id "/" /*9L*/ expr
+	TK_SLASH /*9L*/ id TK_SLASH /*9L*/ expr
 	| expr
 	;
 
 data_set_list :
-	data_set_list "," data_set
+	data_set_list TK_COMMA data_set
 	| data_set
 	;
 
 data_set :
-	data_object_list "/" /*9L*/ data_stmt_value_list "/" /*9L*/
+	data_object_list TK_SLASH /*9L*/ data_stmt_value_list TK_SLASH /*9L*/
 	;
 
 data_object_list :
-	data_object_list "," data_object
+	data_object_list TK_COMMA data_object
 	| data_object
 	;
 
@@ -826,17 +826,17 @@ data_object :
 	id
 	| struct_member_star id
 	| id "(" fnarray_arg_list_opt ")"
-	| "(" data_object_list "," id "=" expr "," expr ")"
-	| "(" data_object_list "," integer_type id "=" expr "," expr ")"
-	| "(" data_object_list "," id "=" expr "," expr "," expr ")"
-	| "(" data_object_list "," integer_type id "=" expr "," expr "," expr ")"
+	| "(" data_object_list TK_COMMA id TK_EQUAL expr TK_COMMA expr ")"
+	| "(" data_object_list TK_COMMA integer_type id TK_EQUAL expr TK_COMMA expr ")"
+	| "(" data_object_list TK_COMMA id TK_EQUAL expr TK_COMMA expr TK_COMMA expr ")"
+	| "(" data_object_list TK_COMMA integer_type id TK_EQUAL expr TK_COMMA expr TK_COMMA expr ")"
 	;
 
 data_stmt_value_list :
-	data_stmt_value_list "," data_stmt_constant
-	| data_stmt_value_list "," data_stmt_repeat "*" /*9L*/ data_stmt_constant
+	data_stmt_value_list TK_COMMA data_stmt_constant
+	| data_stmt_value_list TK_COMMA data_stmt_repeat TK_STAR /*9L*/ data_stmt_constant
 	| data_stmt_constant
-	| data_stmt_repeat "*" /*9L*/ data_stmt_constant
+	| data_stmt_repeat TK_STAR /*9L*/ data_stmt_constant
 	;
 
 data_stmt_repeat :
@@ -857,36 +857,36 @@ data_stmt_constant :
 	| TK_BOZ_CONSTANT
 	| TK_TRUE
 	| TK_FALSE
-	| "-" /*8L*/ expr %prec UMINUS /*10P*/
+	| TK_MINUS /*8L*/ expr %prec UMINUS /*10P*/
 	;
 
 integer_type :
-	KW_INTEGER "(" kind_arg_list ")" "::"
+	KW_INTEGER "(" kind_arg_list ")" TK_DBL_COLON
 	;
 
 kind_arg_list :
-	kind_arg_list "," kind_arg2
+	kind_arg_list TK_COMMA kind_arg2
 	| kind_arg2
 	;
 
 kind_arg2 :
 	expr
-	| "*" /*9L*/
-	| ":"
-	| id "=" expr
-	| id "=" "*" /*9L*/
-	| id "=" ":"
+	| TK_STAR /*9L*/
+	| TK_COLON
+	| id_skw TK_EQUAL expr
+	| id_skw TK_EQUAL TK_STAR /*9L*/
+	| id_skw TK_EQUAL TK_COLON
 	;
 
 var_modifiers :
 	/*empty*/
-	| "::"
-	| var_modifier_list "::"
+	| TK_DBL_COLON
+	| var_modifier_list TK_DBL_COLON
 	;
 
 var_modifier_list :
-	var_modifier_list "," var_modifier
-	| "," var_modifier
+	var_modifier_list TK_COMMA var_modifier
+	| TK_COMMA var_modifier
 	;
 
 var_modifier :
@@ -924,20 +924,20 @@ var_modifier :
 var_type :
 	KW_INTEGER
 	| KW_INTEGER "(" kind_arg_list ")"
-	| KW_INTEGER "*" /*9L*/ TK_INTEGER
+	| KW_INTEGER TK_STAR /*9L*/ TK_INTEGER
 	| KW_CHARACTER
 	| KW_CHARACTER "(" kind_arg_list ")"
-	| KW_CHARACTER "*" /*9L*/ TK_INTEGER
-	| KW_CHARACTER "*" /*9L*/ "(" "*" /*9L*/ ")"
+	| KW_CHARACTER TK_STAR /*9L*/ TK_INTEGER
+	| KW_CHARACTER TK_STAR /*9L*/ "(" TK_STAR /*9L*/ ")"
 	| KW_REAL
 	| KW_REAL "(" kind_arg_list ")"
-	| KW_REAL "*" /*9L*/ TK_INTEGER
+	| KW_REAL TK_STAR /*9L*/ TK_INTEGER
 	| KW_COMPLEX
 	| KW_COMPLEX "(" kind_arg_list ")"
-	| KW_COMPLEX "*" /*9L*/ TK_INTEGER
+	| KW_COMPLEX TK_STAR /*9L*/ TK_INTEGER
 	| KW_LOGICAL
 	| KW_LOGICAL "(" kind_arg_list ")"
-	| KW_LOGICAL "*" /*9L*/ TK_INTEGER
+	| KW_LOGICAL TK_STAR /*9L*/ TK_INTEGER
 	| KW_DOUBLE KW_PRECISION
 	| KW_DOUBLE_PRECISION
 	| KW_DOUBLE KW_COMPLEX
@@ -948,28 +948,28 @@ var_type :
 	| KW_TYPE "(" KW_COMPLEX "(" kind_arg_list ")" ")"
 	| KW_TYPE "(" KW_LOGICAL "(" kind_arg_list ")" ")"
 	| KW_TYPE "(" KW_CHARACTER "(" kind_arg_list ")" ")"
-	| KW_TYPE "(" "*" /*9L*/ ")"
+	| KW_TYPE "(" TK_STAR /*9L*/ ")"
 	| KW_PROCEDURE "(" id ")"
 	| KW_CLASS "(" id ")"
-	| KW_CLASS "(" "*" /*9L*/ ")"
+	| KW_CLASS "(" TK_STAR /*9L*/ ")"
 	;
 
 var_sym_decl_list :
-	var_sym_decl_list "," var_sym_decl
+	var_sym_decl_list TK_COMMA var_sym_decl
 	| var_sym_decl
 	;
 
 var_sym_decl :
 	id
-	| "/" /*9L*/ id "/" /*9L*/
-	| id "=" expr
-	| id "=>" expr
-	| id "*" /*9L*/ expr
-	| id "*" /*9L*/ "(" "*" /*9L*/ ")"
+	| TK_SLASH /*9L*/ id TK_SLASH /*9L*/
+	| id TK_EQUAL expr
+	| id TK_ARROW expr
+	| id TK_STAR /*9L*/ expr
+	| id TK_STAR /*9L*/ "(" TK_STAR /*9L*/ ")"
 	| id "(" array_comp_decl_list ")"
-	| id "(" array_comp_decl_list ")" "*" /*9L*/ TK_INTEGER
-	| id "(" array_comp_decl_list ")" "=" expr
-	| id "(" array_comp_decl_list ")" "=>" expr
+	| id "(" array_comp_decl_list ")" TK_STAR /*9L*/ TK_INTEGER
+	| id "(" array_comp_decl_list ")" TK_EQUAL expr
+	| id "(" array_comp_decl_list ")" TK_ARROW expr
 	| id TK_LBRACKET coarray_comp_decl_list "]"
 	| id "(" array_comp_decl_list ")" TK_LBRACKET coarray_comp_decl_list "]"
 	| decl_spec
@@ -979,38 +979,38 @@ decl_spec :
 	KW_OPERATOR "(" operator_type ")"
 	| KW_OPERATOR "(" "/)"
 	| KW_OPERATOR "(" TK_DEF_OP /*1L*/ ")"
-	| KW_ASSIGNMENT "(" "=" ")"
+	| KW_ASSIGNMENT "(" TK_EQUAL ")"
 	;
 
 array_comp_decl_list :
-	array_comp_decl_list "," array_comp_decl
+	array_comp_decl_list TK_COMMA array_comp_decl
 	| array_comp_decl
 	;
 
 array_comp_decl :
 	expr
-	| expr ":" expr
-	| expr ":"
-	| ":" expr
-	| ":"
-	| "*" /*9L*/
-	| expr ":" "*" /*9L*/
+	| expr TK_COLON expr
+	| expr TK_COLON
+	| TK_COLON expr
+	| TK_COLON
+	| TK_STAR /*9L*/
+	| expr TK_COLON TK_STAR /*9L*/
 	| TK_DBL_DOT
 	;
 
 coarray_comp_decl_list :
-	coarray_comp_decl_list "," coarray_comp_decl
+	coarray_comp_decl_list TK_COMMA coarray_comp_decl
 	| coarray_comp_decl
 	;
 
 coarray_comp_decl :
 	expr
-	| expr ":" expr
-	| expr ":"
-	| ":" expr
-	| ":"
-	| "*" /*9L*/
-	| expr ":" "*" /*9L*/
+	| expr TK_COLON expr
+	| expr TK_COLON
+	| TK_COLON expr
+	| TK_COLON
+	| TK_STAR /*9L*/
+	| expr TK_COLON TK_STAR /*9L*/
 	;
 
 statements :
@@ -1027,7 +1027,7 @@ sep_one :
 	TK_NEWLINE
 	| TK_COMMENT
 	| TK_EOLCOMMENT
-	| ";"
+	| TK_SEMICOLON
 	;
 
 decl_statements :
@@ -1098,7 +1098,7 @@ single_line_statement :
 
 multi_line_statement :
 	multi_line_statement0
-	| id ":" multi_line_statement0 id
+	| id TK_COLON multi_line_statement0 id
 	;
 
 multi_line_statement0 :
@@ -1121,16 +1121,16 @@ assign_statement :
 	;
 
 assignment_statement :
-	expr "=" expr
+	expr TK_EQUAL expr
 	;
 
 goto_statement :
 	goto TK_INTEGER
 	| goto "(" expr_list ")" expr
-	| goto "(" expr_list ")" "," expr
+	| goto "(" expr_list ")" TK_COMMA expr
 	| goto id
 	| goto id "(" expr_list ")"
-	| goto id "," "(" expr_list ")"
+	| goto id TK_COMMA "(" expr_list ")"
 	;
 
 goto :
@@ -1139,7 +1139,7 @@ goto :
 	;
 
 associate_statement :
-	expr "=>" expr
+	expr TK_ARROW expr
 	;
 
 associate_block :
@@ -1167,13 +1167,13 @@ subroutine_call :
 
 print_statement :
 	KW_PRINT format
-	| KW_PRINT format ","
-	| KW_PRINT format "," expr_list
+	| KW_PRINT format TK_COMMA
+	| KW_PRINT format TK_COMMA expr_list
 	;
 
 format :
 	expr
-	| "*" /*9L*/
+	| TK_STAR /*9L*/
 	;
 
 open_statement :
@@ -1185,32 +1185,32 @@ close_statement :
 	;
 
 write_arg_list :
-	write_arg_list "," write_arg2
+	write_arg_list TK_COMMA write_arg2
 	| write_arg2
 	;
 
 write_arg2 :
 	write_arg
-	| id "=" write_arg
+	| id TK_EQUAL write_arg
 	;
 
 write_arg :
 	expr
-	| "*" /*9L*/
+	| TK_STAR /*9L*/
 	;
 
 write_statement :
 	KW_WRITE "(" write_arg_list ")" expr_list
-	| KW_WRITE "(" write_arg_list ")" "," expr_list
+	| KW_WRITE "(" write_arg_list ")" TK_COMMA expr_list
 	| KW_WRITE "(" write_arg_list ")"
 	;
 
 read_statement :
 	KW_READ "(" write_arg_list ")" expr_list
-	| KW_READ "(" write_arg_list ")" "," expr_list
+	| KW_READ "(" write_arg_list ")" TK_COMMA expr_list
 	| KW_READ "(" write_arg_list ")"
-	| KW_READ TK_INTEGER "," expr_list
-	| KW_READ "*" /*9L*/ "," expr_list
+	| KW_READ TK_INTEGER TK_COMMA expr_list
+	| KW_READ TK_STAR /*9L*/ TK_COMMA expr_list
 	| KW_READ TK_INTEGER
 	;
 
@@ -1263,7 +1263,7 @@ if_statement :
 
 if_statement_single :
 	KW_IF "(" expr ")" single_line_statement
-	| KW_IF "(" expr ")" TK_INTEGER "," TK_INTEGER "," TK_INTEGER
+	| KW_IF "(" expr ")" TK_INTEGER TK_COMMA TK_INTEGER TK_COMMA TK_INTEGER
 	;
 
 if_block :
@@ -1322,20 +1322,20 @@ case_statement :
 	;
 
 case_conditions :
-	case_conditions "," case_condition
+	case_conditions TK_COMMA case_condition
 	| case_condition
 	;
 
 case_condition :
 	expr
-	| expr ":"
-	| ":" expr
-	| expr ":" expr
+	| expr TK_COLON
+	| TK_COLON expr
+	| expr TK_COLON expr
 	;
 
 select_rank_statement :
 	select_rank "(" expr ")" sep select_rank_case_stmts end_select
-	| select_rank "(" id "=>" expr ")" sep select_rank_case_stmts end_select
+	| select_rank "(" id TK_ARROW expr ")" sep select_rank_case_stmts end_select
 	;
 
 select_rank :
@@ -1350,13 +1350,13 @@ select_rank_case_stmts :
 
 select_rank_case_stmt :
 	KW_RANK "(" expr ")" id_opt sep statements
-	| KW_RANK "(" "*" /*9L*/ ")" id_opt sep statements
+	| KW_RANK "(" TK_STAR /*9L*/ ")" id_opt sep statements
 	| KW_RANK KW_DEFAULT id_opt sep statements
 	;
 
 select_type_statement :
 	select_type "(" expr ")" sep select_type_body_statements end_select
-	| select_type "(" id "=>" expr ")" sep select_type_body_statements end_select
+	| select_type "(" id TK_ARROW expr ")" sep select_type_body_statements end_select
 	;
 
 select_type :
@@ -1383,22 +1383,22 @@ while_statement :
 
 do_statement :
 	KW_DO sep statements enddo
-	| KW_DO comma_opt id "=" expr "," expr sep statements enddo
-	| KW_DO comma_opt id "=" expr "," expr "," expr sep statements enddo
-	| KW_DO TK_INTEGER comma_opt id "=" expr "," expr sep statements enddo
-	| KW_DO TK_INTEGER comma_opt id "=" expr "," expr "," expr sep statements enddo
+	| KW_DO comma_opt id TK_EQUAL expr TK_COMMA expr sep statements enddo
+	| KW_DO comma_opt id TK_EQUAL expr TK_COMMA expr TK_COMMA expr sep statements enddo
+	| KW_DO TK_INTEGER comma_opt id TK_EQUAL expr TK_COMMA expr sep statements enddo
+	| KW_DO TK_INTEGER comma_opt id TK_EQUAL expr TK_COMMA expr TK_COMMA expr sep statements enddo
 	| KW_DO comma_opt KW_CONCURRENT "(" concurrent_control_list ")" concurrent_locality_star sep statements enddo
-	| KW_DO comma_opt KW_CONCURRENT "(" concurrent_control_list "," expr ")" concurrent_locality_star sep statements enddo
+	| KW_DO comma_opt KW_CONCURRENT "(" concurrent_control_list TK_COMMA expr ")" concurrent_locality_star sep statements enddo
 	;
 
 concurrent_control_list :
-	concurrent_control_list "," concurrent_control
+	concurrent_control_list TK_COMMA concurrent_control
 	| concurrent_control
 	;
 
 concurrent_control :
-	id "=" expr ":" expr
-	| id "=" expr ":" expr ":" expr
+	id TK_EQUAL expr TK_COLON expr
+	| id TK_EQUAL expr TK_COLON expr TK_COLON expr
 	;
 
 concurrent_locality_star :
@@ -1411,22 +1411,22 @@ concurrent_locality :
 	| KW_LOCAL_INIT "(" id_list ")"
 	| KW_SHARED "(" id_list ")"
 	| KW_DEFAULT "(" KW_NONE ")"
-	| KW_REDUCE "(" reduce_op ":" id_list ")"
+	| KW_REDUCE "(" reduce_op TK_COLON id_list ")"
 	;
 
 comma_opt :
-	","
+	TK_COMMA
 	| /*empty*/
 	;
 
 forall_statement :
 	KW_FORALL "(" concurrent_control_list ")" concurrent_locality_star sep statements endforall
-	| KW_FORALL "(" concurrent_control_list "," expr ")" concurrent_locality_star sep statements endforall
+	| KW_FORALL "(" concurrent_control_list TK_COMMA expr ")" concurrent_locality_star sep statements endforall
 	;
 
 forall_statement_single :
 	KW_FORALL "(" concurrent_control_list ")" assignment_statement
-	| KW_FORALL "(" concurrent_control_list "," expr ")" assignment_statement
+	| KW_FORALL "(" concurrent_control_list TK_COMMA expr ")" assignment_statement
 	;
 
 format_statement :
@@ -1438,8 +1438,8 @@ data_statement :
 	;
 
 form_team_statement :
-	form_team "(" expr "," id ")"
-	| form_team "(" expr "," id sync_stat_list ")"
+	form_team "(" expr TK_COMMA id ")"
+	| form_team "(" expr TK_COMMA id sync_stat_list ")"
 	;
 
 form_team :
@@ -1448,8 +1448,8 @@ form_team :
 	;
 
 reduce_op :
-	"+" /*8L*/
-	| "*" /*9L*/
+	TK_PLUS /*8L*/
+	| TK_STAR /*9L*/
 	| id
 	;
 
@@ -1508,25 +1508,25 @@ entry_statement :
 stop_statement :
 	KW_STOP
 	| KW_STOP expr
-	| KW_STOP "," KW_QUIET "=" expr
-	| KW_STOP expr "," KW_QUIET "=" expr
+	| KW_STOP TK_COMMA KW_QUIET TK_EQUAL expr
+	| KW_STOP expr TK_COMMA KW_QUIET TK_EQUAL expr
 	;
 
 error_stop_statement :
 	KW_ERROR KW_STOP
 	| KW_ERROR KW_STOP expr
-	| KW_ERROR KW_STOP "," KW_QUIET "=" expr
-	| KW_ERROR KW_STOP expr "," KW_QUIET "=" expr
+	| KW_ERROR KW_STOP TK_COMMA KW_QUIET TK_EQUAL expr
+	| KW_ERROR KW_STOP expr TK_COMMA KW_QUIET TK_EQUAL expr
 	;
 
 event_post_statement :
 	KW_EVENT KW_POST "(" expr ")"
-	| KW_EVENT KW_POST "(" expr "," event_post_stat_list ")"
+	| KW_EVENT KW_POST "(" expr TK_COMMA event_post_stat_list ")"
 	;
 
 event_wait_statement :
 	KW_EVENT KW_WAIT "(" expr ")"
-	| KW_EVENT KW_WAIT "(" expr "," event_wait_spec_list ")"
+	| KW_EVENT KW_WAIT "(" expr TK_COMMA event_wait_spec_list ")"
 	;
 
 sync_all_statement :
@@ -1541,9 +1541,9 @@ sync_all :
 	;
 
 sync_images_statement :
-	sync_images "(" "*" /*9L*/ ")"
+	sync_images "(" TK_STAR /*9L*/ ")"
 	| sync_images "(" expr ")"
-	| sync_images "(" "*" /*9L*/ sync_stat_list ")"
+	| sync_images "(" TK_STAR /*9L*/ sync_stat_list ")"
 	| sync_images "(" expr sync_stat_list ")"
 	;
 
@@ -1574,13 +1574,13 @@ sync_team :
 	;
 
 event_wait_spec_list :
-	event_wait_spec_list "," sync_stat
+	event_wait_spec_list TK_COMMA sync_stat
 	| event_wait_spec
 	| /*empty*/
 	;
 
 event_wait_spec :
-	id "=" expr
+	id TK_EQUAL expr
 	;
 
 event_post_stat_list :
@@ -1588,15 +1588,15 @@ event_post_stat_list :
 	;
 
 sync_stat_list :
-	sync_stat_list "," sync_stat
-	| "," sync_stat
+	sync_stat_list TK_COMMA sync_stat
+	| TK_COMMA sync_stat
 	| sync_stat
 	;
 
 sync_stat :
-	KW_STAT "=" id
-	| KW_ERRMSG "=" id
-	| KW_NEW_INDEX "=" expr
+	KW_STAT TK_EQUAL id
+	| KW_ERRMSG TK_EQUAL id
+	| KW_NEW_INDEX TK_EQUAL expr
 	;
 
 critical_statement :
@@ -1613,13 +1613,13 @@ change_team_statement :
 	;
 
 coarray_association_list :
-	coarray_association_list "," coarray_association
+	coarray_association_list TK_COMMA coarray_association
 	| coarray_association
 	| /*empty*/
 	;
 
 coarray_association :
-	id TK_LBRACKET coarray_arg_list "]" "=>" expr
+	id TK_LBRACKET coarray_arg_list "]" TK_ARROW expr
 	;
 
 change_team :
@@ -1633,7 +1633,7 @@ expr_list_opt :
 	;
 
 expr_list :
-	expr_list "," expr
+	expr_list TK_COMMA expr
 	| expr
 	;
 
@@ -1655,8 +1655,8 @@ expr :
 	| id "(" fnarray_arg_list_opt ")" TK_LBRACKET coarray_arg_list "]"
 	| struct_member_star id "(" fnarray_arg_list_opt ")" TK_LBRACKET coarray_arg_list "]"
 	| TK_LBRACKET expr_list_opt rbracket
-	| TK_LBRACKET var_type "::" expr_list_opt rbracket
-	| TK_LBRACKET id "::" expr_list_opt rbracket
+	| TK_LBRACKET var_type TK_DBL_COLON expr_list_opt rbracket
+	| TK_LBRACKET id TK_DBL_COLON expr_list_opt rbracket
 	| TK_INTEGER
 	| TK_REAL
 	| TK_STRING
@@ -1664,22 +1664,22 @@ expr :
 	| TK_TRUE
 	| TK_FALSE
 	| "(" expr ")"
-	| "(" expr "," expr ")"
-	| "(" expr "," id "=" expr "," expr ")"
-	| "(" expr "," expr "," id "=" expr "," expr ")"
-	| "(" expr "," expr "," expr_list "," id "=" expr "," expr ")"
-	| "(" expr "," id "=" expr "," expr "," expr ")"
-	| "(" expr "," expr "," id "=" expr "," expr "," expr ")"
-	| "(" expr "," expr "," expr_list "," id "=" expr "," expr "," expr ")"
+	| "(" expr TK_COMMA expr ")"
+	| "(" expr TK_COMMA id TK_EQUAL expr TK_COMMA expr ")"
+	| "(" expr TK_COMMA expr TK_COMMA id TK_EQUAL expr TK_COMMA expr ")"
+	| "(" expr TK_COMMA expr TK_COMMA expr_list TK_COMMA id TK_EQUAL expr TK_COMMA expr ")"
+	| "(" expr TK_COMMA id TK_EQUAL expr TK_COMMA expr TK_COMMA expr ")"
+	| "(" expr TK_COMMA expr TK_COMMA id TK_EQUAL expr TK_COMMA expr TK_COMMA expr ")"
+	| "(" expr TK_COMMA expr TK_COMMA expr_list TK_COMMA id TK_EQUAL expr TK_COMMA expr TK_COMMA expr ")"
 	| TK_DEF_OP /*1L*/ expr
-	| expr "+" /*8L*/ expr
-	| expr "-" /*8L*/ expr
-	| expr "*" /*9L*/ expr
-	| expr "/" /*9L*/ expr
-	| "-" /*8L*/ expr %prec UMINUS /*10P*/
-	| "+" /*8L*/ expr %prec UMINUS /*10P*/
-	| expr "**" /*11R*/ expr
-	| expr "//" /*7L*/ expr
+	| expr TK_PLUS /*8L*/ expr
+	| expr TK_MINUS /*8L*/ expr
+	| expr TK_STAR /*9L*/ expr
+	| expr TK_SLASH /*9L*/ expr
+	| TK_MINUS /*8L*/ expr %prec UMINUS /*10P*/
+	| TK_PLUS /*8L*/ expr %prec UMINUS /*10P*/
+	| expr TK_POW /*11R*/ expr
+	| expr TK_CONCAT /*7L*/ expr
 	| expr TK_EQ /*6L*/ expr
 	| expr TK_NE /*6L*/ expr
 	| expr TK_LT /*6L*/ expr
@@ -1701,51 +1701,51 @@ struct_member_star :
 	;
 
 struct_member :
-	id "%"
-	| id "(" fnarray_arg_list_opt ")" "%"
+	id TK_PERCENT
+	| id "(" fnarray_arg_list_opt ")" TK_PERCENT
 	;
 
 fnarray_arg_list_opt :
-	fnarray_arg_list_opt "," fnarray_arg
+	fnarray_arg_list_opt TK_COMMA fnarray_arg
 	| fnarray_arg
 	| /*empty*/
 	;
 
 fnarray_arg :
 	expr
-	| ":"
-	| expr ":"
-	| ":" expr
-	| expr ":" expr
-	| "::" expr
-	| ":" ":" expr
-	| expr "::" expr
-	| expr ":" ":" expr
-	| ":" expr ":" expr
-	| expr ":" expr ":" expr
-	| id "=" expr
-	| "*" /*9L*/ TK_INTEGER
+	| TK_COLON
+	| expr TK_COLON
+	| TK_COLON expr
+	| expr TK_COLON expr
+	| TK_DBL_COLON expr
+	| TK_COLON TK_COLON expr
+	| expr TK_DBL_COLON expr
+	| expr TK_COLON TK_COLON expr
+	| TK_COLON expr TK_COLON expr
+	| expr TK_COLON expr TK_COLON expr
+	| id TK_EQUAL expr
+	| TK_STAR /*9L*/ TK_INTEGER
 	;
 
 coarray_arg_list :
-	coarray_arg_list "," coarray_arg
+	coarray_arg_list TK_COMMA coarray_arg
 	| coarray_arg
 	;
 
 coarray_arg :
 	expr
-	| ":"
-	| expr ":"
-	| ":" expr
-	| expr ":" expr
-	| "::" expr
-	| ":" ":" expr
-	| expr "::" expr
-	| expr ":" ":" expr
-	| ":" expr ":" expr
-	| expr ":" expr ":" expr
-	| id "=" expr
-	| "*" /*9L*/
+	| TK_COLON
+	| expr TK_COLON
+	| TK_COLON expr
+	| expr TK_COLON expr
+	| TK_DBL_COLON expr
+	| TK_COLON TK_COLON expr
+	| expr TK_DBL_COLON expr
+	| expr TK_COLON TK_COLON expr
+	| TK_COLON expr TK_COLON expr
+	| expr TK_COLON expr TK_COLON expr
+	| id TK_EQUAL expr
+	| TK_STAR /*9L*/
 	;
 
 id_list_opt :
@@ -1754,7 +1754,7 @@ id_list_opt :
 	;
 
 id_list :
-	id_list "," id
+	id_list TK_COMMA id
 	| id
 	;
 
@@ -1765,6 +1765,21 @@ id_opt :
 
 id :
 	TK_NAME
+	| soft_keywords
+	;
+
+id_skw :
+	id
+	| soft_keywords
+	;
+
+soft_keywords :
+    KW_LEN
+    //| KW_NAME
+    ;
+
+/*
+keywords :
 	| KW_ABSTRACT
 	| KW_ALL
 	| KW_ALLOCATABLE
@@ -1935,7 +1950,7 @@ id :
 	| KW_WHILE
 	| KW_WRITE
 	;
-
+*/
 %%
 
 end   \x00
@@ -2148,7 +2163,7 @@ ws_comment   {whitespace}?{comment}?{newline}
 "memory"   KW_MEMORY
 "module"   KW_MODULE
 "mold"   KW_MOLD
-"name"   KW_NAME
+//"name"   KW_NAME
 "namelist"   KW_NAMELIST
 "new_index"   KW_NEW_INDEX
 "nopass"   KW_NOPASS
@@ -2248,23 +2263,23 @@ ws_comment   {whitespace}?{comment}?{newline}
 "(/"  TK_LBRACKET
 "]"  "]" //TK_RBRACKET
 "/)"  "/)" //TK_RBRACKET_OLD
-"+"  "+" //TK_PLUS
-"-"  "-" //TK_MINUS
-"="  "=" //TK_EQUAL
-":"  ":" //TK_COLON
-";"  ";" //TK_SEMICOLON
-"/"  "/" //TK_SLASH
-"%"  "%" //TK_PERCENT
-","  "," //TK_COMMA
-"*"  "*" //TK_STAR
-//"|"  "|" //TK_VBAR
+"+"  TK_PLUS
+"-"  TK_MINUS
+"="  TK_EQUAL
+":"  TK_COLON
+";"  TK_SEMICOLON
+"/"  TK_SLASH
+"%"  TK_PERCENT
+","  TK_COMMA
+"*"  TK_STAR
+//"|"  TK_VBAR
 
 // Multiple character symbols
 ".." TK_DBL_DOT
-"::"  "::" //TK_DBL_COLON
-"**"  "**" //TK_POW
-"//"  "//" //TK_CONCAT
-"=>"  "=>" //TK_ARROW
+"::"  TK_DBL_COLON
+"**"  TK_POW
+"//"  TK_CONCAT
+"=>"  TK_ARROW
 
 // Relational operators
 "=="   TK_EQ
@@ -2314,6 +2329,7 @@ integer / defop {
 */
 
 {real} TK_REAL
+{integer}{whitespace}{name}{newline}	TK_LABEL
 /*
 integer / (whitespace name) {
 	if (last_token == yytokentype::TK_NEWLINE) {
@@ -2355,7 +2371,8 @@ integer / (whitespace name) {
 
 "&"{ws_comment}+{whitespace}?"&"? skip()
 
-{comment}{newline}  TK_EOLCOMMENT
+{comment}{newline}  TK_COMMENT
+{comment}  TK_EOLCOMMENT
 /*{
 	line_num++; cur_line=cur;
 	token(yylval.string);
