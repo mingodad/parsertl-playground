@@ -58,6 +58,7 @@ const sampleList = [
 	["Chapel parser", "chapel.g", "test.chapel", "ace/mode/c_cpp"],
 	["Textmapper parser", "textmapper.g", "test.tm", "ace/mode/yaml"],
 	["Antlr4.5 parser", "antlr-v4.5.g", "test.antlr", "ace/mode/yaml"],
+	["idl2cpp parser", "idl2cpp.g", "test.idl", "ace/mode/c_cpp"],
 	["Doxygen code scanner torture", "code-doxygen.g", "test.c", "ace/mode/c_cpp"],
 	["HTML parser", "html-parser.g", "index.html", "ace/mode/html"],
 	["Lark parser", "lark.g", "test.lark", "ace/mode/yaml"],
