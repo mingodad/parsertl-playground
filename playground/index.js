@@ -65,6 +65,7 @@ const sampleList = [
 	["MSTA parser", "msta.g", "test.msta", "ace/mode/yaml"],
 	["Textdiagram parser", "textdiagram.g", "test.textdiagram", "ace/mode/text"],
 	["Pikchr parser", "pikchr.g", "test.pikchr", "ace/mode/text"],
+	["Scheme parser", "scheme.g", "test.scheme", "ace/mode/lisp"],
 	["Minic parser", "minic.g", "test.minic", "ace/mode/c_cpp"],
 	["Z80 assembler parser", "z80-asm.g", "test.z80-asm", "ace/mode/assembly_x86"],
 	["Peg parser (partially working)", "peg.g", "test.peg", "ace/mode/yaml"],
