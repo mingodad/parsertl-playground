@@ -689,7 +689,7 @@ identifier_nondigit   {nondigit}|{universal_character_name}
 identifier   {identifier_nondigit}({identifier_nondigit}|{digit})*
 
 /* Whitespaces */
-whitespace_char_no_newline   [ \t\r]
+whitespace_char_no_newline   [ \t\f\r]
 
 /* Integer constants */
 nonzero_digit   [1-9]
