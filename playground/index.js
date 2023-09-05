@@ -47,6 +47,8 @@ const sampleList = [
 	["Lua2ljs parser", "lua2ljs.g", "test.lua", "ace/mode/lua"],
 	["JavascriptCore parser", "javascript-core.g", "test.js.txt", "ace/mode/javascript"],
 	["Ansi C parser", "cparser.g", "test.c", "ace/mode/c_cpp"],
+	["Ansi C11 parser (partially working)", "c11-ansi-c.g", "test.c", "ace/mode/c_cpp"],
+	["Ansi C18 parser (partially working)", "c18-ansi.g", "test.c", "ace/mode/c_cpp"],
 	["PnetC parser", "pnet-c.g", "test.c", "ace/mode/c_cpp"],
 	["PnetJava parser", "pnet-java.g", "test.java", "ace/mode/java"],
 	["PnetVBasic parser", "pnet-vb.g", "test.vb", "ace/mode/vbscript"],
