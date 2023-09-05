@@ -72,8 +72,8 @@
 %token BITSTRUCT
 %token STATIC
 %token BANGBANG
-%token AT_CONST_IDENT
-%token HASH_TYPE_IDENT
+//%token AT_CONST_IDENT
+//%token HASH_TYPE_IDENT
 %token STRUCT
 %token UNION
 %token ENUM
@@ -154,7 +154,7 @@
 %token CT_CONST_IDENT
 %token LBRAPIPE
 %token RBRAPIPE
-%token HASH_CONST_IDENT
+//%token HASH_CONST_IDENT
 %token '.'
 %token '('
 %token ')'
@@ -1318,9 +1318,9 @@ define_ident :
 	;
 
 define_declaration :
-	DEF define_ident ';'
-	| DEF define_attribute ';'
-	| DEF TYPE_IDENT opt_attributes '=' opt_distinct_inline typedef_type ';'
+	DEF define_ident opt_attributes ';'
+	| DEF define_attribute opt_attributes';'
+	| DEF TYPE_IDENT opt_attributes '=' opt_distinct_inline typedef_type opt_attributes ';'
 	;
 
 tl_ct_if :
@@ -1412,7 +1412,7 @@ E           [Ee][+-]?{D}+
 P           [Pp][+-]?{D}+
 B64         [ \t\v\n\f]?[A-Za-z0-9+/][ \t\v\n\fA-Za-z0-9+/=]+
 HEX         [ \t\v\n\f]?[A-Fa-f0-9][ \t\v\n\fA-Fa-f0-9]+
-INTTYPE     [ui](8|16|32|64|128)?
+INTTYPE     (([ui](8|16|32|64|128))|([Uu][Ll]?|[Ll]))?
 REALTYPE    [f](8|16|32|64|128)?
 INT         {D}(_*{D})*
 HINT        {H}(_*{H})*
@@ -1533,12 +1533,12 @@ WS          [ \t\v\n\r\f]
 "void"		VOID
 "while"		WHILE
 
-@{CONST}        AT_CONST_IDENT
-#{CONST}        HASH_CONST_IDENT
+//@{CONST}        AT_CONST_IDENT
+//#{CONST}        HASH_CONST_IDENT
 "$"{CONST}      CT_CONST_IDENT
 {CONST}         CONST_IDENT
 @{TYPE}         AT_TYPE_IDENT
-#{TYPE}         HASH_TYPE_IDENT
+//#{TYPE}         HASH_TYPE_IDENT
 "$"{TYPE}       CT_TYPE_IDENT
 {TYPE}          TYPE_IDENT
 @{IDENTIFIER}   AT_IDENT
@@ -1568,7 +1568,7 @@ b64\`{B64}+\` BYTES
 <RAW_STRING>{
 	"``"<.>
 	"`"<INITIAL>         STRING_LITERAL
-	(?s:.)+?<.>
+	[^`]<.>
 }
 
 "..."		ELLIPSIS
