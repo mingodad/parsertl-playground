@@ -101,6 +101,8 @@
 %token '@'
 %token '^'
 
+%nonassoc /*1*/ IF_WITHOUT_ELSE
+%nonassoc /*2*/ K_ELSE
 
 %start Program
 
@@ -342,7 +344,7 @@ IfStatement :
 	;
 
 IfTail :
-	Statement
+	Statement %prec IF_WITHOUT_ELSE
 	| Statement K_ELSE Statement
 	;
 
