@@ -106,7 +106,7 @@ peculiaridentifier "-"|"+"|"..."
 subsequent         ({initial})|{digit}|{specialsubsequent}
 identifier	   ({initial})({subsequent})*|{peculiaridentifier}
 sign               [+-]
-number		   ({sign})?({digit})+("."{digit}+)?
+number		   ({sign})?({digit})+("."{digit}+)?|"#x"[0-9A-Fa-f]+
 
 %%
 
