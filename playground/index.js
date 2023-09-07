@@ -75,6 +75,7 @@ const sampleList = [
 	["Mulang parser (not working)", "mulang.g", "test.mulang", "ace/mode/text"],
 	["Openscad parser (partially working)", "openscad.g", "test.openscad", "ace/mode/text"],
 	["Peg parser (partially working)", "peg.g", "test.peg", "ace/mode/yaml"],
+	["PHP-8.2 parser (partially working)", "php-8.2.g", "test.php", "ace/mode/php"],
 	["Pikchr parser", "pikchr.g", "test.pikchr", "ace/mode/text"],
 	["Playground3 parser", "playground-master3.g", "playground-master3.g", "ace/mode/yaml"],
 	["Playground parser", "playground-master.g", "calculator.g", "ace/mode/yaml"],
