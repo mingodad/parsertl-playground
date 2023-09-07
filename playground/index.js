@@ -52,6 +52,7 @@ const sampleList = [
 	["Ispc parser", "ispc.g", "test.ispc", "ace/mode/c_cpp"],
 	["Java11 parser", "java11.g", "test.java", "ace/mode/java"],
 	["JavascriptCore parser", "javascript-core.g", "test.js.txt", "ace/mode/javascript"],
+	["Jq parser (partially working)", "jq-parser.g", "test.jq", "ace/mode/text"],
 	["Json5 parser", "json5.g", "test.json5.txt", "ace/mode/json"],
 	["Json lexer", "json-lexer.g", "test.json.txt", "ace/mode/json"],
 	["Json parser", "json.g", "test.json.txt", "ace/mode/json"],
@@ -89,6 +90,7 @@ const sampleList = [
 	["Tameparse parser (not working)", "tameparser.g", "test.tameparser", "ace/mode/yaml"],
 	["Textdiagram parser", "textdiagram.g", "test.textdiagram", "ace/mode/text"],
 	["Textmapper parser", "textmapper.g", "test.tm", "ace/mode/yaml"],
+	["Webassembly interpreter parser", "wasm-interpreter.g", "test.wast", "ace/mode/lisp"],
 	["XML parser", "xml.g", "test.xml.txt", "ace/mode/xml"],
 	["Z80 assembler parser", "z80-asm.g", "test.z80-asm", "ace/mode/assembly_x86"],
 ];
