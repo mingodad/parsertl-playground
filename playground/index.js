@@ -89,6 +89,7 @@ const sampleList = [
 	["Rust parser", "rust.g", "test.rs.txt", "ace/mode/rust"], /*github send ext '.rs' as application/rls-services+xml */
 	["Scheme parser", "scheme.g", "test.scheme", "ace/mode/lisp"],
 	["Souffle parser", "souffle.g", "test.souffle", "ace/mode/prolog"],
+	["SQLite3 parser (partially working)", "sqlite3.g", "test.sql", "ace/mode/sql"],
 	["Tameparse parser (not working)", "tameparser.g", "test.tameparser", "ace/mode/yaml"],
 	["Textdiagram parser", "textdiagram.g", "test.textdiagram", "ace/mode/text"],
 	["Textmapper parser", "textmapper.g", "test.tm", "ace/mode/yaml"],
