@@ -666,6 +666,8 @@ ANY : ID ;
 
 %%
 
+BASE_ID	[_a-zA-Z][a-zA-Z0-9_]*
+
 %%
 
 [ \t\n\r]+   skip()
@@ -684,7 +686,7 @@ AND	AND
 AS	AS
 ASC	ASC
 ATTACH	ATTACH
-AUTOINCR	AUTOINCR
+AUTOINCREMENT	AUTOINCR
 BEFORE	BEFORE
 BEGIN	BEGIN
 BETWEEN	BETWEEN
@@ -755,11 +757,11 @@ INTO	INTO
 IS	IS
 ISNULL	ISNULL
 JOIN	JOIN
-JOIN_KW	JOIN_KW
+CROSS|FULL|INNER|LEFT|NATURAL|OUTER|RIGHT	JOIN_KW
 KEY	KEY
 LAST	LAST
 "<="	LE
-LIKE	LIKE_KW
+LIKE|GLOB|REGEXP	LIKE_KW
 LIMIT	LIMIT
 "("	LP
 "<<"	LSHIFT
@@ -838,6 +840,6 @@ WITHOUT	WITHOUT
 [0-9]+	INTEGER
 '(''|[^'\n])*'	STRING
 /* Order matter if identifier comes before keywords they are classified as identifier */
-[_a-zA-Z][a-zA-Z0-9_]*	ID
+{BASE_ID}|\"{BASE_ID}\"	ID
 
 %%
