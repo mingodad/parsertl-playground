@@ -73,6 +73,7 @@ const sampleList = [
 	["Minizinc parser (not working)", "minizinc.g", "test.mzn", "ace/mode/text"],
 	["MSTA parser", "msta.g", "test.msta", "ace/mode/yaml"],
 	["Mulang parser (not working)", "mulang.g", "test.mulang", "ace/mode/text"],
+	["Mysql parser (be patient)(partially working)", "mysql.g", "test.mysql", "ace/mode/sql"],
 	["Openscad parser (partially working)", "openscad.g", "test.openscad", "ace/mode/text"],
 	["Peg parser (partially working)", "peg.g", "test.peg", "ace/mode/yaml"],
 	["PHP-8.2 parser (partially working)", "php-8.2.g", "test.php", "ace/mode/php"],
