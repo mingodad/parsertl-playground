@@ -20,7 +20,7 @@ ocamlyacc -v menhir-fancy-parser-yacc.mly
    mode no longer exist. Thus, we replace all calls to [Error.signal]
    with calls to [Error.error], and report just one error. */
 
-%x ACTION_ST
+%x ACTION_ST OBLK_COMMENT CBLK_COMMENT
 
 %token TOKEN TYPE LEFT RIGHT NONASSOC START PREC
 %token PUBLIC COLON BAR EQUAL INLINE LPAREN
@@ -551,9 +551,20 @@ located_symbol_expression_ :
 %%
 
 [ \t\n\r]	skip()
-"/*"(?s:.)*?"*/"	skip()
-"(*"(?s:.)*?"*)"	skip()
 
+"/*"<>CBLK_COMMENT>
+<CBLK_COMMENT> {
+    "/*"<>CBLK_COMMENT>
+    "*/"<<> skip()
+    (?s:.)<.>   skip()
+}
+
+"(*"<>OBLK_COMMENT>
+<OBLK_COMMENT> {
+    "(*"<>OBLK_COMMENT>
+    "*)"<<> skip()
+    (?s:.)<.>   skip()
+}
 
 "[".+?"]"	ATTRIBUTE
 "%attribute" PERCENTATTRIBUTE
@@ -597,7 +608,7 @@ located_symbol_expression_ :
 }
 
 [a-z][A-Za-z0-9_]*	LID
-[A-Z][A-Z0-9_]*	UID
+[A-Z][A-Za-z0-9_]*	UID
 \"("\\".|[^"\n\r\\])*\"	QID
 
 %%

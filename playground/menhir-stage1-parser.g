@@ -19,7 +19,7 @@
    4. [fancy-parser] supports the new rule syntax. */
 
 
-%x ACTION_ST
+%x ACTION_ST OBLK_COMMENT CBLK_COMMENT
 
 %token TOKEN TYPE LEFT RIGHT NONASSOC START PREC PUBLIC COLON BAR EQUAL
 %token INLINE LPAREN RPAREN COMMA QUESTION STAR PLUS PARAMETER ON_ERROR_REDUCE
@@ -293,9 +293,20 @@ optional_semis:
 %%
 
 [ \t\n\r]	skip()
-"/*"(?s:.)*?"*/"	skip()
-"(*"(?s:.)*?"*)"	skip()
 
+"/*"<>CBLK_COMMENT>
+<CBLK_COMMENT> {
+    "/*"<>CBLK_COMMENT>
+    "*/"<<> skip()
+    (?s:.)<.>   skip()
+}
+
+"(*"<>OBLK_COMMENT>
+<OBLK_COMMENT> {
+    "(*"<>OBLK_COMMENT>
+    "*)"<<> skip()
+    (?s:.)<.>   skip()
+}
 
 "[".+?"]"	ATTRIBUTE
 "%attribute" PERCENTATTRIBUTE
@@ -333,7 +344,7 @@ optional_semis:
 }
 
 [a-z][A-Za-z0-9_]*	LID
-[A-Z][A-Z0-9_]*	UID
+[A-Z][A-Za-z0-9_]*	UID
 \"("\\".|[^"\n\r\\])*\"	QID
 
 %%
