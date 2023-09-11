@@ -65,9 +65,21 @@ terminal :
 	;
 
 repeat_range :
-	LBRACE NUMBER RBRACE
-	| LBRACE NUMBER COMMA NUMBER RBRACE
+	LBRACE range_exact RBRACE
+	| LBRACE range_min COMMA range_max RBRACE
 	;
+
+range_exact :
+    NUMBER
+    ;
+
+range_min :
+    NUMBER
+    ;
+
+range_max :
+    NUMBER
+    ;
 
 symbol :
 	terminal
@@ -81,9 +93,13 @@ rule_rhs_symbols :
 	;
 
 rule_rhs_part :
-	NUMBER rule_rhs_symbols
+	weigh_randon_sel rule_rhs_symbols
 	| rule_rhs_symbols
 	;
+
+weigh_randon_sel :
+    NUMBER
+    ;
 
 rule_rhs :
 	rule_rhs_part
