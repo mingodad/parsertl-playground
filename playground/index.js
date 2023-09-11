@@ -44,6 +44,7 @@ const sampleList = [
 	["Carbon parser (need review of '*')", "carbon-lang.g", "prelude.carbon", "ace/mode/typescript"],
 	["Chapel parser", "chapel.g", "test.chapel", "ace/mode/c_cpp"],
 	["CocoR parser (partially working)", "cocor.g", "test.cocor", "ace/mode/yaml"],
+	["CoqPP parser", "coqpp_parse.g", "test.coqpp", "ace/mode/yaml"],
 	["Cpp5-v2 parser (not working)", "cpp5-v2.g", "test.cpp", "ace/mode/c_cpp"],
 	["Cql parser", "cql.g", "test.cql", "ace/mode/sql"],
 	["Cxx parser (not working)", "CxxParser.g", "test.cpp", "ace/mode/c_cpp"],
