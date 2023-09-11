@@ -1,0 +1,404 @@
+/*
+This class is an example implementation of a binary search tree.
+It is a Bolt adaptation of my own existing Java BST implementation.
+
+Some workarounds:
+- no bounded generics (so key is an int)
+- no exceptions (so we have an errorCode) - interestingly the errorCode capability also taints method signatures like "throws BlahException" would do in Java! (So you don't lose info!)
+- Bolt has simpler constructor syntax and a little less sugar all round
+- let expressions : Bolt has local variable type inference\
+- no ArrayList (Bolt's Collection's library is coming soon... ;) )
+ */
+
+class TreeNode<T> {
+  capability read elemKey, local elemVal, local elemNull, local otherNodes;
+  var int key : elemKey;
+  var T value : elemVal;
+  var bool isNull : elemNull;
+  var TreeNode<T> parent : otherNodes;
+  var TreeNode<T> leftChild : otherNodes;
+  var TreeNode<T> rightChild : otherNodes;
+
+
+}
+
+class BinarySearchTree<T> {
+  capability local Root, read ErrorCode;
+  var TreeNode<T> mRoot : Root;
+  var int errorCode : ErrorCode;
+
+  /*
+  each node in the tree contains a key (by which it is ordered)
+  and pointers to its parent and left and right children.
+  NB: we also include a value isNull for all nodes - this is for compatibility
+  reasons with Java
+   Note BST property :
+  key(leftChild)<=key(node)<=key(rightChild)
+   */
+
+  // internal method to return the TreeNode with the particular key
+  // useful since we can then traverse the tree from that point
+  TreeNode<T> nodeWithKey(int k) : Root {
+    let currentNode = this.mRoot;
+      while (this.isNonNull(currentNode) && (k != (currentNode.key))) {
+        // compare with the current node's key
+        if (k < (currentNode.key)) {  // go down left subtree
+          currentNode := currentNode.leftChild
+      } else {  // k must be in right subtree if it is in tree
+          currentNode := currentNode.rightChild
+      }
+    };
+    currentNode
+  }
+
+  /* helper functions to avoid  chaining field accesses  */
+  bool isNull(TreeNode<T> node) : Root { node.isNull }
+  bool isNonNull(TreeNode<T> node) : Root { !(node.isNull) }
+  int getKey(TreeNode<T> node) : Root { (node.key) }
+  TreeNode<T> getNodeLeftChild(TreeNode<T> node) : Root {
+    if(node.isNull){
+        node // null implies we're a leaf, so return a null node
+    }
+    else{
+        node.leftChild
+    }
+  }
+  TreeNode<T> getNodeRightChild(TreeNode<T> node) : Root {
+    if(node.isNull){
+        node // null implies we're a leaf, so return a null node
+    }
+    else{
+        node.rightChild
+    }
+  }
+  TreeNode<T> setNodeParent(TreeNode<T> node, TreeNode<T> newVal) : Root {
+    node.parent := newVal
+  }
+  TreeNode<T> setNodeLeftChild(TreeNode<T> node, TreeNode<T> newVal) : Root {
+    node.leftChild := newVal
+    }
+   TreeNode<T> setNodeRightChild(TreeNode<T> node, TreeNode<T> newVal) : Root {
+    node.rightChild := newVal
+    }
+
+ void printNode(TreeNode<T> node) : Root {  // used to print out node
+    printf("(k: %d, v: %d)\n", node.key, node.value)
+  }
+  /*
+  The following methods implement the Ordered Set ADT, hence only returning a
+  key
+   */
+
+  int min() : Root, ErrorCode {
+    if (this.isEmpty()) {
+      this.errorCode  // no min since tree is empty
+    } else {
+      let currentNode = this.mRoot;
+      // keep following left child until we reach leaf
+      while (this.isNonNull(currentNode.leftChild)) {
+      currentNode:= currentNode.leftChild
+      };
+      currentNode.key
+    }
+  }
+
+  int max() : Root, ErrorCode {
+    if (this.isEmpty()) {
+      this.errorCode  // no max since tree is empty
+    } else {
+      let currentNode = this.mRoot;
+      // keep following right child until we reach leaf
+      while (this.isNonNull(currentNode.rightChild)) {
+      currentNode := currentNode.rightChild
+      };
+      currentNode.key
+    }
+  }
+
+  int predecessor(int k) : Root, ErrorCode {
+    let currentNode = this.nodeWithKey(k);
+        // if currentNode is null then there's no key
+    if ((currentNode.isNull) || ((this.min()) == (k))) {  // check if k is min element of tree
+      // if so, we have violated a pre-condition of predecessor()
+      this.errorCode  // so no predecessor
+    } else {
+      // now we know there is a valid predecessor, let us find it.
+      let predint = this.errorCode;
+      // case 1: node with key k has a left subtree, in which case get max
+      // element of left subtree
+      if (this.isNonNull(currentNode.leftChild)) {
+
+        let leftSubtree =
+              new BinarySearchTree<T>(mRoot : currentNode.leftChild,
+                            errorCode: this.errorCode);
+        predint := leftSubtree.max()
+      }
+
+      // case 2: an ancestor of the node is k's predecessor. so traverse with
+      // sketch below:
+      // pred
+      //   \
+            //   /
+      //  /
+      // /
+      // k
+      // we need to go up the tree until key of ancestor(node)< k
+      // this is the case since k = min element of pred's right subtree, i.e k
+      // is pred's successor
+      else {
+        while ( (this.getNodeLeftChild(currentNode.parent)) == (currentNode)) {
+          currentNode := currentNode.parent
+        };
+        predint := this.getKey(currentNode.parent)
+      };
+      predint
+    }
+  }
+
+  int successor(int k) : Root, ErrorCode {
+    // this is the mirror image of predecessor
+
+    let currentNode = this.nodeWithKey(k);
+        // if currentNode is null that means the key doesn't exist
+      if ( (currentNode.isNull) || ((this.max()) == (k)) ) {  // check if k is max element of tree
+        // if so, we have violated a pre-condition of successor()
+        this.errorCode  // so no successor
+
+    } else {
+
+    // now we know there is a valid successor, let us find it.
+    let succint = this.errorCode;
+    // case 1: node with key k has a right subtree, in which case get min
+    // element of right subtree
+    if (this.isNonNull(currentNode.rightChild)) {
+        let rightSubTree = new BinarySearchTree<T>(mRoot: currentNode.rightChild,
+                                            errorCode: this.errorCode);
+        succint := rightSubTree.min()
+
+    }
+
+    // case 2: an ancestor of the node is k's successor. so traverse with sketch
+    // below:
+    // succ
+    //   /
+    //   \
+        //    \
+        //     \
+        //      k
+    // we need to go up the tree until key of ancestor(node)> k
+    // this is the case since k = max element of succ's left subtree, i.e k is
+    // succ's predecessor
+    else {
+      while ((this.getNodeRightChild(currentNode.parent)) == (currentNode)) {
+        currentNode := currentNode.parent
+      };
+      succint := this.getKey(currentNode.parent)
+    };
+     succint
+    }
+  }
+
+  void insert(int k, T v) : Root {
+    let currentNode = this.mRoot;
+    let parentNode = new TreeNode<T>(isNull:true);  // parent of current node
+    while ((this.isNonNull(currentNode)) && ( (k != (currentNode.key)))) {
+
+      if (k < (currentNode.key)) {  // k< current node key so go down left subtree
+        parentNode := currentNode;
+        currentNode := currentNode.leftChild
+      } else {  // k> current node key so go down right subtree
+        parentNode := currentNode;
+        currentNode := currentNode.rightChild
+      }
+    };
+    if ((k) == (currentNode.key)){ // Case 1: key is already present so overwrite the value
+        currentNode.isNull := false;
+        currentNode.value := v;
+        currentNode // return this so types are consistent
+    } else {
+        // we've reached bottom of tree so insert as leaf
+        let newNode = new TreeNode<T>(key: k, value: v, isNull: false, leftChild: new TreeNode<T>( isNull:true ), rightChild: new TreeNode<T>( isNull:true ));
+
+        if (parentNode.isNull) {  // Case 2: tree is empty
+            this.mRoot := newNode
+
+        }
+        // Case 3:we have a parent node so we update newNode as the parent node's
+        // left or right child, depending on key
+        else {
+        newNode.parent := parentNode;
+        if (k < (parentNode.key)) {
+            parentNode.leftChild := newNode
+
+        } else {
+            parentNode.rightChild := newNode
+
+        }
+        }
+    }
+  }
+
+  void delete (int k) : Root, ErrorCode {
+    let currentNode = this.nodeWithKey(k);
+    if (currentNode.isNull){ // nothing to delete
+         currentNode // just to make types consistent
+    }
+
+    else {
+    // Case 1: if node has at most one subtree, we just shift this up
+    if ((this.isNull(currentNode.leftChild)) || (this.isNull(currentNode.rightChild))) {
+      if (this.isNull(currentNode.leftChild)) {
+        // splice out node and update pointers
+        this.setNodeParent(currentNode.rightChild,currentNode.parent);
+        if (currentNode == (this.mRoot)) {
+          this.mRoot := currentNode.rightChild
+        } else {
+          if ( (this.getNodeLeftChild(currentNode.parent)) == (currentNode)) {
+                this.setNodeLeftChild(currentNode.parent,currentNode.rightChild)
+          } else {
+              this.setNodeRightChild(currentNode.parent,currentNode.rightChild)
+          }
+        }
+      } else {
+          this.setNodeParent(currentNode.leftChild,currentNode.parent);
+          if (currentNode == (this.mRoot)) {
+            this.mRoot := currentNode.rightChild
+          } else {
+        // splice out node and update pointers
+          if ( (this.getNodeLeftChild(currentNode.parent)) == (currentNode)) {
+              this.setNodeLeftChild(currentNode.parent,currentNode.leftChild)
+          } else {
+              this.setNodeRightChild(currentNode.parent,currentNode.leftChild)
+          }
+        }
+      }
+    }
+    // Case 2: node has both subtrees, so its successor lies in right subtree
+    // we swap node with its successor, then delete it
+    // For ease of implementation, we will do this by deleting successor from
+    // tree, then swapping it into the original node's position.
+
+    else {
+      let succNode = this.nodeWithKey(this.successor(k));
+      // note successor has no left subtree so case 1 applies
+       this.setNodeParent(succNode.rightChild,succNode.parent);
+
+        if ( (this.getNodeLeftChild(succNode.parent)) == (succNode)) {
+            this.setNodeLeftChild(succNode.parent,succNode.rightChild)
+        } else {
+            this.setNodeRightChild(succNode.parent,succNode.rightChild)
+        };
+
+      // next let us swap succNode into currentNode's position by updating
+      // pointers
+
+      // first the parent node
+      succNode.parent := currentNode.parent;
+
+      if (currentNode == (this.mRoot)) {
+        this.mRoot := succNode
+      } else {  // i.e. if currentNode has a parent (i.e. not root)
+
+        if ( (this.getNodeLeftChild(currentNode.parent)) == (currentNode)) {
+            this.setNodeLeftChild(currentNode.parent,succNode)
+        } else {
+            this.setNodeRightChild(currentNode.parent,succNode)
+        };
+        succNode // just to keep types of branches consistent
+      };
+
+      // next, the children
+      succNode.leftChild := currentNode.leftChild;
+
+      succNode.rightChild := currentNode.rightChild;
+      this.setNodeParent(currentNode.rightChild, succNode)
+    }
+    }
+  }
+
+
+  bool isEmpty() : Root {  (this.isNull(this.mRoot)) }
+
+  bool hasKey(int k) : Root, ErrorCode  {
+        let node = this.nodeWithKey(k);
+        this.isNonNull(node)
+  }
+
+  int chooseAny() : Root, ErrorCode {
+    if (this.isEmpty()) {
+        this.errorCode
+    }
+    else{
+      this.getKey(this.mRoot)  // return the root's key for simplicity's sake
+    }
+  }
+
+  int size() : Root, ErrorCode {
+    if (!(this.isEmpty())) {
+      // recursively count the left and right subtrees if they exist
+      let leftSubtree = new BinarySearchTree<T>(mRoot: this.getNodeLeftChild(this.mRoot) , errorCode: this.errorCode);
+      let rightSubTree = new BinarySearchTree<T>(mRoot: this.getNodeRightChild(this.mRoot) , errorCode: this.errorCode);
+       1 + ((leftSubtree.size())+ (rightSubTree.size()))
+
+    } else {
+        0
+    }
+
+  }
+  /*
+  This implementation prints nodes when doing an inorder traversal.
+   */
+  void inOrderTraversal() :Root, ErrorCode {
+    // visit left subtree first, then node, then right subtree
+    // Postorder: visit L then R then node itself
+    // Preorder: visit node then L then R
+    if (!(this.isEmpty())) {
+      // recursively count the left and right subtrees if they exist
+      let leftSubtree = new BinarySearchTree<T>(mRoot: this.getNodeLeftChild(this.mRoot) , errorCode: this.errorCode);
+      let rightSubTree = new BinarySearchTree<T>(mRoot: this.getNodeRightChild(this.mRoot) , errorCode: this.errorCode);
+       leftSubtree.inOrderTraversal();
+       this.printNode(this.mRoot);
+       rightSubTree.inOrderTraversal()
+
+    } else {
+
+    }
+
+  }
+
+  // this method returns the depth of the tree
+  int depth(TreeNode<T> currentNode) :Root {
+    if (currentNode.isNull) {
+      0   // since 1 node tree has depth 0
+    }
+    else {
+      let leftDepth = this.depth(currentNode.leftChild);
+      let rightDepth = this.depth(currentNode.rightChild);
+
+      let maxChildDepth = if (leftDepth > rightDepth){
+          leftDepth
+      }
+      else {
+          rightDepth
+      };
+       maxChildDepth + 1
+    }
+  }
+}
+
+
+void main() {
+  let lc = new TreeNode<int>( isNull:true );
+  let rc = new TreeNode<int>( isNull:true );
+  let root = new TreeNode<int>(key: 1, value: 42, isNull:false, leftChild: lc, rightChild: rc);
+  let tree = new  BinarySearchTree<int> (mRoot: root, errorCode: -1);
+  tree.insert(2, 32);
+  tree.insert(-1, 30);
+  printf("Size of tree: %d\n" tree.size() );
+  tree.inOrderTraversal();
+  printf("Min key in tree: %d\n" tree.min() );
+  printf("Max key in tree: %d\n" tree.max());
+  tree.delete(-1);
+  tree.inOrderTraversal();
+  printf("Min key in tree after deleting -1: %d\n" tree.min() )
+}

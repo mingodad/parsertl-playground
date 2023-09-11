@@ -1,0 +1,181 @@
+<start> ::= "select ( " <expr> " ) as expr;" ;
+
+<expr>	::=
+	10 <term>
+	| 10 <expr> <binary_op> <expr>
+	| "(" <expr> ")"
+	| <id>
+	#| JOIN_KW
+	#| <nm> "." <nm>
+	#| <nm> "." <nm> "." <nm>
+	#| VARIABLE
+	| <expr> " collate " <ids>
+	| " CAST" "(" <expr> " as " <typetoken> ")"
+	| <id> "(" <distinct>{0,1} <exprlist> ")"
+	| <id> "(" "*" ")"
+	#| <id> "(" distinct{0,1} <exprlist> ")" filter_over
+	#| <id> "(" "*" ")" filter_over
+	| "(" <nexprlist> "," <expr> ")"
+	#| <expr> likeop <expr>
+	#| <expr> likeop <expr> " ESCAPE " <expr>
+	| <expr> <suffix_op>
+	| <unary_op> <expr>
+	| <expr> <between_op> <expr> " AND " <expr>
+	| <expr> <in_op> "(" <exprlist> ")"
+	| "(" <select> ")"
+	| <expr> <in_op> "(" <select> ")"
+	#| <expr> <in_op> nm dbnm paren_exprlist
+	| " EXISTS" "(" <select> ")"
+	#| " CASE " <expr>{0,1} <case_exprlist> <case_else>{0,1} " END "
+	#| " RAISE" "(" "IGNORE" ")"
+	#| " RAISE" "(" raisetype "," nm ")"
+	;
+
+<exprlist>	::=
+	<nexprlist>
+	;
+
+<nexprlist>	::=
+	<nexprlist> "," <expr>
+	| <expr>
+	;
+
+<paren_exprlist>	::=
+	#/* empty */
+	"(" <exprlist>{0,1} ")"
+	;
+
+<term>	::=
+	" NULL "
+	| <number>
+	#| BLOB
+	| <STRING>
+	#| CTIME_KW
+	;
+
+<binary_op> ::=
+	<logical_op>
+	| <comparison_op>
+	| <equality_op>
+	| <bitwise_op>
+	| <add_op>
+	| <mul_op>
+	| " || " #CONCAT
+	| " IS "
+	| " IS NOT "
+	;
+
+<comparison_op> ::=
+	" < " | " > " | " >= " | " <= "
+	;
+
+<equality_op> ::=
+	" = " | " <> "
+	;
+
+<bitwise_op> ::=
+	" & " | " | " | " << " | " >> "
+	;
+
+<add_op> ::=
+	" + " | " - "
+	;
+
+<mul_op> ::=
+	" * " | " / " | " % "
+	;
+
+<logical_op> ::=
+	" AND " | " OR "
+	;
+
+<unary_op> ::=
+	" NOT "
+	| " !"
+	| " +"
+	| " -"
+	;
+
+<suffix_op> ::=
+	" NOT NULL "
+	| " ISNULL "
+	| " NOTNULL "
+	;
+
+<STRING> ::= "'str'";
+
+<id> ::=
+	"ab"
+	| "cd"
+	| "ef"
+	| "gh"
+	;
+
+<nm> ::= <id>
+	| <STRING>
+	#| JOIN_KW
+	;
+
+<ids> ::=
+	<id> | <STRING>
+	;
+
+<distinct>	::=
+	" DISTINCT "
+	| " ALL "
+	;
+
+<in_op> ::=
+	" IN "
+	| " NOT IN "
+	;
+
+<between_op> ::=
+	" BETWEEN "
+	| " NOT BETWEEN "
+	;
+
+<typetoken>	::=	#/* empty */
+	<typename>
+	#| <typename> "(" <signed> ")"
+	#| <typename> "(" <signed> "," <signed> ")"
+	;
+
+<typename>	::=
+	" integer "
+	#| <ids>
+	#| <typename> <ids>
+	;
+
+<signed>	::=
+	<plus_num>
+	| <minus_num>
+	;
+
+<plus_num> ::=
+	" +"{0,1} <number>
+	;
+
+<minus_num> ::=
+	" -" <number>
+	;
+
+<nzdigit> ::= "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+<digit> ::= "0" | <nzdigit> ;
+
+<integer> ::= <nzdigit> <digit>{1, 3};
+<float> ::= <integer> "." <integer>;
+<number> ::= <integer> | <float>;
+
+<select> ::=
+	" select " <integer> " as xnum "
+	;
+
+<case_exprlist>	::=
+	<case_exprlist> " WHEN " <expr> " THEN " <expr>
+	| " WHEN " <expr> " THEN " <expr>
+	;
+
+<case_else>	::=
+	" ELSE " <expr>
+	;
