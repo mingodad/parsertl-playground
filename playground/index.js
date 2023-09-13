@@ -96,6 +96,7 @@ const sampleList = [
 	["Postgresql parser (be patient)", "postgres16.g", "test.sql", "ace/mode/sql"],
 	["Preprocessor parser (not working)", "pp.g", "test.pp", "ace/mode/c_cpp"],
 	["Protobuf3 parser", "pb_parsing_parser.g", "test.proto3", "ace/mode/c_cpp"],
+	["ReasonML parser (partially working)", "reason_parser.g", "test.reason", "ace/mode/javascript"],
 	["Rust parser", "rust.g", "test.rs.txt", "ace/mode/rust"], /*github send ext '.rs' as application/rls-services+xml */
 	["Scheme parser", "scheme.g", "test.scheme", "ace/mode/lisp"],
 	["Souffle parser", "souffle.g", "test.souffle", "ace/mode/prolog"],
