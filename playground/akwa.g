@@ -1,7 +1,7 @@
 //From: https://github.com/noyesno/awka/blob/master/awka/parse.y
 
-%token UNEXPECTED
-%token BAD_DECIMAL
+//%token UNEXPECTED
+//%token BAD_DECIMAL
 %token NL
 %token SEMI_COLON
 %token LBRACE
@@ -446,6 +446,8 @@ ident		[a-zA-Z_][a-zA-Z_0-9]*
 #[^\n\r]*   skip()
 [ \t]   skip()
 
+"BEGIN"  a_BEGIN
+"END"  a_END
 "print"  PRINT
 "printf"  PRINTF
 "do"  DO
@@ -459,8 +461,6 @@ ident		[a-zA-Z_][a-zA-Z_0-9]*
 "delete"  DELETE
 "split"  SPLIT
 "match"  MATCH_FUNC
-"BEGIN"  a_BEGIN
-"END"  a_END
 "exit"  EXIT
 "abort"  ABORT
 "next"  NEXT
@@ -499,7 +499,7 @@ ident		[a-zA-Z_][a-zA-Z_0-9]*
 ":" 	COLON
 "||" 	OR
 "&&" 	AND
-"!~" 	MATCH
+"!~"|"~" 	MATCH
 "==" 	EQ
 "!=" 	NEQ
 "<" 	LT
@@ -512,7 +512,7 @@ ident		[a-zA-Z_][a-zA-Z_0-9]*
 "*" 	MUL
 "/" 	DIV
 "%" 	MOD
-"NOT" 	NOT
+"!" 	NOT
 "IO_IN" 	IO_IN
 "|" 	PIPE
 "|&" 	COPROCESS
