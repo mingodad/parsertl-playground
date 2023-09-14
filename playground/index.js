@@ -50,6 +50,7 @@ const sampleList = [
 	["Cql parser", "cql.g", "test.cql", "ace/mode/sql"],
 	["C parser frama-c (partially working)", "cparser-frama-c.g", "test.frama-c", "ace/mode/c_cpp"],
 	["Cxx parser (not working)", "CxxParser.g", "test.cpp", "ace/mode/c_cpp"],
+	["D parser (partially working)", "dlang-uaiso.g", "test.d", "ace/mode/c_cpp"],
 	["Doxygen code scanner torture", "code-doxygen.g", "test.c", "ace/mode/c_cpp"],
 	["Ecere parser (not working)", "ecere.g", "test.ecere", "ace/mode/c_cpp"],
 	["GramGrep parser", "grammar.g", "calculator.g", "ace/mode/yaml"],
