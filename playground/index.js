@@ -34,6 +34,7 @@ const sampleList = [
 	["Ansi C18 parser (partially working)", "c18-ansi.g", "test.c", "ace/mode/c_cpp"],
 	["Ansi C parser", "cparser.g", "test.c", "ace/mode/c_cpp"],
 	["Antlr4.5 parser", "antlr-v4.5.g", "test.antlr", "ace/mode/yaml"],
+	["ArangoDB AQL parser", "arangodb-aql.g", "test.arangodb-aql", "ace/mode/text"],
 	["Austral parser (partially working)", "austral-parser.g", "test.austral", "ace/mode/text"],
 	["Bison parser (partially working)", "bison.g", "carbon-lang.y", "ace/mode/yaml"],
 	["BNFGen parser", "bnfgen.g", "test.bnfgen", "ace/mode/yaml"],
