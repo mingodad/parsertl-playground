@@ -41,6 +41,7 @@ const sampleList = [
 	["Bolt parser", "bolt-parser.g", "test.bolt", "ace/mode/c_cpp"],
 	["Blawn parser", "blawn-parser.g", "test.blawn", "ace/mode/python"],
 	["Braille parser (not working)", "braille.g", "test.braille", "ace/mode/text"],
+	["Build your own prog. lang. CH13 parser", "build-your-own-programming-language-ch13.g", "test-ch13.java", "ace/mode/java"],
 	["C3c  parser", "c3lang.g", "test.c3lang", "ace/mode/c_cpp"],
 	["Calculator parser", "calculator.g", "test-calc.txt", "ace/mode/text"],
 	["Carbon parser (need review of '*')", "carbon-lang.g", "prelude.carbon", "ace/mode/typescript"],
