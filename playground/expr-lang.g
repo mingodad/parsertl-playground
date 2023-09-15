@@ -22,6 +22,10 @@
  * SOFTWARE.
  */
 
+ /*
+ Replaced right recursion by left recursion on rule statements.
+ */
+
 /*Tokens*/
 %token MINUS
 %token PLUS
@@ -71,8 +75,8 @@ unit :
 	;
 
 statements :
-	/*empty*/
-	| statement statements
+	statement
+	| statements statement
 	;
 
 statement :
