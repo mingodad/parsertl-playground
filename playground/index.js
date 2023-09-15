@@ -101,6 +101,7 @@ const sampleList = [
 	["Protobuf3 parser", "pb_parsing_parser.g", "test.proto3", "ace/mode/c_cpp"],
 	["ReasonML parser (partially working)", "reason_parser.g", "test.reason", "ace/mode/javascript"],
 	["Rust parser", "rust.g", "test.rs.txt", "ace/mode/rust"], /*github send ext '.rs' as application/rls-services+xml */
+	["SC-im spreadsheet parser", "sc-im.g", "test.sc-im", "ace/mode/text"],
 	["Scheme parser", "scheme.g", "test.scheme", "ace/mode/lisp"],
 	["Souffle parser", "souffle.g", "test.souffle", "ace/mode/prolog"],
 	["SQLite3 parser (partially working)", "sqlite3.g", "test.sqlite3", "ace/mode/sql"],
