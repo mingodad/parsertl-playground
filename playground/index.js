@@ -87,6 +87,8 @@ const sampleList = [
 	["OcamlLex parser (partially working)", "ocaml-lex.g", "test.ocamllex", "ace/mode/ocaml"],
 	["Ocaml parser from rescript (partially working)", "rescript-ocaml-parser.g", "test.ocaml", "ace/mode/ocaml"],
 	["Openscad parser (partially working)", "openscad.g", "test.openscad", "ace/mode/text"],
+	["PCC cccom parser (partially working)", "pcc-cccom.g", "test.c", "ace/mode/c_cpp"],
+	["PCC cxxcom parser (partially working)", "pcc-cxxcom.g", "test.c", "ace/mode/c_cpp"],
 	["Peg parser (partially working)", "peg.g", "test.peg", "ace/mode/yaml"],
 	["PHP-8.2 parser (partially working)", "php-8.2.g", "test.php", "ace/mode/php"],
 	["Pikchr parser", "pikchr.g", "test.pikchr", "ace/mode/text"],
