@@ -1,0 +1,42 @@
+#include <core.h>
+#include <cycboot.h>
+#include "warn.h"
+#include "flags.h"
+#define ALL_PARSE_H
+#include "parse.h"
+namespace ParseErrors {
+  struct ParseState { int state; int token; const char ?msg; };
+
+  static struct ParseState msg_table[] = {
+
+#include "parse_errors_gen.h"
+
+  };
+}
+using ParseErrors;
+
+void yyerror(const char* s, int state, int token) {
+  if (Flags::print_parser_state_and_token) {
+    printf("parse error: state [%d], token [%d]\n",state,token);
+    exit(1);
+  }
+  // search through the msg_table to try and find a matching state & token
+  // or if the entry in the table for the token has -1, then it matches
+  // as well.  We want token-specific matches to override.
+  for (unsigned i = 0; i < numelts(msg_table); i++) {
+    if (msg_table[i].state == state &&
+        msg_table[i].token == token) {
+      s = msg_table[i].msg;
+      break;
+    } else if (msg_table[i].state == state)
+      s = msg_table[i].msg;
+  }
+  let ts = token2string(token);
+  if (ts != NULL)
+    Warn::err(yylloc.first_line,"%s (found %s instead)",s,token2string(token));
+  else
+    Warn::err(yylloc.first_line,"%s ",s);
+}
+
+
+
