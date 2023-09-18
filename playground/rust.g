@@ -1,4 +1,13 @@
 //From: https://github.com/bleibig/rust-grammar.git
+// Copyright 2015 The Rust Project Developers. See the COPYRIGHT
+// file at the top-level directory of this distribution and at
+// http://rust-lang.org/COPYRIGHT.
+//
+// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
+// option. This file may not be copied, modified, or distributed
+// except according to those terms.
 
 /*Tokens*/
 %token SHL
@@ -130,23 +139,74 @@
 
 %token ILLEGAL_CHARACTER
 
+ /*
+   Quoting from the Bison manual:
+
+   "Finally, the resolution of conflicts works by comparing the precedence
+   of the rule being considered with that of the lookahead token. If the
+   token's precedence is higher, the choice is to shift. If the rule's
+   precedence is higher, the choice is to reduce. If they have equal
+   precedence, the choice is made based on the associativity of that
+   precedence level. The verbose output file made by ‘-v’ (see Invoking
+   Bison) says how each conflict was resolved"
+ */
+
+ // Mainly to give PUB a low precedence to resolve shift/reduce conflict with '('
 %precedence /*1*/ PRECLOW
+
+// fake-precedence symbol to cause '|' bars in lambda context to parse
+// at low precedence, permit things like |x| foo = bar, where '=' is
+// otherwise lower-precedence than '|'. Also used for proc() to cause
+// things like proc() a + b to parse as proc() { a + b }.
 %precedence /*2*/ LAMBDA
+
 %precedence /*3*/ SELF
+
+// MUT should be lower precedence than IDENT so that in the pat rule,
+// "& MUT pat" has higher precedence than "binding_mode ident [@ pat]"
 %precedence /*4*/ MUT
+
+// IDENT needs to be lower than '{' so that 'foo {' is shifted when
+// trying to decide if we've got a struct-construction expr (esp. in
+// contexts like 'if foo { .')
+//
+// IDENT also needs to be lower precedence than '<' so that '<' in
+// 'foo:bar . <' is shifted (in a trait reference occurring in a
+// bounds list), parsing as foo:(bar<baz>) rather than (foo:bar)<baz>.
 %precedence /*5*/ IDENT
+
+// Put the weak keywords that can be used as idents here as well
 %precedence /*6*/ CATCH
 %precedence /*7*/ DEFAULT
 %precedence /*8*/ UNION
+
+// A couple fake-precedence symbols to use in rules associated with +
+// and < in trailing type contexts. These come up when you have a type
+// in the RHS of operator-AS, such as "foo as bar<baz>". The "<" there
+// has to be shifted so the parser keeps trying to parse a type, even
+// though it might well consider reducing the type "bar" and then
+// going on to "<" as a subsequent binop. The "+" case is with
+// trailing type-bounds ("foo as bar:A+B"), for the same reason.
 %precedence /*9*/ SHIFTPLUS
+
 %precedence /*10*/ MOD_SEP
 %precedence /*11*/ RARROW ':'
+
+// In where clauses, "for" should have greater precedence when used as
+// a higher ranked constraint than when used as the beginning of a
+// for_in_type (which is a ty)
 %precedence /*12*/ FORTYPE
 %precedence /*13*/ FOR
+
+// Binops & unops, and their precedences
 %precedence /*14*/ '?'
 %precedence /*15*/ BOX
 %nonassoc /*16*/ DOTDOT
+
+// RETURN needs to be lower-precedence than tokens that start
+// prefix_exprs
 %precedence /*17*/ RETURN YIELD
+
 %right /*18*/ SHLEQ SHREQ MINUSEQ ANDEQ OREQ PLUSEQ STAREQ SLASHEQ CARETEQ PERCENTEQ '='
 %right /*19*/ LARROW
 %left /*20*/ OROR
@@ -167,6 +227,10 @@
 %start crate
 
 %%
+
+////////////////////////////////////////////////////////////////////////
+// Part 1: Items and attributes
+////////////////////////////////////////////////////////////////////////
 
 crate :
 	maybe_shebang inner_attrs maybe_mod_items
@@ -240,11 +304,13 @@ mod_item :
 	attrs_and_vis item
 	;
 
+// items that can appear outside of a fn block
 item :
 	stmt_item
 	| item_macro
 	;
 
+// items that can appear in "stmts"
 stmt_item :
 	item_static
 	| item_const
@@ -322,6 +388,7 @@ maybe_init_expr :
 	| %empty
 	;
 
+// structs
 item_struct :
 	STRUCT ident generic_params maybe_where_clause struct_decl_args
 	| STRUCT ident generic_params struct_tuple_args maybe_where_clause ';'
@@ -358,6 +425,7 @@ struct_tuple_field :
 	attrs_and_vis ty_sum
 	;
 
+// enums
 item_enum :
 	ENUM ident generic_params maybe_where_clause '{' /*32P*/ enum_defs '}'
 	| ENUM ident generic_params maybe_where_clause '{' /*32P*/ enum_defs ',' '}'
@@ -381,6 +449,7 @@ enum_args :
 	| %empty
 	;
 
+// unions
 item_union :
 	UNION /*8P*/ ident generic_params maybe_where_clause '{' /*32P*/ struct_decl_fields '}'
 	| UNION /*8P*/ ident generic_params maybe_where_clause '{' /*32P*/ struct_decl_fields ',' '}'
@@ -546,6 +615,21 @@ impl_method :
 	| attrs_and_vis maybe_default maybe_unsafe EXTERN maybe_abi FN ident generic_params fn_decl_with_self maybe_where_clause inner_attrs_and_block
 	;
 
+// There are two forms of impl:
+//
+// impl (<...>)? TY { ... }
+// impl (<...>)? TRAIT for TY { ... }
+//
+// Unfortunately since TY can begin with '<' itself -- as part of a
+// TyQualifiedPath type -- there's an s/r conflict when we see '<' after IMPL:
+// should we reduce one of the early rules of TY (such as maybe_once)
+// or shall we continue shifting into the generic_params list for the
+// impl?
+//
+// The production parser disambiguates a different case here by
+// permitting / requiring the user to provide parens around types when
+// they are ambiguous with traits. We do the same here, regrettably,
+// by splitting ty into ty and ty_prim.
 item_impl :
 	maybe_default_maybe_unsafe IMPL generic_params ty_prim_sum maybe_where_clause '{' /*32P*/ maybe_inner_attrs maybe_impl_items '}'
 	| maybe_default_maybe_unsafe IMPL generic_params '(' /*32P*/ ty ')' maybe_where_clause '{' /*32P*/ maybe_inner_attrs maybe_impl_items '}'
@@ -754,6 +838,10 @@ ty_params :
 	| ty_params ',' ty_param
 	;
 
+// A path with no type parameters; e.g. `foo::bar::Baz`
+//
+// These show up in 'use' view-items, because these are processed
+// without respect to types.
 path_no_types_allowed :
 	ident
 	| MOD_SEP /*10P*/ ident
@@ -765,6 +853,17 @@ path_no_types_allowed :
 	| path_no_types_allowed MOD_SEP /*10P*/ ident
 	;
 
+// A path with a lifetime and type parameters, with no double colons
+// before the type parameters; e.g. `foo::bar<'a>::Baz<T>`
+//
+// These show up in "trait references", the components of
+// type-parameter bounds lists, as well as in the prefix of the
+// path_generic_args_and_bounds rule, which is the full form of a
+// named typed expression.
+//
+// They do not have (nor need) an extra '::' before '<' because
+// unlike in expr context, there are no "less-than" type exprs to
+// be ambiguous with.
 path_generic_args_without_colons :
 	ident %prec IDENT /*5P*/
 	| ident generic_args %prec IDENT /*5P*/
@@ -802,6 +901,10 @@ maybe_bindings :
 	',' bindings
 	| %empty
 	;
+
+////////////////////////////////////////////////////////////////////////
+// Part 2: Patterns
+////////////////////////////////////////////////////////////////////////
 
 pat :
 	UNDERSCORE
@@ -903,6 +1006,10 @@ pat_vec_elts :
 	pat
 	| pat_vec_elts ',' pat
 	;
+
+////////////////////////////////////////////////////////////////////////
+// Part 3: Types
+////////////////////////////////////////////////////////////////////////
 
 ty :
 	ty_prim
@@ -1114,6 +1221,10 @@ trait_ref :
 	| MOD_SEP /*10P*/ path_generic_args_without_colons %prec IDENT /*5P*/
 	;
 
+////////////////////////////////////////////////////////////////////////
+// Part 4: Blocks, statements, and expressions
+////////////////////////////////////////////////////////////////////////
+
 inner_attrs_and_block :
 	'{' /*32P*/ maybe_inner_attrs maybe_stmts '}'
 	;
@@ -1128,6 +1239,30 @@ maybe_stmts :
 	| nonblock_expr
 	| %empty
 	;
+
+// There are two sub-grammars within a "stmts: exprs" derivation
+// depending on whether each stmt-expr is a block-expr form; this is to
+// handle the "semicolon rule" for stmt sequencing that permits
+// writing
+//
+//     if foo { bar } 10
+//
+// as a sequence of two stmts (one if-expr stmt, one lit-10-expr
+// stmt). Unfortunately by permitting juxtaposition of exprs in
+// sequence like that, the non-block expr grammar has to have a
+// second limited sub-grammar that excludes the prefix exprs that
+// are ambiguous with binops. That is to say:
+//
+//     {10} - 1
+//
+// should parse as (progn (progn 10) (- 1)) not (- (progn 10) 1), that
+// is to say, two statements rather than one, at least according to
+// the mainline rust parser.
+//
+// So we wind up with a 3-way split in exprs that occur in stmt lists:
+// block, nonblock-prefix, and nonblock-nonprefix.
+//
+// In non-stmts contexts, expr can relax this trichotomy.
 
 stmts :
 	stmt
@@ -1169,6 +1304,11 @@ path_expr :
 	| SELF /*3P*/ MOD_SEP /*10P*/ path_generic_args_with_colons
 	;
 
+// A path with a lifetime and type parameters with double colons before
+// the type parameters; e.g. `foo::bar::<'a>::Baz::<T>`
+//
+// These show up in expr context, in order to disambiguate from "less-than"
+// expressions.
 path_generic_args_with_colons :
 	ident
 	| SUPER
@@ -1177,6 +1317,7 @@ path_generic_args_with_colons :
 	| path_generic_args_with_colons MOD_SEP /*10P*/ generic_args
 	;
 
+// the braces-delimited macro is a block_expr so it doesn't appear here
 macro_expr :
 	path_expr '!' /*31P*/ maybe_ident parens_delimited_token_trees
 	| path_expr '!' /*31P*/ maybe_ident brackets_delimited_token_trees
@@ -1569,6 +1710,10 @@ maybe_label :
 let :
 	LET pat maybe_ty_ascription maybe_init_expr ';'
 	;
+
+////////////////////////////////////////////////////////////////////////
+// Part 5: Macros and misc. rules
+////////////////////////////////////////////////////////////////////////
 
 lit :
 	LIT_BYTE
