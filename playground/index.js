@@ -59,6 +59,7 @@ const sampleList = [
 	["Ecere parser (not working)", "ecere.g", "test.ecere", "ace/mode/c_cpp"],
 	["Expr-lang parser", "expr-lang.g", "test.expr-lang", "ace/mode/txt"],
 	["GramGrep parser", "grammar.g", "calculator.g", "ace/mode/yaml"],
+	["Gringo-Clingo parser non grounding (partially working)", "gringo-ngp.g", "test.gringo-ngp", "ace/mode/text"],
 	["HTML parser", "html-parser.g", "index.html", "ace/mode/html"],
 	["idl2cpp parser", "idl2cpp.g", "test.idl", "ace/mode/c_cpp"],
 	["Ispc parser", "ispc.g", "test.ispc", "ace/mode/c_cpp"],
