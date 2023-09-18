@@ -305,7 +305,14 @@ function parse() {
 	//	win.focus();
 	//}
 	//else
-		$grammarInfo.html("<pre>" + escapeHtml(outputs.parse_ebnf_yacc.replaceAll("'\\''", '"\'"')) + "</pre>");
+	      $grammarInfo.html("<pre>" + escapeHtml(outputs.parse_ebnf_yacc.replaceAll("'\\''", '"\'"')) + "</pre>");
+	      try {
+		navigator.clipboard.writeText(outputs.parse_ebnf_yacc);
+	      }
+	      catch(e)
+	      {
+		      console.log("Failed to copy generated EBNF/YACC to clipboard");
+	      }
         return;
       }
 
