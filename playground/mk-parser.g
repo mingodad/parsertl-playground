@@ -1,3 +1,4 @@
+//From: https://gitlab.gnome.org/Archive/anjuta/-/blob/master/plugins/mk-project/mk-parser.y?ref_type=heads
 /*
  * mk-parser.y
  * Copyright (C) Sébastien Granjoux 2009 <seb.sfo@free.fr>
@@ -48,7 +49,9 @@
 %token _SILENT
 %token _EXPORT_ALL_VARIABLES
 %token _NOTPARALLEL
-
+%token	IFEQ
+%token	ELSE
+%token	ENDIF
 
 %start file
 
@@ -63,6 +66,7 @@ statement :
 	end_of_line
 	| space end_of_line
 	| definition end_of_line
+	| conditional end_of_line
 	| rule command_list
 	;
 
@@ -84,6 +88,15 @@ command_list :
 	/*empty*/
 	| command_list TAB command_line EOL
 	;
+
+conditional:
+	IFEQ value
+	| ELSE
+	| ENDIF
+	;
+
+/* Lists
+ *----------------------------------------------------------------------------*/
 
 end_of_line :
 	EOL
@@ -123,6 +136,9 @@ command_line :
 	/*empty*/
 	| command_line command_token
 	;
+
+/* Items
+ *----------------------------------------------------------------------------*/
 
 optional_space :
 	/*empty*/
@@ -166,6 +182,9 @@ equal_group :
 	| CONDITIONAL_EQUAL
 	| APPEND
 	;
+
+/* Tokens
+ *----------------------------------------------------------------------------*/
 
 not_eol_token :
 	word_token
@@ -261,6 +280,9 @@ word_token :
 	| _SILENT
 	| _EXPORT_ALL_VARIABLES
 	| _NOTPARALLEL
+	| IFEQ
+	| ELSE
+	| ENDIF
 	;
 
 space_token :
@@ -347,6 +369,12 @@ NAME          [^ \t\n\r:#=$"'`&@\\]+
 ".EXPORT_ALL_VARIABLES"	_EXPORT_ALL_VARIABLES
 
 ".NOTPARALLEL"	_NOTPARALLEL
+
+ifeq	IFEQ
+
+else	ELSE
+
+endif	ENDIF
 
 {NAME}	NAME
 
