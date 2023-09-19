@@ -132,7 +132,6 @@ optional_space :
 space :
 	space_token
 	| space space_token
-	| space variable_token
 	;
 
 head :
@@ -159,7 +158,6 @@ prerequisite :
 name_prerequisite :
 	prerequisite_token
 	| name_prerequisite prerequisite_token
-	| name_prerequisite variable_token
 	;
 
 equal_group :
@@ -178,6 +176,7 @@ prerequisite_token :
 	name_token
 	| equal_token
 	| rule_token
+	| variable_token
 	;
 
 command_token :
