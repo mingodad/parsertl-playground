@@ -82,6 +82,7 @@ const sampleList = [
 	["Lua-5.3 parser", "lua-5.3.g", "test.lua", "ace/mode/lua"],
 	["Lua parser", "lua.g", "test.lua", "ace/mode/lua"],
 	["LuaPP parser (partially working)", "luapp.g", "test.luapp", "ace/mode/lua"],
+	["Make parser (from anjuta)", "mk-parser.g", "test.mk-parser", "ace/mode/Makefile"],
 	["Menhir stage1 parser", "menhir-stage1-parser.g", "menhir-stage1-parser.mly", "ace/mode/yaml"],
 	["Menhir fancy parser", "menhir-fancy-parser.g", "menhir-fancy-parser.mly", "ace/mode/yaml"],
 	["Minic parser", "minic.g", "test.minic", "ace/mode/c_cpp"],
