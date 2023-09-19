@@ -114,6 +114,7 @@ const sampleList = [
 	["Scheme parser", "scheme.g", "test.scheme", "ace/mode/lisp"],
 	["Souffle parser", "souffle.g", "test.souffle", "ace/mode/prolog"],
 	["SQLite3 parser (partially working)", "sqlite3.g", "test.sqlite3", "ace/mode/sql"],
+	["Stanc3 parser", "stanc3-parser.g", "test.stanc3", "ace/mode/text"],
 	["Tameparse parser (not working)", "tameparser.g", "test.tameparser", "ace/mode/yaml"],
 	["TDengine SQL parser", "tdengine-sql.g", "test.tdengine-sql", "ace/mode/sql"],
 	["Textdiagram parser", "textdiagram.g", "test.textdiagram", "ace/mode/text"],
