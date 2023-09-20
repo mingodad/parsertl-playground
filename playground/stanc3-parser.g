@@ -1,4 +1,11 @@
-/* From: https://github.com/stan-dev/stanc3/blob/master/src/frontend/parser.mly */
+/*
+From:
+	https://github.com/stan-dev/stanc3/blob/2da1bbc75f544885b1f5de9bf98f027911c83f1e/src/frontend/parser.mly
+	https://github.com/stan-dev/stanc3/blob/2da1bbc75f544885b1f5de9bf98f027911c83f1e/src/frontend/lexer.mll
+menhir --only-preprocess-for-ocamlyacc parser.mly > parser.mly.yacc
+ocamlyacc -v parser.mly.yacc
+manual extraction and fixes including lexer.mll
+*/
 /** The parser for Stan. A Menhir file. */
 
 %token AND
