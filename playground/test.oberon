@@ -1,0 +1,164 @@
+(*Copyright (C) 2017, 2018, 2019 Karl Landstrom <karl@miasap.se>
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.*)
+
+MODULE Strings;
+(**Operations on strings
+
+Implements the basic library module from "The Oakwood Guidelines for Oberon-2 Compiler Developers". All character arrays are assumed to contain 0X as a terminator and positions start at 0.*)
+
+	PROCEDURE Length*(s: ARRAY OF CHAR): INTEGER;
+(**Length(s) returns the number of characters in s up to and excluding the first 0X.*)
+		VAR i: INTEGER;
+	BEGIN
+		i := 0;
+		WHILE s[i] # 0X DO
+			INC(i)
+		END
+	RETURN i
+	END Length;
+
+
+	PROCEDURE Min(a, b: INTEGER): INTEGER;
+	BEGIN IF a > b THEN a := b END
+	RETURN a
+	END Min;
+
+
+	PROCEDURE Insert*(source: ARRAY OF CHAR; pos: INTEGER; VAR dest: ARRAY OF CHAR);
+(**Insert(src, pos, dst) inserts the string src into the string dst at position pos (0 <= pos <= Length(dst)). If pos = Length(dst), src is appended to dst. If the size of dst is not large enough to hold the result of the operation, the result is truncated so that dst is always terminated with a 0X.*)
+		VAR sourceLength, destLength, newLength: INTEGER;
+			i, lim: INTEGER;
+	BEGIN
+		destLength := Length(dest);
+		ASSERT(pos >= 0);
+		ASSERT(pos <= destLength);
+
+		sourceLength := Length(source);
+		newLength := Min(destLength + sourceLength, LEN(dest) - 1);
+
+		(*make room for source in dest*)
+		dest[newLength] := 0X;
+		FOR i := newLength - 1 TO pos + sourceLength BY -1 DO
+			dest[i] := dest[i - sourceLength]
+		END;
+
+		(*copy source to dest*)
+		lim := Min(pos + sourceLength - 1, newLength - 1);
+		FOR i := pos TO lim DO
+			dest[i] := source[i - pos];
+		END
+	END Insert;
+
+
+	PROCEDURE Append*(extra: ARRAY OF CHAR; VAR dest: ARRAY OF CHAR);
+(**Append(s, dst) has the same effect as Insert(s, Length(dst), dst).*)
+		VAR destLength, newLength: INTEGER;
+			i: INTEGER;
+	BEGIN
+		destLength := Length(dest);
+		newLength := Min(destLength + Length(extra), LEN(dest) - 1);
+
+		FOR i := destLength TO newLength - 1 DO
+			dest[i] := extra[i - destLength]
+		END;
+		dest[newLength] := 0X
+	END Append;
+
+
+	PROCEDURE Delete*(VAR s: ARRAY OF CHAR; pos, n: INTEGER);
+(**Delete(s, pos, n) deletes n characters from s starting at position pos (0 <= pos <= Length(s)). If n > Length(s) - pos, the new length of s is pos.*)
+		VAR length, n1, i: INTEGER;
+	BEGIN
+		length := Length(s);
+		ASSERT(pos >= 0);
+		ASSERT(pos <= length);
+		ASSERT(n >= 0);
+
+		n1 := Min(n, length - pos); (*actual number of characters to delete*)
+		FOR i := pos TO length - n1 DO
+			s[i] := s[i + n1]
+		END
+	END Delete;
+
+
+	PROCEDURE Replace*(source: ARRAY OF CHAR; pos: INTEGER; VAR dest: ARRAY OF CHAR);
+(**Replace(src, pos, dst) has the same effect as Delete(dst, pos, Length(src)) followed by an Insert(src, pos, dst).*)
+		VAR destLength, n, i: INTEGER;
+	BEGIN
+		destLength := Length(dest);
+		ASSERT(pos >= 0);
+		ASSERT(pos <= destLength);
+
+		n := Min(Length(source), LEN(dest) - 1 - pos); (*actual number of characters to replace*)
+
+		(*replace characters*)
+		FOR i := 0 TO n - 1 DO
+			dest[pos + i] := source[i]
+		END;
+
+		IF pos + n > destLength THEN
+			dest[pos + n] := 0X
+		END
+	END Replace;
+
+
+	PROCEDURE Extract*(source: ARRAY OF CHAR; pos, n: INTEGER; VAR dest: ARRAY OF CHAR);
+(**Extract(src, pos, n, dst) extracts a substring dst with n characters from position pos (0 <= pos <= Length(src)) in src. If n > Length(src) - pos, dst is only the part of src from pos to the end of src, i.e. Length(src) - 1. If the size of dst is not large enough to hold the result of the operation, the result is truncated so that dst is always terminated with a 0X.*)
+		VAR sourceLength, n1, i: INTEGER;
+	BEGIN
+		sourceLength := Length(source);
+		ASSERT(pos >= 0);
+		ASSERT(pos <= sourceLength);
+
+		n1 := Min(n, Min(sourceLength - pos, LEN(dest) - 1)); (*actual number of characters to extract*)
+		FOR i := 0 TO n1 - 1 DO
+			dest[i] := source[pos + i]
+		END;
+		dest[n1] := 0X
+	END Extract;
+
+
+	PROCEDURE Pos*(pattern, s: ARRAY OF CHAR; pos: INTEGER): INTEGER;
+(**Pos(pat, s, pos) returns the position of the first occurrence of pat in s. Searching starts at position pos (0 <= pos <= Length(s)). If pat is not found, -1 is returned.*)
+		VAR is, ip, result: INTEGER;
+	BEGIN
+		ASSERT(pos >= 0);
+		ASSERT(pos < LEN(s));
+
+		is := pos - 1;
+		REPEAT
+			INC(is);
+			ip := 0;
+			WHILE (pattern[ip] # 0X) & (s[is + ip] = pattern[ip]) DO
+				INC(ip)
+			END
+		UNTIL (pattern[ip] = 0X) OR (s[is + ip] = 0X);
+
+		IF pattern[ip] = 0X THEN
+			result := is
+		ELSE
+			result := -1
+		END;
+
+		ASSERT((result = -1) OR (result >= 0) & (result + ip < LEN(s)))
+	RETURN result
+	END Pos;
+
+
+	PROCEDURE Cap*(VAR s: ARRAY OF CHAR);
+(**Cap(s) replaces each lower case letter within s by its upper case equivalent.*)
+		VAR i: INTEGER;
+	BEGIN
+		i := 0;
+		WHILE s[i] # 0X DO
+			IF (s[i] >= "a") & (s[i] <= "z") THEN
+				s[i] := CHR(ORD("A") + ORD(s[i]) - ORD("a"));
+			END;
+			INC(i)
+		END
+	END Cap;
+
+END Strings.
