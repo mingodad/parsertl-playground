@@ -7878,7 +7878,7 @@ WITH_ROLLUP_SYM	WITH_ROLLUP_SYM
 
 /* Order matter if identifier comes before keywords they are classified as identifier */
 {base_id}	IDENT
-IDENT_QUOTED	IDENT_QUOTED
+[`]{base_id}[`]	IDENT_QUOTED
 
 %%
 
