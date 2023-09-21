@@ -124,6 +124,7 @@ const sampleList = [
 	["TDengine SQL parser", "tdengine-sql.g", "test.tdengine-sql", "ace/mode/sql"],
 	["Textdiagram parser", "textdiagram.g", "test.textdiagram", "ace/mode/text"],
 	["Textmapper parser", "textmapper.g", "test.tm", "ace/mode/yaml"],
+	["Tidb SQL parser (be patient)(partially working)", "tidb-sql.g", "test.mysql", "ace/mode/sql"],
 	["Tradofion SQL parser (be patient)(partially working)", "tradofion-sqlparser.g", "test.tradofion-sql", "ace/mode/sql"],
 	["Webassembly interpreter parser", "wasm-interpreter.g", "test.wast", "ace/mode/lisp"],
 	["Vitess SQL parser (be patient)(partially working)", "sql-vitess.g", "test.sql-vitess", "ace/mode/sql"],
