@@ -38,7 +38,7 @@ const sampleList = [
 	["AM parser", "am-parser.g", "test.am-parser", "ace/mode/Makefile"],
 	["ArangoDB AQL parser", "arangodb-aql.g", "test.arangodb-aql", "ace/mode/text"],
 	["Austral parser (partially working)", "austral-parser.g", "test.austral", "ace/mode/text"],
-	["BC calculator (partially working)", "bc.g", "test.bc", "ace/mode/sh"],
+	["BC calculator", "bc.g", "test.bc-calculator", "ace/mode/sh"],
 	["Bison parser (partially working)", "bison.g", "carbon-lang.y", "ace/mode/yaml"],
 	["BNFGen parser", "bnfgen.g", "test.bnfgen", "ace/mode/yaml"],
 	["Bolt parser", "bolt-parser.g", "test.bolt", "ace/mode/c_cpp"],
