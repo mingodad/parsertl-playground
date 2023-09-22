@@ -1,4 +1,8 @@
-//From: https://github.com/koka-lang/koka/blob/b3122869ac74bfb6f432f7e76eeb723b1f69a491/doc/spec/grammar/parser.y
+/*
+From: https://github.com/koka-lang/koka/blob/b3122869ac74bfb6f432f7e76eeb723b1f69a491/doc/spec/grammar/parser.y
+** Notice that the parser on the playground do not automatically insert '{', '}' and ';'
+** so you should explicitly add then for this parser to accept it.
+*/
 /* Copyright 2012-2021, Microsoft Research, Daan Leijen
    This is free software; you can redistribute it and/or modify it under the
    terms of the Apache License, Version 2.0.
@@ -1181,7 +1185,7 @@ r#*\"([^"])*\"#*	STRING
   /* White space  */
 {Space}+                  skip()
 {Newline}                 skip()
-{Newline}{Newline}  INSERTED_SEMI
+//{Newline}{Newline}  INSERTED_SEMI
 //.                         { illegalchar(yytext[yyleng-1],NULL,yyscanner);
 
 %%
