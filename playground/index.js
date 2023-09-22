@@ -95,6 +95,7 @@ const sampleList = [
 	["MSTA parser", "msta.g", "test.msta", "ace/mode/yaml"],
 	["Mulang parser (not working)", "mulang.g", "test.mulang", "ace/mode/text"],
 	["Mysql parser (be patient)(partially working)", "mysql.g", "test.mysql", "ace/mode/sql"],
+	["NASL parser", "nasl-parser.g", "test.nasl", "ace/mode/shell"],
 	["OcamlLex parser (partially working)", "ocaml-lex.g", "test.ocamllex", "ace/mode/ocaml"],
 	["Oberon parser", "oberon.g", "test.oberon", "ace/mode/pascal"],
 	["Ocaml parser from rescript (partially working)", "rescript-ocaml-parser.g", "test.ocaml", "ace/mode/ocaml"],
