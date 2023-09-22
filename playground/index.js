@@ -30,6 +30,7 @@ const sampleList = [
 	["Ada parser", "ada-adayacc.g", "test.adb", "ace/mode/ada"],
 	["Akwa parser (not working)", "akwa.g", "test.awk", "ace/mode/text"],
 	["Aliceml parser (partially working)", "aliceml.g", "test.aliceml", "ace/mode/ocaml"],
+	["Anna parser ", "anna-parser.g", "test.anna", "ace/mode/Go"],
 	["Ansi C11 parser (partially working)", "c11-ansi-c.g", "test.c", "ace/mode/c_cpp"],
 	["Ansi C18 parser (partially working)", "c18-ansi.g", "test.c", "ace/mode/c_cpp"],
 	["Ansi C parser", "cparser.g", "test.c", "ace/mode/c_cpp"],

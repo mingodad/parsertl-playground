@@ -1,0 +1,94 @@
+attribute(internal, doc("Internal module for the classType macro."))
+
+macro classType(node) (
+    doc("
+A macro that performs a bunch of macro magic that makes types behave
+more like traditional classes in languages like Java and C#, e.g. adds
+the magical this parameter to methods and so on.")
+){
+    className := node[0] as Identifier
+    body := node[2] as Call
+    node.function = ast(typeType)
+
+    constructor := ? as Call
+    initExtra := «Pair«Node, Node»»[]
+    body.each(idx,chld){
+	if(chld.callTo?("__const__")){
+	    decl := chld as Call
+	    if(decl[2].callTo?("__def__")){
+	        funDef := decl[2] as Call
+	        param := funDef[2] as Call
+ 	        attr := funDef[3] as Call
+  	        name := funDef[0] as Identifier
+  	        funBody := funDef[4] as Call
+
+		if(name.name == "__init__"){
+		    // Super ugly, broken and fragile hack:
+		    // Append a 'this' to the end of the constructor, since we need construcgtors to return
+		    // the value they're constructing. Blergh.
+		    funBody ~= [ast(this)]
+		    constructor = funDef
+		}
+		if(!attr.childNamed?("static")){
+		    attr.push(ast(bound))
+		    (decl[3] as Call).push(ast(bound))
+		    /*
+		       For non-static methods, prepend a variable
+		       declaration to the argument lost of the
+		       function named «this». An independent second
+		       piece of code will be needed at every call site
+		       to inject the this pointer into the argument
+		       list.
+		    */
+		    funDef[2] = Call(
+			param,
+			param.function,
+			ast(__var__(this, %This, ?, {}))) ~ param
+		    /*
+		      For non-static methods, also add a use expression for «this».
+
+		      Doing so for static methods wouldn't really be
+		      meaningful, since the only members we're really
+		      interested in accessing are static anyway.
+		    */
+		    funDef[4] = Call(
+			funBody,
+			funBody.function,
+			ast(use(this))) ~ funBody
+
+		}
+	    }
+	}
+	/*
+	  Find any member declarations with an initial value given in the declaration
+	 */
+	if(chld.callTo?("__const__") or chld.callTo?("__var__")){
+	    decl := chld as Call
+	    if(!decl[2].callTo?("__def__")){
+		if(type(decl[1]) == NullLiteral and type(decl[2]) != NullLiteral){
+		    //	    print("ABC ", decl, "\n")
+		    initExtra.push(decl[0]|decl[2])
+		    decl[1] = ast(staticType(%init)) % ["init": decl[2]]
+		    decl[2] = NullLiteral(decl[2])
+		}
+	    }
+	}
+    }
+    /*
+      If we have have members with initial values given in the declaration,
+      move these into the constructor.
+    */
+    if(!initExtra.empty?){
+	if(!constructor){
+	  constructorDecl := ast(def __init__(%This this)(bound){use(this), this})
+	    body.push(constructorDecl)
+	    constructor = constructorDecl[2] as Call
+	}
+
+        newBody := ast({use(this)}) ~ initExtra.map(extra){
+	    ast(this.%name = %value) % ["name": extra.first, "value": extra.second]
+	} ~ (constructor[4] as Call)[1...]
+	constructor[4] = newBody
+    }
+    node
+}
