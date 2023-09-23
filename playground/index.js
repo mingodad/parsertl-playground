@@ -29,6 +29,7 @@ const sampleList = [
 	//title, grammar, input, input ace syntax
 	["Ada parser", "ada-adayacc.g", "test.adb", "ace/mode/ada"],
 	["Akwa parser (not working)", "akwa.g", "test.awk", "ace/mode/text"],
+	["AlaSQL parser", "alasql-parser.g", "test.alasql", "ace/mode/sql"],
 	["Aliceml parser (partially working)", "aliceml.g", "test.aliceml", "ace/mode/ocaml"],
 	["Anna parser ", "anna-parser.g", "test.anna", "ace/mode/Go"],
 	["Ansi C11 parser (partially working)", "c11-ansi-c.g", "test.c", "ace/mode/c_cpp"],
