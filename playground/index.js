@@ -89,6 +89,7 @@ const sampleList = [
 	["Lua parser", "lua.g", "test.lua", "ace/mode/lua"],
 	["LuaPP parser (partially working)", "luapp.g", "test.luapp", "ace/mode/lua"],
 	["Make parser (from anjuta)", "mk-parser.g", "test.mk-parser", "ace/mode/Makefile"],
+	["Matrixone MYSQL parser (be patient)(partially working)", "matrixone-mysql.g", "test.mysql", "ace/mode/sql"],
 	["Menhir stage1 parser", "menhir-stage1-parser.g", "menhir-stage1-parser.mly", "ace/mode/yaml"],
 	["Menhir fancy parser", "menhir-fancy-parser.g", "menhir-fancy-parser.mly", "ace/mode/yaml"],
 	["Minic parser", "minic.g", "test.minic", "ace/mode/c_cpp"],
@@ -117,6 +118,7 @@ const sampleList = [
 	["Postgresql parser (be patient)", "postgres16.g", "test.sql", "ace/mode/sql"],
 	["Preprocessor parser (not working)", "pp.g", "test.pp", "ace/mode/c_cpp"],
 	["Protobuf3 parser", "pb_parsing_parser.g", "test.proto3", "ace/mode/c_cpp"],
+	["Pyethon parser", "pyethon.g", "test.pyethon", "ace/mode/python"],
 	["R parser (partially working)", "r-parser.g", "test.r-parser", "ace/mode/r"],
 	["ReasonML parser (partially working)", "reason_parser.g", "test.reason", "ace/mode/javascript"],
 	["Rust parser", "rust.g", "test.rs.txt", "ace/mode/rust"], /*github send ext '.rs' as application/rls-services+xml */
