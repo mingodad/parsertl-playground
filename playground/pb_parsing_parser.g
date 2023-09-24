@@ -340,6 +340,7 @@ enum_values :
 enum_body_content :
 	option
 	| enum_value
+	| reserved
 	;
 
 enum_value :
