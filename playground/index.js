@@ -66,6 +66,7 @@ const sampleList = [
 	["Expr-lang parser", "expr-lang.g", "test.expr-lang", "ace/mode/txt"],
 	["Fortune sheet formula parser", "fortune-sheet-formula.g", "test.fortune-sheet-formula", "ace/mode/txt"],
 	["GramGrep parser", "grammar.g", "calculator.g", "ace/mode/yaml"],
+	["Graphql parser", "libgraphql.g", "test.libgraphql", "ace/mode/yaml"],
 	["Gringo-Clingo parser non grounding (partially working)", "gringo-ngp.g", "test.gringo-ngp", "ace/mode/text"],
 	["HTML parser", "html-parser.g", "index.html", "ace/mode/html"],
 	["idl2cpp parser", "idl2cpp.g", "test.idl", "ace/mode/c_cpp"],
