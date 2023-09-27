@@ -59,6 +59,7 @@ const sampleList = [
 	["Cxx parser (not working)", "CxxParser.g", "test.cpp", "ace/mode/c_cpp"],
 	["Cyclone parser (partially working)", "cyclone.g", "test.cyclone", "ace/mode/c_cpp"],
 	["D parser (partially working)", "dlang-uaiso.g", "test.d", "ace/mode/c_cpp"],
+	["Delphi parser (partially working)", "delphi.g", "test.delphi", "ace/mode/pascal"],
 	["Doxygen code scanner torture", "code-doxygen.g", "test.c", "ace/mode/c_cpp"],
 	["DuckDB SQL parser (be patient)", "duckdb-pgsql.g", "test.duckdb", "ace/mode/sql"],
 	["Dynare preprocessor parser (partially working)", "dynare-pp.g", "test.dynare-pp", "ace/mode/javascript"],
