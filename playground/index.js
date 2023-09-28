@@ -56,6 +56,7 @@ const sampleList = [
 	["CoqPP parser", "coqpp_parse.g", "test.coqpp", "ace/mode/yaml"],
 	["Cpp5-v2 parser (not working)", "cpp5-v2.g", "test.cpp", "ace/mode/c_cpp"],
 	["C parser frama-c (partially working)", "cparser-frama-c.g", "test.frama-c", "ace/mode/c_cpp"],
+	["CSS parser from VLC", "CSSGrammar-vlc.g", "style.css", "ace/mode/css"],
 	["Cxx parser (not working)", "CxxParser.g", "test.cpp", "ace/mode/c_cpp"],
 	["Cyclone parser (partially working)", "cyclone.g", "test.cyclone", "ace/mode/c_cpp"],
 	["D parser (partially working)", "dlang-uaiso.g", "test.d", "ace/mode/c_cpp"],
