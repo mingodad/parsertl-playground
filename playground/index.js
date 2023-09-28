@@ -94,6 +94,7 @@ const sampleList = [
 	["Lua parser", "lua.g", "test.lua", "ace/mode/lua"],
 	["LuaPP parser (partially working)", "luapp.g", "test.luapp", "ace/mode/lua"],
 	["Make parser (from anjuta)", "mk-parser.g", "test.mk-parser", "ace/mode/Makefile"],
+	["MangoFix parser", "mangofix.g", "test.mangofix", "ace/mode/c_cpp"],
 	["Matrixone MYSQL parser (be patient)(partially working)", "matrixone-mysql.g", "test.mysql", "ace/mode/sql"],
 	["Menhir stage1 parser", "menhir-stage1-parser.g", "menhir-stage1-parser.mly", "ace/mode/yaml"],
 	["Menhir fancy parser", "menhir-fancy-parser.g", "menhir-fancy-parser.mly", "ace/mode/yaml"],
