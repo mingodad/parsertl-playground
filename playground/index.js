@@ -67,6 +67,7 @@ const sampleList = [
 	["Ebnf2bnf parser", "ebnf2bnf.g", "test.ebnf2bnf", "ace/mode/yaml"],
 	["Ecere parser (not working)", "ecere.g", "test.ecere", "ace/mode/c_cpp"],
 	["Expr-lang parser", "expr-lang.g", "test.expr-lang", "ace/mode/txt"],
+	["Faust parser", "faustparser.g", "test.faustparser", "ace/mode/txt"],
 	["Fortune sheet formula parser", "fortune-sheet-formula.g", "test.fortune-sheet-formula", "ace/mode/txt"],
 	["GramGrep parser", "grammar.g", "calculator.g", "ace/mode/yaml"],
 	["Graphql parser", "libgraphql.g", "test.libgraphql", "ace/mode/yaml"],
