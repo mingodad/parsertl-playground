@@ -139,6 +139,7 @@ const sampleList = [
 	["SQLite3 parser (partially working)", "sqlite3.g", "test.sqlite3", "ace/mode/sql"],
 	["Stanc3 parser", "stanc3-parser.g", "test.stanc3", "ace/mode/text"],
 	["Tameparse parser (not working)", "tameparser.g", "test.tameparser", "ace/mode/yaml"],
+	["Tarantol SQL parser (partially working)", "tarantol-sql.g", "test.tarantol-sql", "ace/mode/sql"],
 	["TDengine SQL parser", "tdengine-sql.g", "test.tdengine-sql", "ace/mode/sql"],
 	["Textdiagram parser", "textdiagram.g", "test.textdiagram", "ace/mode/text"],
 	["Textmapper parser", "textmapper.g", "test.tm", "ace/mode/yaml"],
