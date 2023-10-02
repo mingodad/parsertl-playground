@@ -134,6 +134,7 @@ const sampleList = [
 	["Pyethon parser", "pyethon.g", "test.pyethon", "ace/mode/python"],
 	["R parser (partially working)", "r-parser.g", "test.r-parser", "ace/mode/r"],
 	["ReasonML parser (partially working)", "reason_parser.g", "test.reason", "ace/mode/javascript"],
+	["Rune parser", "rune-deparse.g", "test.rune-deparse", "ace/mode/text"],
 	["Rust parser", "rust.g", "test.rs.txt", "ace/mode/rust"], /*github send ext '.rs' as application/rls-services+xml */
 	["SC-im spreadsheet parser", "sc-im.g", "test.sc-im", "ace/mode/text"],
 	["Scheme parser", "scheme.g", "test.scheme", "ace/mode/lisp"],

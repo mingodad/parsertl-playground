@@ -1,0 +1,54 @@
+//  Copyright 2021 Google LLC.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// Add a symbol table class to encourage folks to do less string processing.
+
+class Symtab(self) {
+}
+
+// Do not call this constructor directly!  Instead call Sym.new.
+// TODO: Enhance Rune to make it possible to avoid the factory function here.
+class Sym(self, name: string) {
+  self.name = name
+  self.hashVal = hashValue(name)
+
+  func new(name: string) -> Sym {
+    // TODO: When array references are implemented, delete this.
+    nameCopy = name
+    newSym = Sym(nameCopy)
+    oldSym = theSymbolTable.findSym(newSym)
+    if !isnull(oldSym) {
+      return oldSym!
+    }
+    theSymbolTable.insertSym(newSym)
+    return newSym
+  }
+
+  func hash(self) -> u64 {
+    return self.hashVal
+  }
+
+  func equals(self: Sym, other: Sym) -> bool {
+    return self.name == other.name
+  }
+}
+
+relation HashedClass Symtab Sym cascade
+
+theSymbolTable = Symtab()
+if false {
+  // TODO: Somehow fix binding so we don't need hacks like this.  This hack
+  // tells the binding code what a constructed Sym looks like.
+  Sym("")
+}
