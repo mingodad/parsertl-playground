@@ -2,7 +2,7 @@
 
 %option caseless
 
-%x xdolq
+%x xdolq xwith_la xwithout_la xformat_la xnulls_la xnot_la
 
 %token IDENT
 //%token UIDENT
@@ -6656,12 +6656,12 @@ YES	YES_P
 ZONE	ZONE
 
 
-<=	LESS_EQUALS
->=	GREATER_EQUALS
+{less_equals}	LESS_EQUALS
+{greater_equals}	GREATER_EQUALS
 !=|\<>	NOT_EQUALS
-:=	COLON_EQUALS
-=>	EQUALS_GREATER
-::	TYPECAST
+{colon_equals}	COLON_EQUALS
+{equals_greater}	EQUALS_GREATER
+{typecast}	TYPECAST
 
 MODE_TYPE_NAME	MODE_TYPE_NAME
 MODE_PLPGSQL_EXPR	MODE_PLPGSQL_EXPR
@@ -6669,12 +6669,28 @@ MODE_PLPGSQL_ASSIGN1	MODE_PLPGSQL_ASSIGN1
 MODE_PLPGSQL_ASSIGN2	MODE_PLPGSQL_ASSIGN2
 MODE_PLPGSQL_ASSIGN3	MODE_PLPGSQL_ASSIGN3
 
-FROMAT_LA	FORMAT_LA
-WITH_LA	WITH_LA
-WITHOUT_LA	WITHOUT_LA
-NULLS_LA	NULLS_LA
-NOT_LA	NOT_LA
-Op	Op
+FORMAT\s+JSON<xformat_la>	reject()
+<xformat_la> {
+	FORMAT<INITIAL>	FORMAT_LA
+}
+WITH\s+TIME<xwith_la> reject()
+<xwith_la> {
+	WITH<INITIAL>	WITH_LA
+}
+WITHOUT\s+TIME<xwithout_la> reject()
+<xwithout_la> {
+	WITHOUT<INITIAL>	WITHOUT_LA
+}
+NULLS\s+(FIRST|LAST)<xnulls_la>	reject()
+<xnulls_la> {
+	NULLS<INITIAL>	NULLS_LA
+}
+NOT\s+(BETWEEN|IN|LIKE|ILIKE|SIMILAR)<xnot_la> reject()
+<xnot_la> {
+	NOT<INITIAL>	NOT_LA
+}
+//Op	Op
+"||"	Op
 
 \<	'<'
 >	'>'
@@ -6696,9 +6712,10 @@ Op	Op
 
 /* Order matter if identifier comes before keywords they are classified as identifier */
 {identifier}	IDENT
+\"(\\[\"\\]|[^\"\n\r])*\"	IDENT
 {real}	FCONST
 {decimal} FCONST
-\"(\\[\"\\]|[^\"\n\r])*\"|'(\\['\\]|[^'\n\r])*'	SCONST
+'(\\['\\]|[^'\n\r])*'	SCONST
 
 <INITIAL>{dolqdelim}<xdolq>
 <xdolq>[^$]|\$[^$]<.>
