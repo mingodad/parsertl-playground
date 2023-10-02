@@ -80,6 +80,7 @@ const sampleList = [
 	["HTML parser", "html-parser.g", "index.html", "ace/mode/html"],
 	["Hue SQL generic parser", "hue-generic.g", "test.hue-generic", "ace/mode/sql"],
 	["idl2cpp parser", "idl2cpp.g", "test.idl", "ace/mode/c_cpp"],
+	["Influxql parser", "influxql-sql.g", "test.influxql-sql", "ace/mode/sql"],
 	["Ispc parser", "ispc.g", "test.ispc", "ace/mode/c_cpp"],
 	["Java11 parser", "java11.g", "test.java", "ace/mode/java"],
 	["JavascriptCore parser", "javascript-core.g", "test.js.txt", "ace/mode/javascript"],

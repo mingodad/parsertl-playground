@@ -1,0 +1,20 @@
+CREATE CONTINUOUS QUERY "cq0_1"
+    ON "db0" RESAMPLE EVERY 1h FOR 90m
+BEGIN
+    SELECT mean("passengers") INTO "average_passengers" FROM "bus_data" GROUP BY time(30m)
+END;
+
+create continuous query "cq0_1" on "db0" resample every 1h for 90m
+begin
+select mean("passengers") into "average_passengers" from "bus_data" group by time(30m)
+end;
+
+DROP CONTINUOUS QUERY "cq2_1" ON "db2";
+
+SHOW CONTINUOUS QUERIES;
+
+CREATE RETENTION POLICY rp1 ON db0 DURATION 1h REPLICATION 1;
+
+CREATE DATABASE db0;
+
+CREATE DATABASE db0_r WITH DURATION 24h REPLICATION 1 NAME db0_r_policy;
