@@ -1,0 +1,55 @@
+create population p1 for t1 (
+                id integer;
+                label nominal;
+                age numerical;
+                weight numerical;
+                ignore id
+            );
+
+create population p for t (
+                guess stattypes of (*);
+                ignore gender
+            );
+
+create population p for t (
+                    guess stattypes of (*);
+                    gender nominal
+                );
+alter population p set stattype of gender to numerical;
+
+estimate predictive relevance
+            of (label = 'Uganda')
+            to existing rows (rowid < 4)
+            and hypothetical rows with values (
+                ("age" = 82, "weight" = 14),
+                ("age" = 74, label = 'Europe', "weight" = 7)
+            )
+            in the context of "weight"
+        by p1;
+
+estimate predictive relevance
+            of (label = 'mumble')
+            to existing rows (label = 'frotz' or age <= 4)
+            in the context of "label"
+        by p1;
+
+ESTIMATE DEPENDENCE PROBABILITY FROM PAIRWISE VARIABLES OF p;
+
+CREATE POPULATION p FOR t WITH SCHEMA (
+                    SET STATTYPES OF a, b, c TO NOMINAL;
+                );
+
+ESTIMATE MUTUAL INFORMATION OF a WITH b
+            BY p
+            MODELED BY m1;
+
+
+estimate
+                probability density of foo = 'x',
+                probability density of foo = 'x' given (bar = 'a'),
+                probability density of foo = 'x' given (bar = 'b'),
+                probability density of foo = 'y',
+                probability density of foo = 'y' given (bar = 'a'),
+                probability density of foo = 'y' given (bar = 'b')
+
+            by p;
