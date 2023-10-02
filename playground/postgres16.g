@@ -6182,6 +6182,7 @@ xxblock_comment	\/\*(?s:.)*?\*\/
 /*Lexer rules*/
 
 {whitespace}	skip()
+{xxblock_comment}   skip()
 
 ABORT	ABORT_P
 ABSENT	ABSENT
@@ -6691,6 +6692,15 @@ NOT\s+(BETWEEN|IN|LIKE|ILIKE|SIMILAR)<xnot_la> reject()
 }
 //Op	Op
 "||"	Op
+"->"    Op
+"->>"    Op
+"#>"    Op
+"#>>"    Op
+"@>"    Op
+"<@"    Op
+"?" Op
+"?|" Op
+"?&" Op
 
 \<	'<'
 >	'>'
