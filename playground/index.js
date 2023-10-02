@@ -28,6 +28,7 @@ const codeDbg = setupInfoArea("code-dbg");
 const sampleList = [
 	//title, grammar, input, input ace syntax
 	["Ada parser", "ada-adayacc.g", "test.adb", "ace/mode/ada"],
+	["Age parser", "cypher_gram.g", "test.cypher_gram", "ace/mode/sql"],
 	["Akwa parser (not working)", "akwa.g", "test.awk", "ace/mode/text"],
 	["AlaSQL parser", "alasql-parser.g", "test.alasql", "ace/mode/sql"],
 	["Aliceml parser (partially working)", "aliceml.g", "test.aliceml", "ace/mode/ocaml"],

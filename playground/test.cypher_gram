@@ -1,0 +1,78 @@
+CREATE (:Person {name: 'Daedalus'})-[:FATHER_OF]->(:Person {name: 'Icarus'});
+MATCH (v:Person) RETURN v.name;
+RETURN NULL;
+RETURN 1;
+RETURN 1.0;
+RETURN 1.0::numeric;
+RETURN TRUE;
+RETURN 'This is a string';
+WITH [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as lst RETURN lst;
+WITH [null] as lst RETURN lst;
+WITH [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as lst RETURN lst[3];
+WITH [0, {key: 'key_value'}, 2, 3, 4, 5, 6, 7, 8, 9, 10] as lst RETURN lst;
+WITH [0, {key: 'key_value'}, 2, 3, 4, 5, 6, 7, 8, 9, 10] as lst RETURN lst[1].key;
+WITH [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as lst RETURN lst[-3];
+WITH [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as lst RETURN lst[0..3];
+WITH [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as lst RETURN lst[0..-5];
+WITH [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as lst RETURN lst[..4];
+WITH [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as lst RETURN lst[-5..];
+WITH {int_key: 1, float_key: 1.0, numeric_key: 1::numeric, bool_key: true, string_key: 'Value'} as m
+    RETURN m;
+WITH {listKey: [{inner: 'Map1'}, {inner: 'Map2'}], mapKey: {i: 0}} as m
+    RETURN m;
+WITH {int_key: 1, float_key: 1.0, numeric_key: 1::numeric, bool_key: true, string_key: 'Value'} as m
+    RETURN m.int_key;
+WITH {listKey: [{inner: 'Map1'}, {inner: 'Map2'}], mapKey: {i: 0}} as m
+    RETURN m.listKey[0];
+WITH {id: 0, label: "label_name", properties: {i: 0}}::vertex as v
+	RETURN v;
+WITH {id: 2, start_id: 0, end_id: 1, label: "label_name", properties: {i: 0}}::edge as e
+	RETURN e;
+WITH [{id: 0, label: "label_name_1", properties: {i: 0}}::vertex,
+            {id: 2, start_id: 0, end_id: 1, label: "edge_label", properties: {i: 0}}::edge,
+           {id: 1, label: "label_name_2", properties: {}}::vertex
+           ]::path as p
+	RETURN p;
+
+CREATE (:Person {name: 'John'}),
+       (:Person {name: 'Jeff'}),
+       (:Person {name: 'Joan'}),
+       (:Person {name: 'Bill'});
+
+MATCH (v:Person)
+	WHERE v.name STARTS WITH "J"
+	RETURN v.name;
+
+MATCH (v:Person)
+	WHERE v.name CONTAINS "o"
+	RETURN v.name;
+
+MATCH (v:Person)
+	WHERE v.name ENDS WITH "n"
+	RETURN v.name;
+
+MATCH (v:Person)
+	WHERE v.name =~ 'John'
+	RETURN v.name;
+
+MATCH (v:Person)
+	WHERE v.name =~ '(?i)JoHn'
+	RETURN v.name;
+
+CREATE (a:Person {name: 'A', age: 13}),
+	(b:Person {name: 'B', age: 33, eyes: "blue"}),
+	(c:Person {name: 'C', age: 44, eyes: "blue"}),
+	(d1:Person {name: 'D', eyes: "brown"}),
+	(d2:Person {name: 'D'}),
+	(a)-[:KNOWS]->(b),
+	(a)-[:KNOWS]->(c),
+	(a)-[:KNOWS]->(d1),
+	(b)-[:KNOWS]->(d2),
+	(c)-[:KNOWS]->(d2);
+
+MATCH (v:Person)
+	RETURN v.name, count(*);
+
+MATCH (me:Person)-[]->(friend:Person)
+	RETURN count(friend), me
+	ORDER BY count(friend);
