@@ -55,6 +55,7 @@ const sampleList = [
 	["CG-CQL-author parser", "cg-cql-author.g", "test.cg-cql-author", "ace/mode/sql"],
 	["Chapel parser", "chapel.g", "test.chapel", "ace/mode/c_cpp"],
 	["CocoR parser (partially working)", "cocor.g", "test.cocor", "ace/mode/yaml"],
+	["condb2 sql parser", "condb2-sql.g", "test.sqlite3", "ace/mode/sql"],
 	["CoqPP parser", "coqpp_parse.g", "test.coqpp", "ace/mode/yaml"],
 	["Cpp5-v2 parser (not working)", "cpp5-v2.g", "test.cpp", "ace/mode/c_cpp"],
 	["C parser frama-c (partially working)", "cparser-frama-c.g", "test.frama-c", "ace/mode/c_cpp"],
