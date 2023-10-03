@@ -77,6 +77,7 @@ const sampleList = [
 	["Graphql parser", "libgraphql.g", "test.libgraphql", "ace/mode/yaml"],
 	["Gringo-Clingo parser non grounding (partially working)", "gringo-ngp.g", "test.gringo-ngp", "ace/mode/text"],
 	["Hawq SQL parser (be patient)", "hawq-sql.g", "test.sql", "ace/mode/sql"],
+	["HQL (ECL) parser (be patient)", "hqlgram.g", "test.hqlgram", "ace/mode/pascal"],
 	["HTML parser", "html-parser.g", "index.html", "ace/mode/html"],
 	["Hue SQL generic parser", "hue-generic.g", "test.hue-generic", "ace/mode/sql"],
 	["idl2cpp parser", "idl2cpp.g", "test.idl", "ace/mode/c_cpp"],

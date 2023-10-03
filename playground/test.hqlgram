@@ -1,0 +1,33 @@
+/*##############################################################################
+
+    HPCC SYSTEMS software Copyright (C) 2012 HPCC Systems®.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+############################################################################## */
+
+//define constants
+DG_GenFlat           := true;   //TRUE gens FlatFile
+DG_GenChild          := true;   //TRUE gens ChildFile
+DG_GenGrandChild     := true;   //TRUE gens GrandChildFile
+DG_GenIndex          := true;   //TRUE gens FlatFile AND the index
+DG_GenCSV            := true;   //TRUE gens CSVFile
+DG_GenXML            := true;   //TRUE gens XMLFile
+DG_GenVar            := true;   //TRUE gens VarFile only IF MaxField >= 3
+
+DG_MaxField          := 3;    // maximum number of fields to use building the data records
+DG_MaxChildren       := 3;    //maximum (1 to n) number of child recs
+
+                    // generates (#parents * DG_MaxChildren) records
+DG_MaxGrandChildren  := 3;    //maximum (1 to n) number of grandchild recs
+                    // generates (#children * DG_MaxGrandChildren) records
+
