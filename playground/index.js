@@ -19,9 +19,18 @@ function setupEditorArea(id, lsKey) {
   return e;
 }
 
+let grammarContentHasChanged = false;
+let inputContentHasChanged = false;
+function grammarOnChange(delta) {if(!grammarContentHasChanged) grammarContentHasChanged = true;}
+function inputOnChange(delta) {if(!inputContentHasChanged) inputContentHasChanged = true;}
+
 const grammarEditor = setupEditorArea("grammar-editor", "grammarText");
+grammarEditor.on("change", grammarOnChange);
+grammarContentHasChanged = localStorage.getItem("grammarContentHasChanged");
 grammarEditor.getSession().setMode("ace/mode/yaml");
 const codeEditor = setupEditorArea("code-editor", "codeText");
+codeEditor.on("change", inputOnChange);
+inputContentHasChanged = localStorage.getItem("inputContentHasChanged");
 
 const codeDbg = setupInfoArea("code-dbg");
 
@@ -163,15 +172,22 @@ const sampleList = [
 ];
 
 function loadLalr_sample(self) {
+  if(grammarContentHasChanged || inputContentHasChanged)
+  {
+	let ok = confirm("Your changes will be lost !\nEither OK or Cancel.");
+	if(!ok) return false;
+  }
   let base_url = "./"
   if(self.selectedIndex > 0) {
       let sample_to_use = sampleList[self.selectedIndex-1];
       $.get(base_url + sample_to_use[1], function( data ) {
         grammarEditor.setValue( data );
+	grammarContentHasChanged = false;
       });
       $.get(base_url + sample_to_use[2], function( data ) {
         codeEditor.setValue( data );
 	codeEditor.getSession().setMode(sample_to_use[3]);
+	inputContentHasChanged = false;
       });
   }
 }
@@ -227,8 +243,16 @@ function generateErrorListHTML(errors) {
 }
 
 function updateLocalStorage() {
-  localStorage.setItem('grammarText', grammarEditor.getValue());
-  localStorage.setItem('codeText', codeEditor.getValue());
+  if(grammarContentHasChanged)
+  {
+    localStorage.setItem('grammarText', grammarEditor.getValue());
+    localStorage.setItem('grammarContentHasChanged', grammarContentHasChanged);
+  }
+  if(inputContentHasChanged)
+  {
+    localStorage.setItem('codeText', codeEditor.getValue());
+    localStorage.setItem('inputContentHasChanged', inputContentHasChanged);
+  }
   //localStorage.setItem('optimizationMode', $('#opt-mode').val());
   localStorage.setItem('autoRefresh', $('#auto-refresh').prop('checked'));
 }
