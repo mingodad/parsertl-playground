@@ -35,6 +35,9 @@ EM_JS(void, showDiffTime, (const char *title), {
 #include <parsertl/state_machine.hpp>
 #include <parsertl/lookup.hpp>
 
+#ifdef DEBUGMEM_H_INCLUDED
+bool g_verboseOutput;
+#endif
 
 #if !defined(WASM_PLAYGROUND) && !defined(DEBUGMEM_H_INCLUDED)
 static clock_t start_time;
@@ -72,6 +75,7 @@ struct GlobalState
     ParserRT master_parser;
     ParserRT user_parser;
     int dumpAsEbnfRR;
+    bool verboseOutput = true;
     bool icase;
     bool dump_grammar_lexer;
     bool dump_grammar_lsm;
@@ -451,6 +455,7 @@ struct BuildUserParser
     {
         play_iterator iter_lex;
 
+        if(gs.verboseOutput) showDiffTime("start build user grammar");
         if(gs.dump_grammar_parse_tree)
         {
 #ifdef WASM_PLAYGROUND
@@ -463,7 +468,7 @@ struct BuildUserParser
                     ,"compile_status"
 #endif
                     );
-            showDiffTime("dump grammar parse tree");
+            if(gs.verboseOutput) showDiffTime("dump grammar parse tree");
             return false;
         }
         if(gs.dump_grammar_parse_trace)
@@ -477,7 +482,7 @@ struct BuildUserParser
                     ,"compile_status"
 #endif
                     );
-            showDiffTime("dump grammar parse trace");
+            if(gs.verboseOutput) showDiffTime("dump grammar parse trace");
             return false;
         }
 
@@ -490,16 +495,6 @@ struct BuildUserParser
         iter_lex = play_iterator(gs.grammar_data,
             gs.grammar_data + gs.grammar_data_size, gs.master_parser.lsm);
         results.reset(iter_lex->id, gs.master_parser.gsm);
-
-        if(gs.dump_grammar_lexer)
-        {
-#ifdef WASM_PLAYGROUND
-        switch_output("parse_debug");
-#endif
-            dump_lexer(iter_lex, gs.master_parser.grules, gs.grammar_data);
-            showDiffTime("dump grammr lexer");
-            return false;
-        }
 
         while (results.entry.action != parsertl::action::error &&
             results.entry.action != parsertl::action::accept)
@@ -541,7 +536,7 @@ struct BuildUserParser
             switch_output("parse_ebnf_yacc");
 #endif
             parsertl::debug::dump(gs.user_parser.grules, std::cout, gs.dumpAsEbnfRR == 1);
-            showDiffTime("dump grammar ebnf");
+            if(gs.verboseOutput) showDiffTime("dump grammar ebnf");
             return false;
         }
 
@@ -1226,14 +1221,24 @@ int main_base(int argc, char* argv[], GlobalState& gs)
     try
     {
         build_master_parser(gs);
-        showDiffTime("build master parser");
+        if(gs.verboseOutput) showDiffTime("build master parser");
 
         play_iterator iter_lexg(gs.grammar_data,
                 gs.grammar_data + gs.grammar_data_size, gs.master_parser.lsm);
         play_match_results resultsg(iter_lexg->id, gs.master_parser.gsm);
 
+        if(gs.dump_grammar_lexer)
+        {
+#ifdef WASM_PLAYGROUND
+        switch_output("parse_debug");
+#endif
+            dump_lexer(iter_lexg, gs.master_parser.grules, gs.grammar_data);
+            if(gs.verboseOutput) showDiffTime("dump grammr lexer");
+            return -1;
+        }
+
         bool success = parsertl::parse(iter_lexg, gs.master_parser.gsm, resultsg);
-        showDiffTime("parse user grammar");
+        if(gs.verboseOutput) showDiffTime("parse user grammar");
         if (resultsg.entry.action == parsertl::action::error)
         {
             parser_throw_error("parsing the user grammar", iter_lexg, gs.grammar_data);
@@ -1251,17 +1256,20 @@ int main_base(int argc, char* argv[], GlobalState& gs)
         {
             return -1;
         }
-        showDiffTime("build user parser");
         size_t productions_count = gs.user_parser.grules.grammar().size();
-        std::cerr << "Productions " << productions_count << ".\n";
-        std::cerr << "Terminals " << gs.user_parser.grules.terminals_count() << ".\n";
-        std::cerr << "NonTerminals " << gs.user_parser.grules.non_terminals_count() << ".\n";
-        std::cerr << "States " << gs.user_parser.gsm._rows << ".\n";
-        std::cerr << "Lexer States " << gs.user_parser.lsm.data()._dfa.size() << ".\n";
-        std::cerr << "Lexer State0 " << gs.user_parser.lsm.data()._dfa[0].size() << ".\n";
-        std::cerr << "Shift/Reduce conflicts resolved " << gs.user_parser.grules.shift_reduce_count << ".\n";
-        std::cerr << "Reduce/Reduce conflicts resolved " << gs.user_parser.grules.reduce_reduce_count << ".\n";
-        //std::cerr << "dumpAsEbnfRR = " << gs.dumpAsEbnfRR << "\n";
+        if(gs.verboseOutput)
+        {
+            showDiffTime("build user parser");
+            std::cerr << "Productions " << productions_count << ".\n";
+            std::cerr << "Terminals " << gs.user_parser.grules.terminals_count() << ".\n";
+            std::cerr << "NonTerminals " << gs.user_parser.grules.non_terminals_count() << ".\n";
+            std::cerr << "States " << gs.user_parser.gsm._rows << ".\n";
+            std::cerr << "Lexer States " << gs.user_parser.lsm.data()._dfa.size() << ".\n";
+            std::cerr << "Lexer State0 " << gs.user_parser.lsm.data()._dfa[0].size() << ".\n";
+            std::cerr << "Shift/Reduce conflicts resolved " << gs.user_parser.grules.shift_reduce_count << ".\n";
+            std::cerr << "Reduce/Reduce conflicts resolved " << gs.user_parser.grules.reduce_reduce_count << ".\n";
+            //std::cerr << "dumpAsEbnfRR = " << gs.dumpAsEbnfRR << "\n";
+        }
 
         if(gs.dump_input_parse_tree && productions_count)
         {
@@ -1275,7 +1283,7 @@ int main_base(int argc, char* argv[], GlobalState& gs)
                     ,"parse_stats"
 #endif
                     );
-            showDiffTime("dump input parser tree");
+            if(gs.verboseOutput) showDiffTime("dump input parser tree");
             return -1;
         }
         if(gs.dump_input_parse_trace && productions_count)
@@ -1289,7 +1297,7 @@ int main_base(int argc, char* argv[], GlobalState& gs)
                     ,"parse_stats"
 #endif
                     );
-            showDiffTime("dump input parser trace");
+            if(gs.verboseOutput) showDiffTime("dump input parser trace");
             return -1;
         }
         play_iterator iter_lexi(gs.input_data,
@@ -1300,7 +1308,7 @@ int main_base(int argc, char* argv[], GlobalState& gs)
         switch_output("parse_debug");
 #endif
             dump_lexer(iter_lexi, gs.user_parser.grules, gs.input_data);
-            showDiffTime("dump input lexer");
+            if(gs.verboseOutput) showDiffTime("dump input lexer");
             return -1;
         }
 #ifdef WASM_PLAYGROUND
@@ -1311,7 +1319,7 @@ int main_base(int argc, char* argv[], GlobalState& gs)
             play_match_results resultsi(iter_lexi->id, gs.user_parser.gsm);
 
             success = parsertl::parse(iter_lexi, gs.user_parser.gsm, resultsi);
-            showDiffTime("parse input");
+            if(gs.verboseOutput) showDiffTime("parse input");
             if (resultsi.entry.action == parsertl::action::error)
             {
                 parser_throw_error("parsing the input", iter_lexi, gs.input_data);
@@ -1387,6 +1395,7 @@ static void showHelp(const char* prog_name)
             "-dumpAsEbnfRR  Dump grammar as EBNF for railroad diagram\n"
             "-dumpAsYacc    Dump grammar as Yacc\n"
             "-pruneptree    Do not show empty parser tree nodes\n"
+            "-verbose       Show several metrics for debug\n"
             ;
 }
 
@@ -1406,6 +1415,7 @@ int main(int argc, char *argv[])
     }
 
     int idx_argc = 1;
+    gs.verboseOutput = false;
     for (; idx_argc < argc; ++idx_argc)
     {
         const char* param = argv[idx_argc];
@@ -1454,6 +1464,13 @@ int main(int argc, char *argv[])
         {
             gs.pruneParserTree = true;
         }
+        else if (strcmp("-verbose", param) == 0)
+        {
+            gs.verboseOutput = true;
+#ifdef DEBUGMEM_H_INCLUDED
+            g_verboseOutput = true;
+#endif
+        }
         else if(param[0] == '-')
         {
             std::cout << "Unknown option: " << param << std::endl;
@@ -1476,7 +1493,7 @@ int main(int argc, char *argv[])
     const char* grammar_pathname = argv[idx_argc];
     const char* input_pathname = argv[idx_argc+1];
 
-    showDiffTime("Starting");
+    if(gs.verboseOutput) showDiffTime("Starting");
     try
     {
         lexertl::memory_file mfg(grammar_pathname);
@@ -1487,7 +1504,7 @@ int main(int argc, char *argv[])
         }
         gs.grammar_data = mfg.data();
         gs.grammar_data_size = mfg.size();
-        showDiffTime("read user grammar");
+        if(gs.verboseOutput) showDiffTime("read user grammar");
 
         lexertl::memory_file mfi(input_pathname);
         if (!mfi.data())
@@ -1497,7 +1514,7 @@ int main(int argc, char *argv[])
         }
         gs.input_data = mfi.data();
         gs.input_data_size = mfi.size();
-        showDiffTime("read input");
+        if(gs.verboseOutput) showDiffTime("read input");
         return main_base(argc, argv, gs);
     }
     catch (const std::exception &e)
