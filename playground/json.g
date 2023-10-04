@@ -12,7 +12,7 @@ json : value ;
 obj : '{' pair (',' pair)* '}' | '{' '}' ;
 pair : STRING ':' value ;
 arr : '[' value (',' value)* ']' | '[' ']' ;
-value : STRING | NUMBER | obj | arr | 'true' | 'false' | 'null' ;
+value : STRING | NUMBER | obj | arr | "true" | "false" | "null" ;
 
 %%
 
@@ -42,9 +42,9 @@ WS	[ \t\n\r]+
 :	':'
 \[	'['
 \]	']'
-true	'true'
-false	'false'
-null	'null'
+true	"true"
+false	"false"
+null	"null"
 
 .	ILLEGAL_CHARACTER
 

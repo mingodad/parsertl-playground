@@ -17,8 +17,8 @@ suffix          : primary (
 					signnum? num  // (exactly n / at (least / most) n repetitions
 					|  name // Syntax of relabel module. The pattern p^l is equivalent to p + lpeglabel.T(l).
 					)
-				| '->' (string | pcap | name | num)  /* capture */
-				| '=>' name // match time capture
+				| "->" (string | pcap | name | num)  /* capture */
+				| "=>" name // match time capture
 			    )
 			)*
 			;
@@ -28,20 +28,20 @@ primary         : '(' exp  ')'
 		| keyword
 		| class
 		| defined
-		| '{:' (name ':')? exp ':}'  // (named or anonymous) group capture
+		| "{:" (name ':')? exp ":}"  // (named or anonymous) group capture
 		| '=' name           // back reference
 		| '@' exp   // for throwing labels errors on failure of expected matches
 		| pcap
-		| '{~' exp '~}'   // substitution capture
-		| '{|' exp '|}'   // table capture
+		| "{~" exp "~}"   // substitution capture
+		| "{|" exp "|}"   // table capture
 		| '{' exp '}'     // simple capture
-		| '~?'            // optional capture
-		| '~>' ('foldleft' | 'foldright' | 'rfoldleft' | 'rfoldright' | name ) // fold capture
+		| "~?"            // optional capture
+		| "~>" ("foldleft" | "foldright" | "rfoldleft" | "rfoldright" | name ) // fold capture
 		| '$' (string | name | num | pcap)
 		| '.'
 		| name //!(asttag | arrow )
 		| '<' name '>'    // old-style non terminals
-		| '%{' name '}'   // Syntax of relabel module. Equivalent to lpeglabel.T(l)
+		| "%{" name '}'   // Syntax of relabel module. Equivalent to lpeglabel.T(l)
 		;
 
 grammar         : definition+ ;
@@ -86,32 +86,32 @@ range	.-[^\]]
 "&"	'&'
 "!"	'!'
 "^"	'^'
-"->"	'->'
-"=>"	'=>'
+"->"	"->"
+"=>"	"=>"
 "("	'('
 ")"	')'
-"{:"	'{:'
-":}"	':}'
+"{:"	"{:"
+":}"	":}"
 "="	'='
 "@"	'@'
-"{~"	'{~'
-"~}"	'~}'
-"{|"	'{|'
-"|}"	'|}'
+"{~"	"{~"
+"~}"	"~}"
+"{|"	"{|"
+"|}"	"|}"
 "{"	'{'
 "}"	'}'
-"~?"	'~?'
-"~>"	'~>'
+"~?"	"~?"
+"~>"	"~>"
 "$"	'$'
 "."	'.'
 "<"	'<'
 ">"	'>'
-"%{"	'%{'
+"%{"	"%{"
 ":"	':'
-"foldleft"	'foldleft'
-"foldright"	'foldright'
-"rfoldleft"	'rfoldleft'
-"rfoldright"	'rfoldright'
+"foldleft"	"foldleft"
+"foldright"	"foldright"
+"rfoldleft"	"rfoldleft"
+"rfoldright"	"rfoldright"
 
 [0-9]+	num
 \"[^\"]*\"|'[^']*'	string

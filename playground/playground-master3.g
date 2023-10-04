@@ -6,28 +6,28 @@
 %% //Grammar rules
 
 start : file ;
-file : directives '%%' grules '%%' rx_macros '%%' rx_rules '%%' ;
+file : directives "%%" grules "%%" rx_macros "%%" rx_rules "%%" ;
 directives : %empty | directives directive ;
 directive : NL ;
 
 // Read and store %left entries
-directive : '%left' tokens NL ;
+directive : "%left" tokens NL ;
 // Read and store %nonassoc entries
-directive : '%nonassoc' tokens NL ;
+directive : "%nonassoc" tokens NL ;
 // Read and store %precedence entries
-directive : '%precedence' tokens NL ;
+directive : "%precedence" tokens NL ;
 // Read and store %right entries
-directive : '%right' tokens NL ;
+directive : "%right" tokens NL ;
 // Read and store %start
-directive : '%start' Name NL ;
+directive : "%start" Name NL ;
 // Read and store %token entries
-directive : '%token' tokens NL ;
+directive : "%token" tokens NL ;
 tokens : token | tokens token ;
 token : Literal | Name ;
 // Read and store %option caseless
-directive : '%option' 'caseless' NL ;
+directive : "%option" "caseless" NL ;
 // Read and store %x entries
-directive : '%x' names NL ;
+directive : "%x" names NL ;
 names : Name | names Name ;
 
 // Grammar rules
@@ -35,10 +35,10 @@ grules : %empty | grules grule ;
 grule : Name ':' production ';' ;
 production : opt_prec_list | production '|' opt_prec_list ;
 opt_prec_list : opt_list opt_prec ;
-opt_list : %empty | '%empty' | rhs_list ;
+opt_list : %empty | "%empty" | rhs_list ;
 rhs_list : rhs | rhs_list rhs ;
 rhs : Literal | Name | '[' production ']' | rhs '?' | rhs '*' | rhs '+' | '(' production ')' ;
-opt_prec : %empty | '%prec' Literal | '%prec' Name ;
+opt_prec : %empty | "%prec" Literal | "%prec" Name ;
 
 // Token regex macros
 rx_macros : %empty ;
@@ -76,7 +76,7 @@ rx : sequence | rx '|' sequence ;
 sequence : item | sequence item ;
 item : atom | atom repeat ;
 atom : Charset | Macro | String | '(' rx ')' ;
-repeat : '?' | '\?\?' | '*' | '*?' | '+' | '+?' | Repeat ;
+repeat : '?' | "??" | '*' | "*?" | '+' | "+?" | Repeat ;
 
 %%
 
@@ -95,20 +95,20 @@ literal_common	\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\d+)
 
 <INITIAL,OPTION>[ \t]+	skip()
 {NL}	NL
-"%left"	'%left'
-"%nonassoc"	'%nonassoc'
-"%precedence"	'%precedence'
-"%right"	'%right'
-"%start"	'%start'
-"%token"	'%token'
-"%x"	'%x'
-<INITIAL>"%option"<OPTION>	'%option'
-<OPTION>"caseless"<INITIAL>	'caseless'
-<INITIAL>"%%"<GRULE>	'%%'
+"%left"	"%left"
+"%nonassoc"	"%nonassoc"
+"%precedence"	"%precedence"
+"%right"	"%right"
+"%start"	"%start"
+"%token"	"%token"
+"%x"	"%x"
+<INITIAL>"%option"<OPTION>	"%option"
+<OPTION>"caseless"<INITIAL>	"caseless"
+<INITIAL>"%%"<GRULE>	"%%"
 
 <GRULE> {
     ":"	':'
-    "%prec"	'%prec'
+    "%prec"	"%prec"
     "["	'['
     "]"	']'
     "("	'('
@@ -119,8 +119,8 @@ literal_common	\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\d+)
     "|"	'|'
     ";"	';'
     [ \t]+|{NL}	skip()
-    "%empty"	'%empty'
-    "%%"<MACRO>	'%%'
+    "%empty"	"%empty"
+    "%%"<MACRO>	"%%"
 }
 
 <INITIAL,GRULE> {
@@ -138,7 +138,7 @@ literal_common	\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\d+)
 <MACRO>[A-Z_a-z][0-9A-Z_a-z]*<REGEX>	MacroName
 <MACRO,REGEX>{NL}<MACRO>	skip()
 <MACRO,RULE> {
-    "%%"<RULE>	'%%'
+    "%%"<RULE>	"%%"
     {c_comment}	skip()
     ^[ \t]+{c_comment}	skip()
 }
@@ -159,11 +159,11 @@ literal_common	\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\d+)
     [(]([?](-?(i|s|x))*:)?	'('
     ")"	')'
     "?"	'?'
-    "??"	'\?\?'
+    "??"	"??"
     "*"	'*'
-    "*?"	'*?'
+    "*?"	"*?"
     "+"	'+'
-    "+?"	'+?'
+    "+?"	"+?"
     {escape}|(\[\^?({escape}|{posix}|[^\\\]])*\])|[^\s]	Charset
     [{][A-Z_a-z][-0-9A-Z_a-z]*[}]	Macro
     [{][0-9]+(,([0-9]+)?)?[}][?]?	Repeat

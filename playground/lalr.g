@@ -28,16 +28,16 @@ match_associativity_statement:
 	;
 
 match_whitespace_statement:
-	'%whitespace' match_regex ';'
+	"%whitespace" match_regex ';'
 	;
 
 match_case_insensitive_statement:
-	'%case_insensitive' ';'
+	"%case_insensitive" ';'
 	;
 
 match_error_recovery_statement:
-    '%error_recovery_off' ';'
-    |'%error_recovery_show' ';'
+    "%error_recovery_off" ';'
+    |"%error_recovery_show" ';'
     ;
 
 match_production_statement:
@@ -45,15 +45,15 @@ match_production_statement:
 	;
 
 match_associativity:
-	'%left'
-	| '%right'
+	"%left"
+	| "%right"
 	| none_assoc
-	| '%precedence'
+	| "%precedence"
 	;
 
 none_assoc:
-	'%none'
-	| '%nonassoc'
+	"%none"
+	| "%nonassoc"
 	;
 
 match_symbols:
@@ -92,8 +92,8 @@ match_precedence:
 	;
 
 prec_tag:
-	'%precedence'
-	| '%prec'
+	"%precedence"
+	| "%prec"
 	;
 
 match_action:
@@ -115,17 +115,17 @@ C_STYLE_COMMENT [/][*](?s:.)*?[*][/]
 {COMMENT}	skip()
 {C_STYLE_COMMENT}	skip()
 
-"%case_insensitive"	'%case_insensitive'
+"%case_insensitive"	"%case_insensitive"
 "error"	match_error
-"%error_recovery_off"	'%error_recovery_off'
-"%error_recovery_show"	'%error_recovery_show'
-"%left"	'%left'
-"%nonassoc"	'%nonassoc'
-"%none"	'%none'
-"%precedence"	'%precedence'
-"%prec"	'%prec'
-"%right"	'%right'
-"%whitespace"	'%whitespace'
+"%error_recovery_off"	"%error_recovery_off"
+"%error_recovery_show"	"%error_recovery_show"
+"%left"	"%left"
+"%nonassoc"	"%nonassoc"
+"%none"	"%none"
+"%precedence"	"%precedence"
+"%prec"	"%prec"
+"%right"	"%right"
+"%whitespace"	"%whitespace"
 
 \{	'{'
 \}	'}'

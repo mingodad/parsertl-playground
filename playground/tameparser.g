@@ -84,7 +84,7 @@ Keyword_Definition :
 	;
 
 Lexeme_Definition :
-	identifier ('=' | '|=') (regex | string | character)
+	identifier ('=' | "|=") (regex | string | character)
 	| /*[=> replace identifier '=']*/ replace identifier '=' (regex | string | character)
 	| identifier '=' identifier '.' identifier
 	;
@@ -98,8 +98,8 @@ Grammar_Definition :
 	;
 
 Nonterminal_Definition :
-	//[=> nonterminal ('=' | '|=')]
-	nonterminal ('=' | '|=') Production ('|' Production)*
+	//[=> nonterminal ('=' | "|=")]
+	nonterminal ('=' | "|=") Production ('|' Production)*
 	| /*[=> replace nonterminal '=']*/ replace nonterminal '=' Production ('|' Production)*
 	;
 
@@ -124,8 +124,8 @@ Simple_Ebnf_Item :
 	;
 
 Guard :
-	'[=>' Ebnf_Item ']'
-	| '[=>' '[' can_clash ']' Ebnf_Item ']'
+	"[=>" Ebnf_Item ']'
+	| "[=>" '[' can_clash ']' Ebnf_Item ']'
 	;
 
 Nonterminal :
@@ -201,7 +201,7 @@ Test_Block :
 
 Test_Definition :
 	Nonterminal '=' Test_Specification+
-	| Nonterminal '!=' Test_Specification+
+	| Nonterminal "!=" Test_Specification+
 	| Nonterminal from Test_Specification+
 	;
 
@@ -271,18 +271,18 @@ reduce	reduce
 ":"	':'
 "="	'='
 "."	'.'
-"|="	'|='
+"|="	"|="
 "|"	'|'
 "*"	'*'
 "+"	'+'
 "?"	'?'
 "("	'('
 ")"	')'
-"[=>"	'[=>'
+"[=>"	"[=>"
 "]"	']'
 "["	'['
 ","	','
-"!="	'!='
+"!="	"!="
 
 /* Order matter if identifier comes before keywords they are classified as identifier */
 {identifier}	identifier

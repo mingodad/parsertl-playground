@@ -32,8 +32,8 @@ Set :
 SimSet :
 	ident
 	| string
-	| Char ('..' Char)?
-	| 'ANY'
+	| Char (".." Char)?
+	| "ANY"
 	;
 
 Char :
@@ -57,17 +57,17 @@ Term :
 	;
 
 Factor :
-	'WEAK'? Sym Attribs?
+	"WEAK"? Sym Attribs?
 	| '(' Expression ')'
 	| '[' Expression ']'
 	| '{' Expression '}'
 	| SemText
-	| 'ANY'
-	| 'SYNC'
+	| "ANY"
+	| "SYNC"
 	;
 
 Resolver :
-	'IF' '(' Condition
+	"IF" '(' Condition
 	;
 
 Condition :
@@ -79,7 +79,7 @@ TokenExpr :
 	;
 
 TokenTerm :
-	TokenFactor+ ('CONTEXT' '(' TokenExpr ')')?
+	TokenFactor+ ("CONTEXT" '(' TokenExpr ')')?
 	;
 
 TokenFactor :
@@ -139,11 +139,11 @@ attrdecl	{attrdecl1}|{attrdecl2}
 {semtext}   semtext
 {attrdecl}  attrdecl
 
-"ANY"	'ANY'
+"ANY"	"ANY"
 CHARACTERS	CHARACTERS
 COMMENTS	COMMENTS
 COMPILER	COMPILER
-"CONTEXT"	'CONTEXT'
+"CONTEXT"	"CONTEXT"
 END	END
 FROM	FROM
 IGNORE	IGNORE
@@ -151,18 +151,18 @@ IGNORECASE	IGNORECASE
 NESTED	NESTED
 PRAGMAS	PRAGMAS
 PRODUCTIONS	PRODUCTIONS
-"SYNC"	'SYNC'
+"SYNC"	"SYNC"
 TERMINALS	TERMINALS
 TO	TO
 TOKENS	TOKENS
-"WEAK"	'WEAK'
-"IF"	'IF'
+"WEAK"	"WEAK"
+"IF"	"IF"
 
 "."	'.'
 "="	'='
 "+"	'+'
 "-"	'-'
-".."	'..'
+".."	".."
 ":"	':'
 "|"	'|'
 "("	'('

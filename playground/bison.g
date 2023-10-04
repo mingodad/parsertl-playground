@@ -1,7 +1,6 @@
 // /home/mingo/dev/c/A_grammars/lalr/lalr-nb/dist/Release/GNU-Linux/lalr-nb bison.g
 
 
-
 //%error_recovery_show;
 //%error_recovery_off;
 
@@ -84,29 +83,29 @@ prologue_declarations :
 prologue_declaration :
 	grammar_declaration
 	| VERBATIN_CODE
-	| '%<flag>'
-	| '%define' variable value
-	| '%header' string_opt
-	| '%error-verbose'
-	| '%expect' INT_LITERAL
-	| '%expect-rr' INT_LITERAL
-	| '%file-prefix' STRING
-	| '%glr-parser'
-	| '%initial-action' ACTION_CODE
-	| '%language' STRING
-	| '%name-prefix' STRING
-	| '%no-lines'
-	| '%nondeterministic-parser'
-	| '%output' STRING
-	| '%param' params
-	| '%pure-parser'
-	| '%require' STRING
-	| '%skeleton' STRING
-	| '%token-table'
-	| '%verbose'
-	| '%yacc'
-	//| error ';'
-	| ';'
+	| "%<flag>"
+	| "%define" variable value
+	| "%header" string_opt
+	| "%error-verbose"
+	| "%expect" INT_LITERAL
+	| "%expect-rr" INT_LITERAL
+	| "%file-prefix" STRING
+	| "%glr-parser"
+	| "%initial-action" ACTION_CODE
+	| "%language" STRING
+	| "%name-prefix" STRING
+	| "%no-lines"
+	| "%nondeterministic-parser"
+	| "%output" STRING
+	| "%param" params
+	| "%pure-parser"
+	| "%require" STRING
+	| "%skeleton" STRING
+	| "%token-table"
+	| "%verbose"
+	| "%yacc"
+	//| error ";"
+	| ";"
 	;
 
 params :
@@ -116,17 +115,17 @@ params :
 
 grammar_declaration :
 	symbol_declaration
-	| '%start' symbols_1
+	| "%start" symbols_1
 	| code_props_type ACTION_CODE generic_symlist
-	| '%default-prec'
-	| '%no-default-prec'
-	| '%code' ACTION_CODE
-	| '%code' ID ACTION_CODE
+	| "%default-prec"
+	| "%no-default-prec"
+	| "%code" ACTION_CODE
+	| "%code" ID ACTION_CODE
 	;
 
 code_props_type :
-	'%destructor'
-	| '%printer'
+	"%destructor"
+	| "%printer"
 	;
 
 union_name :
@@ -135,21 +134,21 @@ union_name :
 	;
 
 grammar_declaration :
-	'%union' union_name ACTION_CODE
+	"%union" union_name ACTION_CODE
 	;
 
 symbol_declaration :
-	'%nterm' nterm_decls
-	| '%token' token_decls
-	| '%type' symbol_decls
+	"%nterm" nterm_decls
+	| "%token" token_decls
+	| "%type" symbol_decls
 	| precedence_declarator token_decls_for_prec
 	;
 
 precedence_declarator :
-	'%left'
-	| '%right'
-	| '%nonassoc'
-	| '%precedence'
+	"%left"
+	| "%right"
+	| "%nonassoc"
+	| "%precedence"
 	;
 
 string_opt :
@@ -174,8 +173,8 @@ generic_symlist_item :
 
 tag :
 	TAG
-	//| '<*>'
-	//| '<>'
+	//| "<*>"
+	//| "<>"
 	;
 
 nterm_decls :
@@ -242,32 +241,32 @@ grammar :
 
 rules_or_grammar_declaration :
 	rules
-	| grammar_declaration ';'
-	//| error ';'
+	| grammar_declaration ";"
+	//| error ";"
 	;
 
 rules :
 	id_colon rhses_1
-	| id_colon named_ref_opt ':' rhses_1
+	| id_colon named_ref_opt ":" rhses_1
 	;
 
 rhses_1 :
 	rhs
-	| rhses_1 '|' rhs
-	| rhses_1 ';'
+	| rhses_1 "|" rhs
+	| rhses_1 ";"
 	;
 
 rhs :
 	%empty
 	| rhs symbol named_ref_opt
-	| rhs tag_opt '{...}' named_ref_opt
-	| rhs '%?{...}'
-	| rhs '%empty'
-	| rhs '%prec' symbol
-	| rhs '%dprec' INT_LITERAL
-	| rhs '%merge' TAG
-	| rhs '%expect' INT_LITERAL
-	| rhs '%expect-rr' INT_LITERAL
+	| rhs tag_opt "{...}" named_ref_opt
+	| rhs "%?{...}"
+	| rhs "%empty"
+	| rhs "%prec" symbol
+	| rhs "%dprec" INT_LITERAL
+	| rhs "%merge" TAG
+	| rhs "%expect" INT_LITERAL
+	| rhs "%expect-rr" INT_LITERAL
 	;
 
 named_ref_opt :
@@ -283,7 +282,7 @@ value :
 	%empty
 	| ID
 	| STRING
-	| '{...}'
+	| "{...}"
 	;
 
 id :
@@ -310,6 +309,9 @@ epilogue_opt :
 	;
 
 %%
+
+%x ACTION_CODE_ST
+
 /*Macros*/
 
 SPACES	[ \t\r\n]+
@@ -329,50 +331,50 @@ ID	[a-zA-Z_][a-zA-Z_.0-9]*
 {COMMENT}	skip()
 {C_STYLE_COMMENT}	skip()
 
-"%<flag>"	'%<flag>'
-"%define"	'%define'
-"%header"	'%header'
-"%error-verbose"	'%error-verbose'
-"%expect"	'%expect'
-"%expect-rr"	'%expect-rr'
-"%file-prefix"	'%file-prefix'
-"%glr-parser"	'%glr-parser'
-"%initial-action"	'%initial-action'
-"%language"	'%language'
-"%name-prefix"	'%name-prefix'
-"%no-lines"	'%no-lines'
-"%output"	'%output'
-"%param"	'%param'
-"%pure-parser"	'%pure-parser'
-"%require"	'%require'
-"%skeleton"	'%skeleton'
-"%token-table"	'%token-table'
-"%verbose"	'%verbose'
-"%yacc"	'%yacc'
-";"	';'
-"%start"	'%start'
-"%default-prec"	'%default-prec'
-"%no-default-prec"	'%no-default-prec'
-"%code"	'%code'
-"%destructor"	'%destructor'
-"%printer"	'%printer'
-"%union"	'%union'
-"%nterm"	'%nterm'
-"%token"	'%token'
-"%type"	'%type'
-"%left"	'%left'
-"%right"	'%right'
-"%nonassoc"	'%nonassoc'
-"%precedence"	'%precedence'
-":"	':'
-"|"	'|'
-"{...}"	'{...}'
-"%?{...}"	'%?{...}'
-"%empty"	'%empty'
-"%prec"	'%prec'
-"%dprec"	'%dprec'
-"%merge"	'%merge'
-"%nondeterministic-parser"	'%nondeterministic-parser'
+"%<flag>"	"%<flag>"
+"%define"	"%define"
+"%header"	"%header"
+"%error-verbose"	"%error-verbose"
+"%expect"	"%expect"
+"%expect-rr"	"%expect-rr"
+"%file-prefix"	"%file-prefix"
+"%glr-parser"	"%glr-parser"
+"%initial-action"	"%initial-action"
+"%language"	"%language"
+"%name-prefix"	"%name-prefix"
+"%no-lines"	"%no-lines"
+"%output"	"%output"
+"%param"	"%param"
+"%pure-parser"	"%pure-parser"
+"%require"	"%require"
+"%skeleton"	"%skeleton"
+"%token-table"	"%token-table"
+"%verbose"	"%verbose"
+"%yacc"	"%yacc"
+";"	";"
+"%start"	"%start"
+"%default-prec"	"%default-prec"
+"%no-default-prec"	"%no-default-prec"
+"%code"	"%code"
+"%destructor"	"%destructor"
+"%printer"	"%printer"
+"%union"	"%union"
+"%nterm"	"%nterm"
+"%token"	"%token"
+"%type"	"%type"
+"%left"	"%left"
+"%right"	"%right"
+"%nonassoc"	"%nonassoc"
+"%precedence"	"%precedence"
+":"	":"
+"|"	"|"
+"{...}"	"{...}"
+"%?{...}"	"%?{...}"
+"%empty"	"%empty"
+"%prec"	"%prec"
+"%dprec"	"%dprec"
+"%merge"	"%merge"
+"%nondeterministic-parser"	"%nondeterministic-parser"
 
 "%%"	SECTION_MARK
 
@@ -382,7 +384,12 @@ ID	[a-zA-Z_][a-zA-Z_.0-9]*
 \<[^>]*>	TAG
 '(\\.|[^'\n\r\\])'	CHAR_LITERAL
 
-{ACTION_CODE}	ACTION_CODE
+"{"<>ACTION_CODE_ST>
+<ACTION_CODE_ST> {
+    "{"<>ACTION_CODE_ST>
+    "}"<<> ACTION_CODE
+    (?s:.)<.>
+}
 {VERBATIN_CODE}	VERBATIN_CODE
 
 /*EPILOGUE : ".+" ; //with this we have segfault*/

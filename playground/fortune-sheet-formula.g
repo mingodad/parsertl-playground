@@ -6,7 +6,7 @@
 
 /* operator associations and precedence (low-top, high-bottom) */
 %left '='
-%left '<=' '>=' '<>' NOT
+%left "<=" ">=" "<>" NOT
 %left '>' '<'
 %left '+' '-'
 %left '*' '/'
@@ -32,9 +32,9 @@ expression
   | expression '=' expression
   | expression '+' expression
   | '(' expression ')'
-  | expression '<=' expression
-  | expression '>=' expression
-  | expression '<>' expression
+  | expression "<=" expression
+  | expression ">=" expression
+  | expression "<>" expression
   | expression NOT expression
   | expression '>' expression
   | expression '<' expression
@@ -136,9 +136,9 @@ FUNC   [A-Za-z]{1,}[A-Za-z_0-9.]+|[A-Za-z.]+
 "="                                                                                             '='
 "%"                                                                                            '%'
 
-"<="	'<='
-">="	'>='
-"<>"	'<>'
+"<="	"<="
+">="	">="
+"<>"	"<>"
 
 //[#]                                                                                             '#'
 //<<EOF>>                                                                                         EOF

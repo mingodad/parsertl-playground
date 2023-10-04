@@ -6,41 +6,41 @@
 %% //Grammar rules
 
 start : file ;
-file : directives '%%' grules '%%' rx_directives rx_macros '%%' rx_rules '%%' ;
+file : directives "%%" grules "%%" rx_directives rx_macros "%%" rx_rules "%%" ;
 directives : %empty | directives directive ;
 directive : NL ;
 
 // Read and store %left entries
-directive : '%left' tokens NL ;
+directive : "%left" tokens NL ;
 // Read and store %nonassoc entries
-directive : '%nonassoc' tokens NL ;
+directive : "%nonassoc" tokens NL ;
 // Read and store %precedence entries
-directive : '%precedence' tokens NL ;
+directive : "%precedence" tokens NL ;
 // Read and store %right entries
-directive : '%right' tokens NL ;
+directive : "%right" tokens NL ;
 // Read and store %start
-directive : '%start' Name NL ;
+directive : "%start" Name NL ;
 // Read and store %token entries
-directive : '%token' tokens NL ;
+directive : "%token" tokens NL ;
 tokens : token | tokens token ;
 token : Literal | Name ;
 names : Name | names Name ;
 // Read and store %token_indent entry
-directive : '%token_indent' Name NL ;
+directive : "%token_indent" Name NL ;
 // Read and store %token_dedent entry
-directive : '%token_dedent' Name NL ;
+directive : "%token_dedent" Name NL ;
 // Read and store %token_symbol_table entry
-directive : '%token_symbol_table' Name NL ;
+directive : "%token_symbol_table" Name NL ;
 
 // Grammar rules
 grules : %empty | grules grule ;
 grule : Name ':' production ';' ;
 production : opt_prec_list | production '|' opt_prec_list ;
 opt_prec_list : opt_list opt_prec ;
-opt_list : %empty | '%empty' | rhs_list ;
+opt_list : %empty | "%empty" | rhs_list ;
 rhs_list : rhs | rhs_list rhs ;
 rhs : Literal | Name | '[' production ']' | rhs '?' | '{' production '}' | rhs '*' | rhs '+' | '(' production ')' ;
-opt_prec : %empty | '%prec' Literal | '%prec' Name ;
+opt_prec : %empty | "%prec" Literal | "%prec" Name ;
 
 // Token regex macros
 rx_macros : %empty ;
@@ -49,9 +49,9 @@ rx_macros : rx_macros MacroName regex ;
 rx_directives :  %empty | rx_directives rx_directive ;
 
 // Read and store %x entries
-rx_directive : '%x' names NL ;
+rx_directive : "%x" names NL ;
 // Read and store %option caseless
-rx_directive : '%option' 'caseless' NL ;
+rx_directive : "%option" "caseless" NL ;
 
 // Tokens
 rx_rules : %empty ;
@@ -93,7 +93,7 @@ rx : sequence | rx '|' sequence ;
 sequence : item | sequence item ;
 item : atom | atom repeat ;
 atom : Charset | Macro | String | '(' rx ')' ;
-repeat : '?' | '\?\?' | '*' | '*?' | '+' | '+?' | Repeat ;
+repeat : '?' | "??" | '*' | "*?" | '+' | "+?" | Repeat ;
 
 %%
 
@@ -111,19 +111,19 @@ literal_common	\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\d+)
 
 <INITIAL,OPTION,RXDIRECTIVES>[ \t]+	skip()
 {NL}	NL
-"%left"	'%left'
-"%nonassoc"	'%nonassoc'
-"%precedence"	'%precedence'
-"%right"	'%right'
-"%start"	'%start'
-"%token"	'%token'
-"%token_symbol_table"	'%token_symbol_table'
-"%token_indent"	'%token_indent'
-"%token_dedent"	'%token_dedent'
-<INITIAL>"%%"<GRULE>	'%%'
+"%left"	"%left"
+"%nonassoc"	"%nonassoc"
+"%precedence"	"%precedence"
+"%right"	"%right"
+"%start"	"%start"
+"%token"	"%token"
+"%token_symbol_table"	"%token_symbol_table"
+"%token_indent"	"%token_indent"
+"%token_dedent"	"%token_dedent"
+<INITIAL>"%%"<GRULE>	"%%"
 
 <GRULE>":"	':'
-<GRULE>"%prec"	'%prec'
+<GRULE>"%prec"	"%prec"
 <GRULE>"["	'['
 <GRULE>"]"	']'
 <GRULE>"("	'('
@@ -136,20 +136,20 @@ literal_common	\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\d+)
 <GRULE>"|"	'|'
 <GRULE>";"	';'
 <GRULE>[ \t]+|{NL}	skip()
-<GRULE>"%empty"	'%empty'
-<GRULE>"%%"<MACRO>	'%%'
+<GRULE>"%empty"	"%empty"
+<GRULE>"%%"<MACRO>	"%%"
 <INITIAL,GRULE>{c_comment}	skip()
 /* Bison supports single line comments */
 <INITIAL,GRULE>"//".*	skip()
-<INITIAL,GRULE,ID>'({literal_common}|[^'\\])+'|["]({literal_common}|[^"\\])+["]	Literal
+<INITIAL,GRULE,ID>'({literal_common}|[^'\\])'|["]({literal_common}|[^"\\])+["]	Literal
 <INITIAL,GRULE,ID,RXDIRECTIVES>[.A-Z_a-z][-.0-9A-Z_a-z]*	Name
 <ID>[1-9][0-9]*	Number
 
-<MACRO,RULE>"%%"<RULE>	'%%'
-<MACRO>"%option"<OPTION>	'%option'
-<OPTION>"caseless"	'caseless'
+<MACRO,RULE>"%%"<RULE>	"%%"
+<MACRO>"%option"<OPTION>	"%option"
+<OPTION>"caseless"	"caseless"
 <OPTION,RXDIRECTIVES>{NL}<MACRO> NL
-<MACRO,RULE>"%x"<RXDIRECTIVES>	'%x'
+<MACRO,RULE>"%x"<RXDIRECTIVES>	"%x"
 <MACRO>[A-Z_a-z][0-9A-Z_a-z]*<REGEX>	MacroName
 <MACRO,REGEX>{NL}<MACRO>	skip()
 <MACRO,RULE,RXDIRECTIVES>{c_comment}	skip()
@@ -166,11 +166,11 @@ literal_common	\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\d+)
 <REGEX,RULE>[(]([?](-?(i|s|x))*:)?	'('
 <REGEX,RULE>")"	')'
 <REGEX,RULE>"?"	'?'
-<REGEX,RULE>"??"	'\?\?'
+<REGEX,RULE>"??"	"??"
 <REGEX,RULE>"*"	'*'
-<REGEX,RULE>"*?"	'*?'
+<REGEX,RULE>"*?"	"*?"
 <REGEX,RULE>"+"	'+'
-<REGEX,RULE>"+?"	'+?'
+<REGEX,RULE>"+?"	"+?"
 <REGEX,RULE>{escape}|(\[\^?({escape}|{posix}|[^\\\]])*\])|[^\s]	Charset
 <REGEX,RULE>[{][A-Z_a-z][-0-9A-Z_a-z]*[}]	Macro
 <REGEX,RULE>[{][0-9]+(,([0-9]+)?)?[}][?]?	Repeat

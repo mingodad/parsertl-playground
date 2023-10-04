@@ -660,13 +660,13 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
 
     grules.push("start", "file");
     grules.push("file",
-        "directives '%%' grules '%%' rx_directives rx_macros '%%' rx_rules '%%'");
+        "directives \"%%\" grules \"%%\" rx_directives rx_macros \"%%\" rx_rules \"%%\"");
     grules.push("directives", "%empty "
         "| directives directive");
     grules.push("directive", "NL");
 
     // Read and store %left entries
-    gs.master_parser.actions[grules.push("directive", "'%left' tokens NL")] =
+    gs.master_parser.actions[grules.push("directive", "\"%left\" tokens NL")] =
         [](BuildUserParser& state)
     {
         const std::string tokens = state.dollar(1);
@@ -675,7 +675,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     };
     // Read and store %nonassoc entries
     gs.master_parser.actions[grules.push("directive",
-        "'%nonassoc' tokens NL")] =
+        "\"%nonassoc\" tokens NL")] =
         [](BuildUserParser& state)
     {
         const std::string tokens = state.dollar(1);
@@ -684,7 +684,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     };
     // Read and store %precedence entries
     gs.master_parser.actions[grules.push("directive",
-        "'%precedence' tokens NL")] =
+        "\"%precedence\" tokens NL")] =
         [](BuildUserParser& state)
     {
         const std::string tokens = state.dollar(1);
@@ -692,7 +692,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         state.gs.user_parser.grules.precedence(tokens);
     };
     // Read and store %right entries
-    gs.master_parser.actions[grules.push("directive", "'%right' tokens NL")] =
+    gs.master_parser.actions[grules.push("directive", "\"%right\" tokens NL")] =
         [](BuildUserParser& state)
     {
         const std::string tokens = state.dollar(1);
@@ -700,7 +700,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         state.gs.user_parser.grules.right(tokens);
     };
     // Read and store %start
-    gs.master_parser.actions[grules.push("directive", "'%start' Name NL")] =
+    gs.master_parser.actions[grules.push("directive", "\"%start\" Name NL")] =
         [](BuildUserParser& state)
     {
         const std::string name = state.dollar(1);
@@ -708,7 +708,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         state.gs.user_parser.grules.start(name);
     };
     // Read and store %token entries
-    gs.master_parser.actions[grules.push("directive", "'%token' tokens NL")] =
+    gs.master_parser.actions[grules.push("directive", "\"%token\" tokens NL")] =
         [](BuildUserParser& state)
     {
         const std::string tokens = state.dollar(1);
@@ -738,7 +738,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         "| production '|' opt_prec_list");
     grules.push("opt_prec_list", "opt_list opt_prec");
     grules.push("opt_list", "%empty "
-        "| '%empty' "
+        "| \"%empty\" "
         "| rhs_list");
     grules.push("rhs_list", "rhs "
         "| rhs_list rhs");
@@ -751,8 +751,8 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         "| rhs '+' "
         "| '(' production ')'");
     grules.push("opt_prec", "%empty "
-        "| '%prec' Literal "
-        "| '%prec' Name");
+        "| \"%prec\" Literal "
+        "| \"%prec\" Name");
 
     // Token regex macros
     grules.push("rx_macros", "%empty");
@@ -769,7 +769,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     grules.push("rx_directives", "%empty"
         "| rx_directives rx_directive");
     // Read and store %x entries
-    gs.master_parser.actions[grules.push("rx_directive", "'%x' names NL")] =
+    gs.master_parser.actions[grules.push("rx_directive", "\"%x\" names NL")] =
         [](BuildUserParser& state)
     {
         const auto& names = state.results.dollar(1, state.gs.master_parser.gsm,
@@ -799,13 +799,13 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         }
     };
     gs.master_parser.actions[grules.push("rx_directive",
-        "'%option' 'caseless' NL")] =
+        "\"%option\" \"caseless\" NL")] =
         [](BuildUserParser& state)
     {
         state.gs.user_parser.lrules.flags(state.gs.user_parser.lrules.flags() |
                 *lexertl::regex_flags::icase);
     };
-    
+
     // Tokens
 
     auto regex_token_action_token =
@@ -1095,11 +1095,11 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         "| String "
         "| '(' rx ')'");
     grules.push("repeat", "'?' "
-        "| '\?\?' "
+        "| \"??\" "
         "| '*' "
-        "| '*?' "
+        "| \"*?\" "
         "| '+' "
-        "| '+?' "
+        "| \"+?\" "
         "| Repeat");
 
     std::string warnings;
@@ -1131,16 +1131,16 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
 
     lrules.push("INITIAL,OPTION,RXDIRECTIVES", "[ \t]+", lexertl::rules::skip(), ".");
     lrules.push("{NL}", grules.token_id("NL"));
-    lrules.push("%left", grules.token_id("'%left'"));
-    lrules.push("%nonassoc", grules.token_id("'%nonassoc'"));
-    lrules.push("%precedence", grules.token_id("'%precedence'"));
-    lrules.push("%right", grules.token_id("'%right'"));
-    lrules.push("%start", grules.token_id("'%start'"));
-    lrules.push("%token", grules.token_id("'%token'"));
-    lrules.push("INITIAL", "%%", grules.token_id("'%%'"), "GRULE");
+    lrules.push("%left", grules.token_id("\"%left\""));
+    lrules.push("%nonassoc", grules.token_id("\"%nonassoc\""));
+    lrules.push("%precedence", grules.token_id("\"%precedence\""));
+    lrules.push("%right", grules.token_id("\"%right\""));
+    lrules.push("%start", grules.token_id("\"%start\""));
+    lrules.push("%token", grules.token_id("\"%token\""));
+    lrules.push("INITIAL", "%%", grules.token_id("\"%%\""), "GRULE");
 
     lrules.push("GRULE", ":", grules.token_id("':'"), ".");
-    lrules.push("GRULE", "%prec", grules.token_id("'%prec'"), ".");
+    lrules.push("GRULE", "%prec", grules.token_id("\"%prec\""), ".");
     lrules.push("GRULE", "\\[", grules.token_id("'['"), ".");
     lrules.push("GRULE", "\\]", grules.token_id("']'"), ".");
     lrules.push("GRULE", "[(]", grules.token_id("'('"), ".");
@@ -1153,24 +1153,24 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     lrules.push("GRULE", "[|]", grules.token_id("'|'"), ".");
     lrules.push("GRULE", ";", grules.token_id("';'"), ".");
     lrules.push("GRULE", "[ \t]+|{NL}", lexertl::rules::skip(), ".");
-    lrules.push("GRULE", "%empty", grules.token_id("'%empty'"), ".");
-    lrules.push("GRULE", "%%", grules.token_id("'%%'"), "MACRO");
+    lrules.push("GRULE", "%empty", grules.token_id("\"%empty\""), ".");
+    lrules.push("GRULE", "%%", grules.token_id("\"%%\""), "MACRO");
     lrules.push("INITIAL,GRULE", "{c_comment}", lexertl::rules::skip(), ".");
     // Bison supports single line comments
     lrules.push("INITIAL,GRULE", "[/][/].*", lexertl::rules::skip(), ".");
     lrules.push("INITIAL,GRULE,ID",
-        "'({literal_common}|[^'\\\\])+'|"
+        "'({literal_common}|[^'\\\\])'|"
         "[\"]({literal_common}|[^\"\\\\])+[\"]",
         grules.token_id("Literal"), ".");
     lrules.push("INITIAL,GRULE,ID,RXDIRECTIVES", "[.A-Z_a-z][-.0-9A-Z_a-z]*",
         grules.token_id("Name"), ".");
     lrules.push("ID", "[1-9][0-9]*", grules.token_id("Number"), ".");
 
-    lrules.push("MACRO,RULE", "%%", grules.token_id("'%%'"), "RULE");
-    lrules.push("MACRO", "%option", grules.token_id("'%option'"), "OPTION");
-    lrules.push("OPTION", "caseless", grules.token_id("'caseless'"), ".");
+    lrules.push("MACRO,RULE", "%%", grules.token_id("\"%%\""), "RULE");
+    lrules.push("MACRO", "%option", grules.token_id("\"%option\""), "OPTION");
+    lrules.push("OPTION", "caseless", grules.token_id("\"caseless\""), ".");
     lrules.push("OPTION,RXDIRECTIVES", "{NL}", grules.token_id("NL"), "MACRO");
-    lrules.push("MACRO,RULE", "%x", grules.token_id("'%x'"), "RXDIRECTIVES");
+    lrules.push("MACRO,RULE", "%x", grules.token_id("\"%x\""), "RXDIRECTIVES");
     lrules.push("MACRO", "[A-Z_a-z][0-9A-Z_a-z]*",
         grules.token_id("MacroName"), "REGEX");
     lrules.push("MACRO,REGEX", "{NL}", lexertl::rules::skip(), "MACRO");
@@ -1193,11 +1193,11 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         grules.token_id("'('"), ".");
     lrules.push("REGEX,RULE", "[)]", grules.token_id("')'"), ".");
     lrules.push("REGEX,RULE", "[?]", grules.token_id("'?'"), ".");
-    lrules.push("REGEX,RULE", "[?][?]", grules.token_id("'\?\?'"), ".");
+    lrules.push("REGEX,RULE", "[?][?]", grules.token_id("\"??\""), ".");
     lrules.push("REGEX,RULE", "[*]", grules.token_id("'*'"), ".");
-    lrules.push("REGEX,RULE", "[*][?]", grules.token_id("'*?'"), ".");
+    lrules.push("REGEX,RULE", "[*][?]", grules.token_id("\"*?\""), ".");
     lrules.push("REGEX,RULE", "[+]", grules.token_id("'+'"), ".");
-    lrules.push("REGEX,RULE", "[+][?]", grules.token_id("'+?'"), ".");
+    lrules.push("REGEX,RULE", "[+][?]", grules.token_id("\"+?\""), ".");
     lrules.push("REGEX,RULE", "{escape}|(\\[\\^?({escape}|{posix}|"
         "[^\\\\\\]])*\\])|[^\\s]", grules.token_id("Charset"), ".");
     lrules.push("REGEX,RULE", "[{][A-Z_a-z][-0-9A-Z_a-z]*[}]",

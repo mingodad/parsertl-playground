@@ -7,9 +7,9 @@
 %%
 
 document: prolog element ;
-prolog: '<\?xml' attributes '\?>' | ;
+prolog: "<\?xml" attributes "\?>" | ;
 elements: elements element | element | %prec '<' ;
-element: '<' name attributes '/>' | '<' name attributes '>' elements '</' name '>' ;
+element: '<' name attributes "/>" | '<' name attributes '>' elements "</" name '>' ;
 attributes: attributes attribute | attribute | %prec name ;
 attribute: name '=' value ;
 
@@ -26,10 +26,10 @@ whitespace	[ \t\r\n]+
 
 \<	'<'
 >	'>'
-"<\?xml"	'<\?xml'
-"\?>"	'\?>'
-"/>"	'/>'
-"</"	'</'
+"<\?xml"	"<\?xml"
+"\?>"	"\?>"
+"/>"	"/>"
+"</"	"</"
 =	'='
 
 .	ILLEGAL_CHARACTER
