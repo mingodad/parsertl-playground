@@ -26,7 +26,7 @@ The availabel debugging options are:
 - Grammar lexer state machine
 - Grammar parse state machine
 
-This project can also be built as a command line tool (see playground/build.sh) then you can use it to check grammar/input on your disc:
+This project can also be built as a command line tool (see [build.sh](https://github.com/mingodad/parsertl-playground/blob/main/playground/build.sh)) then you can use it to check grammar/input on your disc:
 ```
 ./parsertl-playground
 usage: ./parsertl-playground [options] grammar_fname input_fname
@@ -45,6 +45,19 @@ options can be:
 -verbose       Show several metrics for debug
 
 ```
+
+The grammar used internally to parse the user grammar is this one [playground-master.g](https://github.com/mingodad/parsertl-playground/blob/main/playground/playground-master.g) the grammar has 4 sections:
+```
+/*Grammar header*/
+%%
+/*Grammar rules*/
+%%
+/*Lex header*/
+%%
+/*Lex rules*/
+%%
+```
+The first two sections are equivalent to `yacc/bison` format and the other two sections are equivalent to `lex/flex` format.
 
 Related projects:
 - Tree-sitter https://tree-sitter.github.io/tree-sitter/playground
