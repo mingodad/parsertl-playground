@@ -4,6 +4,28 @@ A web based playground for https://github.com/BenHanson/parsertl14 and https://g
 
 The playground website is based on https://yhirose.github.io/cpp-peglib/ and also with modifications based on https://chrishixon.github.io/chpeg/playground/ .
 
+The playground save the grammar and the input in the local storage when you click `Parse`.
+
+The playground has the following main elements:
+- A select labeled `Examples` to choose one available example to start with.
+- A select labeled `Generate` to optionally export Yacc/EBNF (for railroad diagrams).
+- A button labeled `Parse` to build/execute the parser/grammar in the top left side editor over the input in the top right side editor.
+- A bottom right side area to display info about the grammar (errors are clickable links to jump to line in the editor).
+- A bottom left side area to display info about the input source parsing results (errors are clickabel to jump to line in the editor).
+- A center left side foldable read only editor to show debug info about lexing/parsing the grammar or the input.
+
+The availabel debugging options are:
+- Input parse tree pruned
+- Input parse tree full
+- Input lexer dump
+- Input parse trace
+- Grammar parse tree pruned
+- Grammar parse tree full
+- Grammar lexer dump
+- Grammar parse trace
+- Grammar lexer state machine
+- Grammar parse state machine
+
 Related projects:
 - Tree-sitter https://tree-sitter.github.io/tree-sitter/playground
 - Lpegrex/Lua https://mingodad.github.io/lua-wasm-playground/
