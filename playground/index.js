@@ -174,7 +174,7 @@ const sampleList = [
 function loadLalr_sample(self) {
   if(grammarContentHasChanged || inputContentHasChanged)
   {
-	let ok = confirm("Your changes will be lost !\nEither OK or Cancel.");
+	let ok = confirm("Your changes will be lost !\nIf the changes you've made are important save then before proceed.\nCopy and paste to your prefered editor and save it.\nEither OK or Cancel.");
 	if(!ok) return false;
   }
   let base_url = "./"
