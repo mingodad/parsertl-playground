@@ -173,7 +173,7 @@ namespace parsertl
 
                 for (const auto& pair_ : state_._closure)
                 {
-                    const production p_ = grammar_[pair_.first];
+                    const production &p_ = grammar_[pair_.first];
 
                     if (pair_.second < p_._rhs.first.size())
                     {
@@ -247,7 +247,7 @@ namespace parsertl
                     if (pair_.second != 0) continue;
 
                     const production& production_ = grammar_[pair_.first];
-                    prod prod_;
+                    prod &prod_ = new_grammar_.emplace_back();
 
                     prod_._production = &production_;
 
@@ -345,9 +345,6 @@ namespace parsertl
                             }
                         }
                     }
-
-                    new_grammar_.emplace_back();
-                    new_grammar_.back().swap(prod_);
                 }
             }
             //printf("new_grammar : %d : %d\n", (int)new_grammar_.size(), (int)dfa_.size());
