@@ -219,6 +219,15 @@ static void parsetree_indent( int level )
     }
 }
 
+static const char* escapeForParserTree(const parsertl::rules::string& value)
+{
+    if(value == "\n") return "\\n";
+    else if(value == "\r\n") return "\\r\\n";
+    else if(value == "\t") return "\\t";
+    else if(value == "\r") return "\\r";
+    return value.c_str();
+}
+
 static void print_parsetree( const ParseTreeUserData& ast, const parsertl::rules::string_vector& symbols, int level )
 {
     if(ast.symbol_id >= 0)
@@ -227,7 +236,7 @@ static void print_parsetree( const ParseTreeUserData& ast, const parsertl::rules
         if(!ast.value.empty()) //it's a terminal
         {
             printf("%s -> %s\n", symbols[ast.symbol_id].c_str(),
-                    (ast.value == "\n" ? "\\n" : ast.value.c_str()));
+                    escapeForParserTree(ast.value));
         }
         else
         {
