@@ -1282,9 +1282,20 @@ int main_base(int argc, char* argv[], GlobalState& gs)
             std::cerr << "Productions " << productions_count << ".\n";
             std::cerr << "Terminals " << gs.user_parser.grules.terminals_count() << ".\n";
             std::cerr << "NonTerminals " << gs.user_parser.grules.non_terminals_count() << ".\n";
-            std::cerr << "States " << gs.user_parser.gsm._rows << ".\n";
-            std::cerr << "Lexer States " << gs.user_parser.lsm.data()._dfa.size() << ".\n";
-            std::cerr << "Lexer State0 " << gs.user_parser.lsm.data()._dfa[0].size() << ".\n";
+            std::cerr << "Parser States " << gs.user_parser.gsm._rows << ".\n";
+            size_t dfa_count = gs.user_parser.lsm.data()._dfa.size();
+            std::cerr << "Lexer DFAs " << dfa_count << ".\n";
+            for(size_t i = 0, imax=dfa_count; i < imax; ++i)
+            {
+                const std::size_t rows_ = gs.user_parser.lsm.data()._dfa[i].size() /
+                    gs.user_parser.lsm.data()._dfa_alphabet[i];
+                std::cerr << "Lexer DFA[" << i << "] Name " << gs.user_parser.lrules.state(i) << ".\n";
+                std::cerr << "Lexer DFA[" << i << "] Size " << gs.user_parser.lsm.data()._dfa[i].size() << ".\n";
+                std::cerr << "Lexer DFA[" << i << "] Alphabet " << gs.user_parser.lsm.data()._dfa_alphabet[i] << ".\n";
+                std::cerr << "Lexer DFA[" << i << "] Rows " << rows_ << ".\n";
+                //gs.user_parser.lsm.minimise();
+                //std::cerr << "Lexer DFA[" << i << "] Size " << gs.user_parser.lsm.data()._dfa[i].size() << ".\n";
+            }
             std::cerr << "Shift/Reduce conflicts resolved " << gs.user_parser.grules.shift_reduce_count << ".\n";
             std::cerr << "Reduce/Reduce conflicts resolved " << gs.user_parser.grules.reduce_reduce_count << ".\n";
             //std::cerr << "dumpAsEbnfRR = " << gs.dumpAsEbnfRR << "\n";
