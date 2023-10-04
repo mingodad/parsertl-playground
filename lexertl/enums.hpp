@@ -9,6 +9,15 @@
 
 namespace lexertl
 {
+#define LEXERTL_NPOS static_cast<id_type>(~0)
+#define LEXERTL_BOL static_cast<id_type>(~1)
+#define LEXERTL_EOL static_cast<id_type>(~2)
+#define LEXERTL_SKIP static_cast<id_type>(~3)
+#define LEXERTL_EOF static_cast<id_type>(~4)
+#define LEXERTL_REJECT static_cast<id_type>(~5)
+#define LEXERTL_SYMBOL_TABLE static_cast<id_type>(~6)
+#define LEXERTL_INDENT_TRACK static_cast<id_type>(~7)
+
     enum class regex_flags
     {
         icase = 1, dot_not_newline = 2, dot_not_cr_lf = 4,

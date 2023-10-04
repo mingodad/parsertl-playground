@@ -88,12 +88,12 @@ namespace lexertl
 
         static id_type npos()
         {
-            return static_cast<id_type>(~0);
+            return LEXERTL_NPOS;
         }
 
         static id_type skip()
         {
-            return static_cast<id_type>(~1);
+            return LEXERTL_SKIP;
         }
 
         bool operator ==(const match_results& rhs_) const

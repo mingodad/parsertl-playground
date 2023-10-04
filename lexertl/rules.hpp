@@ -120,17 +120,17 @@ namespace lexertl
 
         static id_type npos()
         {
-            return static_cast<id_type>(~0);
+            return LEXERTL_NPOS;
         }
 
         static id_type skip()
         {
-            return static_cast<id_type>(~1);
+            return LEXERTL_SKIP;
         }
 
         static id_type reject()
         {
-            return static_cast<id_type>(~2);
+            return LEXERTL_REJECT;
         }
 
         std::locale imbue(const std::locale& locale_)

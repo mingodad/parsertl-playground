@@ -10,6 +10,7 @@
 #include <memory>
 #include "../../observer_ptr.hpp"
 #include "../../runtime_error.hpp"
+#include "../../enums.hpp"
 #include <stack>
 #include <vector>
 
@@ -42,7 +43,7 @@ namespace lexertl
 
             static id_type null_token()
             {
-                return static_cast<id_type>(~0);
+                return LEXERTL_NPOS;
             }
 
             bool nullable() const

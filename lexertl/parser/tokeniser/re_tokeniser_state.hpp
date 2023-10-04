@@ -33,7 +33,7 @@ namespace lexertl
             const char_type* _macro_name;
             long _paren_count = 0;
             bool _in_string = false;
-            id_type _nl_id = static_cast<id_type>(~0);
+            id_type _nl_id = LEXERTL_NPOS;
 
             basic_re_tokeniser_state(const char_type* start_,
                 const char_type* const end_, id_type id_,

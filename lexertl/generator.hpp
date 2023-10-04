@@ -111,7 +111,7 @@ namespace lexertl
                 (rules_.features()[dfa_] & *feature_bit::bol) != 0;
             observer_ptr<node> root_ = nullptr;
 
-            root_ = parser_.parse(*regex_iter_, *id_iter_, *user_id_iter_,
+            root_ = parser_.parse(rules_, dfa_, *regex_iter_, *id_iter_, *user_id_iter_,
                 *next_dfa_iter_, *push_dfa_iter_, *pop_dfa_iter_,
                 rules_.flags(), cr_id_, nl_id_, seen_bol_);
             ++regex_iter_;
@@ -124,7 +124,7 @@ namespace lexertl
             // Build syntax trees
             while (regex_iter_ != regex_iter_end_)
             {
-                observer_ptr<node> rhs_ = parser_.parse(*regex_iter_, *id_iter_,
+                observer_ptr<node> rhs_ = parser_.parse(rules_, dfa_, *regex_iter_, *id_iter_,
                     *user_id_iter_, *next_dfa_iter_, *push_dfa_iter_,
                     *pop_dfa_iter_, rules_.flags(), cr_id_, nl_id_,
                     (rules_.features()[dfa_] & *feature_bit::bol) != 0);

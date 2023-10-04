@@ -24,7 +24,7 @@ namespace lexertl
 
         static id_type npos()
         {
-            return static_cast<id_type>(~0);
+            return LEXERTL_NPOS;
         }
     };
 
@@ -42,7 +42,7 @@ namespace lexertl
 
         static id_type npos()
         {
-            return static_cast<id_type>(~0);
+            return LEXERTL_NPOS;
         }
     };
 }

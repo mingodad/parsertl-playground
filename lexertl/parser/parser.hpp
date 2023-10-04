@@ -14,6 +14,7 @@
 #include <map>
 #include "tokeniser/re_tokeniser.hpp"
 #include "../runtime_error.hpp"
+#include "../rules.hpp"
 #include "tree/selection_node.hpp"
 #include "tree/sequence_node.hpp"
 #include <type_traits>
@@ -85,7 +86,8 @@ namespace lexertl
             {
             }
 
-            observer_ptr<node> parse(const token_vector& regex_,
+            observer_ptr<node> parse(const rules& rules_, const std::size_t dfa_,
+                const token_vector& regex_,
                 const id_type id_, const id_type user_id_,
                 const id_type next_dfa_, const id_type push_dfa_,
                 const bool pop_dfa_, const std::size_t flags_,
@@ -187,7 +189,7 @@ namespace lexertl
                                 "allowed as this can cause an infinite loop "
                                 "in user code. The match_zero_len flag "
                                 "overrides this check. Rule id " <<
-                                id_ << '.';
+                                id_ << " and Dfa id " << dfa_ << '.';
                             throw runtime_error(ss_.str());
                         }
                     }
@@ -198,12 +200,12 @@ namespace lexertl
 
             static id_type bol_token()
             {
-                return static_cast<id_type>(~1);
+                return LEXERTL_BOL;
             }
 
             static id_type eol_token()
             {
-                return static_cast<id_type>(~2);
+                return LEXERTL_EOL;
             }
 
         private:
