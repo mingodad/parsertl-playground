@@ -77,7 +77,7 @@ namespace parsertl
                 vector_set_t new_mask = mask | set.set_[i];
                 if ( mask != new_mask )
                 {
-                    set_[i] |= new_mask;
+                    set_[i] = new_mask;
                     ++added;
                 }
             }
