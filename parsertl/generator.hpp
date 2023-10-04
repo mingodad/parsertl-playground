@@ -768,13 +768,13 @@ namespace parsertl
             for (std::size_t c_ = 0; c_ < state_._closure.size(); ++c_)
             {
                 const size_t_pair pair_ = state_._closure[c_];
-                const production* p_ = &grammar_[pair_.first];
-                const std::size_t rhs_size_ = p_->_rhs.first.size();
+                const production& p_ = grammar_[pair_.first];
+                const std::size_t rhs_size_ = p_._rhs.first.size();
 
                 if (pair_.second < rhs_size_)
                 {
                     // SHIFT
-                    const symbol& symbol_ = p_->_rhs.first[pair_.second];
+                    const symbol& symbol_ = p_._rhs.first[pair_.second];
 
                     if (symbol_._type == symbol::type::NON_TERMINAL)
                     {
