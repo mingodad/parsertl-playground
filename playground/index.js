@@ -243,13 +243,10 @@ function generateErrorListHTML(errors) {
 }
 
 function updateLocalStorage() {
-  if(grammarContentHasChanged)
+  if(grammarContentHasChanged || inputContentHasChanged)
   {
     localStorage.setItem('grammarText', grammarEditor.getValue());
     localStorage.setItem('grammarContentHasChanged', grammarContentHasChanged);
-  }
-  if(inputContentHasChanged)
-  {
     localStorage.setItem('codeText', codeEditor.getValue());
     localStorage.setItem('inputContentHasChanged', inputContentHasChanged);
   }
