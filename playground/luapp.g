@@ -2,10 +2,6 @@
 
 %token ILLEGAL_CHARACTER
 
-%x LCOMMENT
-%x COMMENT
-%x LSTRING
-
 /*Tokens*/
 %token IDENTIFIER_T
 %token NUMBER_T
@@ -309,6 +305,10 @@ last_statement :
 	;
 
 %%
+
+%x LCOMMENT
+%x COMMENT
+%x LSTRING
 
 newline         \n
 ws              [ \t\v\f]

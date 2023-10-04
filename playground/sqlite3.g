@@ -1,7 +1,5 @@
 //From: https://www.sqlite.org/src/info/aeb7760d41cfa86465e3adba506500c021597049fd55f82a30e5b7045862c28c
 
-%option caseless
-
 %token  SEMI EXPLAIN QUERY PLAN BEGIN TRANSACTION
 %token  DEFERRED IMMEDIATE EXCLUSIVE COMMIT END ROLLBACK
 %token  SAVEPOINT RELEASE TO TABLE CREATE IF
@@ -665,6 +663,8 @@ filter_clause : FILTER LP WHERE expr RP ;
 ANY : ID ;
 
 %%
+
+%option caseless
 
 BASE_ID	[_a-zA-Z][a-zA-Z0-9_]*
 

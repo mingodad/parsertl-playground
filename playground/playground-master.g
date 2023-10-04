@@ -3,12 +3,10 @@
 %token Charset ExitState Literal Macro MacroName Name NL
 %token Number Repeat StartState String Skip Reject SymbolTable IndentTrack
 
-%x OPTION GRULE MACRO REGEX RULE ID
-
 %% //Grammar rules
 
 start : file ;
-file : directives '%%' grules '%%' rx_macros '%%' rx_rules '%%' ;
+file : directives '%%' grules '%%' rx_directives rx_macros '%%' rx_rules '%%' ;
 directives : %empty | directives directive ;
 directive : NL ;
 
@@ -26,10 +24,6 @@ directive : '%start' Name NL ;
 directive : '%token' tokens NL ;
 tokens : token | tokens token ;
 token : Literal | Name ;
-// Read and store %option caseless
-directive : '%option' 'caseless' NL ;
-// Read and store %x entries
-directive : '%x' names NL ;
 names : Name | names Name ;
 // Read and store %token_indent entry
 directive : '%token_indent' Name NL ;
@@ -45,12 +39,19 @@ production : opt_prec_list | production '|' opt_prec_list ;
 opt_prec_list : opt_list opt_prec ;
 opt_list : %empty | '%empty' | rhs_list ;
 rhs_list : rhs | rhs_list rhs ;
-rhs : Literal | Name | '[' production ']' | rhs '?' | rhs '*' | rhs '+' | '(' production ')' ;
+rhs : Literal | Name | '[' production ']' | rhs '?' | '{' production '}' | rhs '*' | rhs '+' | '(' production ')' ;
 opt_prec : %empty | '%prec' Literal | '%prec' Name ;
 
 // Token regex macros
 rx_macros : %empty ;
 rx_macros : rx_macros MacroName regex ;
+
+rx_directives :  %empty | rx_directives rx_directive ;
+
+// Read and store %x entries
+rx_directive : '%x' names NL ;
+// Read and store %option caseless
+rx_directive : '%option' 'caseless' NL ;
 
 // Tokens
 rx_rules : %empty ;
@@ -96,6 +97,8 @@ repeat : '?' | '\?\?' | '*' | '*?' | '+' | '+?' | Repeat ;
 
 %%
 
+%x OPTION GRULE MACRO REGEX RULE ID RXDIRECTIVES
+
 c_comment  [/]{2}.*|[/][*](?s:.)*?[*][/]
 escape \\(.|x[0-9A-Fa-f]+|c[@a-zA-Z])
 posix_name alnum|alpha|blank|cntrl|digit|graph|lower|print|punct|space|upper|xdigit
@@ -106,7 +109,7 @@ literal_common	\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\d+)
 
 %%
 
-<INITIAL,OPTION>[ \t]+	skip()
+<INITIAL,OPTION,RXDIRECTIVES>[ \t]+	skip()
 {NL}	NL
 "%left"	'%left'
 "%nonassoc"	'%nonassoc'
@@ -117,9 +120,6 @@ literal_common	\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\d+)
 "%token_symbol_table"	'%token_symbol_table'
 "%token_indent"	'%token_indent'
 "%token_dedent"	'%token_dedent'
-"%x"	'%x'
-<INITIAL>"%option"<OPTION>	'%option'
-<OPTION>"caseless"<INITIAL>	'caseless'
 <INITIAL>"%%"<GRULE>	'%%'
 
 <GRULE>":"	':'
@@ -128,6 +128,8 @@ literal_common	\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\d+)
 <GRULE>"]"	']'
 <GRULE>"("	'('
 <GRULE>")"	')'
+<GRULE>"{"	'{'
+<GRULE>"}"	'}'
 <GRULE>"?"	'?'
 <GRULE>"*"	'*'
 <GRULE>"+"	'+'
@@ -140,13 +142,17 @@ literal_common	\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\d+)
 /* Bison supports single line comments */
 <INITIAL,GRULE>"//".*	skip()
 <INITIAL,GRULE,ID>'({literal_common}|[^'\\])+'|["]({literal_common}|[^"\\])+["]	Literal
-<INITIAL,GRULE,ID>[.A-Z_a-z][-.0-9A-Z_a-z]*	Name
+<INITIAL,GRULE,ID,RXDIRECTIVES>[.A-Z_a-z][-.0-9A-Z_a-z]*	Name
 <ID>[1-9][0-9]*	Number
 
 <MACRO,RULE>"%%"<RULE>	'%%'
+<MACRO>"%option"<OPTION>	'%option'
+<OPTION>"caseless"	'caseless'
+<OPTION,RXDIRECTIVES>{NL}<MACRO> NL
+<MACRO,RULE>"%x"<RXDIRECTIVES>	'%x'
 <MACRO>[A-Z_a-z][0-9A-Z_a-z]*<REGEX>	MacroName
 <MACRO,REGEX>{NL}<MACRO>	skip()
-<MACRO,RULE>{c_comment}	skip()
+<MACRO,RULE,RXDIRECTIVES>{c_comment}	skip()
 <MACRO,RULE>^[ \t]+{c_comment}	skip()
 
 <RULE>^[ \t]+({c_comment}([ \t]+|{c_comment})*)?	skip()

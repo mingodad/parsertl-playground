@@ -16,9 +16,6 @@ ther in a spirit of brotherhood.
 
 */
 
-// exclusive start conditions
-%x letters numbers
-
 %token ILLEGAL_CHARACTER
 
 %token "a"
@@ -261,6 +258,9 @@ ther in a spirit of brotherhood.
 start :  ;
 
 %%
+
+// exclusive start conditions
+%x letters numbers
 
 /* lookaheads for contractions to be valid, spacing and punctuation !?("'- */
 la [\u{2800} \t\n\r⠖⠦⠶⠴⠄⠤]

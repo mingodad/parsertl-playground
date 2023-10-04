@@ -23,8 +23,6 @@
 
 /* sql_yacc.yy */
 
-%option caseless
-
 /*Tokens*/
 //%token ABORT_SYM
 //%token ACCESSIBLE_SYM
@@ -6956,6 +6954,8 @@ json_attribute :
 	;
 
 %%
+
+%option caseless
 
 spaces	[ \t\r\n]+
 line_comment	--[^\r\n]*

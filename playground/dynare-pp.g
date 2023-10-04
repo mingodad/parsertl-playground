@@ -18,20 +18,6 @@
  * along with Dynare.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-%option caseless
-
- /* NB: if new start conditions are defined, add them in the line for <<EOF>> */
-%x COMMENT
-%x DYNARE_STATEMENT
-%x DYNARE_BLOCK
-%x VERBATIM_BLOCK
-%x NATIVE
-%x NATIVE_COMMENT
-%x DATES_STATEMENT
-%x LINE1
-%x LINE2
-%x LINE3
-
 /*Tokens*/
 %token AIM_SOLVER
 %token ANALYTIC_DERIVATION
@@ -5849,6 +5835,20 @@ symbol :
 	;
 
 %%
+
+%option caseless
+
+ /* NB: if new start conditions are defined, add them in the line for <<EOF>> */
+%x COMMENT
+%x DYNARE_STATEMENT
+%x DYNARE_BLOCK
+%x VERBATIM_BLOCK
+%x NATIVE
+%x NATIVE_COMMENT
+%x DATES_STATEMENT
+%x LINE1
+%x LINE2
+%x LINE3
 
 DATE -?[0-9]+([ya]|m([1-9]|1[0-2])|q[1-4])
 

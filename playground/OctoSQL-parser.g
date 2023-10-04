@@ -21,8 +21,6 @@ Copyright 2019 The OctoSQL Authors
 Licensed under the MIT license, as in the LICENSE file
 */
 
-%option caseless
-
 /*Tokens*/
 //%token LEX_ERROR
 %token UNION
@@ -1839,6 +1837,8 @@ ddl_skip_to_end :
 	;
 
 %%
+
+%option caseless
 
 basic_id	[_a-zA-Z][a-zA-Z0-9_]*
 

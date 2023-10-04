@@ -15,8 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-%option caseless
-
 /*Tokens*/
 %token FROM
 %token MEASUREMENT
@@ -992,6 +990,8 @@ SET_CONFIG_STATEMENT :
 	;
 
 %%
+
+%option caseless
 
 BASE_ID	[_a-zA-Z][a-zA-Z0-9_]*
 

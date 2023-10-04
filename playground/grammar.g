@@ -1,7 +1,6 @@
 //Directives
 
 %token Charset ExitState Index Integer Literal Macro MacroName Name NL Number Repeat ScriptString StartState String
-%x OPTION GRULE SCRIPT MACRO REGEX RULE ID
 
 %% //Grammar rules
 
@@ -82,6 +81,8 @@ repeat : '?' | '\?\?' | '*' | '*?' | '+' | '+?' | Repeat ;
 
 %%
 
+%x OPTION GRULE SCRIPT MACRO REGEX RULE ID
+
 c_comment [/][*](?s:.)*?[*][/]
 escape \\(.|x[0-9A-Fa-f]+|c[@a-zA-Z])
 posix_name alnum|alpha|blank|cntrl|digit|graph|lower|print|punct|space|upper|xdigit
@@ -99,7 +100,7 @@ state_name [A-Z_a-z][0-9A-Z_a-z]*
 %right	'%right'
 %start	'%start'
 %token	'%token'
-%x	'%x'
+"%x"	'%x'
 <INITIAL>%option<OPTION>	'%option'
 <OPTION>caseless<INITIAL>	'caseless'
 <INITIAL>\%\%<GRULE>	'%%'

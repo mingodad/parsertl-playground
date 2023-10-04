@@ -54,8 +54,6 @@
 %token PLUS OR RANGE POUND NOT ARGUMENT_CONTENT
 %token TOKEN_REF LEXER_CHAR_SET
 
-%x Argument TargetLanguageAction
-
 %%
 // The main entry point for parsing a v4 grammar.
 grammarSpec
@@ -393,6 +391,8 @@ identifier
    ;
 
 %%
+
+%x Argument TargetLanguageAction
 
 /*
 lexer grammar LexBasic;

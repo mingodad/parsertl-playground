@@ -1,25 +1,5 @@
 //From: https://github.com/eranif/codelite/blob/master/CodeLite/pp.y
 
-/**
- * the "incl" state is used for picking up the name
- * of an include file
- */
-%x incl
-%x c_comment
-%x cpp_comment
-//%x using_namespace
-%x PP
-
-/** #define related states **/
-%x define_state
-%x define_state_2
-%x define_state_signature
-%x define_state_definition
-%x define_generic_c_comment
-%x define_generic_cpp_comment
-%x ifdef_state
-%x if_state
-
 /*Tokens*/
 %token PP_DEFINE
 %token PP_IF
@@ -137,6 +117,26 @@ test_operator :
 	;
 
 %%
+
+/**
+ * the "incl" state is used for picking up the name
+ * of an include file
+ */
+%x incl
+%x c_comment
+%x cpp_comment
+//%x using_namespace
+%x PP
+
+/** #define related states **/
+%x define_state
+%x define_state_2
+%x define_state_signature
+%x define_state_definition
+%x define_generic_c_comment
+%x define_generic_cpp_comment
+%x ifdef_state
+%x if_state
 
 identifier [a-zA-Z_][0-9a-zA-Z_]*
 simple_escape [abfnrtv'"?\\]

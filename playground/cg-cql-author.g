@@ -34,9 +34,6 @@
 //  2. Use simple printable AST parse nodes (no separate #define per AST node type).
 //  3. 100% unit test coverage on all passes including output validation.
 
-%option caseless
-%x FROM_BLOB_TS
-
 /*Tokens*/
 %token ID
 %token TRUE_
@@ -2018,6 +2015,9 @@ blob_update_val_stmt :
 
 %%
 
+%option caseless
+%x FROM_BLOB_TS
+
 stop [^A-Z_0-9]
 sp [ \t]+
 hex [0-9A-F]
@@ -2281,7 +2281,7 @@ CURSOR{sp}HAS{sp}ROW  CURSOR_HAS_ROW
 ({d}+"."{d}*|"."{d}+)(E("+"|"-")?{d}+)? REALLIT
 
 \"("\\".|[^\\"\n\r])*\"          CSTRLIT
-'("''"|[^'\n\r])*'               STRLIT
+'(''|[^'\n\r])*'               STRLIT
 X'({hex}{hex})*'             BLOBLIT
 
 "-"	'-'
@@ -2306,7 +2306,7 @@ X'({hex}{hex})*'             BLOBLIT
 
 \[                           '['
 \]                           ']'
-[_A-Za-z][A-Za-z0-9_]*             ID
+[_A-Z][A-Z0-9_]*             ID
 
 [ \t\n\r]                      skip()
 \-\-.*                       skip()

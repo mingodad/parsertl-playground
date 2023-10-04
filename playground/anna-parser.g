@@ -1,8 +1,5 @@
 //From: https://github.com/liljencrantz/anna/blob/dce1085594ab1f0cfb115997b726a74d120d6432/src/yacc.y
 
-%x COMMENT
-%x LONG_STRING
-
 %token ILLEGAL_CHARACTHER
 
 /*Tokens*/
@@ -392,6 +389,9 @@ attribute_list :
 	;
 
 %%
+
+%x COMMENT
+%x LONG_STRING
 
 %%
 

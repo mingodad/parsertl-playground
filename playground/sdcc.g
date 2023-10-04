@@ -26,8 +26,6 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
-%x asm
-
 /*Tokens*/
 %token IDENTIFIER
 %token TYPE_NAME
@@ -1007,6 +1005,8 @@ identifier :
 	;
 
 %%
+
+%x asm
 
 DC  '?[0-9]
 OC  '?[0-7]

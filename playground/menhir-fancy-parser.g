@@ -20,8 +20,6 @@ ocamlyacc -v menhir-fancy-parser-yacc.mly
    mode no longer exist. Thus, we replace all calls to [Error.signal]
    with calls to [Error.error], and report just one error. */
 
-%x ACTION_ST OBLK_COMMENT CBLK_COMMENT
-
 %token TOKEN TYPE LEFT RIGHT NONASSOC START PREC
 %token PUBLIC COLON BAR EQUAL INLINE LPAREN
 %token RPAREN COMMA QUESTION STAR PLUS PARAMETER
@@ -547,6 +545,8 @@ located_symbol_expression_ :
 	;
 
 %%
+
+%x ACTION_ST OBLK_COMMENT CBLK_COMMENT
 
 %%
 

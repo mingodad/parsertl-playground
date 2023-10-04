@@ -1,7 +1,5 @@
 //From: https://github.com/souffle-lang/souffle/blob/master/src/parser/parser.yy
 
-%x /*COMMENT*/ INCLUDE
-
 %token IP_NUMBER
 
 /*Tokens*/
@@ -493,6 +491,8 @@ kvp_value :
 	;
 
 %%
+
+%x  INCLUDE /*COMMENT*/
 
 WS [ \t\r\v\f]
 

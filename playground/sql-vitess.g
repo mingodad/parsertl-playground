@@ -14,8 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-%option caseless
-
 /*Tokens*/
 %token MEMBER
 %token FUNCTION_CALL_NON_KEYWORD
@@ -4277,6 +4275,8 @@ ddl_skip_to_end :
 	;
 
 %%
+
+%option caseless
 
 basic_id	[_a-zA-Z][a-zA-Z0-9_]*
 

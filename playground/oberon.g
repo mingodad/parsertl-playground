@@ -16,9 +16,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with OBNC.  If not, see <http://www.gnu.org/licenses/>.*/
 
-//%option caseless
-%x	RANGE_BT
-
 /*Tokens*/
 //%token TOKEN_START
 %token ARRAY
@@ -560,6 +557,9 @@ ModuleStatements :
 	;
 
 %%
+
+//%option caseless
+%x	RANGE_BT
 
 WORD [A-Za-z](_?[A-Za-z0-9])*
 

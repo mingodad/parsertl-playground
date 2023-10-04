@@ -16,8 +16,6 @@ From: https://github.com/coq/coq/blob/master/coqpp/coqpp_parse.mly
 /*         *     (see LICENSE file for the text of the license)         */
 /************************************************************************/
 
-%x start_comment start_ocaml start_string
-
 %token CODE
 //%token  COMMENT
 %token  IDENT QUALID
@@ -381,6 +379,8 @@ doc_gram_gram_token :
 	;
 
 %%
+
+%x start_comment start_ocaml start_string
 
 letter   [a-zA-Z]
 letterlike   [_a-zA-Z]

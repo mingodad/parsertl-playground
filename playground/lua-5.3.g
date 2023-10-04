@@ -4,8 +4,6 @@
 // Renamed long nonterminal names functiondef->function, functioncall->funccall, tableconstructor->table
 // Requires lua.l, lua.y, lua.hpp
 
-%x LONGCOMMENT LONGSTRING
-
 /*Tokens*/
 %token NAME
 %token INTEGER
@@ -300,6 +298,8 @@ field :
 	;
 
 %%
+
+%x LONGCOMMENT LONGSTRING
 
 digit                           [0-9]
 alpha                           [a-zA-Z_]

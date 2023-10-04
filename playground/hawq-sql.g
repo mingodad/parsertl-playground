@@ -63,8 +63,6 @@
  *-------------------------------------------------------------------------
  */
 
-%option caseless
-
 /*Tokens*/
 %token ABORT_P
 %token ABSOLUTE_P
@@ -5229,6 +5227,8 @@ SpecialRuleRelation :
 	;
 
 %%
+
+%option caseless
 
 /*
  * In order to make the world safe for Windows and Mac clients as well as

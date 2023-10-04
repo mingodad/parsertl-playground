@@ -1,7 +1,5 @@
 //From: https://github.com/mingodad/ljs/blob/master/lua2ljs/lua-parser.ly
 
-%x LongString
-
 %token  LPAREN SEMICOLON UNTIL DO END
 %token  WHILE REPEAT IF FUNCTION ASSIGN GOTO
 %token  LABEL FOR IN ELSE ELSEIF THEN
@@ -178,6 +176,7 @@ string : LONGSTRING ;
 
 %%
 
+%x LongString
 
 D        [0-9]
 E        [Ee][+-]?{D}+

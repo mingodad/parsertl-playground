@@ -1,7 +1,5 @@
 //From: https://github.com/tarantool/tarantool/blob/f1b238960c7b094241fb260b50f22ca4ca525504/src/box/sql/parse.y
 
-%option caseless
-
 %token  SEMI EXPLAIN QUERY PLAN OR AND
 %token  NOT IS MATCH LIKE_KW BETWEEN IN
 %token  NE EQ GT LE LT GE
@@ -522,6 +520,8 @@ number_typedef : INTEGER_KW ;
 number_typedef : UNSIGNED ;
 
 %%
+
+%option caseless
 
 BASE_ID	[_a-zA-Z][a-zA-Z0-9_]*
 

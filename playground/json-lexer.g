@@ -1,5 +1,12 @@
 // http://code.google.com/p/bsn-goldparser/wiki/JsonGrammar
 
+%token eOpenOb eCloseOb eOpenArr eCloseArr
+%token eName eString eNumber eBoolean eNull
+
+%%
+
+%%
+
 %x END
 
 %x OBJECT
@@ -11,13 +18,6 @@
 %x ARRAY
 %x ARR_COMMA
 %x ARR_VALUE
-
-%token eOpenOb eCloseOb eOpenArr eCloseArr
-%token eName eString eNumber eBoolean eNull
-
-%%
-
-%%
 
 /*STRING	["]([ -\x10ffff]{-}["\\]|\\(["\\/bfnrt]|u[0-9a-fA-F]{4}))*["]*/
 /*STRING	\"(\\.|[^\"\n\r\\])*\"*/

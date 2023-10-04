@@ -1,8 +1,6 @@
 //From: https://github.com/ruilisi/fortune-sheet/blob/3a0a0ad40a38f8e931fc7f5069964dcecaaae93b/packages/formula-parser/src/grammar-parser/grammar-parser.jison
 /* description: Parses end evaluates mathematical expressions. */
 
-%x FUNC_ST
-
 %token STRING FUNCTION ERROR ABSOLUTE_CELL MIXED_CELL RELATIVE_CELL
 %token VARIABLE NUMBER ARRAY DECIMAL NOT
 
@@ -91,6 +89,8 @@ error
 ;
 
 %%
+
+%x FUNC_ST
 
 FUNC   [A-Za-z]{1,}[A-Za-z_0-9.]+|[A-Za-z.]+
 

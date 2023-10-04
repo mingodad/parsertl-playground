@@ -46,8 +46,6 @@
  *
  */
 
-%x BLK_COMMENT
-
 /* Tokens */
 
 %token AMPERAMPER
@@ -2431,6 +2429,8 @@ lseparated_nonempty_list_aux_SEMI_class_sig_field_ :
 	;
 
 %%
+
+%x BLK_COMMENT
 
 newline   \n\r?|\r\n?
 blank   [ \t\f]

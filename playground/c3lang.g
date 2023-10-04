@@ -1,7 +1,5 @@
 //From: https://github.com/c3lang/c3c/blob/master/resources/grammar/grammar.y
 
-%x COMMENT RAW_STRING
-
 /*Tokens*/
 %token IDENT
 %token HASH_IDENT
@@ -1392,6 +1390,8 @@ top_level :
 	;
 
 %%
+
+%x COMMENT RAW_STRING
 
 D           [0-9]
 DU          [0-9_]

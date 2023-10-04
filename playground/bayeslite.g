@@ -15,8 +15,6 @@
  *  limitations under the License.
  */
 
- %option caseless
-
 %token  T_SEMI K_BEGIN K_ROLLBACK K_COMMIT K_CREATE K_TABLE
 %token  K_AS K_FROM K_DROP K_ALTER T_COMMA K_RENAME
 %token  K_TO K_COLUMN L_STRING K_GUESS K_SCHEMA K_FOR
@@ -541,6 +539,8 @@ typearg : T_MINUS L_INTEGER ;
 ANY : L_NAME ;
 
 %%
+
+%option caseless
 
 BASE_ID	[_a-zA-Z][a-zA-Z0-9_]*
 

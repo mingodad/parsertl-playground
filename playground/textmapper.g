@@ -1,5 +1,3 @@
-/*%s initial afterID afterColonOrEq afterGT*/
-%x afterGT afterID CODE_ST
 
 /*Tokens*/
 
@@ -681,6 +679,10 @@ rawTypeopt :
 	;
 
 %%
+
+/*%s initial afterID afterColonOrEq afterGT*/
+%x afterGT afterID CODE_ST
+
 /*Macros*/
 
 reClass	\[([^\n\r\]\\]|\\.)*\]

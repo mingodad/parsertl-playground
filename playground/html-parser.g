@@ -1,17 +1,5 @@
 //From: https://github.com/eyoung-father/eyoung/blob/EYOUNG_R1/libdecoder/html/decode/html.y
 
-%option caseless
-
-%x HTML_LEX_COMMENT
-%x HTML_LEX_META
-%x HTML_LEX_TAG_NAME
-%x HTML_LEX_PROT_NAME
-%x HTML_LEX_PROT_VALUE
-%x HTML_LEX_PROT_VALUE_NOQUOTE
-%x HTML_LEX_PROT_VALUE_DQUOTE
-%x HTML_LEX_PROT_VALUE_SQUOTE
-%x HTML_LEX_PROT_VALUE_RSQUOTE
-
 /*Tokens*/
 //%token SYM_LEX_CONTINUE
 %token SYM_TEXT
@@ -802,6 +790,18 @@ html_tag_prot_name_ :
 	;
 
 %%
+
+%x HTML_LEX_COMMENT
+%x HTML_LEX_META
+%x HTML_LEX_TAG_NAME
+%x HTML_LEX_PROT_NAME
+%x HTML_LEX_PROT_VALUE
+%x HTML_LEX_PROT_VALUE_NOQUOTE
+%x HTML_LEX_PROT_VALUE_DQUOTE
+%x HTML_LEX_PROT_VALUE_SQUOTE
+%x HTML_LEX_PROT_VALUE_RSQUOTE
+
+%option caseless
 
 SPACE			[ \t\r\n]+
 HTML_CHARSET	[[:space:][:alnum:]\-_:<>=%]

@@ -14,7 +14,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-%option caseless
 %token NK_SEMI
 
 %token  OR AND UNION ALL
@@ -855,6 +854,8 @@ null_ordering_opt : NULLS FIRST ;
 null_ordering_opt : NULLS LAST ;
 
 %%
+
+%option caseless
 
 BASE_ID	[_a-zA-Z][a-zA-Z0-9_]*
 

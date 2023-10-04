@@ -1,6 +1,5 @@
 //From: https://github.com/lcompilers/lpython/blob/main/src/lpython/parser/parser.yy
 
-%x ST_INDENT ST_INDENT2
 %token_indent TK_INDENT
 %token_dedent TK_DEDENT
 
@@ -952,6 +951,8 @@ sep_one :
 	;
 
 %%
+
+%x ST_INDENT ST_INDENT2
 
 end  "\x00"
 whitespace  [ \t\v]+

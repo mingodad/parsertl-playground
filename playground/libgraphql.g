@@ -6,10 +6,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-%x STRING_STATE
-%x BLOCK_STRING_STATE
-%x LINE_COMMENT_STATE
-
 %token UNRECOGNIZED_CHARACTER INVALID_CHARACTER UNTERMINATED_STRING
 %token BAD_UNICODE_ESCAPE_SEQUENCE BAD_ESCAPE_SEQUENCE
 
@@ -473,6 +469,10 @@ directive_locations :
 	;
 
 %%
+
+%x STRING_STATE
+%x BLOCK_STRING_STATE
+%x LINE_COMMENT_STATE
 
 FLOAT -?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?
 INTEGER -?(0|[1-9][0-9]*)

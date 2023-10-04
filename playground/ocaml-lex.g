@@ -15,8 +15,6 @@
 
 /* The grammar for lexer definitions */
 
-%x comment_st string_st char_st action_st
-
 %token  Tident
 %token  Tchar
 %token  Tstring
@@ -117,6 +115,8 @@ char_class1 :
 	;
 
 %%
+
+%x comment_st string_st char_st action_st
 
 /*identstart   [A-Za-z_\192-\214 \216-\246 \248-\255]*/
 identstart   [A-Za-z_\xC0-\xD6\xD8-\xF6\xF8-\xFF]

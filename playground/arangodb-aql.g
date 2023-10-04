@@ -1,4 +1,4 @@
-%option caseless
+//From: https://github.com/arangodb/arangodb/blob/e3df0c4cc4268574d9fcf7b520ccdce37a48a0ec/arangod/Aql/grammar.y
 
 /*Tokens*/
 %token T_FOR
@@ -626,6 +626,8 @@ variable_name :
 	;
 
 %%
+
+%option caseless
 
 %%
 

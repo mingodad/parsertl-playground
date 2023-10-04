@@ -17,8 +17,6 @@
 
 //#file	syntax_header.jison
 
-%option caseless
-
 %token ARRAY MAP STRUCT BETWEEN_AND
 %token BACKTICKEDIDENTIFIER SINGLEQUOTEDVALUE DOUBLEQUOTEDVALUE
 
@@ -2980,6 +2978,8 @@ CaseWhenThenListPartTwo
 
 
 %%
+
+%option caseless
 
 %%
 

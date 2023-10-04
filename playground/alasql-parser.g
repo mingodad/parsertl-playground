@@ -8,8 +8,6 @@
 //
 */
 
-%option caseless
-
 //%token ABSENT /*1*/
 //%token ABSOLUTE /*4*/
 //%token ACCORDING /*1*/
@@ -2441,6 +2439,8 @@ Reindex :
 //	;
 
 %%
+
+%option caseless
 
 %%
 

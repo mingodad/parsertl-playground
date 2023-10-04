@@ -2,12 +2,6 @@
 
 %token ILLEGAL_CHARACTER
 
-%x COMMENT
-%x STRING
-%x VERBATIM
-%x IDMODE
-//%x CHAR
-
 /*Tokens*/
 %token MU_CONSTRUCT
 %token MU_FLOATCONST
@@ -817,6 +811,12 @@ constant :
 	;
 
 %%
+
+%x COMMENT
+%x STRING
+%x VERBATIM
+%x IDMODE
+//%x CHAR
 
 Identifier		[A-Za-z_][A-Za-z_0-9]*
 NewLine 		\r?[\n]

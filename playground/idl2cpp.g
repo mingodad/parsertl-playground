@@ -7,8 +7,6 @@
 // Start of new grammar 02/06/2018
 %token Name Number String Uuid
 
-// All keywords from Microsoft site:
-%x ATTRIBUTES
 
 %%
 
@@ -181,6 +179,9 @@ uuid : Uuid ;
 uuid : String ;
 
 %%
+
+// All keywords from Microsoft site:
+%x ATTRIBUTES
 
 %%
 

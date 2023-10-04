@@ -15,8 +15,6 @@
 /*                                                                        */
 /**************************************************************************/
 
-%x  BLK_COMMENT
-
 /* Tokens */
 
 %token AMPERAMPER
@@ -1530,6 +1528,8 @@ payload :
 	;
 
 %%
+
+%x  BLK_COMMENT
 
 newline   \n\r?|\r\n?
 blank   [  \t\v\f]

@@ -1,3 +1,4 @@
+//From commit: https://github.com/duckdb/duckdb/commit/7400e11a5ecec3f5e3ab775691f5fb6e4cb3b281
 /*-------------------------------------------------------------------------
  *
  * gram.y
@@ -40,23 +41,6 @@
  *
  *-------------------------------------------------------------------------
  */
-
-%option caseless
-
-%x NOT_LA_ST NULLS_LA_ST WITH_LA_ST
-
-%x xb
-%x xc
-%x xd
-%x xh
-%x xe
-%x xq
-%x xdolq
-%x xui
-%x xuiend
-%x xus
-%x xusend
-%x xeu
 
 /*Tokens*/
 %token IDENT
@@ -3977,6 +3961,23 @@ reserved_keyword :
 	;
 
 %%
+
+%option caseless
+
+%x NOT_LA_ST NULLS_LA_ST WITH_LA_ST
+
+%x xb
+%x xc
+%x xd
+%x xh
+%x xe
+%x xq
+%x xdolq
+%x xui
+%x xuiend
+%x xus
+%x xusend
+%x xeu
 
 /*
  * In order to make the world safe for Windows and Mac clients as well as

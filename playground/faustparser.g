@@ -1,10 +1,6 @@
 //From: https://github.com/grame-cncm/faust/blob/c861af641d1fee280a0632b00b42fdff6ca8079f/compiler/parser/faustparser.y
 /* Parser for the Faust language */
 
-%x comment
-%x doc
-%x lst
-
 /*Tokens*/
 %token SPLIT
 %token MIX
@@ -582,6 +578,10 @@ argtype :
 	;
 
 %%
+
+%x comment
+%x doc
+%x lst
 
 DIGIT    [0-9]
 ID       [a-zA-Z_][_a-zA-Z0-9]*

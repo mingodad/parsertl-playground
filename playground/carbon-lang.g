@@ -112,14 +112,6 @@
 
 %token ILLEGAL_CHARACTER
 
-/* Lexing a token immediately after consuming some whitespace. */
-%x AFTER_WHITESPACE
-/*
- * Lexing a token immediately after consuming an operand-ending token:
- * a closing bracket, identifier, or literal.
- */
-%x AFTER_OPERAND AFTER_OPERAND_BACKTRACK
-
 %start input
 
 %%
@@ -747,6 +739,14 @@ impl_body :
 	;
 
 %%
+
+/* Lexing a token immediately after consuming some whitespace. */
+%x AFTER_WHITESPACE
+/*
+ * Lexing a token immediately after consuming an operand-ending token:
+ * a closing bracket, identifier, or literal.
+ */
+%x AFTER_OPERAND AFTER_OPERAND_BACKTRACK
 
 /* This should be kept table-like, but isn't automatic due to spaces. */
 identifier            [A-Za-z_][A-Za-z0-9_]*

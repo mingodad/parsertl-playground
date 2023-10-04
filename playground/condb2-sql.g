@@ -18,8 +18,6 @@
 
 //defined(SQLITE_BUILDING_FOR_COMDB2)
 
-%option caseless
-
 %token  SEMI EXPLAIN QUERY PLAN DISTRIBUTION BEGIN
 %token  TRANSACTION DEFERRED IMMEDIATE EXCLUSIVE COMMIT END
 %token  ROLLBACK SAVEPOINT RELEASE TO TABLE NOSQL
@@ -967,6 +965,8 @@ filter_opt : FILTER LP WHERE expr RP ;
 ANY : ID ; //for playground
 
 %%
+
+%option caseless
 
 BASE_ID	[_a-zA-Z][a-zA-Z0-9_]*
 

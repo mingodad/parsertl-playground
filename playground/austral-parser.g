@@ -12,8 +12,6 @@ Changes:
 - Created a start rule to detect module interface/body and parse both for use in the playground
 */
 
-%x TQSTR
-
 /* Brackets */
 %token LPAREN
 %token RPAREN
@@ -693,6 +691,8 @@ docstringopt :
 	;
 
 %%
+
+%x TQSTR
 
 /* Helper regexes */
 

@@ -36,7 +36,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.           *
  *******************************************************************************/
 
-%option caseless
 %token NL
 
 /*Tokens*/
@@ -735,6 +734,8 @@ setitem :
 	;
 
 %%
+
+%option caseless
 
 %%
 

@@ -1,7 +1,5 @@
 //From: https://github.com/Ada-France/ayacc/blob/master/examples/ada_parser/ada.y
 
-%option caseless
-
 %token '&'
 %token '\''
 %token '('
@@ -1085,8 +1083,10 @@ ty_mk_rec_aggr :
 	 qualified_expr
 	;
 
-//Regex macros
 %%
+//Regex macros
+
+%option caseless
 
 spaces	[ \t\r\n]+
 line_comment	--[^\r\n]*

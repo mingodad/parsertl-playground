@@ -14,6 +14,11 @@
  *
  */
 
+%token ILLEGAL_CHARACTER
+
+%%
+%%
+
 %x      SkipString
 %x      SkipStringS
 %x      SkipVerbString
@@ -52,11 +57,6 @@
 %x      InlineInit
 %x      ModuleName
 %x      ModuleImport
-
-%token ILLEGAL_CHARACTER
-
-%%
-%%
 
 B       [ \t]
 Bopt    {B}

@@ -23,8 +23,6 @@
 //
 //   [1]: http://github.com/cznic/ebnf2y
 
-%option caseless
-
 /*Tokens*/
 %token identifier
 %token asof
@@ -5823,6 +5821,8 @@ DropQueryWatchStmt :
 	;
 
 %%
+
+%option caseless
 
 spaces	[ \t\r\n]+
 line_comment	--[^\r\n]*

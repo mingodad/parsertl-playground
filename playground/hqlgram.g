@@ -15,8 +15,6 @@
 //    limitations under the License.
 //############################################################################## */
 
-%option caseless
-
 /*Tokens*/
 %token ABS
 %token ACOS
@@ -4309,6 +4307,8 @@ startStoredAttrs :
 	;
 
 %%
+
+%option caseless
 
 letter        [a-z_A-Z]
 digit         [0-9]

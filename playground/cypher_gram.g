@@ -22,13 +22,6 @@
 Semicolon is not optional for the playground to parser multiple statements
 */
 
-%option caseless
-
-%x xdecimalfail
-%x mlcomment
-%x dqstr sqstr qstru
-%x bqid
-
 /*Tokens*/
 %token INTEGER
 %token DECIMAL
@@ -643,6 +636,13 @@ conflicted_keywords :
 	;
 
 %%
+
+%option caseless
+
+%x xdecimalfail
+%x mlcomment
+%x dqstr sqstr qstru
+%x bqid
 
 /*
  * whitespace rule in Cypher handles twenty-four characters out of the

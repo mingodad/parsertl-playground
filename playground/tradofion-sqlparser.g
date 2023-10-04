@@ -43,8 +43,6 @@
 // This solves the problem because bison does not have to reduce after reading TOK_DROP. Rather,
 // after reading TOK_DROP TOK_TABLE, it can lookahead at the next token to decide what to do.
 
-%option caseless
-
 /*Tokens*/
 //%token NON_SQLTEXT_CHARACTER
 %token ARITH_PLACEHOLDER
@@ -9358,6 +9356,8 @@ MP_nonreserved_func_word :
 	;
 
 %%
+
+%option caseless
 
 ident	[A-Za-z_][A-Za-z0-9_]*
 

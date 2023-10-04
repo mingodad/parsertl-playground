@@ -10,8 +10,6 @@ and
 
 */
 
-%x attribute
-
 %token	ILLEGAL_CHARACTER FLOAT128 INT128 AUTO_TYPE BUILTIN_VA_LIST
 %token_symbol_table IDENTIFIER
 
@@ -548,6 +546,8 @@ declaration_list
 	;
 
 %%
+
+%x attribute
 
 O   [0-7]
 D   [0-9]

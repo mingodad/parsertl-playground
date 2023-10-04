@@ -1,8 +1,5 @@
 //Directives
 
-%option caseless
-
-%x xdolq xwith_la xwithout_la xformat_la xnulls_la xnot_la
 
 %token IDENT
 //%token UIDENT
@@ -5953,6 +5950,10 @@ bare_label_keyword :
 
 %%
 /*Lexer macros*/
+
+%option caseless
+
+%x xdolq xwith_la xwithout_la xformat_la xnulls_la xnot_la
 
 /*
  * In order to make the world safe for Windows and Mac clients as well as

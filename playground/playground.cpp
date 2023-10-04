@@ -660,7 +660,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
 
     grules.push("start", "file");
     grules.push("file",
-        "directives '%%' grules '%%' rx_macros '%%' rx_rules '%%'");
+        "directives '%%' grules '%%' rx_directives rx_macros '%%' rx_rules '%%'");
     grules.push("directives", "%empty "
         "| directives directive");
     grules.push("directive", "NL");
@@ -719,43 +719,6 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         "| tokens token");
     grules.push("token", "Literal | Name");
     // Read and store %option caseless
-    gs.master_parser.actions[grules.push("directive",
-        "'%option' 'caseless' NL")] =
-        [](BuildUserParser& state)
-    {
-        state.gs.user_parser.lrules.flags(state.gs.user_parser.lrules.flags() |
-                *lexertl::regex_flags::icase);
-    };
-    // Read and store %x entries
-    gs.master_parser.actions[grules.push("directive", "'%x' names NL")] =
-        [](BuildUserParser& state)
-    {
-        const auto& names = state.results.dollar(1, state.gs.master_parser.gsm,
-            state.productions);
-        const char* start = names.first;
-        const char* curr = start;
-
-        for (; curr != names.second; ++curr)
-        {
-            if (*curr == ' ' || *curr == '\t')
-            {
-                state.gs.user_parser.lrules.push_state(std::string(start, curr).c_str());
-
-                do
-                {
-                    ++curr;
-                } while (curr != names.second &&
-                    (*curr == ' ' || *curr == '\t'));
-
-                start = curr;
-            }
-        }
-
-        if (start != curr)
-        {
-            state.gs.user_parser.lrules.push_state(std::string(start, curr).c_str());
-        }
-    };
     grules.push("names", "Name "
         "| names Name");
 
@@ -803,6 +766,46 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         state.gs.user_parser.lrules.insert_macro(name.c_str(), regex);
     };
 
+    grules.push("rx_directives", "%empty"
+        "| rx_directives rx_directive");
+    // Read and store %x entries
+    gs.master_parser.actions[grules.push("rx_directive", "'%x' names NL")] =
+        [](BuildUserParser& state)
+    {
+        const auto& names = state.results.dollar(1, state.gs.master_parser.gsm,
+            state.productions);
+        const char* start = names.first;
+        const char* curr = start;
+
+        for (; curr != names.second; ++curr)
+        {
+            if (*curr == ' ' || *curr == '\t')
+            {
+                state.gs.user_parser.lrules.push_state(std::string(start, curr).c_str());
+
+                do
+                {
+                    ++curr;
+                } while (curr != names.second &&
+                    (*curr == ' ' || *curr == '\t'));
+
+                start = curr;
+            }
+        }
+
+        if (start != curr)
+        {
+            state.gs.user_parser.lrules.push_state(std::string(start, curr).c_str());
+        }
+    };
+    gs.master_parser.actions[grules.push("rx_directive",
+        "'%option' 'caseless' NL")] =
+        [](BuildUserParser& state)
+    {
+        state.gs.user_parser.lrules.flags(state.gs.user_parser.lrules.flags() |
+                *lexertl::regex_flags::icase);
+    };
+    
     // Tokens
 
     auto regex_token_action_token =
@@ -1116,6 +1119,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     lrules.push_state("REGEX");
     lrules.push_state("RULE");
     lrules.push_state("ID");
+    lrules.push_state("RXDIRECTIVES");
     lrules.insert_macro("c_comment", "[/]{2}.*|[/][*](?s:.)*?[*][/]");
     lrules.insert_macro("escape", "\\\\(.|x[0-9A-Fa-f]+|c[@a-zA-Z])");
     lrules.insert_macro("posix_name", "alnum|alpha|blank|cntrl|digit|graph|"
@@ -1125,7 +1129,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     lrules.insert_macro("NL", "\n|\r\n");
     lrules.insert_macro("literal_common", "\\\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\\d+)");
 
-    lrules.push("INITIAL,OPTION", "[ \t]+", lexertl::rules::skip(), ".");
+    lrules.push("INITIAL,OPTION,RXDIRECTIVES", "[ \t]+", lexertl::rules::skip(), ".");
     lrules.push("{NL}", grules.token_id("NL"));
     lrules.push("%left", grules.token_id("'%left'"));
     lrules.push("%nonassoc", grules.token_id("'%nonassoc'"));
@@ -1133,9 +1137,6 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     lrules.push("%right", grules.token_id("'%right'"));
     lrules.push("%start", grules.token_id("'%start'"));
     lrules.push("%token", grules.token_id("'%token'"));
-    lrules.push("%x", grules.token_id("'%x'"));
-    lrules.push("INITIAL", "%option", grules.token_id("'%option'"), "OPTION");
-    lrules.push("OPTION", "caseless", grules.token_id("'caseless'"), "INITIAL");
     lrules.push("INITIAL", "%%", grules.token_id("'%%'"), "GRULE");
 
     lrules.push("GRULE", ":", grules.token_id("':'"), ".");
@@ -1161,16 +1162,20 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         "'({literal_common}|[^'\\\\])+'|"
         "[\"]({literal_common}|[^\"\\\\])+[\"]",
         grules.token_id("Literal"), ".");
-    lrules.push("INITIAL,GRULE,ID", "[.A-Z_a-z][-.0-9A-Z_a-z]*",
+    lrules.push("INITIAL,GRULE,ID,RXDIRECTIVES", "[.A-Z_a-z][-.0-9A-Z_a-z]*",
         grules.token_id("Name"), ".");
     lrules.push("ID", "[1-9][0-9]*", grules.token_id("Number"), ".");
 
     lrules.push("MACRO,RULE", "%%", grules.token_id("'%%'"), "RULE");
+    lrules.push("MACRO", "%option", grules.token_id("'%option'"), "OPTION");
+    lrules.push("OPTION", "caseless", grules.token_id("'caseless'"), ".");
+    lrules.push("OPTION,RXDIRECTIVES", "{NL}", grules.token_id("NL"), "MACRO");
+    lrules.push("MACRO,RULE", "%x", grules.token_id("'%x'"), "RXDIRECTIVES");
     lrules.push("MACRO", "[A-Z_a-z][0-9A-Z_a-z]*",
         grules.token_id("MacroName"), "REGEX");
     lrules.push("MACRO,REGEX", "{NL}", lexertl::rules::skip(), "MACRO");
 
-    lrules.push("MACRO,RULE", "{c_comment}",
+    lrules.push("MACRO,RULE,RXDIRECTIVES", "{c_comment}",
         lexertl::rules::skip(), ".");
     lrules.push("MACRO,RULE", "^[ \t]+{c_comment}",
         lexertl::rules::skip(), ".");

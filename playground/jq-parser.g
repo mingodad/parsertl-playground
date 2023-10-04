@@ -1,11 +1,5 @@
 //From: https://github.com/jqlang/jq/blob/master/src/parser.y
 
-//%s IN_PAREN
-//%s IN_BRACKET
-//%s IN_BRACE
-//%s IN_QQINTERP
-%x IN_QQSTRING
-
 /*Tokens*/
 %token INVALID_CHARACTER
 %token IDENT
@@ -347,6 +341,12 @@ MkDictPair :
 	;
 
 %%
+
+//%s IN_PAREN
+//%s IN_BRACKET
+//%s IN_BRACE
+//%s IN_QQINTERP
+%x IN_QQSTRING
 
 %%
 

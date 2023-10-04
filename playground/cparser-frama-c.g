@@ -45,8 +45,6 @@
     2.0  George Necula 12/12/00: Practically complete rewrite.
 */
 
-%x	hash_st
-
 %token  SPEC
 %token  DECL
 %token  CODE_ANNOT
@@ -1061,6 +1059,8 @@ asmlabels :
 	;
 
 %%
+
+%x	hash_st
 
 decdigit   [0-9]
 octdigit   [0-7]

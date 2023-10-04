@@ -1,18 +1,5 @@
 //From: https://github.com/vesoft-inc/nebula/blob/798d48e6c78e72dd4995fa9596a006072eaadd12/src/parser/parser.yy
 
-/* Define some exclusive states.
- * Each state is referenced within a `<>` in the rules section
- * <DQ_STR> double quoted string literal
- * <SQ_STR> single quoted string literal
- * <LB_STR> accent quoted label, eg. `v2`
- * <COMMENT> comment
- */
-%x DQ_STR
-%x SQ_STR
-%x LB_STR
-%x COMMENT
-
-%option caseless
 
 /*Tokens*/
 %token KW_BOOL
@@ -1930,6 +1917,20 @@ sentences :
 	;
 
 %%
+
+/* Define some exclusive states.
+ * Each state is referenced within a `<>` in the rules section
+ * <DQ_STR> double quoted string literal
+ * <SQ_STR> single quoted string literal
+ * <LB_STR> accent quoted label, eg. `v2`
+ * <COMMENT> comment
+ */
+%x DQ_STR
+%x SQ_STR
+%x LB_STR
+%x COMMENT
+
+%option caseless
 
 nbsp                        (\xc2\xa0)
 blank_without_newline       ([ \t\r]|{nbsp})

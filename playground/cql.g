@@ -1,7 +1,5 @@
 //Grammar directives
 
-%option caseless
-
 //%token ASSIGN ":="
 //%token CONCAT "||"
 //%token EQEQ "=="
@@ -1463,6 +1461,8 @@ enforce_pop_stmt :
 
 //Regex macros
 %%
+
+%option caseless
 
 spaces	[ \t\r\n]+
 line_comment	--[^\r\n]*

@@ -2,13 +2,6 @@
 
 %token ILLEGAL_CHARACTER
 
-%x string
-%x string_quote
-%x multilinecomment
-%x doccomment
-%x doccomment_file
-%x quoted_exp
-
 /*Tokens*/
 %token MZN_INTEGER_LITERAL
 %token MZN_BOOL_LITERAL
@@ -900,6 +893,13 @@ id_or_quoted_op :
 	;
 
 %%
+
+%x string
+%x string_quote
+%x multilinecomment
+%x doccomment
+%x doccomment_file
+%x quoted_exp
 
 %%
 

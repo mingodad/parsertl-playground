@@ -1,9 +1,5 @@
 //From: https://github.com/miguelzf/multidelphi/blob/ce124df197d3780d354695ada7b077501a28bbc6/etc/delphi-cparser-linux/delphi.y
 
-%option caseless
-
-%x XCOMMENT1 XCOMMENT2 ASMCODESEC ASMCODESEC_BT
-
 /*Tokens*/
 %token KW_LIBRARY
 %token KW_UNIT
@@ -1117,6 +1113,10 @@ casttype :
 	;
 
 %%
+
+%option caseless
+
+%x XCOMMENT1 XCOMMENT2 ASMCODESEC ASMCODESEC_BT
 
 %%
 

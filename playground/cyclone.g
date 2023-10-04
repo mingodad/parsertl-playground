@@ -41,8 +41,6 @@ There are 2 shift-reduce conflicts having to do with
 @requires and @ensures clauses on function prototypes.
 */
 
-%x  QUAL1_BT QUAL2_BT
-
 /*Tokens*/
 %token AUTO
 %token REGISTER
@@ -1421,6 +1419,8 @@ c_op :
 	;
 
 %%
+
+%x  QUAL1_BT QUAL2_BT
 
 newline     \r\n?|\r\n?
 notnewline  [^\n\r]

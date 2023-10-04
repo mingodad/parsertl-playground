@@ -19,8 +19,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
- %x COMMENT
-
  %token ILLEGAL_CHARACTER
 
 /*Tokens*/
@@ -823,6 +821,8 @@ ArrayCreationExpression :
 	;
 
 %%
+
+%x COMMENT
 
 DIGIT			[0-9]
 HEX				[a-fA-F0-9]

@@ -3,8 +3,6 @@
 %token Charset ExitState Literal Macro MacroName Name NL
 %token Number Repeat StartState String Skip Reject
 
-%x OPTION GRULE MACRO REGEX RULE ID
-
 %% //Grammar rules
 
 start : file ;
@@ -81,6 +79,8 @@ atom : Charset | Macro | String | '(' rx ')' ;
 repeat : '?' | '\?\?' | '*' | '*?' | '+' | '+?' | Repeat ;
 
 %%
+
+%x OPTION GRULE MACRO REGEX RULE ID
 
 c_comment  [/]{2}.*|[/][*](?s:.)*?[*][/]
 escape \\(.|x[0-9A-Fa-f]+|c[@a-zA-Z])

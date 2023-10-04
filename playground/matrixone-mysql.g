@@ -13,8 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-%option caseless
-
 /*Tokens*/
 %token EMPTY
 %token UNION
@@ -4215,6 +4213,8 @@ not_keyword :
 	;
 
 %%
+
+%option caseless
 
 spaces	[ \t\r\n]+
 line_comment	--[^\r\n]*

@@ -1,9 +1,5 @@
 //From: https://github.com/openscad/openscad/blob/2835e35fa93a36ffa757c5b80d95b0ed49703fc1/src/core/parser.y
 
-%x cond_comment cond_lcomment cond_string
-%x cond_include
-%x cond_use
-
 %token ILLEGAL_CHARACTER
 
 /*Tokens*/
@@ -274,6 +270,10 @@ argument :
 	;
 
 %%
+
+%x cond_comment cond_lcomment cond_string
+%x cond_include
+%x cond_use
 
 D [0-9]
 E [Ee][+-]?{D}+

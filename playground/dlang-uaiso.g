@@ -22,9 +22,6 @@
 /*--- The UaiSo! Project ---*/
 /*--------------------------*/
 
-%x BCOMMENT NBCOMMENT DQSTRING QCHAR ESCSEQ JOINBRACE
-%x NOT_IN_HACK_ST NOT_IS_HACK_ST FLOAT_LIT1_ST	FLOAT_LIT2_ST
-
 /*Tokens*/
 %token ABSTRACT
 %token ALIAS
@@ -1186,7 +1183,6 @@ PlainStmt :
 	| StaticAssert
 	| CondStmt
 	| SwitchStmt
-	//| ';'
 	;
 
 StmtList :
@@ -1465,6 +1461,9 @@ TemplateSingleArg :
 	;
 
 %%
+
+%x BCOMMENT NBCOMMENT DQSTRING QCHAR ESCSEQ JOINBRACE
+%x NOT_IN_HACK_ST NOT_IS_HACK_ST FLOAT_LIT1_ST	FLOAT_LIT2_ST
 
 %%
 
