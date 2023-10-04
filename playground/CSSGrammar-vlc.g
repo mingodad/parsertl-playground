@@ -427,7 +427,7 @@ range		\?{1,6}|{h}(\?{0,5}|{h}(\?{0,4}|{h}(\?{0,3}|{h}(\?{0,2}|{h}(\??|{h})))))
 "%"	'%'
 "+"	'+'
 
-CHARSET_SYM	CHARSET_SYM
+"@charset"	CHARSET_SYM
 SGML_CD	SGML_CD
 
 "url("{w}{string}{w}")"	 URI
