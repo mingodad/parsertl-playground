@@ -601,7 +601,7 @@ namespace parsertl
                         action::go_to,
                         static_cast<id_type>(tran_.second));
 
-                    if (fill_entry(rules_, d_._closure, symbols_,
+                    if (fill_entry(0, rules_, d_._closure, symbols_,
                         lhs_, id_, rhs_, warnings_))
                         sm_.set(index_, id_, lhs_);
                 }
@@ -671,7 +671,7 @@ namespace parsertl
                                 action::reduce,
                                 static_cast<id_type>(production_._index));
 
-                            if (fill_entry(rules_, d_._closure, symbols_,
+                            if (fill_entry(index_, rules_, d_._closure, symbols_,
                                 lhs_, id_, rhs_, warnings_))
                                 sm_.set(index_, id_, lhs_);
                         }
@@ -840,7 +840,7 @@ namespace parsertl
             return hash_;
         }
 
-        static bool fill_entry(const rules& rules_,
+        static bool fill_entry(const std::size_t rule_index, const rules& rules_,
             const size_t_pair_vector& config_, const string_vector& symbols_,
             entry& lhs_, const std::size_t id_, const entry& rhs_,
             std::string& warnings_)
@@ -906,6 +906,7 @@ namespace parsertl
                         // Favour shift (leave lhs as it is).
                         std::ostringstream ss_;
 
+                        ss_ << "state " << rule_index << " ";
                         ss_ << actions_[static_cast<int>(lhs_.action)];
                         dump_action(grammar_, terminals_, config_, symbols_,
                             id_, lhs_, ss_);
@@ -925,6 +926,7 @@ namespace parsertl
                             {
                                 std::ostringstream ss_;
 
+                                ss_ << "state " << rule_index << " ";
                                 ss_ << actions_[static_cast<int>(lhs_.action)];
                                 dump_action(grammar_, terminals_, config_,
                                     symbols_, id_, lhs_, ss_);
@@ -981,6 +983,7 @@ namespace parsertl
             {
                 std::ostringstream ss_;
 
+                ss_ << "state " << rule_index << ":" << symbols_[id_] << " ";
                 ss_ << actions_[static_cast<int>(lhs_.action)];
                 dump_action(grammar_, terminals_, config_, symbols_, id_, lhs_,
                     ss_);
