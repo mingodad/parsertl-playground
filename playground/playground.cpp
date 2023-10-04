@@ -20,8 +20,9 @@ EM_JS(void, showDiffTime, (const char *title), {
 });
 
 #else
-
+#ifdef WITH_DEBUG_MEM
 #include "debugmem.h"
+#endif
 #include <lexertl/memory_file.hpp>
 
 #endif
@@ -88,7 +89,7 @@ struct GlobalState
     const char *input_data;
     size_t input_data_size;
 //#endif
-    
+
     uint16_t token_Number = 0;
     uint16_t token_Name = 0;
     uint16_t token_Literal = 0;
@@ -96,7 +97,7 @@ struct GlobalState
     uint16_t token_Skip = 0;
     std::vector<std::string> group_State;
     std::string group_State_str;
-    
+
     GlobalState():
         dumpAsEbnfRR(0)
         ,icase(false)
@@ -369,7 +370,7 @@ static void dump_parse_trace(const char* data_start, const char* data_end,
             {
                 const std::string str(iter_lex->first, iter_lex->second);
                 std::cout << "\n<- shift " << sm_entry.param << ":" <<
-                        results.stack.size() << " <- " << 
+                        results.stack.size() << " <- " <<
                         (str == "\n" ? "\\n" : str) << '\n';
                 break;
             }
@@ -379,7 +380,7 @@ static void dump_parse_trace(const char* data_start, const char* data_end,
                     gsm._rules[sm_entry.param];
 
                 std::cout << "-> reduce " << sm_entry.param << ":" <<
-                        results.stack.size() << " by " << 
+                        results.stack.size() << " by " <<
                         symbols[idv_pair.first] << " ->";
 
                 if (idv_pair.second.empty())
@@ -421,7 +422,7 @@ struct BuildUserParser
 
     BuildUserParser(GlobalState& pgs): gs(pgs)
     {}
-    
+
 
     const std::string dollar(const std::size_t index)
     {
@@ -517,7 +518,7 @@ struct BuildUserParser
                     {
                         std::ostringstream ss;
                         LineColumn lc = get_line_colum(iter_lex, gs.grammar_data);
-                        ss << e.what() << "\nLine error:" << lc.line << ":" 
+                        ss << e.what() << "\nLine error:" << lc.line << ":"
                                 << lc.column << ":\n";
                         throw std::runtime_error(ss.str());
                     }
@@ -542,8 +543,8 @@ struct BuildUserParser
             parsertl::debug::dump(gs.user_parser.grules, std::cout, gs.dumpAsEbnfRR == 1);
             showDiffTime("dump grammar ebnf");
             return false;
-        }            
-        
+        }
+
         if (gs.user_parser.grules.grammar().empty())
         {
             gs.user_parser.lrules.push(".{+}[\r\n]", lexertl::rules::skip());
@@ -619,7 +620,7 @@ struct BuildUserParser
             parsertl::debug::dump(gs.user_parser.grules, dfa_, std::cout);
             return false;
         }
-        
+
         lexertl::generator::build(gs.user_parser.lrules, gs.user_parser.lsm);
 
         if(gs.dump_grammar_lsm)
@@ -638,7 +639,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
 {
     parsertl::rules& grules = gs.master_parser.grules;
     lexertl::rules& lrules = gs.master_parser.lrules;
-    
+
     static const char* initial_state_str = "INITIAL";
     static const char* current_state_str = ".";
 
@@ -802,7 +803,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     {
         const std::string regex = state.dollar(1);
         const token& rc_token = state.dollar_token(2);
-        
+
         const char* start_state = state.gs.group_State_str.empty()
                         ? initial_state_str : state.gs.group_State_str.c_str();
 
@@ -915,13 +916,13 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
             throw std::runtime_error("Unexpected token id in rxrule");
         }
     };
-    
+
     auto regex_exit_state_token_action_token =
         [](BuildUserParser& state)
     {
         const std::string regex = state.dollar(1);
         const std::string exit_state = state.dollar(2, 1, -1);
-        
+
         const char* start_state = state.gs.group_State_str.empty()
                         ? initial_state_str : state.gs.group_State_str.c_str();
 
@@ -969,7 +970,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
                     throw std::runtime_error("Unexpected number of productions in rxrule");
         }
     };
-    
+
     grules.push("rx_rules", "%empty");
     gs.master_parser.actions[grules.push("rx_rules",
         "rx_rules regex ExitState")] =
@@ -995,7 +996,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         "rx_rules regex ExitState Literal")] =
         regex_exit_state_token_action_token;
     gs.master_parser.actions[grules.push("rx_rules",
-        "rx_rules StartState regex ExitState Literal")] = 
+        "rx_rules StartState regex ExitState Literal")] =
         start_end_state_action_token;
     gs.master_parser.actions[grules.push("rx_rules",
         "rx_rules regex Name")] =
@@ -1007,7 +1008,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         "rx_rules regex ExitState Name")] =
         regex_exit_state_token_action_token;
     gs.master_parser.actions[grules.push("rx_rules",
-        "rx_rules StartState regex ExitState Name")] = 
+        "rx_rules StartState regex ExitState Name")] =
         start_end_state_action_token;
     gs.master_parser.actions[grules.push("rx_rules",
         "rx_rules regex Skip")] =regex_token_action_token ;
@@ -1217,7 +1218,7 @@ int main_base(int argc, char* argv[], GlobalState& gs)
 
     switch_output("compile_status");
 #else
-#ifndef DEBUGMEM_H_INCLUDED   
+#ifndef DEBUGMEM_H_INCLUDED
     start_time = clock();
 #endif
 #endif
@@ -1243,9 +1244,9 @@ int main_base(int argc, char* argv[], GlobalState& gs)
         bup.build();
         if(gs.dump_grammar_parse_tree
                 || gs.dump_grammar_parse_trace
-                || gs.dump_grammar_lexer 
-                || gs.dump_grammar_lsm 
-                || gs.dump_grammar_gsm 
+                || gs.dump_grammar_lexer
+                || gs.dump_grammar_lsm
+                || gs.dump_grammar_gsm
                 || gs.dumpAsEbnfRR)
         {
             return -1;
@@ -1261,7 +1262,7 @@ int main_base(int argc, char* argv[], GlobalState& gs)
         std::cerr << "Shift/Reduce conflicts resolved " << gs.user_parser.grules.shift_reduce_count << ".\n";
         std::cerr << "Reduce/Reduce conflicts resolved " << gs.user_parser.grules.reduce_reduce_count << ".\n";
         //std::cerr << "dumpAsEbnfRR = " << gs.dumpAsEbnfRR << "\n";
-        
+
         if(gs.dump_input_parse_tree && productions_count)
         {
 #ifdef WASM_PLAYGROUND
@@ -1331,7 +1332,7 @@ int main_base(int argc, char* argv[], GlobalState& gs)
     return err;
 #else
     return 0;
-#endif    
+#endif
 }
 
 extern "C" int main_playground(
@@ -1347,7 +1348,7 @@ extern "C" int main_playground(
         ,int dump_input_parse_trace
         ,int dumpAsEbnfRR)
 {
-    const char *argv[] = {"parsertl", "-f", "grammar.g", "input.txt"}; 
+    const char *argv[] = {"parsertl", "-f", "grammar.g", "input.txt"};
     int argc = 4;
     GlobalState gs;
     gs.grammar_data = grammar_data;
@@ -1365,7 +1366,7 @@ extern "C" int main_playground(
     gs.dump_input_parse_trace = dump_input_parse_trace;
     gs.dumpAsEbnfRR = dumpAsEbnfRR;
     gs.pruneParserTree = (dump_grammar_parse_tree == 1 || dump_input_parse_tree == 1);
-    
+
     return main_base(argc, (char**)argv, gs);
 }
 
@@ -1384,6 +1385,7 @@ static void showHelp(const char* prog_name)
             "-dumpglsm      Dump grammar lexer state machine\n"
             "-dumpgsm       Dump grammar parser state machine\n"
             "-dumpAsEbnfRR  Dump grammar as EBNF for railroad diagram\n"
+            "-dumpAsYacc    Dump grammar as Yacc\n"
             "-pruneptree    Do not show empty parser tree nodes\n"
             ;
 }
@@ -1442,7 +1444,11 @@ int main(int argc, char *argv[])
         }
         else if (strcmp("-dumpAsEbnfRR", param) == 0)
         {
-            gs.dumpAsEbnfRR = true;
+            gs.dumpAsEbnfRR = 1;
+        }
+        else if (strcmp("-dumpAsYacc", param) == 0)
+        {
+            gs.dumpAsEbnfRR = 2;
         }
         else if (strcmp("-pruneptree", param) == 0)
         {
@@ -1498,8 +1504,8 @@ int main(int argc, char *argv[])
     {
         std::cout << e.what() << '\n';
     }
-    
+
     //return main_playground(nullptr, 0, nullptr, 0, false, false, false, false, true);
-    return 1;    
+    return 1;
 }
 #endif
