@@ -783,6 +783,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         "| Name "
         "| '[' production ']' "
         "| rhs '?' "
+        "| '{' production '}' "
         "| rhs '*' "
         "| rhs '+' "
         "| '(' production ')'");
@@ -1143,6 +1144,8 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     lrules.push("GRULE", "\\]", grules.token_id("']'"), ".");
     lrules.push("GRULE", "[(]", grules.token_id("'('"), ".");
     lrules.push("GRULE", "[)]", grules.token_id("')'"), ".");
+    lrules.push("GRULE", "[{]", grules.token_id("'{'"), ".");
+    lrules.push("GRULE", "[}]", grules.token_id("'}'"), ".");
     lrules.push("GRULE", "[?]", grules.token_id("'?'"), ".");
     lrules.push("GRULE", "[*]", grules.token_id("'*'"), ".");
     lrules.push("GRULE", "[+]", grules.token_id("'+'"), ".");
