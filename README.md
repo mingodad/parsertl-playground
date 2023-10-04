@@ -26,6 +26,26 @@ The availabel debugging options are:
 - Grammar lexer state machine
 - Grammar parse state machine
 
+This project can also be built as a command line tool (see playground/build.sh) then you can use it to check grammar/input on your disc:
+```
+./parsertl-playground
+usage: ./parsertl-playground [options] grammar_fname input_fname
+options can be:
+-dumpil        Dump input lexer
+-dumpiptree    Dump input parser tree
+-dumpiptrace   Dump input parser trace
+-dumpgl        Dump grammar lexer
+-dumpgptree    Dump grammar parser tree
+-dumpgptrace   Dump grammar parser trace
+-dumpglsm      Dump grammar lexer state machine
+-dumpgsm       Dump grammar parser state machine
+-dumpAsEbnfRR  Dump grammar as EBNF for railroad diagram
+-dumpAsYacc    Dump grammar as Yacc
+-pruneptree    Do not show empty parser tree nodes
+-verbose       Show several metrics for debug
+
+```
+
 Related projects:
 - Tree-sitter https://tree-sitter.github.io/tree-sitter/playground
 - Lpegrex/Lua https://mingodad.github.io/lua-wasm-playground/
