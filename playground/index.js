@@ -19,20 +19,32 @@ function setupEditorArea(id, lsKey) {
   return e;
 }
 
+let userContentHasChanged = false;
 let grammarContentHasChanged = false;
 let inputContentHasChanged = false;
-function grammarOnChange(delta) {if(!grammarContentHasChanged) grammarContentHasChanged = true;}
-function inputOnChange(delta) {if(!inputContentHasChanged) inputContentHasChanged = true;}
+function grammarOnChange(delta) {
+	if(!grammarContentHasChanged) {
+		grammarContentHasChanged = true;
+		userContentHasChanged = true;
+	}
+}
+function inputOnChange(delta) {
+	if(!inputContentHasChanged) {
+		inputContentHasChanged = true;
+		userContentHasChanged = true;
+	}
+}
 
 const grammarEditor = setupEditorArea("grammar-editor", "grammarText");
 grammarEditor.on("change", grammarOnChange);
-grammarContentHasChanged = localStorage.getItem("grammarContentHasChanged");
 grammarEditor.getSession().setMode("ace/mode/yaml");
 const codeEditor = setupEditorArea("code-editor", "codeText");
 codeEditor.on("change", inputOnChange);
-inputContentHasChanged = localStorage.getItem("inputContentHasChanged");
+userContentHasChanged = localStorage.getItem("userContentHasChanged");
 
 const codeDbg = setupInfoArea("code-dbg");
+
+onbeforeunload= function(event) { updateLocalStorage(); };
 
 const sampleList = [
 	//title, grammar, input, input ace syntax
@@ -172,7 +184,7 @@ const sampleList = [
 ];
 
 function loadLalr_sample(self) {
-  if(grammarContentHasChanged || inputContentHasChanged)
+  if(userContentHasChanged)
   {
 	let ok = confirm("Your changes will be lost !\nIf the changes you've made are important save then before proceed.\nCopy and paste to your prefered editor and save it.\nEither OK or Cancel.");
 	if(!ok) return false;
@@ -183,11 +195,13 @@ function loadLalr_sample(self) {
       $.get(base_url + sample_to_use[1], function( data ) {
         grammarEditor.setValue( data );
 	grammarContentHasChanged = false;
+	userContentHasChanged = false;
       });
       $.get(base_url + sample_to_use[2], function( data ) {
         codeEditor.setValue( data );
 	codeEditor.getSession().setMode(sample_to_use[3]);
 	inputContentHasChanged = false;
+	userContentHasChanged = false;
       });
   }
 }
@@ -246,12 +260,13 @@ function updateLocalStorage() {
   if(grammarContentHasChanged || inputContentHasChanged)
   {
     localStorage.setItem('grammarText', grammarEditor.getValue());
-    localStorage.setItem('grammarContentHasChanged', grammarContentHasChanged);
     localStorage.setItem('codeText', codeEditor.getValue());
-    localStorage.setItem('inputContentHasChanged', inputContentHasChanged);
+    grammarContentHasChanged = false;
+    inputContentHasChanged = false;
+    localStorage.setItem('userContentHasChanged', userContentHasChanged);
   }
   //localStorage.setItem('optimizationMode', $('#opt-mode').val());
-  localStorage.setItem('autoRefresh', $('#auto-refresh').prop('checked'));
+  //localStorage.setItem('autoRefresh', $('#auto-refresh').prop('checked'));
 }
 
 var parse_start_time = 0;
