@@ -19,7 +19,8 @@ namespace parsertl
         using rules = basic_rules<char_type>;
         using ostream = std::basic_ostream<char_type>;
 
-        static void dump(const rules& rules_, ostream& stream_, bool asEbnfRR = false)
+        static void dump(const rules& rules_, ostream& stream_,
+                bool asEbnfRR = false, bool withIndex=false)
         {
             const std::size_t start_ = rules_.start();
             const production_vector& grammar_ = rules_.grammar();
@@ -103,7 +104,8 @@ namespace parsertl
                     static_cast<char_type>('\n');
             }
 
-            dump_grammar(grammar_, seen_, symbols_, terminals_, stream_, asEbnfRR);
+            dump_grammar(grammar_, seen_, symbols_, terminals_, stream_,
+                    asEbnfRR, withIndex);
             if(!asEbnfRR)
             {
                 stream_ << static_cast<char_type>('%') <<
@@ -112,13 +114,16 @@ namespace parsertl
             }
         }
 
-        static void dump(const rules& rules_, const dfa& dfa_, ostream& stream_)
+        static void dump(const rules& rules_, const dfa& dfa_, ostream& stream_,
+                bool withIndex=false)
         {
             const production_vector& grammar_ = rules_.grammar();
             const std::size_t terminals_ = rules_.tokens_info().size();
             string_vector symbols_;
 
             rules_.symbols(symbols_);
+
+            dump(rules_, stream_, false, true);
 
             for (std::size_t idx_ = 0, dfa_size_ = dfa_.size();
                 idx_ < dfa_size_; ++idx_)
@@ -133,12 +138,14 @@ namespace parsertl
                     const production& p_ = grammar_[pair_.first];
                     std::size_t j_ = 0;
 
-                    stream_ << static_cast<char_type>(' ') <<
+                    stream_ << static_cast<char_type>('(') <<
+                        pair_.first <<
+                        static_cast<char_type>(')') <<
+                        static_cast<char_type>(' ') <<
                         static_cast<char_type>(' ') <<
                         symbols_[terminals_ + p_._lhs] <<
                         static_cast<char_type>(' ') <<
-                        static_cast<char_type>('-') <<
-                        static_cast<char_type>('>');
+                        static_cast<char_type>(':');
                     dump_rhs(j_, p_, terminals_, pair_, symbols_, stream_);
 
                     if (j_ == pair_.second)
@@ -184,7 +191,8 @@ namespace parsertl
 
         static void dump_grammar(const production_vector& grammar_,
             std::set<std::size_t>& seen_, const string_vector& symbols_,
-            const std::size_t terminals_, ostream& stream_, bool asEbnfRR = false)
+            const std::size_t terminals_, ostream& stream_,
+            bool asEbnfRR = false, bool withIndex=false)
         {
             for (auto iter_ = grammar_.cbegin(), end_ = grammar_.cend();
                 iter_ != end_; ++iter_)
@@ -206,13 +214,18 @@ namespace parsertl
                         stream_ << static_cast<char_type>(':');
                     }
 
-                    stream_ << static_cast<char_type>('\n') <<
-                        static_cast<char_type>('\t') <<
+                    stream_ << static_cast<char_type>('\n');
+                    if(withIndex) {
+                        stream_ << static_cast<char_type>('(') <<
+                            index_ <<
+                            static_cast<char_type>(')');
+                    }
+                    stream_ << static_cast<char_type>('\t') <<
                         static_cast<char_type>(' ');
 
                     while (index_ != static_cast<prod_size_t>(~0))
                         dump_production(grammar_, lhs_iter_, symbols_,
-                            terminals_, index_, stream_, asEbnfRR);
+                            terminals_, index_, stream_, asEbnfRR, withIndex);
 
                     seen_.insert(iter_->_lhs);
                     if(!asEbnfRR)
@@ -230,7 +243,8 @@ namespace parsertl
         static void dump_production(const production_vector& grammar_,
             typename production_vector::const_iterator& lhs_iter_,
             const string_vector& symbols_, const std::size_t terminals_,
-            prod_size_t& index_, ostream& stream_, bool asEbnfRR = false)
+            prod_size_t& index_, ostream& stream_, bool asEbnfRR = false,
+            bool withIndex=false)
         {
             if (lhs_iter_->_rhs.first.empty())
             {
@@ -275,6 +289,11 @@ namespace parsertl
 
                 lhs_iter_ = grammar_.cbegin() + index_;
                 stream_ << static_cast<char_type>('\n');
+                if(withIndex) {
+                    stream_ << static_cast<char_type>('(') <<
+                        index_ <<
+                        static_cast<char_type>(')');
+                }
 
                 stream_ << static_cast<char_type>('\t') <<
                     static_cast<char_type>('|');
