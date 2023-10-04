@@ -666,6 +666,7 @@ namespace parsertl
             }
 
             // Look for unused rules
+            std::ostringstream ss_;
             for (const auto& [nt_name, nt_id] : _non_terminals)
             {
                 bool found_ = false;
@@ -690,14 +691,16 @@ namespace parsertl
 
                 if (!found_)
                 {
-                    std::ostringstream ss_;
-                    const string name_ = nt_name;
 
+                    const string name_ = nt_name;
                     ss_ << '\'';
                     narrow(name_.c_str(), ss_);
-                    ss_ << "' is an unused rule.";
-                    throw runtime_error(ss_.str());
+                    ss_ << "' is an unused rule.\n";
                 }
+            }
+            if(ss_.str().size())
+            {
+                throw runtime_error(ss_.str());
             }
 
             static const char_type accept_[] =
@@ -723,14 +726,16 @@ namespace parsertl
             {
                 if (_nt_locations[i_]._first_production == npos())
                 {
-                    std::ostringstream ss_;
                     const string name_ = name_from_nt_id(i_);
 
                     ss_ << "Non-terminal '";
                     narrow(name_.c_str(), ss_);
-                    ss_ << "' does not have any productions.";
-                    throw runtime_error(ss_.str());
+                    ss_ << "' does not have any productions.\n";
                 }
+            }
+            if(ss_.str().size())
+            {
+                throw runtime_error(ss_.str());
             }
         }
 
