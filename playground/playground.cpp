@@ -164,6 +164,17 @@ static LineColumn get_line_colum(const IT& iter_lex, const char* data)
 }
 
 template<typename IT>
+static void parser_throw_error(const char*fname, const char* msg, const IT& iter_lex, const char* data)
+{
+    LineColumn lc = get_line_colum(iter_lex, data);
+    std::ostringstream ss;
+
+    ss << fname << ":" <<  lc.line << ":" << lc.column
+            << ": error " << msg << " -> " << iter_lex->str();
+    throw std::runtime_error(ss.str());
+}
+
+template<typename IT>
 static void parser_throw_error(const char* msg, const IT& iter_lex, const char* data)
 {
     LineColumn lc = get_line_colum(iter_lex, data);
@@ -1515,7 +1526,50 @@ int main(int argc, char *argv[])
         gs.input_data = mfi.data();
         gs.input_data_size = mfi.size();
         if(gs.verboseOutput) showDiffTime("read input");
-        return main_base(argc, argv, gs);
+        int rc = main_base(argc, argv, gs);
+        if(rc == 0 && gs.user_parser.grules.grammar().size() > 0)
+        {
+            idx_argc += 2;
+            while(idx_argc < argc)
+            {
+                input_pathname = argv[idx_argc];
+                printf("Now processing %s\n", input_pathname);
+                mfi.open(input_pathname);
+                if (!mfi.data())
+                {
+                    std::cerr << "Error: failed to open " << input_pathname << ".\n";
+                    return 1;
+                }
+                else
+                {
+                    gs.input_data = mfi.data();
+                    gs.input_data_size = mfi.size();
+
+                    try
+                    {
+                        play_iterator iter_lexi(gs.input_data,
+                                gs.input_data + gs.input_data_size, gs.user_parser.lsm);
+
+                        play_match_results resultsi(iter_lexi->id, gs.user_parser.gsm);
+
+                        bool success = parsertl::parse(iter_lexi, gs.user_parser.gsm, resultsi);
+                        if (resultsi.entry.action == parsertl::action::error)
+                        {
+                            parser_throw_error(input_pathname, "parsing the input", iter_lexi, gs.input_data);
+                        }
+#ifndef WASM_PLAYGROUND
+                        else std::cout << "Parser input success: " << success << "\n";
+#endif
+                    }
+                    catch (const std::exception &e)
+                    {
+                        std::cout << e.what() << '\n';
+                    }
+                }
+                ++idx_argc;
+            }
+        }
+        return rc;
     }
     catch (const std::exception &e)
     {
