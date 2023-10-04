@@ -279,10 +279,10 @@ function parse() {
     let dump_grammar_lexer = false;
     let dump_grammar_lsm = false;
     let dump_grammar_gsm = false;
-    let dump_grammar_parse_tree = false;
+    let dump_grammar_parse_tree = 0;
     let dump_grammar_parse_trace = false;
     let dump_input_lexer = false;
-    let dump_input_parse_tree = false;
+    let dump_input_parse_tree = 0;
     let dump_input_parse_trace = false;
     let dump_ebnf_yacc = false;
 
@@ -290,10 +290,12 @@ function parse() {
     {
 	switch(dbgMode)
 	{
-		case 'iptree': dump_input_parse_tree = true; break;
+		case 'iptreep': dump_input_parse_tree = 1; break;
+		case 'iptreef': dump_input_parse_tree = 2; break;
 		case 'iptrace': dump_input_parse_trace = true; break;
 		case 'il': dump_input_lexer = true; break;
-		case 'gptree': dump_grammar_parse_tree = true; break;
+		case 'gptreep': dump_grammar_parse_tree = 1; break;
+		case 'gptreef': dump_grammar_parse_tree = 2; break;
 		case 'gptrace': dump_grammar_parse_trace = true; break;
 		case 'gl': dump_grammar_lexer = true; break;
 		case 'glsm': dump_grammar_lsm = true; break;

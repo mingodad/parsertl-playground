@@ -80,6 +80,7 @@ struct GlobalState
     bool dump_grammar_parse_trace;
     bool dump_input_parse_tree;
     bool dump_input_parse_trace;
+    bool pruneParserTree = false;
 
 //#ifdef WASM_PLAYGROUND
     const char *grammar_data;
@@ -228,7 +229,7 @@ static const char* escapeForParserTree(const parsertl::rules::string& value)
     return value.c_str();
 }
 
-static void print_parsetree( const ParseTreeUserData& ast, const parsertl::rules::string_vector& symbols, int level )
+static void print_parsetree( const ParseTreeUserData& ast, const parsertl::rules::string_vector& symbols, int level, bool bPrune )
 {
     if(ast.symbol_id >= 0)
     {
@@ -244,15 +245,24 @@ static void print_parsetree( const ParseTreeUserData& ast, const parsertl::rules
         }
     }
 
-    for (const auto& child : ast.children)
+    if(bPrune && ast.children.size() == 1)
     {
-        print_parsetree( child, symbols, ast.symbol_id >= 0 ? (level + 1) : level );
+        const ParseTreeUserData *ast_tmp = &ast;
+        while(ast_tmp->children.size() == 1) ast_tmp = &ast_tmp->children[0];
+        print_parsetree( *ast_tmp, symbols, ast.symbol_id >= 0 ? (level + 1) : level, bPrune );
+    }
+    else
+    {
+        for (const auto& child : ast.children)
+        {
+            print_parsetree( child, symbols, ast.symbol_id >= 0 ? (level + 1) : level, bPrune );
+        }
     }
 }
 
 static void dump_parse_tree(const char* data_start, const char* data_end,
         const parsertl::rules grules, const parsertl::state_machine& gsm,
-        const lexertl::state_machine& lsm
+        const lexertl::state_machine& lsm, bool bPrune
 #ifdef WASM_PLAYGROUND
         ,const char* error_output
 #endif
@@ -323,7 +333,7 @@ static void dump_parse_tree(const char* data_start, const char* data_end,
 
     if (!syn_tree.empty())
     {
-        print_parsetree(syn_tree.front(), symbols, 0);
+        print_parsetree(syn_tree.front(), symbols, 0, bPrune);
     }
 }
 
@@ -446,7 +456,8 @@ struct BuildUserParser
         switch_output("parse_debug");
 #endif
             dump_parse_tree(gs.grammar_data, gs.grammar_data + gs.grammar_data_size,
-                    gs.master_parser.grules, gs.master_parser.gsm, gs.master_parser.lsm
+                    gs.master_parser.grules, gs.master_parser.gsm,
+                    gs.master_parser.lsm, gs.pruneParserTree
 #ifdef WASM_PLAYGROUND
                     ,"compile_status"
 #endif
@@ -1257,7 +1268,8 @@ int main_base(int argc, char* argv[], GlobalState& gs)
         switch_output("parse_debug");
 #endif
             dump_parse_tree(gs.input_data, gs.input_data + gs.input_data_size,
-                    gs.user_parser.grules, gs.user_parser.gsm, gs.user_parser.lsm
+                    gs.user_parser.grules, gs.user_parser.gsm,
+                    gs.user_parser.lsm, gs.pruneParserTree
 #ifdef WASM_PLAYGROUND
                     ,"parse_stats"
 #endif
@@ -1352,6 +1364,7 @@ extern "C" int main_playground(
     gs.dump_input_parse_tree = dump_input_parse_tree;
     gs.dump_input_parse_trace = dump_input_parse_trace;
     gs.dumpAsEbnfRR = dumpAsEbnfRR;
+    gs.pruneParserTree = (dump_grammar_parse_tree == 1 || dump_input_parse_tree == 1);
     
     return main_base(argc, (char**)argv, gs);
 }
@@ -1371,6 +1384,7 @@ static void showHelp(const char* prog_name)
             "-dumpglsm      Dump grammar lexer state machine\n"
             "-dumpgsm       Dump grammar parser state machine\n"
             "-dumpAsEbnfRR  Dump grammar as EBNF for railroad diagram\n"
+            "-pruneptree    Do not show empty parser tree nodes\n"
             ;
 }
 
@@ -1429,6 +1443,10 @@ int main(int argc, char *argv[])
         else if (strcmp("-dumpAsEbnfRR", param) == 0)
         {
             gs.dumpAsEbnfRR = true;
+        }
+        else if (strcmp("-pruneptree", param) == 0)
+        {
+            gs.pruneParserTree = true;
         }
         else if(param[0] == '-')
         {
