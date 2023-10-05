@@ -64,7 +64,7 @@ const sampleList = [
 	["BaikalDB SQL parser", "BaikalDB-sql.g", "test.BaikalDB-sql", "ace/mode/sql"],
 	["Bayeslite parser", "bayeslite.g", "test.bayeslite", "ace/mode/text"],
 	["BC calculator", "bc.g", "test.bc-calculator", "ace/mode/sh"],
-	["Bison parser (partially working)", "bison.g", "carbon-lang.y", "ace/mode/yaml"],
+	["Bison parser", "bison.g", "carbon-lang.y", "ace/mode/yaml"],
 	["BNFGen parser", "bnfgen.g", "test.bnfgen", "ace/mode/yaml"],
 	["Bolt parser", "bolt-parser.g", "test.bolt", "ace/mode/c_cpp"],
 	["Blawn parser", "blawn-parser.g", "test.blawn", "ace/mode/python"],
@@ -179,6 +179,7 @@ const sampleList = [
 	["Treelang parser", "treelang.g", "test.treelang", "ace/mode/c_cpp"],
 	["Webassembly interpreter parser", "wasm-interpreter.g", "test.wast", "ace/mode/lisp"],
 	["Vitess SQL parser (be patient)(partially working)", "sql-vitess.g", "test.sql-vitess", "ace/mode/sql"],
+	["X64 ASM ATT parser", "x64asm-att.g", "test.x64asm-att", "ace/mode/assembly_x86"],
 	["XML parser", "xml.g", "test.xml.txt", "ace/mode/xml"],
 	["Z80 assembler parser", "z80-asm.g", "test.z80-asm", "ace/mode/assembly_x86"],
 ];
