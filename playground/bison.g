@@ -104,8 +104,8 @@ prologue_declaration :
 	| "%token-table"
 	| "%verbose"
 	| "%yacc"
-	//| error ";"
-	| ";"
+	//| error ';'
+	| ';'
 	;
 
 params :
@@ -241,25 +241,25 @@ grammar :
 
 rules_or_grammar_declaration :
 	rules
-	| grammar_declaration ";"
-	//| error ";"
+	| grammar_declaration ';'
+	//| error ';'
 	;
 
 rules :
 	id_colon rhses_1
-	| id_colon named_ref_opt ":" rhses_1
+	| id_colon named_ref_opt ':' rhses_1
 	;
 
 rhses_1 :
 	rhs
-	| rhses_1 "|" rhs
-	| rhses_1 ";"
+	| rhses_1 '|' rhs
+	| rhses_1 ';'
 	;
 
 rhs :
 	%empty
 	| rhs symbol named_ref_opt
-	| rhs tag_opt "{...}" named_ref_opt
+	| rhs tag_opt ACTION_CODE named_ref_opt
 	| rhs "%?{...}"
 	| rhs "%empty"
 	| rhs "%prec" symbol
@@ -282,7 +282,7 @@ value :
 	%empty
 	| ID
 	| STRING
-	| "{...}"
+	| ACTION_CODE
 	;
 
 id :
@@ -305,12 +305,13 @@ string_as_id :
 
 epilogue_opt :
 	%empty
+	| SECTION_MARK
 	| SECTION_MARK EPILOGUE
 	;
 
 %%
 
-%x ACTION_CODE_ST
+%x RULES_ST EPILOGUE_ST ACTION_CODE_ST
 
 /*Macros*/
 
@@ -322,84 +323,85 @@ STRING	\"(\\.|[^\"\n\r\\])*\"|'(\\.|[^'\n\r\\])*'
 ACTION_CODE [{](?s:.)*?[}]
 VERBATIN_CODE "%{"(?s:.)*?"%}"
 
-ID	[a-zA-Z_][a-zA-Z_.0-9]*
+ID	[a-zA-Z_][a-zA-Z_.0-9-]*
 
 %%
 /*Lexer*/
 
-{SPACES} skip()
-{COMMENT}	skip()
-{C_STYLE_COMMENT}	skip()
+<INITIAL>"%%"<RULES_ST>	SECTION_MARK
+<RULES_ST>"%%"<EPILOGUE_ST>	SECTION_MARK
+<EPILOGUE_ST>(?s:.)+   EPILOGUE
 
-"%<flag>"	"%<flag>"
-"%define"	"%define"
-"%header"	"%header"
-"%error-verbose"	"%error-verbose"
-"%expect"	"%expect"
-"%expect-rr"	"%expect-rr"
-"%file-prefix"	"%file-prefix"
-"%glr-parser"	"%glr-parser"
-"%initial-action"	"%initial-action"
-"%language"	"%language"
-"%name-prefix"	"%name-prefix"
-"%no-lines"	"%no-lines"
-"%output"	"%output"
-"%param"	"%param"
-"%pure-parser"	"%pure-parser"
-"%require"	"%require"
-"%skeleton"	"%skeleton"
-"%token-table"	"%token-table"
-"%verbose"	"%verbose"
-"%yacc"	"%yacc"
-";"	";"
-"%start"	"%start"
-"%default-prec"	"%default-prec"
-"%no-default-prec"	"%no-default-prec"
-"%code"	"%code"
-"%destructor"	"%destructor"
-"%printer"	"%printer"
-"%union"	"%union"
-"%nterm"	"%nterm"
-"%token"	"%token"
-"%type"	"%type"
-"%left"	"%left"
-"%right"	"%right"
-"%nonassoc"	"%nonassoc"
-"%precedence"	"%precedence"
-":"	":"
-"|"	"|"
-"{...}"	"{...}"
-"%?{...}"	"%?{...}"
-"%empty"	"%empty"
-"%prec"	"%prec"
-"%dprec"	"%dprec"
-"%merge"	"%merge"
-"%nondeterministic-parser"	"%nondeterministic-parser"
+<INITIAL,RULES_ST> {
+    {SPACES} skip()
+    {COMMENT}	skip()
+    {C_STYLE_COMMENT}	skip()
 
-"%%"	SECTION_MARK
+    "%<flag>"	"%<flag>"
+    "%define"	"%define"
+    "%header"	"%header"
+    "%error-verbose"	"%error-verbose"
+    "%expect"	"%expect"
+    "%expect-rr"	"%expect-rr"
+    "%file-prefix"	"%file-prefix"
+    "%glr-parser"	"%glr-parser"
+    "%initial-action"	"%initial-action"
+    "%language"	"%language"
+    "%name-prefix"	"%name-prefix"
+    "%no-lines"	"%no-lines"
+    "%output"	"%output"
+    "%param"	"%param"
+    "%pure-parser"	"%pure-parser"
+    "%require"	"%require"
+    "%skeleton"	"%skeleton"
+    "%token-table"	"%token-table"
+    "%verbose"	"%verbose"
+    "%yacc"	"%yacc"
+    ";"	';'
+    "%start"	"%start"
+    "%default-prec"	"%default-prec"
+    "%no-default-prec"	"%no-default-prec"
+    "%code"	"%code"
+    "%destructor"	"%destructor"
+    "%printer"	"%printer"
+    "%union"	"%union"
+    "%nterm"	"%nterm"
+    "%token"	"%token"
+    "%type"	"%type"
+    "%left"	"%left"
+    "%right"	"%right"
+    "%nonassoc"	"%nonassoc"
+    "%precedence"	"%precedence"
+    ":"	':'
+    "|"	'|'
+    "%?{...}"	"%?{...}"
+    "%empty"	"%empty"
+    "%prec"	"%prec"
+    "%dprec"	"%dprec"
+    "%merge"	"%merge"
+    "%nondeterministic-parser"	"%nondeterministic-parser"
 
-[0-9]+	INT_LITERAL
-{STRING}	STRING
-"_("{STRING}")"	TSTRING
-\<[^>]*>	TAG
-'(\\.|[^'\n\r\\])'	CHAR_LITERAL
+    [0-9]+	INT_LITERAL
+    {STRING}	STRING
+    "_("{STRING}")"	TSTRING
+    \<[^>]*>	TAG
+    '(\\.|[^'\n\r\\])'	CHAR_LITERAL
 
-"{"<>ACTION_CODE_ST>
+    "{"<>ACTION_CODE_ST>
+    {VERBATIN_CODE}	VERBATIN_CODE
+
+    /* Order matter if identifier comes before keywords they are classified as identifier */
+    /*ID_COLON : ID ':' */
+    {ID}[[:space:]]*\:	ID_COLON /*Order matter, need be before ID*/
+    {ID}	ID
+    /*BRACKETED_ID : '[' ID ']' ;*/
+    \[{ID}\]	BRACKETED_ID
+}
+
 <ACTION_CODE_ST> {
     "{"<>ACTION_CODE_ST>
     "}"<<> ACTION_CODE
     (?s:.)<.>
 }
-{VERBATIN_CODE}	VERBATIN_CODE
-
-/*EPILOGUE : ".+" ; //with this we have segfault*/
-"xxxxx"	EPILOGUE /*".*"*/
-
-/* Order matter if identifier comes before keywords they are classified as identifier */
-/*ID_COLON : ID ':' */
-{ID}[[:space:]]*\:	ID_COLON /*Order matter, need be before ID*/
-{ID}	ID
-/*BRACKETED_ID : '[' ID ']' ;*/
-\[{ID}\]	BRACKETED_ID
 
 %%
