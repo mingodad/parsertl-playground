@@ -249,8 +249,13 @@ static void print_parsetree( const ParseTreeUserData& ast, const parsertl::rules
 {
     if(ast.symbol_id >= 0)
     {
+        bool isTerminal = !ast.value.empty();
+        if(bPrune && !isTerminal && ast.children.size() == 0)
+        {
+            return;
+        }
         parsetree_indent( level );
-        if(!ast.value.empty()) //it's a terminal
+        if(isTerminal)
         {
             printf("%s -> %s\n", symbols[ast.symbol_id].c_str(),
                     escapeForParserTree(ast.value));
