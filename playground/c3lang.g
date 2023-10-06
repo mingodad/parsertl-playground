@@ -244,7 +244,7 @@ flat_path :
 
 maybe_optional_type :
 	optional_type
-	| empty
+	| /*empty*/
 	;
 
 string_expr :
@@ -521,9 +521,9 @@ assignment_op :
 	| OR_ASSIGN
 	;
 
-empty :
-	/*empty*/
-	;
+//empty :
+//	/*empty*/
+//	;
 
 assignment_expr :
 	ternary_expr
@@ -589,13 +589,13 @@ call_arg_list :
 	| arg_list ';' parameters
 	| ';'
 	| ';' parameters
-	| empty
+	| /*empty*/
 	;
 
 opt_arg_list_trailing :
 	arg_list
 	| arg_list ','
-	| empty
+	| /*empty*/
 	;
 
 enum_constants :
@@ -853,7 +853,7 @@ do_stmt :
 
 optional_label_target :
 	CONST_IDENT
-	| empty
+	| /*empty*/
 	;
 
 continue_stmt :
@@ -1002,7 +1002,7 @@ statement_list :
 
 opt_stmt_list :
 	statement_list
-	| empty
+	| /*empty*/
 	;
 
 switch_stmt :
@@ -1019,7 +1019,7 @@ expression_list :
 
 optional_label :
 	CONST_IDENT ':'
-	| empty
+	| /*empty*/
 	;
 
 ct_assert_stmt :
@@ -1100,7 +1100,7 @@ attribute_list :
 
 opt_attributes :
 	attribute_list
-	| empty
+	| /*empty*/
 	;
 
 trailing_block_param :
@@ -1113,7 +1113,7 @@ macro_params :
 	parameters
 	| parameters ';' trailing_block_param
 	| ';' trailing_block_param
-	| empty
+	| /*empty*/
 	;
 
 macro_func_body :
@@ -1151,7 +1151,7 @@ enum_params :
 enum_param_list :
 	'(' enum_params ')'
 	| '(' ')'
-	| empty
+	| /*empty*/
 	;
 
 struct_member_decl :
@@ -1166,7 +1166,7 @@ struct_member_decl :
 
 enum_spec :
 	':' type enum_param_list
-	| empty
+	| /*empty*/
 	;
 
 enum_declaration :
@@ -1248,7 +1248,7 @@ opt_distinct_inline :
 	| DISTINCT INLINE
 	| INLINE DISTINCT
 	| INLINE
-	| empty
+	| /*empty*/
 	;
 
 generic_parameters :
@@ -1270,7 +1270,7 @@ multi_declaration :
 
 global_storage :
 	TLOCAL
-	| empty
+	| /*empty*/
 	;
 
 global_declaration :
@@ -1281,7 +1281,7 @@ global_declaration :
 
 opt_tl_stmts :
 	top_level_statements
-	| empty
+	| /*empty*/
 	;
 
 tl_ct_case :
@@ -1306,7 +1306,7 @@ generic_expr :
 
 opt_generic_parameters :
 	generic_expr
-	| empty
+	| /*empty*/
 	;
 
 define_ident :
@@ -1356,7 +1356,7 @@ import_decl :
 
 translation_unit :
 	top_level_statements
-	| empty
+	| /*empty*/
 	;
 
 top_level_statements :
@@ -1366,7 +1366,7 @@ top_level_statements :
 
 opt_extern :
 	EXTERN
-	| empty
+	| /*empty*/
 	;
 
 top_level :
