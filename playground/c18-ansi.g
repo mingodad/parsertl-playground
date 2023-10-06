@@ -629,7 +629,8 @@ compound_statement :
 	 LBRACE option_block_item_list_ RBRACE
 	;
 block_item_list :
-	 option_block_item_list_ block_item
+	 block_item
+	| block_item_list block_item
 	;
 block_item :
 	 declaration
@@ -656,7 +657,7 @@ jump_statement :
 	| RETURN option_expression_ SEMICOLON
 	;
 translation_unit_file :
-	 external_declaration translation_unit_file
+	 translation_unit_file external_declaration
 	| external_declaration //EOF
 	;
 external_declaration :
