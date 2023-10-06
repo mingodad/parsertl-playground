@@ -175,9 +175,9 @@ namespace parsertl
                 {
                     const production &p_ = grammar_[pair_.first];
 
-                    if (pair_.second < p_._rhs.first.size())
+                    if (pair_.second < p_._rhs.size())
                     {
-                        const symbol& symbol_ = p_._rhs.first[pair_.second];
+                        const symbol& symbol_ = p_._rhs[pair_.second];
                         const std::size_t id_ =
                             symbol_._type == symbol::type::TERMINAL ?
                             symbol_._id : terminals_ + symbol_._id;
@@ -293,15 +293,15 @@ namespace parsertl
 
                     std::size_t index_ = sidx_;
 
-                    if (production_._rhs.first.empty())
+                    if (production_._rhs.empty())
                     {
                         prod_._rhs_indexes.emplace_back(sidx_, sidx_);
                     }
 
                     for (std::size_t ridx_ = 0, rsize_ = production_._rhs.
-                        first.size(); ridx_ != rsize_; ++ridx_)
+                        size(); ridx_ != rsize_; ++ridx_)
                     {
-                        const symbol& symbol_ = production_._rhs.first[ridx_];
+                        const symbol& symbol_ = production_._rhs[ridx_];
                         const dfa_state& st_ = dfa_[index_];
 
                         prod_._rhs_indexes.emplace_back(index_, 0);
@@ -552,10 +552,9 @@ namespace parsertl
 
             struct grammar_idx {
                 dfa_size_t lhs, prod_lhs, rhs_back;
-                const std::pair<symbol_vector, string>* rhs;
+                const symbol_vector* rhs;
                 grammar_idx(dfa_size_t the_lhs, dfa_size_t the_prod_lhs,
-                    dfa_size_t the_rhs_back, const std::pair<symbol_vector,
-                    string>* the_rhs):
+                    dfa_size_t the_rhs_back, const symbol_vector* the_rhs):
                     lhs(the_lhs), prod_lhs(the_prod_lhs),
                     rhs_back(the_rhs_back), rhs(the_rhs)
                 {}
@@ -608,7 +607,7 @@ namespace parsertl
                 {
                     const production& production_ = grammar_[c_.first];
 
-                    if (production_._rhs.first.size() == c_.second)
+                    if (production_._rhs.size() == c_.second)
                     {
 #ifdef PARSERTL_WITH_BITSET
                         follow_set_.set_clear();
@@ -686,14 +685,12 @@ namespace parsertl
 
             for (const production& production_ : grammar_)
             {
-                sm_._rules.emplace_back();
-
-                auto& pair_ = sm_._rules.back();
+                auto& pair_ = sm_._rules.emplace_back();
 
                 pair_.first = static_cast<id_type>(terminals_ +
                     production_._lhs);
 
-                for (const auto& symbol_ : production_._rhs.first)
+                for (const auto& symbol_ : production_._rhs)
                 {
                     if (symbol_._type == symbol::type::TERMINAL)
                     {
@@ -766,12 +763,12 @@ namespace parsertl
             {
                 const size_t_pair pair_ = state_._closure[c_];
                 const production& p_ = grammar_[pair_.first];
-                const std::size_t rhs_size_ = p_._rhs.first.size();
+                const std::size_t rhs_size_ = p_._rhs.size();
 
                 if (pair_.second < rhs_size_)
                 {
                     // SHIFT
-                    const symbol& symbol_ = p_._rhs.first[pair_.second];
+                    const symbol& symbol_ = p_._rhs[pair_.second];
 
                     if (symbol_._type == symbol::type::NON_TERMINAL)
                     {
@@ -881,8 +878,18 @@ namespace parsertl
                 {
                     const production& prod_ = grammar_[lhs_.param];
 
-                    lhs_prec_ = prod_._precedence;
-                    lhs_assoc_ = prod_._associativity;
+                    if(prod_._ctx_precedence_id > 0)
+                    {
+                        const token_info& tki = tokens_info_[prod_._ctx_precedence_id];
+                        lhs_prec_ = tki._precedence;
+                        lhs_assoc_ = tki._associativity;
+                    }
+                    else if(prod_._precedence_id > 0)
+                    {
+                        const token_info& tki = tokens_info_[prod_._precedence_id];
+                        lhs_prec_ = tki._precedence;
+                        lhs_assoc_ = tki._associativity;
+                    }
                 }
 
                 if (rhs_.action == action::shift)
@@ -891,7 +898,18 @@ namespace parsertl
                 }
                 else if (rhs_.action == action::reduce)
                 {
-                    rhs_prec_ = grammar_[rhs_.param]._precedence;
+                    const production& prod_ = grammar_[rhs_.param];
+
+                    if(prod_._ctx_precedence_id > 0)
+                    {
+                        const token_info& tki = tokens_info_[prod_._ctx_precedence_id];
+                        rhs_prec_ = tki._precedence;
+                    }
+                    else if(prod_._precedence_id > 0)
+                    {
+                        const token_info& tki = tokens_info_[prod_._precedence_id];
+                        rhs_prec_ = tki._precedence;
+                    }
                 }
 
                 if (lhs_.action == action::shift &&
@@ -1005,8 +1023,8 @@ namespace parsertl
                 {
                     const production& production_ = grammar_[c_.first];
 
-                    if (production_._rhs.first.size() > c_.second &&
-                        production_._rhs.first[c_.second]._id == id_)
+                    if (production_._rhs.size() > c_.second &&
+                        production_._rhs[c_.second]._id == id_)
                     {
                         dump_production(production_, c_.second, terminals_,
                             symbols_, ss_);
@@ -1026,8 +1044,8 @@ namespace parsertl
             const std::size_t dot_, const std::size_t terminals_,
             const string_vector& symbols_, std::ostringstream& ss_)
         {
-            auto sym_iter_ = production_._rhs.first.cbegin();
-            auto sym_end_ = production_._rhs.first.cend();
+            auto sym_iter_ = production_._rhs.cbegin();
+            auto sym_end_ = production_._rhs.cend();
             std::size_t index_ = 0;
 
             ss_ << " (";

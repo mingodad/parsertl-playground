@@ -246,15 +246,15 @@ namespace parsertl
             prod_size_t& index_, ostream& stream_, bool asEbnfRR = false,
             bool withIndex=false)
         {
-            if (lhs_iter_->_rhs.first.empty())
+            if (lhs_iter_->_rhs.empty())
             {
                 stream_ << static_cast<char_type>(' ');
                 empty(stream_, asEbnfRR);
             }
             else
             {
-                auto rhs_iter_ = lhs_iter_->_rhs.first.cbegin();
-                auto rhs_end_ = lhs_iter_->_rhs.first.cend();
+                auto rhs_iter_ = lhs_iter_->_rhs.cbegin();
+                auto rhs_end_ = lhs_iter_->_rhs.cend();
 
                 for (; rhs_iter_ != rhs_end_; ++rhs_iter_)
                 {
@@ -273,11 +273,11 @@ namespace parsertl
                 }
             }
 
-            if (!asEbnfRR && !lhs_iter_->_rhs.second.empty())
+            if (!asEbnfRR && lhs_iter_->_ctx_precedence_id > 0)
             {
                 stream_ << static_cast<char_type>(' ');
                 prec(stream_);
-                stream_ << lhs_iter_->_rhs.second;
+                stream_ << symbols_[lhs_iter_->_ctx_precedence_id];
             }
 
             index_ = lhs_iter_->_next_lhs;
@@ -304,9 +304,9 @@ namespace parsertl
             const std::size_t terminals_, const size_t_pair& pair_,
             const string_vector& symbols_, ostream& stream_)
         {
-            for (; j_ < p_._rhs.first.size(); ++j_)
+            for (; j_ < p_._rhs.size(); ++j_)
             {
-                const symbol& symbol_ = p_._rhs.first[j_];
+                const symbol& symbol_ = p_._rhs[j_];
                 const std::size_t id_ = symbol_._type ==
                     symbol::type::TERMINAL ? symbol_._id :
                     terminals_ + symbol_._id;

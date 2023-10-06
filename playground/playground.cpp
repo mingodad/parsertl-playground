@@ -578,18 +578,11 @@ struct BuildUserParser
             for (const auto& p : grammar)
             {
                 //Add %prec TOKEN to the list of used terminals
-                if (!p._rhs.second.empty())
+                if (p._ctx_precedence_id > 0)
                 {
-                    const auto pos = std::find( terminals.begin()
-                                                     , terminals.end()
-                                                     , p._rhs.second );
-                    if( pos != terminals.end() ) {
-                        size_t idx = pos-terminals.begin();
-                        used_tokens.insert(idx);
-                    }
-
+                        used_tokens.insert(p._ctx_precedence_id);
                 }
-                for (const auto& rhs : p._rhs.first)
+                for (const auto& rhs : p._rhs)
                 {
                     if (rhs._type == parsertl::rules::symbol::type::TERMINAL)
                         used_tokens.insert(rhs._id);
