@@ -286,6 +286,7 @@ function parse() {
 
   const generate_ebnf = $('#generate-action').val() == 'ebnf';
   const generate_yacc = $('#generate-action').val() == 'yacc';
+  const generate_lex = $('#generate-action').val() == 'lex';
   const generate_yacc_html = $('#generate-action').val() == 'yacc_html';
 
   $grammarInfo.html('');
@@ -341,7 +342,8 @@ function parse() {
     }
     if(generate_ebnf) dump_ebnf_yacc = 1;
     else if(generate_yacc) dump_ebnf_yacc = 2;
-    else if(generate_yacc_html) dump_ebnf_yacc = 3;
+    else if(generate_lex) dump_ebnf_yacc = 3;
+    else if(generate_yacc_html) dump_ebnf_yacc = 4;
 
     parsertl(
         grammarText,

@@ -629,6 +629,9 @@ struct BuildUserParser
 
         if(gs.dumpAsEbnfRR == 3)
         {
+#ifdef WASM_PLAYGROUND
+            switch_output("parse_ebnf_yacc");
+#endif
             parsertl::rules::string_vector terminals;
             gs.user_parser.grules.terminals(terminals);
             lexertl::debug::dump(gs.user_parser.lrules, std::cout, terminals);
