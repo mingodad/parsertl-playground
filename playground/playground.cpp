@@ -546,7 +546,7 @@ struct BuildUserParser
                     gs.grammar_data);
         }
 
-        if(gs.dumpAsEbnfRR)
+        if(gs.dumpAsEbnfRR && gs.dumpAsEbnfRR < 3)
         {
 #ifdef WASM_PLAYGROUND
             switch_output("parse_ebnf_yacc");
@@ -626,6 +626,14 @@ struct BuildUserParser
         }
 
         lexertl::generator::build(gs.user_parser.lrules, gs.user_parser.lsm);
+
+        if(gs.dumpAsEbnfRR == 3)
+        {
+            parsertl::rules::string_vector terminals;
+            gs.user_parser.grules.terminals(terminals);
+            lexertl::debug::dump(gs.user_parser.lrules, std::cout, terminals);
+            return false;
+        }
 
         if(gs.dump_grammar_lsm)
         {
@@ -1218,7 +1226,9 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     //gs.master_parser.lsm.minimise ();
     if(dumpGrammar)
     {
-        //lexertl::debug::dump(lrules, std::cout, asEbnfRR);
+        parsertl::rules::string_vector terminals;
+        grules.terminals(terminals);
+        lexertl::debug::dump(lrules, std::cout, terminals);
     }
 }
 
@@ -1422,6 +1432,7 @@ static void showHelp(const char* prog_name)
             "-dumpgsm       Dump grammar parser state machine\n"
             "-dumpAsEbnfRR  Dump grammar as EBNF for railroad diagram\n"
             "-dumpAsYacc    Dump grammar as Yacc\n"
+            "-dumpAsLex     Dump grammar as Lex\n"
             "-pruneptree    Do not show empty parser tree nodes\n"
             "-verbose       Show several metrics for debug\n"
             ;
@@ -1487,6 +1498,10 @@ int main(int argc, char *argv[])
         else if (strcmp("-dumpAsYacc", param) == 0)
         {
             gs.dumpAsEbnfRR = 2;
+        }
+        else if (strcmp("-dumpAsLex", param) == 0)
+        {
+            gs.dumpAsEbnfRR = 3;
         }
         else if (strcmp("-pruneptree", param) == 0)
         {
