@@ -128,6 +128,7 @@ const sampleList = [
 	["Matrixone MYSQL parser (be patient)(partially working)", "matrixone-mysql.g", "test.mysql", "ace/mode/sql"],
 	["Menhir stage1 parser", "menhir-stage1-parser.g", "menhir-stage1-parser.mly", "ace/mode/yaml"],
 	["Menhir fancy parser", "menhir-fancy-parser.g", "menhir-fancy-parser.mly", "ace/mode/yaml"],
+	["Menhir fancy parser left recursion", "menhir-fancy-parser-left-rec.g", "menhir-fancy-parser.mly", "ace/mode/yaml"],
 	["Minic parser", "minic.g", "test.minic", "ace/mode/c_cpp"],
 	["Minizinc parser (not working)", "minizinc.g", "test.mzn", "ace/mode/text"],
 	["MSTA parser", "msta.g", "test.msta", "ace/mode/yaml"],
