@@ -560,27 +560,11 @@ namespace parsertl
             return id(*iter_t);
         }
 
-        string name_from_token_id(const std::size_t id_) const
+        string name_from_map_id(const std::size_t id_, const string_id_type_map& nmap) const
         {
             string name_;
 
-            for (const auto& [t_name, t_id] : _terminals)
-            {
-                if (t_id == id_)
-                {
-                    name_ = t_name;
-                    break;
-                }
-            }
-
-            return name_;
-        }
-
-        string name_from_nt_id(const std::size_t id_) const
-        {
-            string name_;
-
-            for (const auto& pair_nt : _non_terminals)
+            for (const auto& pair_nt : nmap)
             {
                 if (id(pair_nt) == id_)
                 {
@@ -590,6 +574,16 @@ namespace parsertl
             }
 
             return name_;
+        }
+
+        string name_from_token_id(const std::size_t id_) const
+        {
+            return name_from_map_id(id_, _terminals);
+        }
+
+        string name_from_nt_id(const std::size_t id_) const
+        {
+            return name_from_map_id(id_, _non_terminals);
         }
 
         void start(const char_type* start_)
@@ -753,15 +747,26 @@ namespace parsertl
             return _nt_locations;
         }
 
+        void fill_vector_from_map(string_vector& vec_, const string_id_type_map& nmap) const
+        {
+            const std::size_t size_ = vec_.size();
+
+            vec_.resize(size_ + nmap.size());
+
+            for (const auto& [nt_name, nt_id] : nmap)
+            {
+                vec_[size_ + nt_id] = nt_name;
+            }
+        }
+
         void terminals(string_vector& vec_) const
         {
-            vec_.clear();
-            vec_.resize(_terminals.size());
+            fill_vector_from_map(vec_, _terminals);
+        }
 
-            for (const auto& pair_t : _terminals)
-            {
-                vec_[id(pair_t)] = name(pair_t);
-            }
+        const string_id_type_map&   terminals() const
+        {
+            return _terminals;
         }
 
         std::size_t terminals_count() const
@@ -771,14 +776,12 @@ namespace parsertl
 
         void non_terminals(string_vector& vec_) const
         {
-            const std::size_t size_ = vec_.size();
+            fill_vector_from_map(vec_, _non_terminals);
+        }
 
-            vec_.resize(size_ + _non_terminals.size());
-
-            for (const auto& [nt_name, nt_id] : _non_terminals)
-            {
-                vec_[size_ + nt_id] = nt_name;
-            }
+        const string_id_type_map&   non_terminals() const
+        {
+            return _non_terminals;
         }
 
         std::size_t non_terminals_count() const
