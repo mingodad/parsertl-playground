@@ -1,5 +1,6 @@
 /* Generate code using: bison -S parsertl.cc ebnf.y */
-%token EMPTY IDENTIFIER PREC TERMINAL
+%token EMPTY IDENTIFIER PREC TERMINAL PRODALIAS
+
 %%
 
 rule: rhs_or;
@@ -7,7 +8,7 @@ rule: rhs_or;
 rhs_or: opt_prec_list
       | rhs_or '|' opt_prec_list;
 
-opt_prec_list: opt_list opt_prec;
+opt_prec_list: opt_list opt_prec opt_prod_alias;
 
 opt_list:
         | EMPTY
@@ -29,5 +30,8 @@ rhs: IDENTIFIER
 opt_prec:
         | PREC IDENTIFIER
         | PREC TERMINAL;
+
+opt_prod_alias :
+	| PRODALIAS ;
 
 %%

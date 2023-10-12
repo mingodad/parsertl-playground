@@ -84,6 +84,7 @@ namespace parsertl
             prod_size_t _precedence_id = 0;
             prod_size_t _ctx_precedence_id = 0;
             symbol_vector _rhs;
+            string  _alias;
 
             explicit production(const prod_size_t index_) :
                 _index(index_)
@@ -94,6 +95,7 @@ namespace parsertl
             {
                 _lhs = static_cast<prod_size_t>(~0);
                 _rhs.clear();
+                _alias.clear();
                 _precedence_id = 0;
                 _ctx_precedence_id = 0;
                 _index = static_cast<prod_size_t>(~0);
@@ -138,6 +140,8 @@ namespace parsertl
                 static_cast<uint16_t>(ebnf_tables::yytokentype::TERMINAL));
             rules_.push("{IDENTIFIER}",
                 static_cast<uint16_t>(ebnf_tables::yytokentype::IDENTIFIER));
+            rules_.push("[#]{IDENTIFIER}",
+                static_cast<uint16_t>(ebnf_tables::yytokentype::PRODALIAS));
             rules_.push("\\s+", rules_.skip());
             lexer_generator::build(rules_, _token_lexer);
 
@@ -363,14 +367,24 @@ namespace parsertl
                     }
                     case ebnf_indexes::opt_prec_list_idx:
                     {
-                        // opt_prec_list: opt_list opt_prec
+                        // opt_prec_list: opt_list opt_prec opt_prod_alias
                         const std::size_t size_ =
                             _ebnf_tables.yyr2[results_.entry.param];
                         const std::size_t idx_ = productions_.size() - size_;
-                        const token_t& token_ = productions_[idx_ + 1];
+                        const token_t& token_prec = productions_[idx_ + 1];
+                        const token_t& token_alias = productions_[idx_ + 2];
+
+                        // Check if prod_alias is present
+                        if (token_alias.first != token_alias.second)
+                        {
+                            string r_ = rhs_stack_.top();
+
+                            rhs_stack_.pop();
+                            rhs_stack_.top() += char_type(' ') + r_;
+                        }
 
                         // Check if %prec is present
-                        if (token_.first != token_.second)
+                        if (token_prec.first != token_prec.second)
                         {
                             string r_ = rhs_stack_.top();
 
@@ -502,6 +516,19 @@ namespace parsertl
 
                         rhs_stack_.push(token_.str() + char_type(' ') +
                             productions_[idx_ + 1].str());
+                        break;
+                    }
+                    //case ebnf_indexes::prodalias_empy_idx:
+                        // opt_prod_alias: %empty
+                    case ebnf_indexes::prodalias_idx:
+                    {
+                        // opt_prod_alias: PRODALIAS
+                        const std::size_t size_ =
+                            _ebnf_tables.yyr2[results_.entry.param];
+                        const std::size_t idx_ = productions_.size() - size_;
+                        const token_t& token_ = productions_[idx_];
+
+                        rhs_stack_.push(token_.str());
                         break;
                     }
                     default:
@@ -834,7 +861,9 @@ namespace parsertl
             bracketed_idx,
             prec_empty_idx,
             prec_ident_idx,
-            prec_term_idx
+            prec_term_idx,
+            prodalias_empy_idx,
+            prodalias_idx
         };
 
         using lexer_rules = typename lexertl::basic_rules<char, char_type>;
@@ -1091,6 +1120,16 @@ namespace parsertl
 
                         // Explicit %prec, so no conditional
                         production_._ctx_precedence_id = id_;
+                        break;
+                    }
+                    case ebnf_indexes::prodalias_idx:
+                    {
+                        // opt_prod_alias: PRODALIAS
+                        const std::size_t size_ =
+                            _ebnf_tables.yyr2[results_.entry.param];
+                        const std::size_t idx_ = productions_.size() - size_;
+                        const string token_ = productions_[idx_].str();
+                        production_._alias = token_;
                         break;
                     }
                     default:

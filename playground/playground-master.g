@@ -2,6 +2,7 @@
 
 %token Charset ExitState Literal Macro MacroName Name NL
 %token Number Repeat StartState String Skip Reject SymbolTable IndentTrack
+%token ProdAlias
 
 %% //Grammar rules
 
@@ -36,11 +37,12 @@ directive : "%token_symbol_table" Name NL ;
 grules : %empty | grules grule ;
 grule : Name ':' production ';' ;
 production : opt_prec_list | production '|' opt_prec_list ;
-opt_prec_list : opt_list opt_prec ;
+opt_prec_list : opt_list opt_prec opt_prod_alias;
 opt_list : %empty | "%empty" | rhs_list ;
 rhs_list : rhs | rhs_list rhs ;
 rhs : Literal | Name | '[' production ']' | rhs '?' | '{' production '}' | rhs '*' | rhs '+' | '(' production ')' ;
 opt_prec : %empty | "%prec" Literal | "%prec" Name ;
+opt_prod_alias : %empty | ProdAlias ;
 
 // Token regex macros
 rx_macros : %empty ;
@@ -97,7 +99,7 @@ repeat : '?' | "??" | '*' | "*?" | '+' | "+?" | Repeat ;
 
 %%
 
-%x OPTION GRULE MACRO REGEX RULE ID RXDIRECTIVES
+%x OPTION GRULE MACRO REGEX RULE ID RXDIRECTIVES PRODALIAS
 
 c_comment  [/]{2}.*|[/][*](?s:.)*?[*][/]
 escape \\(.|x[0-9A-Fa-f]+|c[@a-zA-Z])
@@ -121,6 +123,12 @@ literal_common	\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\d+)
 "%token_indent"	"%token_indent"
 "%token_dedent"	"%token_dedent"
 <INITIAL>"%%"<GRULE>	"%%"
+
+<PRODALIAS> {
+    "#"   skip()
+    {state_name}<GRULE> ProdAlias
+}
+<GRULE>"#"{state_name}<PRODALIAS> reject()
 
 <GRULE>":"	':'
 <GRULE>"%prec"	"%prec"

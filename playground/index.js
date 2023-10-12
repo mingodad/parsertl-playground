@@ -148,7 +148,7 @@ const sampleList = [
 	["PHP-8.2 parser (partially working)", "php-8.2.g", "test.php", "ace/mode/php"],
 	["Pikchr parser", "pikchr.g", "test.pikchr", "ace/mode/text"],
 	["Playground3 parser", "playground-master3.g", "playground-master3.g", "ace/mode/yaml"],
-	["Playground parser", "playground-master.g", "calculator.g", "ace/mode/yaml"],
+	["Playground parser", "playground-master.g", "calc-alias.g", "ace/mode/yaml"],
 	["PnetC parser", "pnet-c.g", "test.c", "ace/mode/c_cpp"],
 	["PnetCSHarp parser", "pnet-cs.g", "test.cs", "ace/mode/c_cpp"],
 	["PnetDPas parser", "pnet-dpas.g", "test.dpas", "ace/mode/pascal"],

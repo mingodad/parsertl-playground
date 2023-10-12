@@ -222,6 +222,7 @@ static void dump_lexer2(play_iterator& iter_lex, const parsertl::rules& grules, 
 struct ParseTreeUserData {
     std::vector<ParseTreeUserData> children;
     int symbol_id;
+    parsertl::rules::string alias;
     parsertl::rules::string value; ///< The value at this node (empty if this node's symbol is non-terminal).
     ParseTreeUserData():children(0),symbol_id(-1) {}
     ParseTreeUserData(int id):children(0),symbol_id(id) {}
@@ -262,7 +263,8 @@ static void print_parsetree( const ParseTreeUserData& ast, const parsertl::rules
         }
         else
         {
-            printf("%s\n", symbols[ast.symbol_id].c_str());
+            if(ast.alias.size()) printf("%s\n", ast.alias.c_str());
+            else printf("%s\n", symbols[ast.symbol_id].c_str());
         }
     }
 
@@ -295,6 +297,7 @@ static void dump_parse_tree(const char* data_start, const char* data_end,
     play_iterator iter_lex(data_start, data_end, lsm);
     play_match_results results(iter_lex->id, gsm);
     std::vector<ParseTreeUserData> syn_tree;
+    const auto productions = grules.grammar();
     bool parse_done=false;
     for(;;)
     {
@@ -320,6 +323,7 @@ static void dump_parse_tree(const char* data_start, const char* data_end,
             {
                 const auto& [lhs_id, rhs_id_vec] = gsm._rules[sm_entry.param];
                 ParseTreeUserData ud(lhs_id);
+                ud.alias = productions[sm_entry.param]._alias;
 
                 if(!rhs_id_vec.empty())
                 {
@@ -659,7 +663,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     static const char* current_state_str = ".";
 
     grules.token("Charset ExitState Macro MacroName "
-        "NL Repeat StartState String");
+        "NL Repeat StartState String ProdAlias");
 
     gs.token_Number = grules.one_token("Number");
     gs.token_Name = grules.one_token("Name");
@@ -745,7 +749,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     };
     grules.push("production", "opt_prec_list"
         "| production '|' opt_prec_list");
-    grules.push("opt_prec_list", "opt_list opt_prec");
+    grules.push("opt_prec_list", "opt_list opt_prec opt_prod_alias");
     grules.push("opt_list", "%empty "
         "| \"%empty\" "
         "| rhs_list");
@@ -762,6 +766,8 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     grules.push("opt_prec", "%empty "
         "| \"%prec\" Literal "
         "| \"%prec\" Name");
+    grules.push("opt_prod_alias", "%empty "
+        "| ProdAlias ");
 
     // Token regex macros
     grules.push("rx_macros", "%empty");
@@ -1129,6 +1135,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     lrules.push_state("RULE");
     lrules.push_state("ID");
     lrules.push_state("RXDIRECTIVES");
+    lrules.push_state("PRODALIAS");
     lrules.insert_macro("c_comment", "[/]{2}.*|[/][*](?s:.)*?[*][/]");
     lrules.insert_macro("escape", "\\\\(.|x[0-9A-Fa-f]+|c[@a-zA-Z])");
     lrules.insert_macro("posix_name", "alnum|alpha|blank|cntrl|digit|graph|"
@@ -1147,6 +1154,10 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     lrules.push("%start", grules.token_id("\"%start\""));
     lrules.push("%token", grules.token_id("\"%token\""));
     lrules.push("INITIAL", "%%", grules.token_id("\"%%\""), "GRULE");
+
+    lrules.push("PRODALIAS", "#", lexertl::rules::skip(), ".");
+    lrules.push("PRODALIAS", "{state_name}", grules.token_id("ProdAlias"), "GRULE");
+    lrules.push("GRULE", "[#]{state_name}", lexertl::rules::reject(), "PRODALIAS");
 
     lrules.push("GRULE", ":", grules.token_id("':'"), ".");
     lrules.push("GRULE", "%prec", grules.token_id("\"%prec\""), ".");
