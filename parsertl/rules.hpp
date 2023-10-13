@@ -699,7 +699,7 @@ namespace parsertl
                     for (const auto& symbol_ : prod_._rhs)
                     {
                         if (symbol_._type == symbol::type::NON_TERMINAL &&
-                            symbol_._id == nt_id)
+                            symbol_._id == nt_id && symbol_._id != prod_._lhs)
                         {
                             found_ = true;
                             break;
