@@ -60,6 +60,7 @@ The grammar used internally to parse the user grammar is this one [playground-ma
 The first two sections are equivalent to `yacc/bison` format and the other two sections are equivalent to `lex/flex` format.
 
 Related projects:
+- ANTLR Lab http://lab.antlr.org/
 - Tree-sitter https://tree-sitter.github.io/tree-sitter/playground
 - Lpegrex/Lua https://mingodad.github.io/lua-wasm-playground/
 - CocoR https://mingodad.github.io/CocoR-Typescript/playground
