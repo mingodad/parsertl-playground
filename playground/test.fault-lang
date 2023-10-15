@@ -1,0 +1,51 @@
+system repl;
+
+import(
+        "cache.fspec"
+        "orchestrator.fspec"
+    );
+
+global record = new cache.record;
+global manager = new orchestrator.control;
+
+component replCache = states{
+    idle: func{
+        advance(this.expired) || advance(this.lookupRecord);
+    },
+    lookupRecord: func{
+        record.lookup;
+        advance(this.returnRecord) || advance(this.createRecord);
+    },
+    returnRecord: func{
+        record.release;
+        advance(this.idle);
+    },
+    createRecord:func{
+        advance(containerMng.pullContainer);
+    },
+    expired: func{
+        record.expire;
+        advance(this.idle);
+    },
+};
+
+component containerMng = states{
+    idle: func{
+        stay();
+    },
+    pullContainer: func{
+        manager.boot;
+        advance(this.standUpContainer);
+    },
+    standUpContainer: func{
+        manager.add;
+    },
+    shutdownContainer: func{
+        manager.remove;
+    },
+};
+
+start {
+    replCache:lookupRecord,
+    containerMng:idle,
+};
