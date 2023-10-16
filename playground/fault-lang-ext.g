@@ -297,7 +297,7 @@ identList
     ;
 
 constants
-    : numeric
+    : number
     | string_
     | bool_
     | solvable
@@ -345,7 +345,7 @@ comProperties
     ;
 
 structProperties
-    : IDENT COLON numeric #PropInt
+    : IDENT COLON number #PropInt
     | IDENT COLON string_ #PropString
     | IDENT COLON bool_ #PropBool
     | IDENT COLON operandName #PropVar
@@ -651,8 +651,12 @@ prefix :
 
 numeric
     : integer
-    | negative
     | float_
+    ;
+
+number
+    : numeric
+    | negative
     ;
 
 integer
