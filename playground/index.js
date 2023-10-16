@@ -147,6 +147,7 @@ const sampleList = [
 	["PCC cxxcom parser (partially working)", "pcc-cxxcom.g", "test.c", "ace/mode/c_cpp"],
 	["Peg parser (partially working)", "peg.g", "test.peg", "ace/mode/yaml"],
 	["PHP-8.2 parser (partially working)", "php-8.2.g", "test.php", "ace/mode/php"],
+	["Pike-lang parser", "pike-lang.g", "test.pike", "ace/mode/c_cpp"],
 	["Pikchr parser", "pikchr.g", "test.pikchr", "ace/mode/text"],
 	["Playground3 parser", "playground-master3.g", "playground-master3.g", "ace/mode/yaml"],
 	["Playground parser", "playground-master.g", "calc-alias.g", "ace/mode/yaml"],
