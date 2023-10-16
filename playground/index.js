@@ -65,6 +65,7 @@ const sampleList = [
 	["Bayeslite parser", "bayeslite.g", "test.bayeslite", "ace/mode/text"],
 	["BC calculator", "bc.g", "test.bc-calculator", "ace/mode/sh"],
 	["Bison parser", "bison.g", "carbon-lang.y", "ace/mode/yaml"],
+	["Blog-lang parser", "blog-lang.g", "test.blog-lang", "ace/mode/text"],
 	["BNFGen parser", "bnfgen.g", "test.bnfgen", "ace/mode/yaml"],
 	["Bolt parser", "bolt-parser.g", "test.bolt", "ace/mode/c_cpp"],
 	["Blawn parser", "blawn-parser.g", "test.blawn", "ace/mode/python"],
