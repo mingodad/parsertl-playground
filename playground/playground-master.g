@@ -160,8 +160,7 @@ literal_common	\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\d+)
 <MACRO,RULE>"%x"<RXDIRECTIVES>	"%x"
 <MACRO>[A-Z_a-z][0-9A-Z_a-z]*<REGEX>	MacroName
 <MACRO,REGEX>{NL}<MACRO>	skip()
-<MACRO,RULE,RXDIRECTIVES>{c_comment}	skip()
-<MACRO,RULE>^[ \t]+{c_comment}	skip()
+<MACRO,RULE,REGEX,RXDIRECTIVES>{c_comment}	skip()
 
 <RULE>^[ \t]+({c_comment}([ \t]+|{c_comment})*)?	skip()
 <RULE>^<([*]|{state_name}(,{state_name})*)>	StartState

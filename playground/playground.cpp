@@ -1195,9 +1195,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         grules.token_id("MacroName"), "REGEX");
     lrules.push("MACRO,REGEX", "{NL}", lexertl::rules::skip(), "MACRO");
 
-    lrules.push("MACRO,RULE,RXDIRECTIVES", "{c_comment}",
-        lexertl::rules::skip(), ".");
-    lrules.push("MACRO,RULE", "^[ \t]+{c_comment}",
+    lrules.push("MACRO,RULE,REGEX,RXDIRECTIVES", "{c_comment}",
         lexertl::rules::skip(), ".");
     lrules.push("RULE", "^[ \t]+({c_comment}([ \t]+|{c_comment})*)?",
         lexertl::rules::skip(), ".");
