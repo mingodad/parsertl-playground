@@ -171,6 +171,7 @@ const sampleList = [
 	["SDCC C parser (partially working)", "sdcc.g", "test.c", "ace/mode/c_cpp"],
 	["Souffle parser", "souffle.g", "test.souffle", "ace/mode/prolog"],
 	["SQLite3 parser (partially working)", "sqlite3.g", "test.sqlite3", "ace/mode/sql"],
+	["SQLite3 modified parser (partially working)", "sqlite3-dad.g", "test.sqlite3", "ace/mode/sql"],
 	["Stanc3 parser", "stanc3-parser.g", "test.stanc3", "ace/mode/text"],
 	["Tameparse parser (not working)", "tameparser.g", "test.tameparser", "ace/mode/yaml"],
 	["Tarantol SQL parser (partially working)", "tarantol-sql.g", "test.tarantol-sql", "ace/mode/sql"],
