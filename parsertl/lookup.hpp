@@ -34,8 +34,18 @@ namespace parsertl
             }
             else
             {
-                results_.entry =
-                    sm_.at(results_.entry.param, results_.token_id);
+                auto entry = sm_.at(results_.entry.param, results_.token_id);
+                if(entry.action == action::error)
+                {
+                    //try fallback
+                    if(iter_->user_id != lexer_iterator::value_type::npos())
+                    {
+                        results_.token_id = iter_->user_id;
+                        entry =
+                            sm_.at(results_.entry.param, iter_->user_id);
+                    }
+                }
+                results_.entry = entry;
             }
 
             break;
@@ -54,10 +64,23 @@ namespace parsertl
             break;
         }
         case action::go_to:
+        {
             results_.stack.push_back(results_.entry.param);
             results_.token_id = iter_->id;
-            results_.entry = sm_.at(results_.stack.back(), results_.token_id);
+            auto entry = sm_.at(results_.stack.back(), results_.token_id);
+            if(entry.action == action::error)
+            {
+                //try fallback
+                if(iter_->user_id != lexer_iterator::value_type::npos())
+                {
+                    results_.token_id = iter_->user_id;
+                    entry =
+                        sm_.at(results_.stack.back(), iter_->user_id);
+                }
+            }
+            results_.entry = entry;
             break;
+        }
         case action::accept:
         {
             const std::size_t size_ =
@@ -100,8 +123,18 @@ namespace parsertl
             }
             else
             {
-                results_.entry =
-                    sm_.at(results_.entry.param, results_.token_id);
+                auto entry = sm_.at(results_.entry.param, results_.token_id);
+                if(entry.action == action::error)
+                {
+                    //try fallback
+                    if(iter_->user_id != lexer_iterator::value_type::npos())
+                    {
+                        results_.token_id = iter_->user_id;
+                        entry =
+                            sm_.at(results_.entry.param, iter_->user_id);
+                    }
+                }
+                results_.entry = entry;
             }
 
             break;
@@ -137,10 +170,23 @@ namespace parsertl
             break;
         }
         case action::go_to:
+        {
             results_.stack.push_back(results_.entry.param);
             results_.token_id = iter_->id;
-            results_.entry = sm_.at(results_.stack.back(), results_.token_id);
+            auto entry = sm_.at(results_.stack.back(), results_.token_id);
+            if(entry.action == action::error)
+            {
+                //try fallback
+                if(iter_->user_id != lexer_iterator::value_type::npos())
+                {
+                    results_.token_id = iter_->user_id;
+                    entry =
+                        sm_.at(results_.stack.back(), iter_->user_id);
+                }
+            }
+            results_.entry = entry;
             break;
+        }
         case action::accept:
         {
             const std::size_t size_ =

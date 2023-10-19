@@ -109,17 +109,21 @@ namespace parsertl
         {
             prod_size_t _precedence;
             associativity _associativity;
+            id_type _fallback;
 
             token_info() :
                 _precedence(0),
-                _associativity(associativity::token_assoc)
+                _associativity(associativity::token_assoc),
+                _fallback(0)
             {
             }
 
             token_info(const prod_size_t precedence_,
-                const associativity associativity_) :
+                const associativity associativity_,
+                const id_type fallback_) :
                 _precedence(precedence_),
-                _associativity(associativity_)
+                _associativity(associativity_),
+                _fallback(fallback_)
             {
             }
         };
@@ -217,6 +221,74 @@ namespace parsertl
         void token(const string& names_)
         {
             token(names_.c_str(), names_.c_str() + names_.size());
+        }
+
+        void fallback(const char_type* names_start_, const char_type* names_end_)
+        {
+            lexer_iterator iter_(names_start_, names_end_, _token_lexer);
+
+            //token(iter_, 0, associativity::token_assoc, "fallback");
+            lexer_iterator end_;
+            string token_;
+            id_type fallback_id = 0;
+            auto id_ = static_cast<std::size_t>(~0);
+
+            for (; iter_ != end_; ++iter_)
+            {
+                if (iter_->id == _token_lexer.npos())
+                {
+                    std::ostringstream ss_;
+
+                    ss_ << "Unrecognised char in fallback().";
+                    throw runtime_error(ss_.str());
+                }
+
+                token_ = iter_->str();
+                auto iter_t = _terminals.find(token_);
+
+                if (iter_t == _terminals.end())
+                {
+                    std::ostringstream ss_;
+
+                    ss_ << "Unknown token \"";
+                    narrow(token_.c_str(), ss_);
+                    ss_ << "\".";
+                    throw runtime_error(ss_.str());
+                }
+
+                id_ = iter_t->second;
+
+                if(fallback_id == 0)
+                {
+                    fallback_id = id_;
+                    continue;
+                }
+
+                token_info& token_info_ = info(id_);
+
+                if(token_info_._fallback)
+                {
+                    std::ostringstream ss_;
+
+                    ss_ << "Token \"";
+                    narrow(token_.c_str(), ss_);
+                    ss_ << "\" already has a fallback.";
+                    throw runtime_error(ss_.str());
+                }
+
+                token_info_._fallback = fallback_id;
+            }
+
+        }
+
+        void fallback(const char_type* names_)
+        {
+            falback(names_, str_end(names_));
+        }
+
+        void fallback(const string& names_)
+        {
+            fallback(names_.c_str(), names_.c_str() + names_.size());
         }
 
         void left(const char_type* names_start_, const char_type* names_end_)

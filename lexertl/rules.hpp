@@ -397,6 +397,11 @@ namespace lexertl
             return _user_ids;
         }
 
+        id_vector_vector& user_ids_mut()
+        {
+            return _user_ids;
+        }
+
         const id_vector_vector& next_dfas() const
         {
             return _next_dfas;

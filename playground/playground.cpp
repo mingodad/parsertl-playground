@@ -629,6 +629,23 @@ struct BuildUserParser
             return false;
         }
 
+	//Fix fallback if exists
+        const auto& token_info = gs.user_parser.grules.tokens_info();
+        const auto token_info_size = token_info.size();
+        for(size_t i0=0, imax0=gs.user_parser.lrules.statemap().size(); i0 < imax0; ++i0)
+        {
+            const auto& ids_dfa = gs.user_parser.lrules.ids()[i0];
+            auto& user_ids_dfa = gs.user_parser.lrules.user_ids_mut()[i0];
+            for(size_t i=0, imax=ids_dfa.size(); i < imax; ++i)
+            {
+                auto id = ids_dfa[i];
+                if(id < token_info_size && token_info[id]._fallback)
+                {
+                    user_ids_dfa[i] = token_info[id]._fallback;
+                }
+            }
+        }
+
         lexertl::generator::build(gs.user_parser.lrules, gs.user_parser.lsm);
 
         if(gs.dumpAsEbnfRR == 3)
@@ -678,6 +695,14 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         "| directives directive");
     grules.push("directive", "NL");
 
+    // Read and store %fallback entries
+    gs.master_parser.actions[grules.push("directive", "\"%fallback\" tokens NL")] =
+        [](BuildUserParser& state)
+    {
+        const std::string tokens = state.dollar(1);
+
+        state.gs.user_parser.grules.fallback(tokens);
+    };
     // Read and store %left entries
     gs.master_parser.actions[grules.push("directive", "\"%left\" tokens NL")] =
         [](BuildUserParser& state)
@@ -1147,6 +1172,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
 
     lrules.push("INITIAL,OPTION,RXDIRECTIVES", "[ \t]+", lexertl::rules::skip(), ".");
     lrules.push("{NL}", grules.token_id("NL"));
+    lrules.push("%fallback", grules.token_id("\"%fallback\""));
     lrules.push("%left", grules.token_id("\"%left\""));
     lrules.push("%nonassoc", grules.token_id("\"%nonassoc\""));
     lrules.push("%precedence", grules.token_id("\"%precedence\""));

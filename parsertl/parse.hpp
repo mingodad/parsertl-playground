@@ -37,10 +37,21 @@ namespace parsertl
                 }
                 else
                 {
-                    results_.entry =
+                    auto entry =
                         sm_.at(results_.stack.back(), results_.token_id);
-                }
 
+                    if(entry.action == action::error)
+                    {
+                        //try fallback
+                        if(iter_->user_id != lexer_iterator::value_type::npos())
+                        {
+                            results_.token_id = iter_->user_id;
+                            entry =
+                                sm_.at(results_.stack.back(), iter_->user_id);
+                        }
+                    }
+                    results_.entry = entry;
+                }
                 break;
             case action::reduce:
             {
@@ -58,11 +69,23 @@ namespace parsertl
                 break;
             }
             case action::go_to:
+            {
                 results_.stack.push_back(results_.entry.param);
                 results_.token_id = iter_->id;
-                results_.entry =
-                    sm_.at(results_.stack.back(), results_.token_id);
+                auto entry = sm_.at(results_.stack.back(), results_.token_id);
+                if(entry.action == action::error)
+                {
+                    //try fallback
+                    if(iter_->user_id != lexer_iterator::value_type::npos())
+                    {
+                        results_.token_id = iter_->user_id;
+                        entry =
+                            sm_.at(results_.stack.back(), iter_->user_id);
+                    }
+                }
+                results_.entry = entry;
                 break;
+            }
             default:
                 // accept
                 // error
