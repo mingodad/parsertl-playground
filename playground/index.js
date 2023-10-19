@@ -159,6 +159,7 @@ const sampleList = [
 	["PnetJava parser", "pnet-java.g", "test.java", "ace/mode/java"],
 	["PnetVBasic parser", "pnet-vb.g", "test.vb", "ace/mode/vbscript"],
 	["Postgresql parser (be patient)", "postgres16.g", "test.sql", "ace/mode/sql"],
+	["Postgresql parser with fallback", "postgres16-fallback.g", "test.sql", "ace/mode/sql"],
 	["Preprocessor parser (not working)", "pp.g", "test.pp", "ace/mode/c_cpp"],
 	["Protobuf3 parser", "pb_parsing_parser.g", "test.proto3", "ace/mode/c_cpp"],
 	["Pyethon parser", "pyethon.g", "test.pyethon", "ace/mode/python"],

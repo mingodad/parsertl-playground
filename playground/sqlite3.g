@@ -29,6 +29,20 @@
 %token  CASE WHEN THEN ELSE INDEX ALTER
 %token  ADD WINDOW OVER FILTER
 
+%fallback ID  ABORT ACTION AFTER ANALYZE ASC ATTACH BEFORE BEGIN BY CASCADE CAST COLUMNKW
+%fallback ID  CONFLICT DATABASE DEFERRED DESC DETACH DO
+%fallback ID  EACH END EXCLUSIVE EXPLAIN FAIL FOR
+%fallback ID  IGNORE IMMEDIATE INITIALLY INSTEAD LIKE_KW MATCH NO PLAN
+%fallback ID  QUERY KEY OF OFFSET PRAGMA RAISE RECURSIVE RELEASE REPLACE RESTRICT ROW ROWS
+%fallback ID  ROLLBACK SAVEPOINT TEMP TRIGGER VACUUM VIEW VIRTUAL WITH WITHOUT
+%fallback ID  NULLS FIRST LAST
+%fallback ID  EXCEPT INTERSECT UNION
+%fallback ID  CURRENT FOLLOWING PARTITION PRECEDING RANGE UNBOUNDED
+%fallback ID  EXCLUDE GROUPS OTHERS TIES
+%fallback ID  GENERATED ALWAYS
+%fallback ID  MATERIALIZED
+%fallback ID  REINDEX RENAME CTIME_KW IF
+
 /*
 %token COLUMN AGG_COLUMN AGG_FUNCTION TRUEFALSE
 %token ISNOT TRUTH REGISTER VECTOR SELECT_COLUMN
@@ -135,20 +149,20 @@ typename : typename STRING ;
 signed : plus_num ;
 signed : minus_num ;
 
-scanpt : /*empty*/ ;
+//scanpt : /*empty*/ ;
 
-scantok : /*empty*/ ;
+//scantok : /*empty*/ ;
 
 carglist : carglist ccons ;
 carglist : /*empty*/ ;
 
 ccons : CONSTRAINT nm ;
-ccons : DEFAULT scantok term ;
+ccons : DEFAULT /*scantok*/ term ;
 ccons : DEFAULT LP expr RP ;
-ccons : DEFAULT PLUS /*8L*/ scantok term %prec PLUS /*8L*/ ;
-ccons : DEFAULT MINUS /*8L*/ scantok term %prec MINUS /*8L*/ ;
-ccons : DEFAULT scantok ID ;
-ccons : DEFAULT scantok INDEXED ;
+ccons : DEFAULT PLUS /*8L*/ /*scantok*/ term %prec PLUS /*8L*/ ;
+ccons : DEFAULT MINUS /*8L*/ /*scantok*/ term %prec MINUS /*8L*/ ;
+ccons : DEFAULT /*scantok*/ ID ;
+ccons : DEFAULT /*scantok*/ INDEXED ;
 ccons : NULL onconf ;
 ccons : NOT /*3R*/ NULL onconf %prec NOT /*3R*/ ;
 ccons : PRIMARY KEY sortorder onconf autoinc ;
@@ -251,9 +265,9 @@ distinct : /*empty*/ ;
 sclp : selcollist COMMA ;
 sclp : /*empty*/ ;
 
-selcollist : sclp scanpt expr scanpt as ;
-selcollist : sclp scanpt STAR /*9L*/ %prec STAR /*9L*/ ;
-selcollist : sclp scanpt nm DOT STAR /*9L*/ %prec STAR /*9L*/ ;
+selcollist : sclp /*scanpt*/ expr /*scanpt*/ as ;
+selcollist : sclp /*scanpt*/ STAR /*9L*/ %prec STAR /*9L*/ ;
+selcollist : sclp /*scanpt*/ nm DOT STAR /*9L*/ %prec STAR /*9L*/ ;
 
 as : AS nm ;
 as : ID ;
@@ -541,10 +555,10 @@ tridxby : /*empty*/ ;
 tridxby : INDEXED BY nm ;
 tridxby : NOT /*3R*/ INDEXED %prec NOT /*3R*/ ;
 
-trigger_cmd : UPDATE orconf trnm tridxby SET setlist from where_opt scanpt ;
-trigger_cmd : scanpt insert_cmd INTO trnm idlist_opt select upsert scanpt ;
-trigger_cmd : DELETE FROM trnm tridxby where_opt scanpt ;
-trigger_cmd : scanpt select scanpt ;
+trigger_cmd : UPDATE orconf trnm tridxby SET setlist from where_opt /*scanpt*/ ;
+trigger_cmd : /*scanpt*/ insert_cmd INTO trnm idlist_opt select upsert /*scanpt*/ ;
+trigger_cmd : DELETE FROM trnm tridxby where_opt /*scanpt*/ ;
+trigger_cmd : /*scanpt*/ select /*scanpt*/ ;
 
 expr : RAISE LP IGNORE RP ;
 expr : RAISE LP raisetype COMMA nm RP ;
