@@ -975,7 +975,7 @@ katom :
 
 %%
 
-  /* Character classes */
+/* Character classes */
 
 Upper           [A-Z]
 Lower           [a-z]

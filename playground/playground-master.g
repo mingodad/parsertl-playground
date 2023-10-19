@@ -11,6 +11,8 @@ file : directives "%%" grules "%%" rx_directives rx_macros "%%" rx_rules "%%" ;
 directives : %empty | directives directive ;
 directive : NL ;
 
+// Read and store %fallback entries
+directive : "%fallback" tokens NL ;
 // Read and store %left entries
 directive : "%left" tokens NL ;
 // Read and store %nonassoc entries
@@ -113,6 +115,7 @@ literal_common	\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\d+)
 
 <INITIAL,OPTION,RXDIRECTIVES>[ \t]+	skip()
 {NL}	NL
+"%fallback"	"%fallback"
 "%left"	"%left"
 "%nonassoc"	"%nonassoc"
 "%precedence"	"%precedence"

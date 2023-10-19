@@ -80,8 +80,8 @@ opt_name : %empty
 enum_items : enum_item
 	| enum_items ',' enum_item ;
 enum_item : Name '=' Number ;
-name_star_list : Name opt_stars
-	| name_star_list ',' Name opt_stars ;
+///name_star_list : Name opt_stars
+///	| name_star_list ',' Name opt_stars ;
 type : opt_const raw_type opt_stars ;
 opt_const : %empty | "const" ;
 raw_type : "BSTR" ;
@@ -170,8 +170,8 @@ attr : "uuid" '(' uuid ')' ;
 attr : "vararg"
 	| "version" '(' Number ')' ;
 
-string_list : String
-	| string_list String ;
+///string_list : String
+///	| string_list String ;
 
 number_string : Number | String ;
 number_name : Number | Name ;

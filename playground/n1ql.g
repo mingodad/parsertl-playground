@@ -307,10 +307,10 @@ ident_or_default :
 	| DEFAULT
 	;
 
-opt_trailer :
-	/*empty*/
-	| opt_trailer SEMI
-	;
+///opt_trailer :
+///	/*empty*/
+///	| opt_trailer SEMI
+///	;
 
 stmt_body :
 	advise

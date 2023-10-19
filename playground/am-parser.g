@@ -135,10 +135,10 @@ end_of_line :
 	| COMMENT
 	;
 
-not_eol_list :
-	/*empty*/
-	| not_eol_list not_eol_token
-	;
+//not_eol_list :
+//	/*empty*/
+//	| not_eol_list not_eol_token
+//	;
 
 prerequisite_list :
 	/*empty*/
@@ -253,10 +253,10 @@ ac_variable :
 	MACRO
 	;
 
-not_eol_token :
-	word_token
-	| space_token
-	;
+//not_eol_token :
+//	word_token
+//	| space_token
+//	;
 
 prerequisite_token :
 	name_token
@@ -319,12 +319,12 @@ depend_token :
 	SEMI_COLON
 	;
 
-word_token :
-	name_token
-	| equal_token
-	| rule_token
-	| depend_token
-	;
+//word_token :
+//	name_token
+//	| equal_token
+//	| rule_token
+//	| depend_token
+//	;
 
 name_token :
 	NAME

@@ -489,10 +489,10 @@ StructDefinition
 ///	| RegularOrBacktickedIdentifier ':' ColumnDataType_EDIT
 ///	;
 
-ColumnDataTypeList
-	: ColumnDataType
-	| ColumnDataTypeList ',' ColumnDataType
-	;
+///ColumnDataTypeList
+///	: ColumnDataType
+///	| ColumnDataTypeList ',' ColumnDataType
+///	;
 
 ///ColumnDataTypeList_EDIT
 ///	: ColumnDataTypeListInner_EDIT
@@ -897,12 +897,12 @@ GroupByClause
 ///	| GROUP CURSOR
 ///	;
 
-ColumnGroupingSets
-	: /*empty*/
-	| ColumnReference
-	| ColumnGroupingSets ',' ColumnGroupingSets
-	| '(' ColumnGroupingSets ')'
-	;
+///ColumnGroupingSets
+///	: /*empty*/
+///	| ColumnReference
+///	| ColumnGroupingSets ',' ColumnGroupingSets
+///	| '(' ColumnGroupingSets ')'
+///	;
 
 ///ColumnGroupingSets_EDIT
 ///	: ColumnGroupingSet_EDIT
@@ -1033,10 +1033,10 @@ OptionalJoinCondition
 	| ON ValueExpression
 	;
 
-UsingColList
-	: RegularOrBacktickedIdentifier
-	| UsingColList ',' RegularOrBacktickedIdentifier
-	;
+///UsingColList
+///	: RegularOrBacktickedIdentifier
+///	| UsingColList ',' RegularOrBacktickedIdentifier
+///	;
 
 ///JoinCondition_EDIT
 ///	: ON ValueExpression_EDIT
@@ -1953,10 +1953,10 @@ RegularIdentifier
 
 // ===================================== Commonly used constructs =====================================
 
-Commas
-	: ','
-	| Commas ','
-	;
+///Commas
+///	: ','
+///	| Commas ','
+///	;
 
 ///AnyCursor
 ///	: CURSOR
@@ -2152,10 +2152,10 @@ ColumnList
 ///	: '(' SimpleValueList ')'
 ///	;
 
-SimpleValueList
-	: UnsignedValueSpecification
-	| SimpleValueList ',' UnsignedValueSpecification
-	;
+///SimpleValueList
+///	: UnsignedValueSpecification
+///	| SimpleValueList ',' UnsignedValueSpecification
+///	;
 
 SchemaQualifiedTableIdentifier
 	: RegularOrBacktickedIdentifier
@@ -2259,10 +2259,10 @@ BasicIdentifierChain
 ///	| BasicIdentifierChain '.' PartialBacktickedOrPartialCursor '.' BasicIdentifierChain
 ///	;
 
-DerivedColumnChain
-	: ColumnIdentifier
-	| DerivedColumnChain '.' ColumnIdentifier
-	;
+///DerivedColumnChain
+///	: ColumnIdentifier
+///	| DerivedColumnChain '.' ColumnIdentifier
+///	;
 
 ///DerivedColumnChain_EDIT
 ///	: PartialBacktickedIdentifierOrPartialCursor

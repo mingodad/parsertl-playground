@@ -5838,7 +5838,7 @@ symbol :
 
 %option caseless
 
- /* NB: if new start conditions are defined, add them in the line for <<EOF>> */
+/* NB: if new start conditions are defined, add them in the line for <<EOF>> */
 %x COMMENT
 %x DYNARE_STATEMENT
 %x DYNARE_BLOCK

@@ -805,14 +805,14 @@ opt_database_alias :
 	| /*empty*/
 	;
 
-ident_name :
-	IDENT /*14N*/
-	;
+///ident_name :
+///	IDENT /*14N*/
+///	;
 
-ident_list :
-	ident_name
-	| ident_list ',' ident_name
-	;
+///ident_list :
+///	ident_name
+///	| ident_list ',' ident_name
+///	;
 
 InsertStmt :
 	opt_with_clause INSERT opt_or_action INTO insert_target opt_by_name_or_position insert_rest opt_on_conflict returning_clause
@@ -2305,10 +2305,10 @@ extended_indirection_el :
 	| '[' /*22L*/ opt_slice_bound ':' '-' /*16L*/ ':' opt_slice_bound ']' /*22L*/
 	;
 
-extended_indirection :
-	extended_indirection_el
-	| extended_indirection extended_indirection_el
-	;
+///extended_indirection :
+///	extended_indirection_el
+///	| extended_indirection extended_indirection_el
+///	;
 
 opt_extended_indirection :
 	/*empty*/
