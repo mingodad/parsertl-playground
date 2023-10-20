@@ -61,6 +61,7 @@ The first two sections are equivalent to `yacc/bison` format and the other two s
 
 Related projects:
 - ANTLR Lab http://lab.antlr.org/
+- Lezer playground https://lezer-playground.vercel.app/
 - Tree-sitter https://tree-sitter.github.io/tree-sitter/playground
 - Lpegrex/Lua https://mingodad.github.io/lua-wasm-playground/
 - CocoR https://mingodad.github.io/CocoR-Typescript/playground
