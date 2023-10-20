@@ -1,6 +1,8 @@
 %token ILLEGAL_CHARACTER
 
-%token name AtName Literal CharSet InvertedCharSet AnyChar
+%token name AtName Literal CharSet InvertedCharSet AnyChar "as"
+
+%fallback name "as"
 
 %precedence scopedSkip
 %precedence repeat
@@ -38,7 +40,8 @@ PrecedenceDeclaration :
 	;
 
 PrecedenceBody :
-	"{" (Precedence ","?)* "}"
+	"{" "}"
+	| "{" Precedence (","? Precedence)* "}"
 	;
 
 Precedence : PrecedenceName ("@left" | "@right" | "@cut")? ;
@@ -59,7 +62,7 @@ LocalTokensDeclaration :
 	"@local" "tokens" TokensBody
 	;
 
-TokensBody : "{" (tokenDeclaration | ElseToken)* "}" ;
+TokensBody : "{" "}" | "{" (tokenDeclaration | ElseToken)+ "}" ;
 
 ElseToken : "@else" RuleName Props? ;
 
@@ -182,7 +185,7 @@ ParenExpression : "(" expression? ")" ;
 Specialization : ("@specialize" | "@extend") Props? ArgList ;
 
 nameExpression :
-	RuleName
+	RuleName ArgList?
 	| ScopedName
 	| Call
 	;
@@ -205,7 +208,7 @@ ArgList :
 
 RuleName : name ;
 
-PrecedenceName : name ;
+PrecedenceName : name ArgList? | Literal ;
 
 Name : name ;
 
