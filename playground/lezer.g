@@ -1,8 +1,9 @@
 %token ILLEGAL_CHARACTER
 
-%token name AtName Literal CharSet InvertedCharSet AnyChar "as"
+%token name AtName Literal CharSet InvertedCharSet AnyChar
 
-%fallback name "as"
+%token "as" "from" "extend" "prop" "propSource" "specialize" "tokens"
+%fallback name "as" "from" "extend" "prop" "propSource" "specialize" "tokens"
 
 %precedence scopedSkip
 %precedence repeat
