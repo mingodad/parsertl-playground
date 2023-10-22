@@ -139,6 +139,7 @@ const sampleList = [
 	["Mysql parser (be patient)(partially working)", "mysql.g", "test.mysql", "ace/mode/sql"],
 	["N1QL parser", "n1ql.g", "test.n1ql", "ace/mode/sql"],
 	["NASL parser", "nasl-parser.g", "test.nasl", "ace/mode/shell"],
+	["Nearley parser", "nearley.g", "test.nearley", "ace/mode/yaml"],
 	["Nebula parser", "nebula-parser.g", "test.nebula-parser", "ace/mode/sql"],
 	["OcamlLex parser (partially working)", "ocaml-lex.g", "test.ocamllex", "ace/mode/ocaml"],
 	["Oberon parser", "oberon.g", "test.oberon", "ace/mode/pascal"],
