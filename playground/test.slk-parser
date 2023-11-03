@@ -1,0 +1,400 @@
+/*=============================================================================
+
+    grammar.ll
+
+    Version 7.06
+
+    ANSI standard C grammar in EBNF format.
+
+    Recognizer only. Actions included to handle typedef declaration.
+
+    Copyright (c) 2002-2014  DMR, all rights reserved.
+
+    09-18-14    Simplified and converted more to ebnf
+    10-11-14    Added some simple C++ support, no templates
+
+=============================================================================*/
+
+translation_unit :
+    { declaration } __FinishParse
+
+declaration :
+    { declaration_specifier }+ function_or_declaration
+    constructor
+    typedef { declaration_specifier }+ [ init_declarator_list2 ] ;
+    access_specifier :
+    using qualified_type ;
+
+constructor :
+    [ TYPEDEF_NAME :: ] [ ~ ] TYPEDEF_NAME ( [ parameter_type_list ] ) [ base_list ] more_constructor
+    TAG_NAME ( [ parameter_type_list ] ) more_constructor
+
+more_constructor :
+    compound_statement
+    ;
+
+base_list :
+    : qualified_id_or_type ( [ expression ] ) { , qualified_id_or_type ( [ expression ] ) }
+
+function_or_declaration :
+    declarator more_function_or_declaration
+    ;
+
+more_function_or_declaration :
+    compound_statement
+    [ = initializer ] { , init_declarator } ;
+
+declaration_specifier :
+    storage_class_specifier
+    type_specifier
+    type_qualifier
+    access_specifier
+    function_specifier
+    friend
+
+storage_class_specifier :
+    auto
+    register
+    static
+    extern
+    mutable
+
+function_specifier :
+    inline
+    virtual
+    explicit
+
+type_specifier :
+    void
+    char
+    short
+    int
+    long
+    float
+    double
+    signed
+    unsigned
+    TYPEDEF_NAME [ :: TYPEDEF_NAME ]
+    struct_or_union_specifier
+    enum_specifier
+
+type_qualifier :
+    const
+    volatile
+
+access_specifier :
+    private
+    protected
+    public
+
+struct_or_union_specifier :
+    struct_or_union id_or_tagname [ [ base_clause ] \{ { declaration } \} ]
+    struct_or_union \{ { declaration } \}
+    class id_or_typename [ [ base_clause ] \{ { declaration } \} ]
+
+struct_or_union :
+    struct
+    union
+
+qualified_id :
+    [ { id_or_typename :: }+ { * } ] IDENTIFIER
+
+qualified_id_or_type :
+    { id_or_typename :: } id_or_typename
+
+qualified_type :
+    { id_or_typename :: } TYPEDEF_NAME
+
+id_or_typename :
+    TYPEDEF_NAME
+    __SetTypedefName IDENTIFIER
+
+id_or_tagname :
+    TAG_NAME
+    __SetTagName IDENTIFIER
+
+base_clause :
+    : [ access_specifier ] qualified_id_or_type { , [ access_specifier ] qualified_id_or_type }
+
+init_declarator :
+    declarator [ : constant_expression ] [ = initializer ]
+    : constant_expression
+
+init_declarator_list2 :
+    init_declarator2 { , init_declarator2 }
+
+init_declarator2 :
+    declarator __SetTypedefName [ = initializer ]
+
+specifier_qualifier :
+    type_specifier
+    type_qualifier
+
+enum_specifier :
+    enum \{ enumerator_list \}
+    enum IDENTIFIER [ \{ enumerator_list \} ]
+
+enumerator_list :
+    enumerator { , enumerator }
+
+enumerator :
+    IDENTIFIER __SetEnumName [ = constant_expression ]
+    ENUM_NAME [ = constant_expression ]
+
+declarator :
+    [ pointer ] direct_declarator
+
+direct_declarator :
+    qualified_id more_direct_declarator
+    ( declarator ) more_direct_declarator
+
+more_direct_declarator :
+    \[ [ constant_expression ] \] more_direct_declarator
+    __NewScope ( parameter_type_list ) __ReleaseScope more_direct_declarator
+    ( expression ) more_direct_declarator
+    ( ) more_direct_declarator
+    _epsilon_
+
+pointer :
+    * [ type_qualifier ] [ pointer ]
+    &
+
+parameter_type_list :
+    parameter_declaration { , parameter_declaration } [ , ... ]
+
+parameter_declaration :
+    { declaration_specifier }+ [ declarator_or_abstract_declarator ]
+
+declarator_or_abstract_declarator :
+    direct_declarator_or_direct_abstract_declarator
+    pointer [ direct_declarator_or_direct_abstract_declarator ]
+
+direct_declarator_or_direct_abstract_declarator :
+    qualified_id more_dd_or_dad
+    ( declarator_or_abstract_declarator ) more_dd_or_dad
+    \[ [ constant_expression ] \] more_dd_or_dad
+    ( [ parameter_type_list ] ) more_dd_or_dad
+
+more_dd_or_dad :
+    \[ [ constant_expression ] \] more_dd_or_dad
+    ( parameter_type_list ) more_dd_or_dad
+    ( expression ) more_dd_or_dad
+    ( ) more_dd_or_dad
+    _epsilon_
+
+initializer :
+    assignment_expression
+    \{ initializer_list [ , ] \}
+
+initializer_list :
+    initializer { , initializer }
+
+type_name :
+    { specifier_qualifier }+ [ abstract_declarator ]
+
+abstract_declarator :
+    pointer [ direct_abstract_declarator ]
+    direct_abstract_declarator
+
+direct_abstract_declarator :
+    ( abstract_declarator ) more_direct_abstract_declarator
+    \[ [ constant_expression ] \] more_direct_abstract_declarator
+    ( [ parameter_type_list ] ) more_direct_abstract_declarator
+
+more_direct_abstract_declarator :
+    \[ [ constant_expression ] \] more_direct_abstract_declarator
+    ( [ parameter_type_list ] ) more_direct_abstract_declarator
+    _epsilon_
+
+statement :
+    labeled_statement
+    expression_statement
+    compound_statement
+    selection_statement
+    iteration_statement
+    jump_statement
+    declaration
+
+labeled_statement :
+    IDENTIFIER : statement
+    case constant_expression : statement
+    default : statement
+
+expression_statement :
+    [ expression ] ;
+
+compound_statement :
+    __NewScope \{ { statement } \} __ReleaseScope
+
+selection_statement :
+    if ( expression ) statement more_if
+    switch ( expression ) statement
+
+more_if :!
+    else statement
+    _epsilon_
+
+iteration_statement :
+    while ( expression ) statement
+    do statement while ( expression ) ;
+    for ( [ expression ] ; [ expression ] ; [ expression ] ) statement
+
+jump_statement :
+    goto IDENTIFIER ;
+    continue ;
+    break ;
+    return [ expression ] ;
+
+expression :
+    assignment_expression { , assignment_expression }
+
+/* -----------------------------------------------------------------------
+   use semantic check for lvalue instead of the following production:
+        unary_expression  assignment_operator  assignment_expression
+----------------------------------------------------------------------- */
+
+assignment_expression :
+    conditional_expression [ assignment_operator assignment_expression ]
+
+assignment_operator :
+    =
+    *=
+    /=
+    %=
+    +=
+    -=
+    <<=
+    >>=
+    &=
+    ^=
+    |=
+
+conditional_expression :
+    logical_OR_expression [ ? expression : conditional_expression ]
+
+logical_OR_expression :
+    logical_AND_expression { || logical_AND_expression }
+
+logical_AND_expression :
+    inclusive_OR_expression { && inclusive_OR_expression }
+
+inclusive_OR_expression :
+    exclusive_OR_expression { | exclusive_OR_expression }
+
+exclusive_OR_expression :
+    and_expression { ^ and_expression }
+
+and_expression :
+    equality_expression { & equality_expression }
+
+equality_expression :
+    relational_expression { equality_op relational_expression }
+
+equality_op :
+    ==
+    !=
+
+relational_expression :
+    shift_expression { relational_op shift_expression }
+
+relational_op :
+    <
+    >
+    <=
+    >=
+
+shift_expression :
+    additive_expression { shift_op additive_expression }
+
+shift_op :
+    <<
+    >>
+
+additive_expression :
+    multiplicitive_expression { additive_op multiplicitive_expression }
+
+additive_op :
+    +
+    -
+
+multiplicitive_expression :
+    cast_expression { multiplicitive_op cast_expression }
+
+multiplicitive_op :
+    *
+    /
+    %
+
+cast_expression :
+    unary_expression
+    ( type_name ) cast_expression
+
+unary_expression :
+    postfix_expression
+    ++ unary_expression
+    -- unary_expression
+    unary_operator cast_expression
+    sizeof unary_expression
+    sizeof ( type_name )
+    new TYPEDEF_NAME [ :: TYPEDEF_NAME ] ( [ argument_expression_list ] )
+    new ( type_name )
+    delete cast_expression
+    delete \[ \] cast_expression
+
+unary_operator :
+    &
+    *
+    +
+    -
+    ~
+    !
+
+postfix_expression :
+    primary_expression more_postfix_expression
+
+more_postfix_expression :
+    \[ expression \] more_postfix_expression
+    ( [ argument_expression_list ] ) more_postfix_expression
+    . IDENTIFIER more_postfix_expression
+    .* IDENTIFIER more_postfix_expression
+    -> IDENTIFIER more_postfix_expression
+    ->* IDENTIFIER more_postfix_expression
+    ++ more_postfix_expression
+    -- more_postfix_expression
+    _epsilon_
+
+primary_expression :
+    qualified_id
+    constant
+    { STRING }+
+    ( expression )
+
+argument_expression_list :
+    assignment_expression { , assignment_expression }
+
+constant :
+    INTEGER_CONSTANT
+    CHARACTER_CONSTANT
+    FLOATING_CONSTANT
+    ENUMERATION_CONSTANT
+    ENUM_NAME
+
+constant_expression :
+    mul_expression { additive_op mul_expression }
+
+mul_expression :
+    unary_expr { multiplicitive_op unary_expr }
+
+unary_expr :
+    constant
+    unary_op unary_expr
+    ( constant_expression )
+    sizeof unary_expr
+    sizeof ( type_name )
+
+unary_op :
+    *
+    +
+    -
+    ~
+    !
