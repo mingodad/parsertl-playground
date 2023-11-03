@@ -1,6 +1,10 @@
 //From: http://www.slkpg.site/
 
-%token ID RULE_ID TOK ACTION
+/*
+Rule header should start at the begining of a line
+*/
+
+%token ID RULE_ID TOK ACTION ALT_RHS
 
 %%
 
@@ -14,11 +18,16 @@ rules :
     ;
 
 rule :
-    lhs rhs
+    lhs alt_rhs
     ;
 
 lhs :
     RULE_ID
+    ;
+
+alt_rhs :
+    rhs ALT_RHS
+    | alt_rhs rhs ALT_RHS
     ;
 
 rhs :
@@ -41,9 +50,14 @@ repeat_elm :
 
 %%
 
+%x alt_rhs
+
 base_id [A-Za-z_][A-Za-z0-9_]*
 
 rule_sep ":"|"::="|"-->"|":="|"->"|"="|":?"|":!"
+
+tok	"\\"?[^A-Za-z\n]
+action	"__"({base_id}|"action_"{base_id})
 
 %%
 
@@ -51,28 +65,25 @@ rule_sep ":"|"::="|"-->"|":="|"->"|"="|":?"|":!"
 "/*"(?s:.)*?"*/"    skip()
 "//".*  skip()
 
-"{" '{'
-"}" '}'
-"[" '['
-"]" ']'
-"}+" "}+"
+<INITIAL,alt_rhs> {
+    "{" '{'
+    "}" '}'
+    "[" '['
+    "]" ']'
+    "}+" "}+"
+}
+{tok}<alt_rhs> TOK
+{action}<alt_rhs>   ACTION
+{base_id}<alt_rhs> ID
 
-/*
-":" RULE_SEP
-"::=" RULE_SEP
-"-->" RULE_SEP
-":=" RULE_SEP
-"->" RULE_SEP
-"=" RULE_SEP
-":?" RULE_SEP
-":!" RULE_SEP
-*/
+<alt_rhs> {
+    {tok} TOK
+    {action}<alt_rhs>   ACTION
+    {base_id} ID
+    [\r\t ]+    skip()
+    \n<INITIAL> ALT_RHS
+}
 
-"\\"?[^A-Za-z\n] TOK
-
-"__"{base_id}   ACTION
-"__action_"{base_id}   ACTION
-{base_id} ID
-^\s*{base_id}\s*{rule_sep}   RULE_ID
+^{base_id}\s*{rule_sep}   RULE_ID
 
 %%
