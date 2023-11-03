@@ -1,0 +1,63 @@
+# grammar file for basil
+#
+
+# start rule
+start -> rule-seq-opt
+
+# rule seq opt
+rule-seq-opt ->
+rule-seq-opt -> rule-seq
+
+# rule seq
+rule-seq -> rule
+rule-seq -> rule-seq rule
+
+# rule
+# first try right-hand side symbol then left-hand side symbol
+# reduce only if valid token is next
+[RuleNode] rule <* -> rule-name-opt symbol ARROW symbol-seq-opt >
+
+# node name opt
+rule-name-opt -> rule-name
+rule-name-opt ->
+
+# node name
+[NodeName1Node] rule-name -> LBRACK slip-spec-opt IDENT RBRACK
+[NodeName2Node] rule-name -> LBRACK LPAREN IDENT RPAREN RBRACK
+[NodeName3Node] rule-name -> LBRACK RBRACK
+
+# slip specifier opt
+slip-spec-opt -> slip-spec
+slip-spec-opt ->
+
+# slip spec
+slip-spec -> DOLLAR
+
+# symbol sequence opt
+symbol-seq-opt ->
+symbol-seq-opt -> symbol-seq
+
+# symbol sequence
+symbol-seq -> symbol
+[$ SeqNode] symbol-seq -> symbol-seq symbol
+
+# symbol
+[SymbolNode] symbol -> IDENT attrib-seq-opt
+
+# attrib seq opt
+attrib-seq-opt ->
+attrib-seq-opt -> attrib-seq
+
+# attrib seq
+attrib-seq -> attrib
+[(SeqNode)] attrib-seq -> attrib-seq attrib
+
+# attribute
+[Attrib1Node] attrib -> GT
+[Attrib2Node] attrib -> PLUS
+[Attrib3Node] attrib -> NUMBER
+[Attrib4Node] attrib -> STAR
+[Attrib5Node] attrib -> LT
+[Attrib6Node] attrib -> CARET
+[Attrib7Node] attrib -> LPAREN attrib-seq RPAREN NUMBER
+[Attrib8Node] attrib -> BANG

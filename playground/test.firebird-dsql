@@ -1,0 +1,623 @@
+/*
+ * The contents of this file are subject to the Interbase Public
+ * License Version 1.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy
+ * of the License at http://www.Inprise.com/IPL.html
+ *
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code was created by Inprise Corporation
+ * and its predecessors. Portions created by Inprise Corporation are
+ * Copyright (C) Inprise Corporation.
+ *
+ * All Rights Reserved.
+ * Contributor(s): ______________________________________.
+ */
+/*create database "employee.fdb";*/
+/**
+ **  Create a sample employee database.
+ **
+ **  This database keeps track of employees, departments, projects, and sales
+ **  for a small company.
+ **
+ **/
+
+
+/*
+ *   Define domains.
+ */
+/* set echo on;
+*/
+
+CREATE DOMAIN firstname     AS VARCHAR(15);
+
+CREATE DOMAIN lastname      AS VARCHAR(20);
+
+CREATE DOMAIN phonenumber   AS VARCHAR(20);
+
+CREATE DOMAIN countryname   AS VARCHAR(15);
+
+CREATE DOMAIN addressline   AS VARCHAR(30);
+
+
+CREATE DOMAIN empno
+    AS SMALLINT;
+
+CREATE DOMAIN deptno
+    AS CHAR(3)
+    CHECK (VALUE = '000' OR (VALUE > '0' AND VALUE <= '999') OR VALUE IS NULL);
+
+CREATE DOMAIN projno
+    AS CHAR(5)
+    CHECK (VALUE = UPPER (VALUE));
+
+CREATE DOMAIN custno
+    AS INTEGER
+    CHECK (VALUE > 1000);
+
+/* must begin with a letter */
+CREATE DOMAIN jobcode
+    AS VARCHAR(5)
+    CHECK (VALUE > '99999');
+
+CREATE DOMAIN jobgrade
+    AS SMALLINT
+    CHECK (VALUE BETWEEN 0 AND 6);
+
+/* salary is in any currency type */
+CREATE DOMAIN salary
+    AS NUMERIC(10,2)
+    DEFAULT 0
+    CHECK (VALUE > 0);
+
+/* budget is in US dollars */
+CREATE DOMAIN budget
+    AS DECIMAL(12,2)
+    DEFAULT 50000
+    CHECK (VALUE > 10000 AND VALUE <= 2000000);
+
+CREATE DOMAIN prodtype
+    AS VARCHAR(12)
+    DEFAULT 'software' NOT NULL
+    CHECK (VALUE IN ('software', 'hardware', 'other', 'N/A'));
+
+CREATE DOMAIN PONUMBER
+    AS CHAR(8)
+    CHECK (VALUE STARTING WITH 'V');
+
+
+/*
+ *  Create generators.
+ */
+
+CREATE GENERATOR emp_no_gen;
+
+CREATE GENERATOR cust_no_gen;
+SET GENERATOR cust_no_gen to 1000;
+
+COMMIT;
+
+/*
+ *  Create tables.
+ */
+
+
+/*
+ *  Country name, currency type.
+ */
+CREATE TABLE country
+(
+    country         COUNTRYNAME NOT NULL PRIMARY KEY,
+    currency        VARCHAR(10) NOT NULL
+);
+
+
+/*
+ *  Job id, job title, minimum and maximum salary, job description,
+ *  and required languages.
+ *
+ *  A job is defined by a multiple key, consisting of a job_code
+ *  (a 5-letter job abbreviation), a job grade, and a country name
+ *  indicating the salary currency type.
+ *
+ *  The salary range is expressed in the appropriate country's currency.
+ *
+ *  The job requirement is a text blob.
+ *
+ *  The job may also require some knowledge of foreign languages,
+ *  stored in a character array.
+ */
+CREATE TABLE job
+(
+    job_code            JOBCODE NOT NULL,
+    job_grade           JOBGRADE NOT NULL,
+    job_country         COUNTRYNAME NOT NULL,
+    job_title           VARCHAR(25) NOT NULL,
+    min_salary          SALARY NOT NULL,
+    max_salary          SALARY NOT NULL,
+    job_requirement     BLOB(400,1),
+    language_req        VARCHAR(15) [5],
+
+    PRIMARY KEY (job_code, job_grade, job_country),
+    FOREIGN KEY (job_country) REFERENCES country (country),
+
+    CHECK (min_salary < max_salary)
+);
+
+CREATE ASCENDING INDEX minsalx ON job (job_country, min_salary);
+CREATE DESCENDING INDEX maxsalx ON job (job_country, max_salary);
+
+
+/*
+ *  Department number, name, head department, manager id,
+ *  budget, location, department phone number.
+ *
+ *  Each department is a sub-department in some department, determined
+ *  by head_dept.  The head of this tree is the company.
+ *  This information is used to produce a company organization chart.
+ *
+ *  Departments have managers; however, manager id can be null to allow
+ *  for temporary situations where a manager needs to be hired.
+ *
+ *  Budget is allocated in U.S. dollars for all departments.
+ *
+ *  Foreign key mngr_no is added after the employee table is created,
+ *  using 'alter table'.
+ */
+CREATE TABLE department
+(
+    dept_no         DEPTNO NOT NULL,
+    department      VARCHAR(25) NOT NULL UNIQUE,
+    head_dept       DEPTNO,
+    mngr_no         EMPNO,
+    budget          BUDGET,
+    location        VARCHAR(15),
+    phone_no        PHONENUMBER DEFAULT '555-1234',
+
+    PRIMARY KEY (dept_no),
+    FOREIGN KEY (head_dept) REFERENCES department (dept_no)
+);
+
+CREATE DESCENDING INDEX budgetx ON department (budget);
+
+
+/*
+ *  Employee id, name, phone extension, date of hire, department id,
+ *  job and salary information.
+ *
+ *  Salary can be entered in any country's currency.
+ *  Therefore, some of the salaries can appear magnitudes larger than others,
+ *  depending on the currency type.  Ex. Italian lira vs. U.K. pound.
+ *  The currency type is determined by the country code.
+ *
+ *  job_code, job_grade, and job_country reference employee's job information,
+ *  illustrating two tables related by referential constraints on multiple
+ *  columns.
+ *
+ *  The employee salary is verified to be in the correct salary range
+ *  for the given job title.
+ */
+CREATE TABLE employee
+(
+    emp_no          EMPNO NOT NULL,
+    first_name      FIRSTNAME NOT NULL,
+    last_name       LASTNAME NOT NULL,
+    phone_ext       VARCHAR(4),
+    hire_date       TIMESTAMP DEFAULT 'NOW' NOT NULL,
+    dept_no         DEPTNO NOT NULL,
+    job_code        JOBCODE NOT NULL,
+    job_grade       JOBGRADE NOT NULL,
+    job_country     COUNTRYNAME NOT NULL,
+    salary          SALARY NOT NULL,
+    full_name       COMPUTED BY (last_name || ', ' || first_name),
+
+    PRIMARY KEY (emp_no),
+    FOREIGN KEY (dept_no) REFERENCES
+            department (dept_no),
+    FOREIGN KEY (job_code, job_grade, job_country) REFERENCES
+            job (job_code, job_grade, job_country),
+
+    CHECK ( salary >= (SELECT min_salary FROM job WHERE
+                        job.job_code = employee.job_code AND
+                        job.job_grade = employee.job_grade AND
+                        job.job_country = employee.job_country) AND
+            salary <= (SELECT max_salary FROM job WHERE
+                        job.job_code = employee.job_code AND
+                        job.job_grade = employee.job_grade AND
+                        job.job_country = employee.job_country))
+);
+
+CREATE INDEX namex ON employee (last_name, first_name);
+
+CREATE VIEW phone_list AS SELECT
+    emp_no, first_name, last_name, phone_ext, location, phone_no
+    FROM employee, department
+    WHERE employee.dept_no = department.dept_no;
+
+COMMIT;
+
+--SET TERM !! ;
+
+CREATE TRIGGER set_emp_no FOR employee
+BEFORE INSERT AS
+BEGIN
+    if (new.emp_no is null) then
+    new.emp_no = gen_id(emp_no_gen, 1);
+END ;
+
+--SET TERM ; !!
+
+
+/*
+ *  Add an additional constraint to department: check manager numbers
+ *  in the employee table.
+ */
+ALTER TABLE department ADD FOREIGN KEY (mngr_no) REFERENCES employee (emp_no);
+
+
+/*
+ *  Project id, project name, description, project team leader,
+ *  and product type.
+ *
+ *  Project description is a text blob.
+ */
+CREATE TABLE project
+(
+    proj_id         PROJNO NOT NULL,
+    proj_name       VARCHAR(20) NOT NULL UNIQUE,
+    proj_desc       BLOB(800,1),
+    team_leader     EMPNO,
+    product         PRODTYPE,
+
+    PRIMARY KEY (proj_id),
+    FOREIGN KEY (team_leader) REFERENCES employee (emp_no)
+);
+
+CREATE UNIQUE INDEX prodtypex ON project (product, proj_name);
+
+
+/*
+ *  Employee id, project id, employee's project duties.
+ *
+ *  Employee duties is a text blob.
+ */
+CREATE TABLE employee_project
+(
+    emp_no          EMPNO NOT NULL,
+    proj_id         PROJNO NOT NULL,
+
+    PRIMARY KEY (emp_no, proj_id),
+    FOREIGN KEY (emp_no) REFERENCES employee (emp_no),
+    FOREIGN KEY (proj_id) REFERENCES project (proj_id)
+);
+
+
+/*
+ *  Fiscal year, project id, department id, projected head count by
+ *  fiscal quarter, projected budget.
+ *
+ *  Tracks head count and budget planning by project by department.
+ *
+ *  Quarterly head count is an array of integers.
+ */
+CREATE TABLE proj_dept_budget
+(
+    fiscal_year         INTEGER NOT NULL CHECK (FISCAL_YEAR >= 1993),
+    proj_id             PROJNO NOT NULL,
+    dept_no             DEPTNO NOT NULL,
+    quart_head_cnt      INTEGER [4],
+    projected_budget    BUDGET,
+
+    PRIMARY KEY (fiscal_year, proj_id, dept_no),
+    FOREIGN KEY (dept_no) REFERENCES department (dept_no),
+    FOREIGN KEY (proj_id) REFERENCES project (proj_id)
+);
+
+
+/*
+ *  Employee number, salary change date, updater's user id, old salary,
+ *  and percent change between old and new salary.
+ */
+CREATE TABLE salary_history
+(
+    emp_no              EMPNO NOT NULL,
+    change_date         TIMESTAMP DEFAULT 'NOW' NOT NULL,
+    updater_id          VARCHAR(20) NOT NULL,
+    old_salary          SALARY NOT NULL,
+    percent_change      DOUBLE PRECISION
+                            DEFAULT 0
+                            NOT NULL
+                            CHECK (percent_change between -50 and 50),
+    new_salary          COMPUTED BY
+                            (old_salary + old_salary * percent_change / 100),
+
+    PRIMARY KEY (emp_no, change_date, updater_id),
+    FOREIGN KEY (emp_no) REFERENCES employee (emp_no)
+);
+
+CREATE INDEX updaterx ON salary_history (updater_id);
+CREATE DESCENDING INDEX changex ON salary_history (change_date);
+
+COMMIT;
+
+--SET TERM !! ;
+
+CREATE TRIGGER save_salary_change FOR employee
+AFTER UPDATE AS
+BEGIN
+    IF (old.salary <> new.salary) THEN
+        INSERT INTO salary_history
+            (emp_no, change_date, updater_id, old_salary, percent_change)
+        VALUES (
+            old.emp_no,
+            'NOW',
+            user,
+            old.salary,
+            (new.salary - old.salary) * 100 / old.salary);
+END ;
+
+--SET TERM ; !!
+
+COMMIT;
+
+
+/*
+ *  Customer id, customer name, contact first and last names,
+ *  phone number, address lines, city, state or province, country,
+ *  postal code or zip code, and customer status.
+ */
+CREATE TABLE customer
+(
+    cust_no             CUSTNO NOT NULL,
+    customer            VARCHAR(25) NOT NULL,
+    contact_first       FIRSTNAME,
+    contact_last        LASTNAME,
+    phone_no            PHONENUMBER,
+    address_line1       ADDRESSLINE,
+    address_line2       ADDRESSLINE,
+    city                VARCHAR(25),
+    state_province      VARCHAR(15),
+    country             COUNTRYNAME,
+    postal_code         VARCHAR(12),
+    on_hold             CHAR
+                            DEFAULT NULL
+                            CHECK (on_hold IS NULL OR on_hold = '*'),
+    PRIMARY KEY (cust_no),
+    FOREIGN KEY (country) REFERENCES country (country)
+);
+
+CREATE INDEX custnamex ON customer (customer);
+CREATE INDEX custregion ON customer (country, city);
+
+--SET TERM !! ;
+
+CREATE TRIGGER set_cust_no FOR customer
+BEFORE INSERT AS
+BEGIN
+    if (new.cust_no is null) then
+    new.cust_no = gen_id(cust_no_gen, 1);
+END ;
+
+--SET TERM ; !!
+
+COMMIT;
+
+
+/*
+ *  Purchase order number, customer id, sales representative, order status,
+ *  order date, date shipped, date need to ship by, payment received flag,
+ *  quantity ordered, total order value, type of product ordered,
+ *  any percent discount offered.
+ *
+ *  Tracks customer orders.
+ *
+ *  sales_rep is the ID of the employee handling the sale.
+ *
+ *  Number of days passed since the order date is a computed field.
+ *
+ *  Several checks are performed on this table, among them:
+ *      - A sale order must have a status: open, shipped, waiting.
+ *      - The ship date must be entered, if order status is 'shipped'.
+ *      - New orders can't be shipped to customers with 'on_hold' status.
+ *      - Sales rep
+ */
+CREATE TABLE sales
+(
+    po_number       PONUMBER NOT NULL,
+    cust_no         CUSTNO NOT NULL,
+    sales_rep       EMPNO,
+    order_status    VARCHAR(7)
+                        DEFAULT 'new'
+                        NOT NULL
+                        CHECK (order_status in
+                            ('new', 'open', 'shipped', 'waiting')),
+    order_date      TIMESTAMP
+                        DEFAULT 'NOW'
+                        NOT NULL,
+    ship_date       TIMESTAMP
+                        CHECK (ship_date >= order_date OR ship_date IS NULL),
+    date_needed     TIMESTAMP
+                        CHECK (date_needed > order_date OR date_needed IS NULL),
+    paid            CHAR
+                        DEFAULT 'n'
+                        CHECK (paid in ('y', 'n')),
+    qty_ordered     INTEGER
+                        DEFAULT 1
+                        NOT NULL
+                        CHECK (qty_ordered >= 1),
+    total_value     DECIMAL(9,2)
+                        NOT NULL
+                        CHECK (total_value >= 0),
+    discount        FLOAT
+                        DEFAULT 0
+                        NOT NULL
+                        CHECK (discount >= 0 AND discount <= 1),
+    item_type       PRODTYPE,
+    aged            COMPUTED BY
+                        (ship_date - order_date),
+
+    PRIMARY KEY (po_number),
+    FOREIGN KEY (cust_no) REFERENCES customer (cust_no),
+    FOREIGN KEY (sales_rep) REFERENCES employee (emp_no),
+
+    CHECK (NOT (order_status = 'shipped' AND ship_date IS NULL)),
+
+    CHECK (NOT (order_status = 'shipped' AND
+            EXISTS (SELECT on_hold FROM customer
+                    WHERE customer.cust_no = sales.cust_no
+                    AND customer.on_hold = '*')))
+);
+
+CREATE INDEX needx ON sales (date_needed);
+CREATE INDEX salestatx ON sales (order_status, paid);
+CREATE DESCENDING INDEX qtyx ON sales (item_type, qty_ordered);
+
+--SET TERM !! ;
+
+CREATE TRIGGER post_new_order FOR sales
+AFTER INSERT AS
+BEGIN
+    POST_EVENT 'new_order';
+END ;
+
+--SET TERM ; !!
+
+COMMIT;
+
+
+
+
+
+/****************************************************************************
+ *
+ *	Create stored procedures.
+ *
+*****************************************************************************/
+
+
+--SET TERM !! ;
+
+/*
+ *	Get employee's projects.
+ *
+ *	Parameters:
+ *		employee number
+ *	Returns:
+ *		project id
+ */
+
+CREATE PROCEDURE get_emp_proj (emp_no SMALLINT)
+RETURNS (proj_id CHAR(5)) AS
+BEGIN
+	FOR SELECT proj_id
+		FROM employee_project
+		WHERE emp_no = :emp_no
+		INTO :proj_id
+	DO
+		SUSPEND;
+END ;
+
+
+
+/*
+ *	Add an employee to a project.
+ *
+ *	Parameters:
+ *		employee number
+ *		project id
+ *	Returns:
+ *		--
+ */
+
+CREATE EXCEPTION unknown_emp_id 'Invalid employee number or project id.' ;
+
+CREATE PROCEDURE add_emp_proj (emp_no SMALLINT, proj_id CHAR(5))  AS
+BEGIN
+	BEGIN
+	INSERT INTO employee_project (emp_no, proj_id) VALUES (:emp_no, :proj_id);
+	WHEN SQLCODE -530 DO
+		EXCEPTION unknown_emp_id;
+	END
+END ;
+
+
+
+/*
+ *	Select one row.
+ *
+ *	Compute total, average, smallest, and largest department budget.
+ *
+ *	Parameters:
+ *		department id
+ *	Returns:
+ *		total budget
+ *		average budget
+ *		min budget
+ *		max budget
+ */
+
+CREATE PROCEDURE sub_tot_budget (head_dept CHAR(3))
+RETURNS (tot_budget DECIMAL(12, 2), avg_budget DECIMAL(12, 2),
+	min_budget DECIMAL(12, 2), max_budget DECIMAL(12, 2))
+AS
+BEGIN
+	SELECT SUM(budget), AVG(budget), MIN(budget), MAX(budget)
+		FROM department
+		WHERE head_dept = :head_dept
+		INTO :tot_budget, :avg_budget, :min_budget, :max_budget;
+	SUSPEND;
+END ;
+
+
+INSERT INTO country (country, currency) VALUES ('USA',         'Dollar');
+INSERT INTO country (country, currency) VALUES ('England',     'Pound');
+
+INSERT INTO department
+(dept_no, department, head_dept, budget, location, phone_no) VALUES
+('000', 'Corporate Headquarters', null, 1000000, 'Monterey','(408) 555-1234');
+
+INSERT INTO department
+(dept_no, department, head_dept, budget, location, phone_no) VALUES
+('100', 'Sales and Marketing',  '000', 2000000, 'San Francisco',
+'(415) 555-1234');
+
+INSERT INTO job
+(job_code, job_grade, job_country, job_title, min_salary, max_salary) VALUES
+('CEO',   1, 'USA', 'Chief Executive Officer',    130000, 250000);
+
+INSERT INTO job
+(job_code, job_grade, job_country, job_title, min_salary, max_salary) VALUES
+('CFO',   1, 'USA', 'Chief Financial Officer',    85000,  140000);
+
+UPDATE department SET mngr_no = 105 WHERE dept_no = '000';
+UPDATE department SET mngr_no = 85 WHERE dept_no = '100';
+
+UPDATE employee SET salary = salary + salary * 0.10
+    WHERE hire_date <= '08/01/91' AND job_grade = 5;
+UPDATE employee SET salary = salary + salary * 0.05 + 3000
+    WHERE hire_date <= '08/01/91' AND job_grade in (1, 2);
+UPDATE employee SET salary = salary + salary * 0.075
+    WHERE hire_date <= '08/01/91' AND job_grade in (3, 4) AND emp_no > 9;
+UPDATE salary_history
+    SET change_date = '12/15/92', updater_id = 'admin2';
+
+INSERT INTO sales
+(po_number, cust_no, sales_rep, order_date, ship_date, date_needed,
+order_status, paid, qty_ordered, total_value, discount, item_type) VALUES
+('V93F2030', 1012, 134, '12/12/93', null,    null,
+'open',         'y',    15,     450000.49,      0, 'hardware');
+
+INSERT INTO sales
+(po_number, cust_no, sales_rep, order_date, ship_date, date_needed,
+order_status, paid, qty_ordered, total_value, discount, item_type) VALUES
+('V93F2051', 1012, 134, '12/18/93', null, '03/01/94',
+'waiting',      'n',    1,      999.98,         0, 'software');
+
+INSERT INTO cross_rate VALUES ('Dollar', 'CdnDlr',  1.0027,  '11/09/2012');
+INSERT INTO cross_rate VALUES ('Dollar', 'Yen',     79.2400, '11/09/2012');
+INSERT INTO cross_rate VALUES ('Dollar', 'SFranc',  0.9495,  '11/09/2012');
+INSERT INTO cross_rate VALUES ('Dollar', 'Pound',   0.6272,  '11/09/2012');
+
