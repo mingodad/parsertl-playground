@@ -91,3 +91,4 @@ Related projects:
 - Flex https://github.com/westes/flex
 - Byacc https://www.invisible-island.net/byacc/byacc.html
 - BNF playground https://bnfplayground.pauliankline.com/
+- Lrstar an LR(*) parser generator for C++ http://lrstar.cc/
