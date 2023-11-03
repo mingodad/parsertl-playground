@@ -92,3 +92,4 @@ Related projects:
 - Byacc https://www.invisible-island.net/byacc/byacc.html
 - BNF playground https://bnfplayground.pauliankline.com/
 - Lrstar an LR(*) parser generator for C++ http://lrstar.cc/
+- LangCC "A Next-Generation Compiler Compiler" https://github.com/jzimmerman/langcc
