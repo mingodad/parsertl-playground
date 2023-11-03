@@ -62,7 +62,7 @@ base_id [A-Za-z_][A-Za-z0-9_]*
 rule_sep ":"|"::="|"-->"|":="|"->"|"="|":?"|":!"
 
 tok	"\\"?[^A-Za-z\n]
-action	"__"{base_id}|"_action_"{base_id}
+action	"__"{base_id}|"_action_"([0-9]+("_"{base_id})?|{base_id})
 epsilon _epsilon_
 
 %%
