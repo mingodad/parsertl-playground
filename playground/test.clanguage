@@ -1,0 +1,36 @@
+typedef bool boolean;
+typedef unsigned char byte;
+typedef unsigned short word;
+struct SerialClass {
+    void begin(int baud);
+    //void print(char value);
+    //void print(int value);
+    void print(const char *value);
+    void println();
+    void println(int value, int bas);
+    void println(int value);
+	void println(char value);
+    void println(unsigned long value);
+    void println(double value);
+    void println(float value);
+    void println(const char *value);
+};
+struct MemberTest {
+    int f();
+    int f(char testme);
+    int f(int testme);
+    int f(int testme, int bas);
+    int f(float testme);
+    int f(double testme);
+    int f(const char *testme);
+};
+struct MemberTest test;
+struct SerialClass Serial;
+struct CtorTest {
+    int x;
+    CtorTest(int x);
+};
+struct WireClass {
+    void onReceive(void (*callback)(int x));
+};
+struct WireClass Wire;
