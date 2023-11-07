@@ -95,6 +95,7 @@ const sampleList = [
 	["Dynare preprocessor parser (partially working)", "dynare-pp.g", "test.dynare-pp", "ace/mode/javascript"],
 	["Ebnf2bnf parser", "ebnf2bnf.g", "test.ebnf2bnf", "ace/mode/yaml"],
 	["Ecere parser (not working)", "ecere.g", "test.ecere", "ace/mode/c_cpp"],
+	["Estree parser", "estree.g", "test.estree", "ace/mode/txt"],
 	["Expr-lang parser", "expr-lang.g", "test.expr-lang", "ace/mode/txt"],
 	["Fault-lang parser (partially working)", "fault-lang-ext.g", "test.fault-lang", "ace/mode/txt"],
 	["Faust parser", "faustparser.g", "test.faustparser", "ace/mode/txt"],
