@@ -100,6 +100,8 @@ const sampleList = [
 	["Faust parser", "faustparser.g", "test.faustparser", "ace/mode/txt"],
 	["Firebird DSQL parser", "firebird-dsql.g", "test.firebird-dsql", "ace/mode/sql"],
 	["Fortune sheet formula parser", "fortune-sheet-formula.g", "test.fortune-sheet-formula", "ace/mode/txt"],
+	["FsLex parser", "fslex.g", "test.fslex", "ace/mode/yaml"],
+	["FsYacc parser", "fsyacc.g", "test.fsyacc", "ace/mode/yaml"],
 	["GramGrep parser", "grammar.g", "calculator.g", "ace/mode/yaml"],
 	["Graphql parser", "libgraphql.g", "test.libgraphql", "ace/mode/yaml"],
 	["Gringo-Clingo parser non grounding (partially working)", "gringo-ngp.g", "test.gringo-ngp", "ace/mode/text"],
