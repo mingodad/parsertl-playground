@@ -113,7 +113,7 @@ string	\"(\\.|[^"\n\r\\])*\"
 <header> {
 	"%}"<INITIAL>	HEADER
 	{string}<.>
-	[^{}]<.>
+	\n|.<.>
 }
 "%%"  PERCENT_PERCENT
 "%token"{whitespace}*"<"<>fs_type_token>
@@ -143,7 +143,7 @@ string	\"(\\.|[^"\n\r\\])*\"
 	"{"<>code>
 	"}"<<>	CODE
 	{string}<.>
-	[^{}]<.>
+	\n|.<.>
 }
 {whitespace}+  skip()
 {newline} skip()

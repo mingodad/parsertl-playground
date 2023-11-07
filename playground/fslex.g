@@ -152,7 +152,7 @@ sq_string	'(\\.|[^'\n\r\\])*'
 	"}"<<>	CODE
 	{dq_string}<.>
 	{sq_string}<.>
-	[^{}]<.>
+	\n|.<.>
 }
 
 {dq_string}	STRING
