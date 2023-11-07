@@ -1,3 +1,5 @@
+//From: https://github.com/xp44mm/ESTreeParser/blob/1f728480b912e778a5492906ff939a4ae7651e89/ESTreeParser/estree.fsyacc
+
 %token INTERFACE
 %token ID
 %token EXTEND
