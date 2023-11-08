@@ -154,6 +154,7 @@ const sampleList = [
 	["OcamlLex parser (partially working)", "ocaml-lex.g", "test.ocamllex", "ace/mode/ocaml"],
 	["Oberon parser", "oberon.g", "test.oberon", "ace/mode/pascal"],
 	["Ocaml parser from rescript (partially working)", "rescript-ocaml-parser.g", "test.ocaml", "ace/mode/ocaml"],
+	["Ocaml5 parser (partially working)", "ocaml5-parser.g", "test.ocaml", "ace/mode/ocaml"],
 	["OctoSQL parser (partially working)", "OctoSQL-parser.g", "test.OctoSQL-parser", "ace/mode/sql"],
 	["Openscad parser (partially working)", "openscad.g", "test.openscad", "ace/mode/text"],
 	["PCC cccom parser (partially working)", "pcc-cccom.g", "test.c", "ace/mode/c_cpp"],
