@@ -75,6 +75,7 @@ const sampleList = [
 	["Build your own prog. lang. CH13 parser", "build-your-own-programming-language-ch13.g", "test-ch13.java", "ace/mode/java"],
 	["C3c  parser", "c3lang.g", "test.c3lang", "ace/mode/c_cpp"],
 	["Calculator parser", "calculator.g", "test-calc.txt", "ace/mode/text"],
+	["Capnproto parser", "capnproto-antlr4.g", "test.capnproto", "ace/mode/text"],
 	["Carbon parser (need review of '*')", "carbon-lang.g", "prelude.carbon", "ace/mode/typescript"],
 	["CG-CQL-old parser", "cql.g", "test.cql", "ace/mode/sql"],
 	["CG-CQL-author parser", "cg-cql-author.g", "test.cg-cql-author", "ace/mode/sql"],
