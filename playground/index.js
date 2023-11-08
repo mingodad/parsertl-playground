@@ -200,6 +200,7 @@ const sampleList = [
 	["Typedmoon parser", "typedmoon.g", "test.typedmoon", "ace/mode/lua"],
 	["Webassembly interpreter parser", "wasm-interpreter.g", "test.wast", "ace/mode/lisp"],
 	["Vitess SQL parser (be patient)(partially working)", "sql-vitess.g", "test.sql-vitess", "ace/mode/sql"],
+	["Vitess SQL parser with fallback (partially working)", "sql-vitess-fallback.g", "test.sql-vitess", "ace/mode/sql"],
 	["X64 ASM ATT parser", "x64asm-att.g", "test.x64asm-att", "ace/mode/assembly_x86"],
 	["XML parser", "xml.g", "test.xml.txt", "ace/mode/xml"],
 	["Z80 assembler parser", "z80-asm.g", "test.z80-asm", "ace/mode/assembly_x86"],
