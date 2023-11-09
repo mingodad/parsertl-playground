@@ -1,0 +1,44 @@
+
+rules :
+	rules rule // a list of zero or more
+	| /* empty */ // rules
+	;
+
+rule :
+	NONTERMINAL ':' rhses ';' // one rule can represent
+	; // several productions
+
+rhses :
+	rhses '|' rhs // one or more rhs’es
+	| rhs // separated by "|"s
+	;
+
+rhs :
+	symbols optPrec optAction // the right hand side of
+	; // a production
+
+symbols :
+	symbols symbol // a list of zero or more
+	| /* empty */ // symbols
+	;
+
+symbol :
+	TERMINAL // the union of terminals
+	| NONTERMINAL // and nonterminals
+	;
+
+optPrec :
+	PREC TERMINAL // an optional precedence
+	| /* empty */
+	;
+
+optAction :
+	ACTION // and optional action
+	| /* empty */ {
+	    {
+	        dummy_nested_block();
+	    }
+		// register empty action
+		logEmptyAction();
+	}
+	;
