@@ -60,7 +60,7 @@
       "+..."          { L _ (SYMBOL Plus _ _) }
       "-..."          { L _ (SYMBOL Minus _ _) }
       "*..."          { L _ (SYMBOL Times _ _) }
-      "/..."          { L _ (SYMBOL Divide _ _) }
+      Divide          { L _ (SYMBOL Divide _ _) }
       "%..."          { L _ (SYMBOL Mod _ _) }
       "//..."         { L _ (SYMBOL Quot _ _) }
       "%%..."         { L _ (SYMBOL Rem _ _) }
@@ -166,23 +166,23 @@
 %left ifprec letprec caseprec typeprec enumprec sumprec
 %left ',' case id constructor '(' '{'
 %right ':' ":>"
-%right "..." "..<" "..>" ".."
-%left '`' "!..."
+%right "..." TWO_DOTS_LT TWO_DOTS_GT ".."
+%left '`' Bang
 %right "->"
 %left with
 %left '='
-%left "|>..."
-%right "<|..."
-%left "||..."
-%left "&&..."
-%left "<=..." ">=..." ">..." '<' "<..." "==..." "!=..." "!..." "=..."
-%left "&..." "^..." '^' "|..." '|'
-%left "<<..." ">>..."
-%left "+..." "-..." '-'
-%left "*..." '*' "/..." "%..." "//..." "%%..."
-%left "**..."
+%left PipeRight
+%right PipeLeft
+%left LogOr
+%left LogAnd
+%left Leq Geq Greater '<' Less Equal NotEqual Bang Equ
+%left Band Xor '^' Bor '|'
+%left ShiftL ShiftR
+%left Plus Minus '-'
+%left Times '*' Divide Mod Quot Rem
+%left Pow
 %left juxtprec
-%left '[' "...[" indexprec
+%left '[' INDEXING indexprec
 %left top
 
 %start Prog
@@ -314,7 +314,7 @@ Specs_
 
 SizeBinder
 	: '[' id ']'
-	| "...[" id ']'
+	| INDEXING id ']'
 	;
 
 SizeBinders1
@@ -323,14 +323,14 @@ SizeBinders1
 	;
 
 TypeTypeParam
-	: '\'' id
+	: "'" id
 	| "'~" id
 	| "'^" id
 	;
 
 TypeParam
 	: '[' id ']'
-	| "...[" id ']'
+	| INDEXING id ']'
 	| TypeTypeParam
 	;
 
@@ -351,35 +351,35 @@ LocalFunTypeParams
 // Note that this production does not include Minus, but does include
 // operator sections.
 BinOp
-	: "+..."
-	| "-..."
-	| "*..."
+	: Plus
+	| Minus
+	| Times
 	| '*'
-	| "/..."
-	| "%..."
-	| "//..."
-	| "%%..."
-	| "==..."
-	| "!=..."
-	| "<..."
-	| "<=..."
-	| ">..."
-	| ">=..."
-	| "&&..."
-	| "||..."
-	| "**..."
-	| "^..."
+	| Divide
+	| Mod
+	| Quot
+	| Rem
+	| Equal
+	| NotEqual
+	| Less
+	| Leq
+	| Greater
+	| Geq
+	| LogAnd
+	| LogOr
+	| Pow
+	| Xor
 	| '^'
-	| "&..."
-	| "|..."
+	| Band
+	| Bor
 	| '|'
-	| ">>..."
-	| "<<..."
-	| "<|..."
-	| "|>..."
+	| ShiftR
+	| ShiftL
+	| PipeLeft
+	| PipeRight
 	| '<'
-	| "!..."
-	| "=..."
+	| Bang
+	| Equ
 	| '`' QualName '`'
 	;
 
@@ -420,8 +420,8 @@ TypeExp
 TypeExpDims
 	: '[' id ']'
 	| '[' id ']' TypeExpDims
-	| "...[" id ']'
-	| "...[" id ']' TypeExpDims
+	| INDEXING id ']'
+	| INDEXING id ']' TypeExpDims
 	;
 
 TypeExpTerm
@@ -485,8 +485,8 @@ TupleTypes
 SizeExp
 	: '[' Exp ']'
 	| '['     ']'
-	| "...[" Exp ']'
-	| "...["     ']'
+	| INDEXING Exp ']'
+	| INDEXING     ']'
 	;
 
 FunParam :
@@ -531,7 +531,7 @@ Exp2
 	| '-' Exp2  %prec juxtprec
 	| '!' Exp2 %prec juxtprec
 	| Exp2 with '[' DimIndices ']' '=' Exp2
-	| Exp2 with "...[" DimIndices ']' '=' Exp2
+	| Exp2 with INDEXING DimIndices ']' '=' Exp2
 	| Exp2 with FieldAccesses_ '=' Exp2
 	| "\\" FunParams1 maybeAscription_TypeExpTerm "->" Exp %prec letprec
 	| ApplyList
@@ -559,7 +559,7 @@ Atom : PrimLit
 	| Atom '.' id
 	| Atom '.' natlit
 	| Atom '.' '(' Exp ')'
-	| Atom "...[" DimIndices ']'
+	| Atom INDEXING DimIndices ']'
 	| '{' Fields '}'
 	| SectionExp
 	;
@@ -621,7 +621,7 @@ LetExp
 	: let SizeBinders1 Pat '=' Exp LetBody
 	| let Pat '=' Exp LetBody
 	| let id LocalFunTypeParams FunParams1 maybeAscription_TypeExp '=' Exp LetBody
-	| let id "...[" DimIndices ']' '=' Exp LetBody
+	| let id INDEXING DimIndices ']' '=' Exp LetBody
 	;
 
 LetBody
@@ -633,36 +633,36 @@ LetBody
 	;
 
 BinOpExp
-	: Exp2 "+..." Exp2
-	| Exp2 "-..." Exp2
+	: Exp2 Plus Exp2
+	| Exp2 Minus Exp2
 	| Exp2 '-' Exp2
-	| Exp2 "*..." Exp2
+	| Exp2 Times Exp2
 	| Exp2 '*' Exp2
-	| Exp2 "/..." Exp2
-	| Exp2 "%..." Exp2
-	| Exp2 "//..." Exp2
-	| Exp2 "%%..." Exp2
-	| Exp2 "**..." Exp2
-	| Exp2 ">>..." Exp2
-	| Exp2 "<<..." Exp2
-	| Exp2 "&..." Exp2
-	| Exp2 "|..." Exp2
+	| Exp2 Divide Exp2
+	| Exp2 Mod Exp2
+	| Exp2 Quot Exp2
+	| Exp2 Rem Exp2
+	| Exp2 Pow Exp2
+	| Exp2 ShiftR Exp2
+	| Exp2 ShiftL Exp2
+	| Exp2 Band Exp2
+	| Exp2 Bor Exp2
 	| Exp2 '|' Exp2
-	| Exp2 "&&..." Exp2
-	| Exp2 "||..." Exp2
-	| Exp2 "^..." Exp2
+	| Exp2 LogAnd Exp2
+	| Exp2 LogOr Exp2
+	| Exp2 Xor Exp2
 	| Exp2 '^' Exp2
-	| Exp2 "==..." Exp2
-	| Exp2 "!=..." Exp2
-	| Exp2 "<..." Exp2
-	| Exp2 "<=..." Exp2
-	| Exp2 ">..." Exp2
-	| Exp2 ">=..." Exp2
-	| Exp2 "|>..." Exp2
-	| Exp2 "<|..." Exp2
+	| Exp2 Equal Exp2
+	| Exp2 NotEqual Exp2
+	| Exp2 Less Exp2
+	| Exp2 Leq Exp2
+	| Exp2 Greater Exp2
+	| Exp2 Geq Exp2
+	| Exp2 PipeRight Exp2
+	| Exp2 PipeLeft Exp2
 	| Exp2 '<' Exp2
-	| Exp2 "!..." Exp2
-	| Exp2 "=..." Exp2
+	| Exp2 Bang Exp2
+	| Exp2 Equ Exp2
 	| Exp2 '`' QualName '`' Exp2
 	;
 
@@ -678,11 +678,11 @@ SectionExp
 
 RangeExp
 	: Exp2 "..." Exp2
-	| Exp2 "..<" Exp2
-	| Exp2 "..>" Exp2
+	| Exp2 TWO_DOTS_LT Exp2
+	| Exp2 TWO_DOTS_GT Exp2
 	| Exp2 ".." Exp2 "..." Exp2
-	| Exp2 ".." Exp2 "..<" Exp2
-	| Exp2 ".." Exp2 "..>" Exp2
+	| Exp2 ".." Exp2 TWO_DOTS_LT Exp2
+	| Exp2 ".." Exp2 TWO_DOTS_GT Exp2
 	;
 
 IfExp
@@ -887,16 +887,9 @@ doc   "-- |".*(\n{space}*"--".*)*
 "--".*	skip()
 
 "`"	'`'
-"^"	'^'
 "~"	'~'
-"<"	'<'
-"="	'='
-"|"	'|'
 "_"	'_'
-"-"	'-'
 ","	','
-":"	':'
-"!"	'!'
 "?"	'?'
 "."	'.'
 "("	'('
@@ -905,45 +898,68 @@ doc   "-- |".*(\n{space}*"--".*)*
 "]"	']'
 "{"	'{'
 "}"	'}'
-"*"	'*'
 
-"^..."	"^..."
-"<<..."	"<<..."
-"<=..."	"<=..."
-"<|..."	"<|..."
-"<..."	"<..."
-"==..."	"==..."
-"=..."	"=..."
-">=..."	">=..."
-">>..."	">>..."
-">..."	">..."
-"|>..."	"|>..."
-"||..."	"||..."
-"|..."	"|..."
+"^"	'^'
+"^"{opchar}*	Xor
+
+"<"	'<'
+"<<"{opchar}*	ShiftL
+"<="{opchar}*	Leq
+"<|"{opchar}*	PipeLeft
+"<"{opchar}*	Less
+
+"="	'='
+"=="{opchar}*	Equal
+"="{opchar}*	Equ
+
+">="{opchar}*	Geq
+">>"{opchar}*	ShiftR
+">"{opchar}*	Greater
+
+"|"	'|'
+"|>"{opchar}*	PipeRight
+"||"{opchar}*	LogOr
+"|"{opchar}*	Bor
+
+"-"	'-'
 "->"	"->"
-"-..."	"-..."
+"-"{opchar}*	Minus
+
+":"	':'
 ":>"	":>"
-"!=..."	"!=..."
-"!..."	"!..."
-"//..."	"//..."
-"/..."	"/..."
-"..<"	"..<"
-"..>"	"..>"
+
+"!"	'!'
+"!="{opchar}*	NotEqual
+"!"{opchar}*	Bang
+
+"//"{opchar}*	Quot
+"/"{opchar}*	Divide
+
+"..<"	TWO_DOTS_LT
+"..>"	TWO_DOTS_GT
 "..."	"..."
-"...["	"...["
+"...["	INDEXING
 ".."	".."
+
 "'^"	"'^"
 "'~"	"'~"
-"'"	'\''
-"*..."	"*..."
-"**..."	"**..."
+"'"	"'"
+
+"*"	'*'
+"**"{opchar}*	Pow
+"*"{opchar}*	Times
+
 "\\"	"\\"
-"&..."	"&..."
-"&&..."	"&&..."
+
+"&&"{opchar}*	LogAnd
+"&"{opchar}*	Band
+
 "#["	"#["
-"%..."	"%..."
-"%%..."	"%%..."
-"+..."	"+..."
+
+"%"{opchar}*	Mod
+"%%"{opchar}*	Rem
+
+"+"{opchar}*	Plus
 
 assert	assert
 case	case
