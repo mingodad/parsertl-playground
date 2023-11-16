@@ -162,7 +162,7 @@
 %token while
 
 %left bottom
-%left ifprec letprec caseprec typeprec enumprec sumprec
+%left ifprec letprec caseprec typeprec sumprec
 %left ',' case id constructor '(' '{'
 %right ':' ":>"
 %right "..." TWO_DOTS_LT TWO_DOTS_GT ".."
@@ -181,7 +181,7 @@
 %left Times '*' Divide Mod Quot Rem
 %left Pow
 %left juxtprec
-%left '[' INDEXING indexprec
+%left '[' INDEXING
 %left top
 
 %start Prog
