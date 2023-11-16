@@ -997,6 +997,14 @@ namespace parsertl
 
                 token_info& token_info_ = info(id_);
 
+                if(token_info_._precedence)
+                {
+                    std::ostringstream ss_;
+
+                    ss_ << "Token already has precedence declared: " << token_;
+                    throw runtime_error(ss_.str());
+                }
+
                 token_info_._precedence = precedence_;
                 token_info_._associativity = associativity_;
             }
