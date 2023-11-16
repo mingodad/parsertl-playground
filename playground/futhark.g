@@ -162,12 +162,11 @@
 %token while
 
 %left bottom
-%left typeprec
 %left ifprec letprec caseprec typeprec enumprec sumprec
 %left ',' case id constructor '(' '{'
 %right ':' ":>"
 %right "..." TWO_DOTS_LT TWO_DOTS_GT ".."
-%left '`' Bang
+%left '`'
 %right "->"
 %left with
 %left '='
@@ -988,10 +987,11 @@ val	val
 while	while
 with	with
 
+{declit}	natlit
 {binlit}	intlit
 {hexlit}	intlit
 {romlit}	intlit
-{declit}	intlit
+
 {declit}i16	i16lit
 {declit}i32	i32lit
 {declit}i64	i64lit
@@ -1001,8 +1001,6 @@ with	with
 {declit}u32	u32lit
 {declit}u64	u64lit
 {declit}u8	u8lit
-
-{declit}	natlit
 
 //nedd be after intlit
 {reallit}|{hexreallit}	floatlit
