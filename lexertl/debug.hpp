@@ -459,7 +459,7 @@ namespace lexertl
 #define CH_NEED_ESCAPE(x) \
                    (x == static_cast<char_type>('-') || \
                     x == static_cast<char_type>('^') || \
-                    x == static_cast<char_type>(']'))
+                    x == static_cast<char_type>(' '))
 
             for (const auto& range_ : token_._ranges)
             {
