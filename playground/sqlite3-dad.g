@@ -4,6 +4,7 @@
 This grammar has inlined "sclp" in "selcollist" for get a shallow parser tree.
 Also added "softkeyword" to "nm" as a placeholder to add soft keywords as
 a kind of "fallback" functionality.
+Also splitted "expr" (expr/expr2) to eliminate reduce/reduce conflicts (see PostgreSQL and CG-CQL).
 */
 
 %token  SEMI EXPLAIN QUERY PLAN BEGIN TRANSACTION
@@ -35,6 +36,8 @@ a kind of "fallback" functionality.
 %token  CASE WHEN THEN ELSE INDEX ALTER
 %token  ADD WINDOW OVER FILTER
 
+%token ISNOT
+
 %fallback ID  ABORT ACTION AFTER ANALYZE ASC ATTACH BEFORE BEGIN BY CASCADE CAST COLUMNKW
 %fallback ID  CONFLICT DATABASE DEFERRED DESC DETACH DO
 %fallback ID  EACH END EXCLUSIVE EXPLAIN FAIL FOR
@@ -60,7 +63,7 @@ a kind of "fallback" functionality.
 %left /*1*/ OR
 %left /*2*/ AND
 %right /*3*/ NOT
-%left /*4*/ IS MATCH LIKE_KW BETWEEN IN ISNULL NOTNULL NE EQ
+%left /*4*/ IS MATCH LIKE_KW BETWEEN IN ISNULL NOTNULL NE EQ ISNOT
 %left /*5*/ GT LE LT GE
 %right /*6*/ ESCAPE
 %left /*7*/ BITAND BITOR LSHIFT RSHIFT
@@ -390,13 +393,13 @@ idlist_opt : LP idlist RP ;
 idlist : idlist COMMA nm ;
 idlist : nm ;
 
-expr : term ;
-expr : LP expr RP ;
-expr : ID ;
-expr : INDEXED ;
-expr : JOIN_KW ;
-expr : nm DOT nm ;
-expr : nm DOT nm DOT nm ;
+expr2 : term ;
+expr2 : LP expr2 RP ;
+expr2 : ID ;
+expr2 : INDEXED ;
+expr2 : JOIN_KW ;
+expr2 : nm DOT nm ;
+expr2 : nm DOT nm DOT nm ;
 
 term : NULL ;
 term : FLOAT ;
@@ -404,79 +407,80 @@ term : BLOB ;
 term : STRING ;
 term : INTEGER ;
 
-expr : VARIABLE ;
-expr : expr COLLATE /*11L*/ ID %prec COLLATE /*11L*/ ;
-expr : expr COLLATE /*11L*/ STRING %prec COLLATE /*11L*/ ;
-expr : CAST LP expr AS typetoken RP ;
-expr : ID LP distinct exprlist RP ;
-expr : INDEXED LP distinct exprlist RP ;
-expr : JOIN_KW LP distinct exprlist RP ;
-expr : ID LP STAR /*9L*/ RP %prec STAR /*9L*/ ;
-expr : INDEXED LP STAR /*9L*/ RP %prec STAR /*9L*/ ;
-expr : JOIN_KW LP STAR /*9L*/ RP %prec STAR /*9L*/ ;
-expr : ID LP distinct exprlist RP filter_over ;
-expr : INDEXED LP distinct exprlist RP filter_over ;
-expr : JOIN_KW LP distinct exprlist RP filter_over ;
-expr : ID LP STAR /*9L*/ RP filter_over %prec STAR /*9L*/ ;
-expr : INDEXED LP STAR /*9L*/ RP filter_over %prec STAR /*9L*/ ;
-expr : JOIN_KW LP STAR /*9L*/ RP filter_over %prec STAR /*9L*/ ;
+expr2 : VARIABLE ;
+expr2 : expr2 COLLATE /*11L*/ ID %prec COLLATE /*11L*/ ;
+expr2 : expr2 COLLATE /*11L*/ STRING %prec COLLATE /*11L*/ ;
+expr2 : CAST LP expr2 AS typetoken RP ;
+expr2 : ID LP distinct exprlist RP ;
+expr2 : INDEXED LP distinct exprlist RP ;
+expr2 : JOIN_KW LP distinct exprlist RP ;
+expr2 : ID LP STAR /*9L*/ RP %prec STAR /*9L*/ ;
+expr2 : INDEXED LP STAR /*9L*/ RP %prec STAR /*9L*/ ;
+expr2 : JOIN_KW LP STAR /*9L*/ RP %prec STAR /*9L*/ ;
+expr2 : ID LP distinct exprlist RP filter_over ;
+expr2 : INDEXED LP distinct exprlist RP filter_over ;
+expr2 : JOIN_KW LP distinct exprlist RP filter_over ;
+expr2 : ID LP STAR /*9L*/ RP filter_over %prec STAR /*9L*/ ;
+expr2 : INDEXED LP STAR /*9L*/ RP filter_over %prec STAR /*9L*/ ;
+expr2 : JOIN_KW LP STAR /*9L*/ RP filter_over %prec STAR /*9L*/ ;
 
 term : CTIME_KW ;
 
-expr : LP nexprlist COMMA expr RP ;
+expr2 : LP nexprlist COMMA expr2 RP ;
+expr : expr2 ;
 expr : expr AND /*2L*/ expr %prec AND /*2L*/ ;
 expr : expr OR /*1L*/ expr %prec OR /*1L*/ ;
-expr : expr LT /*5L*/ expr %prec LT /*5L*/ ;
-expr : expr GT /*5L*/ expr %prec LT /*5L*/ ;
-expr : expr GE /*5L*/ expr %prec LT /*5L*/ ;
-expr : expr LE /*5L*/ expr %prec LT /*5L*/ ;
-expr : expr EQ /*4L*/ expr %prec EQ /*4L*/ ;
-expr : expr NE /*4L*/ expr %prec EQ /*4L*/ ;
-expr : expr BITAND /*7L*/ expr %prec BITAND /*7L*/ ;
-expr : expr BITOR /*7L*/ expr %prec BITAND /*7L*/ ;
-expr : expr LSHIFT /*7L*/ expr %prec BITAND /*7L*/ ;
-expr : expr RSHIFT /*7L*/ expr %prec BITAND /*7L*/ ;
-expr : expr PLUS /*8L*/ expr %prec PLUS /*8L*/ ;
-expr : expr MINUS /*8L*/ expr %prec PLUS /*8L*/ ;
-expr : expr STAR /*9L*/ expr %prec STAR /*9L*/ ;
-expr : expr SLASH /*9L*/ expr %prec STAR /*9L*/ ;
-expr : expr REM /*9L*/ expr %prec STAR /*9L*/ ;
-expr : expr CONCAT /*10L*/ expr %prec CONCAT /*10L*/ ;
+expr2 : expr2 LT /*5L*/ expr2 %prec LT /*5L*/ ;
+expr2 : expr2 GT /*5L*/ expr2 %prec LT /*5L*/ ;
+expr2 : expr2 GE /*5L*/ expr2 %prec LT /*5L*/ ;
+expr2 : expr2 LE /*5L*/ expr2 %prec LT /*5L*/ ;
+expr2 : expr2 EQ /*4L*/ expr2 %prec EQ /*4L*/ ;
+expr2 : expr2 NE /*4L*/ expr2 %prec EQ /*4L*/ ;
+expr2 : expr2 BITAND /*7L*/ expr2 %prec BITAND /*7L*/ ;
+expr2 : expr2 BITOR /*7L*/ expr2 %prec BITAND /*7L*/ ;
+expr2 : expr2 LSHIFT /*7L*/ expr2 %prec BITAND /*7L*/ ;
+expr2 : expr2 RSHIFT /*7L*/ expr2 %prec BITAND /*7L*/ ;
+expr2 : expr2 PLUS /*8L*/ expr2 %prec PLUS /*8L*/ ;
+expr2 : expr2 MINUS /*8L*/ expr2 %prec PLUS /*8L*/ ;
+expr2 : expr2 STAR /*9L*/ expr2 %prec STAR /*9L*/ ;
+expr2 : expr2 SLASH /*9L*/ expr2 %prec STAR /*9L*/ ;
+expr2 : expr2 REM /*9L*/ expr2 %prec STAR /*9L*/ ;
+expr2 : expr2 CONCAT /*10L*/ expr2 %prec CONCAT /*10L*/ ;
 
 likeop : LIKE_KW /*4L*/ %prec LIKE_KW /*4L*/ ;
 likeop : MATCH /*4L*/ %prec LIKE_KW /*4L*/ ;
 likeop : NOT /*3R*/ LIKE_KW /*4L*/ %prec NOT /*3R*/ ;
 likeop : NOT /*3R*/ MATCH /*4L*/ %prec NOT /*3R*/ ;
 
-expr : expr likeop expr %prec LIKE_KW /*4L*/ ;
-expr : expr likeop expr ESCAPE /*6R*/ expr %prec LIKE_KW /*4L*/ ;
-expr : expr ISNULL /*4L*/ %prec ISNULL /*4L*/ ;
-expr : expr NOTNULL /*4L*/ %prec ISNULL /*4L*/ ;
-expr : expr NOT /*3R*/ NULL %prec NOT /*3R*/ ;
-expr : expr IS /*4L*/ expr %prec IS /*4L*/ ;
-expr : expr IS /*4L*/ NOT /*3R*/ expr %prec IS /*4L*/ ;
-expr : expr IS /*4L*/ NOT /*3R*/ DISTINCT FROM expr %prec IS /*4L*/ ;
-expr : expr IS /*4L*/ DISTINCT FROM expr %prec IS /*4L*/ ;
-expr : NOT /*3R*/ expr %prec NOT /*3R*/ ;
-expr : BITNOT /*12R*/ expr %prec BITNOT /*12R*/ ;
-expr : PLUS /*8L*/ expr %prec BITNOT /*12R*/ ;
-expr : MINUS /*8L*/ expr %prec BITNOT /*12R*/ ;
-expr : expr PTR /*10L*/ expr %prec PTR /*10L*/ ;
+expr2 : expr2 likeop expr2 %prec LIKE_KW /*4L*/ ;
+expr2 : expr2 likeop expr2 ESCAPE /*6R*/ expr2 %prec LIKE_KW /*4L*/ ;
+expr2 : expr2 ISNULL /*4L*/ %prec ISNULL /*4L*/ ;
+expr2 : expr2 NOTNULL /*4L*/ %prec ISNULL /*4L*/ ;
+expr2 : expr2 NOT /*3R*/ NULL %prec NOT /*3R*/ ;
+expr2 : expr2 IS /*4L*/ expr2 %prec IS /*4L*/ ;
+expr2 : expr2 ISNOT expr2 ;
+expr2 : expr2 ISNOT DISTINCT FROM expr2 %prec IS /*4L*/ ;
+expr2 : expr2 IS /*4L*/ DISTINCT FROM expr2 %prec IS /*4L*/ ;
+expr2 : NOT /*3R*/ expr2 %prec NOT /*3R*/ ;
+expr2 : BITNOT /*12R*/ expr2 %prec BITNOT /*12R*/ ;
+expr2 : PLUS /*8L*/ expr2 %prec BITNOT /*12R*/ ;
+expr2 : MINUS /*8L*/ expr2 %prec BITNOT /*12R*/ ;
+expr2 : expr2 PTR /*10L*/ expr2 %prec PTR /*10L*/ ;
 
 between_op : BETWEEN /*4L*/ %prec BETWEEN /*4L*/ ;
 between_op : NOT /*3R*/ BETWEEN /*4L*/ %prec NOT /*3R*/ ;
 
-expr : expr between_op expr AND /*2L*/ expr %prec BETWEEN /*4L*/ ;
+expr2 : expr2 between_op expr2 AND /*2L*/ expr2 %prec BETWEEN /*4L*/ ;
 
 in_op : IN /*4L*/ %prec IN /*4L*/ ;
 in_op : NOT /*3R*/ IN /*4L*/ %prec NOT /*3R*/ ;
 
-expr : expr in_op LP exprlist RP %prec IN /*4L*/ ;
-expr : LP select RP ;
-expr : expr in_op LP select RP %prec IN /*4L*/ ;
-expr : expr in_op nm dbnm paren_exprlist %prec IN /*4L*/ ;
-expr : EXISTS LP select RP ;
-expr : CASE case_operand case_exprlist case_else END ;
+expr2 : expr2 in_op LP exprlist RP %prec IN /*4L*/ ;
+expr2 : LP select RP ;
+expr2 : expr2 in_op LP select RP %prec IN /*4L*/ ;
+expr2 : expr2 in_op nm dbnm paren_exprlist %prec IN /*4L*/ ;
+expr2 : EXISTS LP select RP ;
+expr2 : CASE case_operand case_exprlist case_else END ;
 
 case_exprlist : case_exprlist WHEN expr THEN expr ;
 case_exprlist : WHEN expr THEN expr ;
@@ -782,6 +786,8 @@ INSTEAD	INSTEAD
 INTERSECT	INTERSECT
 INTO	INTO
 IS	IS
+ISNOT   ISNOT
+IS\s+NOT   ISNOT
 ISNULL	ISNULL
 JOIN	JOIN
 CROSS|FULL|INNER|LEFT|NATURAL|OUTER|RIGHT	JOIN_KW
