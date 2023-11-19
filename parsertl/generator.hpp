@@ -982,8 +982,8 @@ namespace parsertl
                         if(rhs_.param < lhs_.param)
                         {
                             // Take the earlier rule on reduce/reduce error
-                            //lhs_ = rhs_;
-                            //modified_ = true;
+                            lhs_ = rhs_;
+                            modified_ = true;
                         }
                     }
 
