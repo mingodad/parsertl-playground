@@ -99,6 +99,7 @@ const sampleList = [
 	["Ecere parser (not working)", "ecere.g", "test.ecere", "ace/mode/c_cpp"],
 	["Estree parser", "estree.g", "test.estree", "ace/mode/txt"],
 	["Expr-lang parser", "expr-lang.g", "test.expr-lang", "ace/mode/txt"],
+	["Event comiler parser", "event-compiler.g", "test.event-compiler", "ace/mode/txt"],
 	["Fault-lang parser (partially working)", "fault-lang-ext.g", "test.fault-lang", "ace/mode/txt"],
 	["Faust parser", "faustparser.g", "test.faustparser", "ace/mode/txt"],
 	["Firebird DSQL parser", "firebird-dsql.g", "test.firebird-dsql", "ace/mode/sql"],
