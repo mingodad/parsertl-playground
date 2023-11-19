@@ -459,7 +459,11 @@ namespace lexertl
 #define CH_NEED_ESCAPE(x) \
                    (x == static_cast<char_type>('-') || \
                     x == static_cast<char_type>('^') || \
-                    x == static_cast<char_type>(' '))
+                    x == static_cast<char_type>('%') || \
+                    x == static_cast<char_type>('$') || \
+                    (needBracket && x == static_cast<char_type>('[')) || \
+                    (needBracket && x == static_cast<char_type>(']')) || \
+                    (!needBracket && x == static_cast<char_type>(' ')))
 
             for (const auto& range_ : token_._ranges)
             {
@@ -468,8 +472,7 @@ namespace lexertl
                     stream_ << static_cast<char_type>('\\');
                 }
 
-                chars_ = string_token::escape_char
-                (range_.first);
+                chars_ = string_token::escape_char(range_.first);
 
                 if (range_.first != range_.second)
                 {

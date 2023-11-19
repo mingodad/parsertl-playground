@@ -77,6 +77,7 @@ struct GlobalState
     int dumpAsEbnfRR;
     bool verboseOutput = true;
     bool icase;
+    bool dump_master_grammar = false;
     bool dump_grammar_lexer;
     bool dump_grammar_lsm;
     bool dump_grammar_gsm;
@@ -1144,7 +1145,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
 
     std::string warnings;
 
-    if(dumpGrammar)
+    if(dumpGrammar || gs.dump_master_grammar)
     {
         parsertl::debug::dump(grules, std::cout, asEbnfRR);
     }
@@ -1262,7 +1263,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     lrules.push("ID", "reject\\s*[(]\\s*[)]", gs.token_Reject, "RULE");
     lexertl::generator::build(lrules, gs.master_parser.lsm);
     //gs.master_parser.lsm.minimise ();
-    if(dumpGrammar)
+    if(dumpGrammar || gs.dump_master_grammar)
     {
         parsertl::rules::string_vector terminals;
         grules.terminals(terminals);
@@ -1471,6 +1472,7 @@ static void showHelp(const char* prog_name)
             "-dumpAsEbnfRR  Dump grammar as EBNF for railroad diagram\n"
             "-dumpAsYacc    Dump grammar as Yacc\n"
             "-dumpAsLex     Dump grammar as Lex\n"
+            "-dumpMaster    Dump master grammar\n"
             "-pruneptree    Do not show empty parser tree nodes\n"
             "-verbose       Show several metrics for debug\n"
             ;
@@ -1540,6 +1542,10 @@ int main(int argc, char *argv[])
         else if (strcmp("-dumpAsLex", param) == 0)
         {
             gs.dumpAsEbnfRR = 3;
+        }
+        else if (strcmp("-dumpMaster", param) == 0)
+        {
+            gs.dump_master_grammar = true;
         }
         else if (strcmp("-pruneptree", param) == 0)
         {
