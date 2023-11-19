@@ -846,7 +846,6 @@ namespace parsertl
             static const char* actions_[] =
             { "ERROR", "SHIFT", "REDUCE", "GOTO", "ACCEPT" };
             bool error_ = false;
-            const auto lhs_saved = lhs_;
 
             if (lhs_.action == action::error)
             {
@@ -976,19 +975,7 @@ namespace parsertl
                 }
                 else
                 {
-                    if (lhs_.action == action::reduce &&
-                        rhs_.action == action::reduce)
-                    {
-                        ++rules_.reduce_reduce_count;
-                        if(rhs_.param < lhs_.param)
-                        {
-                            // Take the earlier rule on reduce/reduce error
-                            lhs_ = rhs_;
-                            lhs_.param = rhs_.param;
-                            modified_ = true;
-                        }
-                    }
-
+                    ++rules_.reduce_reduce_count;
                     error_ = true;
                 }
             }
@@ -1000,12 +987,23 @@ namespace parsertl
                 ss_ << "state " << rule_index << ":" << symbols_[id_] << " ";
                 ss_ << actions_[static_cast<int>(lhs_.action)];
                 dump_action(grammar_, terminals_, config_, symbols_, id_,
-                    lhs_saved, ss_);
+                    lhs_, ss_);
                 ss_ << '/' << actions_[static_cast<int>(rhs_.action)];
                 dump_action(grammar_, terminals_, config_, symbols_, id_, rhs_,
                     ss_);
                 ss_ << " conflict.\n";
                 warnings_ += ss_.str();
+
+                if (lhs_.action == action::reduce &&
+                    rhs_.action == action::reduce)
+                {
+                    if(rhs_.param < lhs_.param)
+                    {
+                        // Take the earlier rule on reduce/reduce error
+                        lhs_.param = rhs_.param;
+                        modified_ = true;
+                    }
+                }
             }
 
             return modified_;
