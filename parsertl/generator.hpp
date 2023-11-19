@@ -975,7 +975,6 @@ namespace parsertl
                 }
                 else
                 {
-                    ++rules_.reduce_reduce_count;
                     error_ = true;
                 }
             }
@@ -997,6 +996,7 @@ namespace parsertl
                 if (lhs_.action == action::reduce &&
                     rhs_.action == action::reduce)
                 {
+                    ++rules_.reduce_reduce_count;
                     if(rhs_.param < lhs_.param)
                     {
                         // Take the earlier rule on reduce/reduce error
