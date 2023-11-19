@@ -984,6 +984,7 @@ namespace parsertl
                         {
                             // Take the earlier rule on reduce/reduce error
                             lhs_ = rhs_;
+                            lhs_.param = rhs_.param;
                             modified_ = true;
                         }
                     }
