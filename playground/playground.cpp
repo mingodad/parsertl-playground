@@ -1343,7 +1343,7 @@ int main_base(int argc, char* argv[], GlobalState& gs)
                 //std::cerr << "Lexer DFA[" << i << "] Size " << gs.user_parser.lsm.data()._dfa[i].size() << ".\n";
             }
             std::cerr << "Shift/Reduce conflicts resolved " << gs.user_parser.grules.shift_reduce_count << ".\n";
-            std::cerr << "Reduce/Reduce conflicts resolved " << gs.user_parser.grules.reduce_reduce_count << ".\n";
+            std::cerr << "Reduce/Reduce conflicts found " << gs.user_parser.grules.reduce_reduce_count << ".\n";
             //std::cerr << "dumpAsEbnfRR = " << gs.dumpAsEbnfRR << "\n";
         }
 
