@@ -1991,9 +1991,9 @@ external_guess_declaration :
 	| STATIC DEFINE identifier '=' conditional_expression ';'
 	;
 
-external_guess_declaration_error :
-	//external_guess_declaration_specifiers error
-	;
+//external_guess_declaration_error :
+//	//external_guess_declaration_specifiers error
+//	;
 
 declaration_error :
 	//declaration_specifiers error
@@ -2190,8 +2190,8 @@ external_declaration_error :
 	| function_definition_error
 	| declaration_mode class_error
 	| declaration_mode function_definition_error
-	| external_guess_declaration_error
-	| declaration_mode external_guess_declaration_error
+	//| external_guess_declaration_error
+	//| declaration_mode external_guess_declaration_error
 	;
 
 translation_unit_error :
