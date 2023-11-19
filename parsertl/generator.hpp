@@ -846,6 +846,7 @@ namespace parsertl
             static const char* actions_[] =
             { "ERROR", "SHIFT", "REDUCE", "GOTO", "ACCEPT" };
             bool error_ = false;
+            const auto lhs_saved = lhs_;
 
             if (lhs_.action == action::error)
             {
@@ -997,8 +998,8 @@ namespace parsertl
 
                 ss_ << "state " << rule_index << ":" << symbols_[id_] << " ";
                 ss_ << actions_[static_cast<int>(lhs_.action)];
-                dump_action(grammar_, terminals_, config_, symbols_, id_, lhs_,
-                    ss_);
+                dump_action(grammar_, terminals_, config_, symbols_, id_,
+                    lhs_saved, ss_);
                 ss_ << '/' << actions_[static_cast<int>(rhs_.action)];
                 dump_action(grammar_, terminals_, config_, symbols_, id_, rhs_,
                     ss_);
