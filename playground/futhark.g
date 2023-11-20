@@ -2,6 +2,10 @@
 // | Futhark parser written with Happy.
 
 /*
+Moved "Exp2 : Exp2 ".." Atom" to "Exp -> Exp ".." Atom" to remove reduce/reduce conflicts.
+*/
+
+/*
 %name prog Prog
 %name futharkType TypeExp
 %name expression Exp
@@ -513,6 +517,7 @@ QualName
 Exp
 	: Exp ':' TypeExp
 	| Exp ":>" TypeExp
+	| Exp ".." Atom
 	| Exp2 %prec ':'
 	;
 
@@ -525,7 +530,6 @@ Exp2
 	| "#[" AttrInfo ']' Exp %prec bottom
 	| BinOpExp
 	| RangeExp
-	| Exp2 ".." Atom
 	| Atom ".." Exp2
 	| '-' Exp2  %prec juxtprec
 	| '!' Exp2 %prec juxtprec
