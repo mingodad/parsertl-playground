@@ -19,7 +19,7 @@ skill(kkk )
 	{: abcd :};
 	(:attr :)
 	script(ttt )
-	//{::}
+	{::}
 	[:attr :]
 	script(ttt )
 	{:
