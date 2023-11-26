@@ -92,6 +92,7 @@
 %token RETURN
 %token FOREACH_R
 %token FOREACH
+%token INTERFACE
 %token FN
 %token FAULT
 %token MACRO
@@ -108,8 +109,6 @@
 %token CT_ENDSWITCH
 %token BUILTIN
 %token IMPLIES
-%token INITIALIZE
-%token FINALIZE
 %token CT_ECHO
 %token CT_ASSERT
 %token CT_EVALTYPE
@@ -141,7 +140,6 @@
 %token CT_EXTNAMEOF
 %token CT_EVAL
 %token CT_DEFINED
-%token CT_CHECKS
 %token CT_ALIGNOF
 %token ASSERT
 %token ASM
@@ -153,9 +151,13 @@
 %token LBRAPIPE
 %token RBRAPIPE
 //%token HASH_CONST_IDENT
+%token CT_ASSIGNABLE
+%token CT_AND
+%token CT_IS_CONST
 %token '.'
 %token '('
 %token ')'
+%token ','
 %token '^'
 %token ':'
 %token '['
@@ -173,7 +175,6 @@
 %token '>'
 %token '?'
 %token '='
-%token ','
 %token ';'
 %token '{'
 %token '}'
@@ -216,17 +217,22 @@ local_ident_expr :
 
 ct_call :
 	CT_ALIGNOF
-	| CT_DEFINED
 	| CT_EXTNAMEOF
 	| CT_NAMEOF
 	| CT_OFFSETOF
 	| CT_QNAMEOF
 	;
 
+ct_castable :
+	CT_ASSIGNABLE
+	;
+
 ct_analyse :
 	CT_EVAL
+	| CT_DEFINED
 	| CT_SIZEOF
 	| CT_STRINGIFY
+	| CT_IS_CONST
 	;
 
 ct_arg :
@@ -244,7 +250,7 @@ flat_path :
 
 maybe_optional_type :
 	optional_type
-	| /*empty*/
+	| empty
 	;
 
 string_expr :
@@ -282,10 +288,11 @@ base_expr :
 	| expr_block
 	| ct_call '(' flat_path ')'
 	| ct_arg '(' expr ')'
-	| ct_analyse '(' expr ')'
+	| ct_analyse '(' expression_list ')'
 	| CT_VACOUNT
 	| CT_FEATURE '(' CONST_IDENT ')'
-	| CT_CHECKS '(' expression_list ')'
+	| CT_AND '(' expression_list ')'
+	| ct_castable '(' expr ',' type ')'
 	| lambda_decl compound_statement
 	;
 
@@ -521,9 +528,9 @@ assignment_op :
 	| OR_ASSIGN
 	;
 
-//empty :
-//	/*empty*/
-//	;
+empty :
+	/*empty*/
+	;
 
 assignment_expr :
 	ternary_expr
@@ -589,13 +596,24 @@ call_arg_list :
 	| arg_list ';' parameters
 	| ';'
 	| ';' parameters
-	| /*empty*/
+	| empty
 	;
 
 opt_arg_list_trailing :
 	arg_list
 	| arg_list ','
-	| /*empty*/
+	| empty
+	;
+
+interfaces :
+	TYPE_IDENT opt_generic_parameters
+	| interfaces ',' TYPE_IDENT opt_generic_parameters
+	;
+
+opt_interface_impl :
+	'(' interfaces ')'
+	| '(' ')'
+	| empty
 	;
 
 enum_constants :
@@ -650,8 +668,8 @@ base_type :
 	| ANYFAULT
 	| ANY
 	| TYPEID
-	| TYPE_IDENT
-	| path TYPE_IDENT
+	| TYPE_IDENT opt_generic_parameters
+	| path TYPE_IDENT opt_generic_parameters
 	| CT_TYPE_IDENT
 	| CT_TYPEOF '(' expr ')'
 	| CT_TYPEFROM '(' constant_expr ')'
@@ -853,7 +871,7 @@ do_stmt :
 
 optional_label_target :
 	CONST_IDENT
-	| /*empty*/
+	| empty
 	;
 
 continue_stmt :
@@ -959,9 +977,12 @@ asm_stmt :
 	;
 
 asm_block_stmt :
-	ASM '(' constant_expr ')'
+	ASM '(' constant_expr ')' ';'
+	| ASM '(' constant_expr ')' AT_IDENT ';'
 	| ASM '{' asm_stmts '}'
+	| ASM AT_IDENT '{' asm_stmts '}'
 	| ASM '{' '}'
+	| ASM AT_IDENT '{' '}'
 	;
 
 statement :
@@ -1002,7 +1023,7 @@ statement_list :
 
 opt_stmt_list :
 	statement_list
-	| /*empty*/
+	| empty
 	;
 
 switch_stmt :
@@ -1019,7 +1040,7 @@ expression_list :
 
 optional_label :
 	CONST_IDENT ':'
-	| /*empty*/
+	| empty
 	;
 
 ct_assert_stmt :
@@ -1037,7 +1058,7 @@ ct_echo_stmt :
 	;
 
 bitstruct_declaration :
-	BITSTRUCT TYPE_IDENT ':' type opt_attributes bitstruct_body
+	BITSTRUCT TYPE_IDENT opt_interface_impl ':' type opt_attributes bitstruct_body
 	;
 
 bitstruct_body :
@@ -1059,11 +1080,6 @@ bitstruct_simple_defs :
 bitstruct_def :
 	base_type IDENT ':' constant_expr DOTDOT constant_expr ';'
 	| base_type IDENT ':' constant_expr ';'
-	;
-
-static_declaration :
-	STATIC INITIALIZE opt_attributes compound_statement
-	| STATIC FINALIZE opt_attributes compound_statement
 	;
 
 attribute_name :
@@ -1100,7 +1116,7 @@ attribute_list :
 
 opt_attributes :
 	attribute_list
-	| /*empty*/
+	| empty
 	;
 
 trailing_block_param :
@@ -1113,7 +1129,7 @@ macro_params :
 	parameters
 	| parameters ';' trailing_block_param
 	| ';' trailing_block_param
-	| /*empty*/
+	| empty
 	;
 
 macro_func_body :
@@ -1131,7 +1147,7 @@ struct_or_union :
 	;
 
 struct_declaration :
-	struct_or_union TYPE_IDENT opt_attributes struct_body
+	struct_or_union TYPE_IDENT opt_interface_impl opt_attributes struct_body
 	;
 
 struct_body :
@@ -1151,7 +1167,7 @@ enum_params :
 enum_param_list :
 	'(' enum_params ')'
 	| '(' ')'
-	| /*empty*/
+	| empty
 	;
 
 struct_member_decl :
@@ -1166,11 +1182,11 @@ struct_member_decl :
 
 enum_spec :
 	':' type enum_param_list
-	| /*empty*/
+	| empty
 	;
 
 enum_declaration :
-	ENUM TYPE_IDENT enum_spec opt_attributes '{' enum_list '}'
+	ENUM TYPE_IDENT opt_interface_impl enum_spec opt_attributes '{' enum_list '}'
 	;
 
 faults :
@@ -1179,8 +1195,8 @@ faults :
 	;
 
 fault_declaration :
-	FAULT TYPE_IDENT opt_attributes '{' faults '}'
-	| FAULT TYPE_IDENT opt_attributes '{' faults ',' '}'
+	FAULT TYPE_IDENT opt_interface_impl opt_attributes '{' faults '}'
+	| FAULT TYPE_IDENT opt_interface_impl opt_attributes '{' faults ',' '}'
 	;
 
 func_macro_name :
@@ -1229,8 +1245,12 @@ parameter :
 	| CT_IDENT ELLIPSIS
 	;
 
-func_definition :
+func_defintion_decl :
 	FN func_header fn_parameter_list opt_attributes ';'
+	;
+
+func_definition :
+	func_defintion_decl
 	| FN func_header fn_parameter_list opt_attributes macro_func_body
 	;
 
@@ -1243,12 +1263,9 @@ func_typedef :
 	FN optional_type fn_parameter_list
 	;
 
-opt_distinct_inline :
-	DISTINCT
-	| DISTINCT INLINE
-	| INLINE DISTINCT
-	| INLINE
-	| /*empty*/
+opt_inline :
+	INLINE
+	| empty
 	;
 
 generic_parameters :
@@ -1260,7 +1277,7 @@ generic_parameters :
 
 typedef_type :
 	func_typedef
-	| type opt_generic_parameters
+	| type
 	;
 
 multi_declaration :
@@ -1270,7 +1287,7 @@ multi_declaration :
 
 global_storage :
 	TLOCAL
-	| /*empty*/
+	| empty
 	;
 
 global_declaration :
@@ -1281,7 +1298,7 @@ global_declaration :
 
 opt_tl_stmts :
 	top_level_statements
-	| /*empty*/
+	| empty
 	;
 
 tl_ct_case :
@@ -1306,7 +1323,7 @@ generic_expr :
 
 opt_generic_parameters :
 	generic_expr
-	| /*empty*/
+	| empty
 	;
 
 define_ident :
@@ -1317,13 +1334,31 @@ define_ident :
 
 define_declaration :
 	DEF define_ident opt_attributes ';'
-	| DEF define_attribute opt_attributes';'
-	| DEF TYPE_IDENT opt_attributes '=' opt_distinct_inline typedef_type opt_attributes ';'
+	| DEF define_attribute opt_attributes ';'
+	| DEF TYPE_IDENT opt_attributes '=' typedef_type opt_attributes ';'
+	;
+
+interface_body :
+	func_defintion_decl
+	| interface_body func_defintion_decl
+	;
+
+interface_declaration :
+	INTERFACE TYPE_IDENT '{' '}'
+	| INTERFACE TYPE_IDENT '{' interface_body '}'
+	;
+
+distinct_declaration :
+	DISTINCT TYPE_IDENT opt_interface_impl opt_attributes '=' opt_inline type ';'
 	;
 
 tl_ct_if :
-	CT_IF constant_expr ':' opt_tl_stmts CT_ENDIF
-	| CT_IF constant_expr ':' opt_tl_stmts CT_ELSE opt_tl_stmts CT_ENDIF
+	CT_IF constant_expr ':' opt_tl_stmts tl_ct_if_tail
+	;
+
+tl_ct_if_tail :
+	CT_ENDIF
+	| CT_ELSE opt_tl_stmts CT_ENDIF
 	;
 
 tl_ct_switch :
@@ -1356,7 +1391,7 @@ import_decl :
 
 translation_unit :
 	top_level_statements
-	| /*empty*/
+	| empty
 	;
 
 top_level_statements :
@@ -1366,7 +1401,7 @@ top_level_statements :
 
 opt_extern :
 	EXTERN
-	| /*empty*/
+	| empty
 	;
 
 top_level :
@@ -1385,8 +1420,9 @@ top_level :
 	| enum_declaration
 	| macro_declaration
 	| define_declaration
-	| static_declaration
 	| bitstruct_declaration
+	| distinct_declaration
+	| interface_declaration
 	;
 
 %%
@@ -1424,9 +1460,10 @@ WS          [ \t\v\n\r\f]
 %%
 
 "$alignof"      CT_ALIGNOF
+"$and"          CT_AND
 "$assert"       CT_ASSERT
+"$assignable"	CT_ASSIGNABLE
 "$case"         CT_CASE
-"$checks"       CT_CHECKS
 "$default"      CT_DEFAULT
 "$defined"      CT_DEFINED
 "$echo"         CT_ECHO
@@ -1443,6 +1480,7 @@ WS          [ \t\v\n\r\f]
 "$for"          CT_FOR
 "$foreach"      CT_FOREACH
 "$if"           CT_IF
+"$is_const"     CT_IS_CONST
 "$include"      CT_INCLUDE
 "$nameof"       CT_NAMEOF
 "$offsetof"     CT_OFFSETOF
@@ -1490,7 +1528,6 @@ WS          [ \t\v\n\r\f]
 "extern"        EXTERN
 "false"         FALSE
 "fault"		FAULT
-"finalize"      FINALIZE
 "float"		FLOAT
 "bfloat16"      BFLOAT16
 "float16"       FLOAT16
@@ -1502,7 +1539,6 @@ WS          [ \t\v\n\r\f]
 "ichar"         ICHAR
 "if"		IF
 "import"        IMPORT
-"initialize"    INITIALIZE
 "inline"	INLINE
 "int"		INT
 "int128"	INT128
@@ -1533,6 +1569,11 @@ WS          [ \t\v\n\r\f]
 "void"		VOID
 "while"		WHILE
 
+"interface"	INTERFACE
+CT_ASSIGNABLE	CT_ASSIGNABLE
+CT_AND	CT_AND
+CT_IS_CONST	CT_IS_CONST
+
 //@{CONST}        AT_CONST_IDENT
 //#{CONST}        HASH_CONST_IDENT
 "$"{CONST}      CT_CONST_IDENT
@@ -1556,7 +1597,7 @@ b64\'{B64}+\' BYTES
 b64\"{B64}+\" BYTES
 b64\`{B64}+\` BYTES
 
-{INT}{E}{REALTYPE}? REAL
+{INT}{E}?{REALTYPE}? REAL
 0[xX]{HINT}{P}{REALTYPE}?	REAL
 {INT}"."{INT}{E}?{REALTYPE}?	REAL
 0[xX]{HINT}"."{HINT}{P}{REALTYPE}? REAL
