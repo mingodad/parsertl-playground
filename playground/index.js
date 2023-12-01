@@ -109,6 +109,7 @@ const sampleList = [
 	["FsYacc parser", "fsyacc.g", "test.fsyacc", "ace/mode/yaml"],
 	["Futhark parser (partially working)", "futhark.g", "test.futhark", "ace/mode/txt"],
 	["GramGrep parser", "grammar.g", "calculator.g", "ace/mode/yaml"],
+	["GGML parser", "ggml.g", "test.ggml", "ace/mode/yaml"],
 	["Graphql parser", "libgraphql.g", "test.libgraphql", "ace/mode/yaml"],
 	["Gringo-Clingo parser non grounding (partially working)", "gringo-ngp.g", "test.gringo-ngp", "ace/mode/text"],
 	["Hawq SQL parser (be patient)", "hawq-sql.g", "test.sql", "ace/mode/sql"],
