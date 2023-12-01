@@ -139,6 +139,7 @@ const sampleList = [
 	["Lua2ljs parser", "lua2ljs.g", "test.lua", "ace/mode/lua"],
 	["Lua-5.3 parser", "lua-5.3.g", "test.lua", "ace/mode/lua"],
 	["Lua parser", "lua.g", "test.lua", "ace/mode/lua"],
+	["Lua-lark parser", "lua-parser-lark.g", "test.lua", "ace/mode/lua"],
 	["LuaPP parser (partially working)", "luapp.g", "test.luapp", "ace/mode/lua"],
 	["Make parser (from anjuta)", "mk-parser.g", "test.mk-parser", "ace/mode/Makefile"],
 	["MangoFix parser", "mangofix.g", "test.mangofix", "ace/mode/c_cpp"],
