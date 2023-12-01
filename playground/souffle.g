@@ -1,6 +1,6 @@
 //From: https://github.com/souffle-lang/souffle/blob/master/src/parser/parser.yy
 
-%token IP_NUMBER
+//%token IP_NUMBER
 
 /*Tokens*/
 %token END
@@ -47,10 +47,12 @@
 %token INPUT_DECL
 %token OUTPUT_DECL
 %token DEBUG_DELTA
+//%token UNIQUE
 %token PRINTSIZE_DECL
 %token LIMITSIZE_DECL
 %token OVERRIDE
 %token TYPE
+%token LATTICE
 %token COMPONENT
 %token INSTANTIATE
 %token NUMBER_TYPE
@@ -96,6 +98,7 @@
 %token LE
 %token GE
 %token NE
+%token MAPSTO
 %token BW_AND
 %token BW_OR
 %token BW_XOR
@@ -139,6 +142,7 @@ unit :
 	| unit component_init
 	| unit pragma
 	| unit type_decl
+	| unit lattice_decl
 	| unit functor_decl
 	| unit relation_decl
 	;
@@ -178,6 +182,19 @@ adt_branch :
 	| IDENT LBRACE non_empty_attributes RBRACE
 	;
 
+lattice_decl :
+	LATTICE IDENT LT GT LBRACE lattice_operator_list RBRACE
+	;
+
+lattice_operator_list :
+	lattice_operator COMMA lattice_operator_list
+	| lattice_operator
+	;
+
+lattice_operator :
+	IDENT MAPSTO arg
+	;
+
 relation_decl :
 	DECL relation_names attributes_list relation_tags dependency_list
 	| DECL IDENT EQUALS DEBUG_DELTA LPAREN IDENT RPAREN relation_tags
@@ -200,6 +217,7 @@ non_empty_attributes :
 
 attribute :
 	IDENT COLON qualified_name
+	| IDENT COLON qualified_name LT GT
 	;
 
 relation_tags :
@@ -423,6 +441,7 @@ component_body :
 	| component_body component_init
 	| component_body component_decl
 	| component_body type_decl
+	| component_body lattice_decl
 	| component_body relation_decl
 	;
 
@@ -503,6 +522,7 @@ WS [ \t\r\v\f]
 ".input"                         INPUT_DECL
 ".output"                        OUTPUT_DECL
 ".printsize"                     PRINTSIZE_DECL
+".lattice"                       LATTICE
 ".limitsize"                     LIMITSIZE_DECL
 ".type"                          TYPE
 ".comp"                          COMPONENT
@@ -601,8 +621,9 @@ WS [ \t\r\v\f]
 "<"                                   LT
 ">"                                   GT
 ":-"                                  IF
+"->"                                  MAPSTO
 
-[0-9]+"."[0-9]+"."[0-9]+"."[0-9]+	IP_NUMBER
+//[0-9]+"."[0-9]+"."[0-9]+"."[0-9]+	IP_NUMBER
 
 [0-9]+[.][0-9]+                       FLOAT
 [0-9]+                                NUMBER
