@@ -1,0 +1,243 @@
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// LRSTAR 24 Grammar
+//
+// This grammar is LALR(1) because the headsymbol() does a get-next-token
+// to see if the next token is a '->' or a ':', which would indicate that
+// the current token is the goal symbol of the grammar.
+//
+// Aug 15 2022 by Paul B Mann
+//
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// DECLARATIONS ...
+
+    ERRORSYMBOL			<error>			=> error ();
+    EOFSYMBOL			<eof>					;
+    GOALSYMBOL			{goalsymbol}  		;
+    HEADSYMBOL			{headsymbol}		;
+    ALPHA			<alpha> 		=> headsymbol ();
+    LEXICAL			<lexical>		=> poslookup ();
+    LITERAL			<literal> 		=> poslookup ();
+    SEMANTIC			<semantic> 		=> poslookup ();
+    INTEGERX			<integer> 		=> poslookup ();
+    STRINGX			<string> 		=> poslookup ();
+    EOFLITERAL			'<eof>'			=> poslookup ();
+    ARROW			'->'          		=> arrow ();
+    COLON			':'			=> colon ();
+    BAR				'|'			=> bar ();
+    SEMI			';'			=> semi ();
+    ACTION			'=>'			=> position ();
+    '+>'	=> position ();
+    '*>'	=> position ();
+    '('		=> position ();
+    ')'		=> position ();
+    '{'		=> position ();
+    '}'		=> position ();
+    '['		=> position ();
+    ']'		=> position ();
+    '<<'	=> position ();
+    '>>'	=> position ();
+    '+'		=> position ();
+    '*'		=> position ();
+    '?'		=> position ();
+    '/'		=> position ();
+    '...'	=> position ();
+    '~'		=> position ();
+    '^'		=> position ();
+    '#'               ;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// GOAL SYMBOL ...
+
+   Goal					-> Grammar <eof>										*> start_
+
+   Grammar				-> Declarations OperPrec Rules
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// DECLARATIONS ...
+
+   Declarations      	->															*> declarations_
+			-> TerminalDecl+  				*> declarations_
+
+   TerminalDecl      	-> DefCon Terminal ';'                      	//=*> terminal_decl_(1)
+			-> DefCon Terminal TerminalAction ';'		//=*> terminal_decl_(1)
+			-> Terminal ';'			*> terminal_decl_
+			-> Terminal TerminalAction ';'	*> terminal_decl_
+
+
+   DefCon   		-> <alpha>         				//=*> defcon_(1)
+
+   Terminal      	-> <alpha>					//=*> terminal_(1)
+			-> <lexical>				        //=*> terminal_(1)
+                  	-> <literal>       		                //=*> terminal_(1)
+                  	-> <semantic>				        //=*> terminal_(1)
+                  	-> '<eof>'				        //=*> terminal_(1)
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// OPERATOR PRECEDENCE ...
+
+   OperPrec          	->                                           *> operprec_
+			-> OperPrecLine+                             *> operprec_
+
+   OperPrecLine		-> '{' Operator+ '}' '<<'                    *> leftassoc_
+			-> '{' Operator+ '}' '>>'                    *> rightassoc_
+
+   Operator       	-> <alpha>			             //=*> oper_(1)
+                  	-> <lexical>		                     //=*> oper_(1)
+                  	-> <semantic>		                     //=*> oper_(1)
+                  	-> <literal>		                     //=*> oper_(1)
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// RULES ...
+
+   Rules		-> GoalSymbolDef [NonterminalDef]+           *> rules_
+
+   GoalSymbolDef    	-> GoalSymbol GoalSymbolRule		     *> goaldef_(1)
+
+   GoalSymbol		-> {goalsymbol}                              //=> goalsymbol_(1)
+
+   GoalSymbolRule	-> ':'  GoalExprList RuleAction ';'         //=*> prod_(1)
+			-> '->' GoalExprList RuleAction             //=*> prod_(1)
+
+   GoalExprList      	-> TailExpr EOFTailExpr                      *> tail_list_
+
+   EOFTailExpr      	-> EOFTail					//=> tail_expr_
+   EOFTail           	-> '<eof>'      				//=*> tail_(1)
+			-> <alpha>      				//=*> tail_eof_(1)
+
+   NonterminalDef	-> HeadSymbol ColonFirst          ';'        *> headdef_(1)
+			-> HeadSymbol ColonFirst BarRules ';'        *> headdef_(1)
+			-> HeadSymbol ArrowFirst                     *> headdef_(1)
+			-> HeadSymbol ArrowFirst ArrowRules          *> headdef_(1)
+
+   HeadSymbol        	-> {headsymbol}			             //=> headsymbol_(1)
+
+   ColonFirst        	-> ':'  TailList RuleAction              //=*> prod_(1)
+			-> ':'  SemTail  RuleAction              //=*> prod_(1)
+
+   ArrowFirst        	-> '->' TailList RuleAction              //=*> prod_(1)
+			-> '->' SemTail  RuleAction              //=*> prod_(1)
+
+   BarRules          	-> BarRule+
+   BarRule         	-> '|'  TailList RuleAction             //=*> prod_(1)
+                  	-> '#' '|'  TailList RuleAction             //=*> priority_(2)
+			-> '|'  SemTail  RuleAction             //=*> prod_(1)
+
+   ArrowRules        -> ArrowRule+
+   ArrowRule         ->     '->' TailList RuleAction             //=*> prod_(1)
+                     -> '#' '->' TailList RuleAction             //=*> priority_(2)
+                     ->     '->' SemTail  RuleAction             //=*> prod_(1)
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// EXPRESSIONS ...
+
+   TailList		->					*> tail_list_
+			-> TailExpr+				*> tail_list_
+
+   SemTail		-> TailUpgrade				*> tail_list_
+
+   TailUpgrade		-> TailUpgrade2				//=> tail_expr_
+   TailExpr       	-> Tail					//=> tail_expr_
+			-> ComplexTail				//=> tail_expr_
+
+   ComplexTail     	-> Tail '+'                          	*> repeat_one_or_more_
+                  	-> Tail '...'                        	*> repeat_one_or_more_
+			-> Tail '*'				*> repeat_zero_or_more_
+			-> Tail '?'	  			*> repeat_zero_or_one_
+                  	-> Tail '/' SepExpr '+'			*> repeat_one_or_more_
+                  	-> Tail '/' SepExpr '...'            	*> repeat_one_or_more_
+                  	-> Tail '/' SepExpr '*'              	*> repeat_zero_or_more_
+
+                  	-> Group
+			-> Group '+'                         	*> repeat_one_or_more_
+	               	-> Group '...'                       	*> repeat_one_or_more_
+			-> Group '*'				*> repeat_zero_or_more_
+			-> Group '?'				*> repeat_zero_or_one_
+                  	-> Group '/' SepExpr '+'             	*> repeat_one_or_more_
+                  	-> Group '/' SepExpr '...'           	*> repeat_one_or_more_
+                  	-> Group '/' SepExpr '*'             	*> repeat_zero_or_more_
+
+                  	-> OptGroup
+                  	-> OptGroup '+'                      	*> repeat_zero_or_more_
+                    	-> OptGroup '...'                    	*> repeat_zero_or_more_
+                  	-> OptGroup '/' SepExpr '+'          	*> repeat_zero_or_more_
+                  	-> OptGroup '/' SepExpr '...'        	*> repeat_zero_or_more_
+
+   Group             	-> '(' ComplexSection /'|'+ ')'		 *> group_
+   OptGroup          	-> '[' ComplexSection /'|'+ ']'		 *> optgroup_
+   SepGroup		-> '(' SimpleSection  /'|'+ ')'		 *> sepgroup_
+
+   ComplexSection	-> (Tail | ComplexTail)+		*> section_
+   SimpleSection	-> Tail+				*> section_
+
+   SepExpr           	-> Sep
+			-> SepGroup
+
+   TailUpgrade2      	-> LexVar '^' SemVar    		*> semargs_(3)
+
+   LexVar            	-> <alpha>                          //=*> tail_(1)
+                  	-> <lexical>                        //=*> tail_(1)
+
+   SemVar            	-> <alpha>                          //=*> arg_semantic_(1)
+                  	-> <semantic>                       //=*> arg_terminal_(1)
+
+   Tail       		-> <alpha>                          //=*> tail_(1)
+                  	-> <lexical>                        //=*> tail_(1)
+                  	-> <literal>                        //=*> tail_(1)
+                  	-> <semantic>                       //=*> tail_(1)
+
+   Sep			-> <alpha>                          //=*> sep_(1)
+                  	-> <lexical>                        //=*> sep_(1)
+                  	-> <literal>                        //=*> sep_(1)
+			-> <semantic>			    //=*> sep_(1)
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// ACTIONS ...
+
+   TerminalAction	-> '=>' TAName 		  	            *> terminal_actn_
+
+   TAName		-> <alpha> TArgs                    //=*> ta_name_(1)
+
+   RuleAction		->
+			-> '+>'  NodeName   PArgs Rev        *> rule_actions_
+			-> '*>'  NodeNameWA PArgs Rev        *> rule_actions_
+
+   NodeName          	-> <alpha>                          //=*> node_name_(1)
+   NodeNameWA        	-> NodeAction                       //=*> node_name_(1)
+   NodeAction        	-> <alpha>                          //=*> node_action_(1)
+   Rev               	->
+			-> '~'                              *> reverse_
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// ARGUMENTS ...
+
+   TArgs	        ->        			*> targs_
+			-> '(' ')'			*> targs_
+			-> '(' ArgVar ')'		*> targs_
+
+   PArgs		->      			*> pargs_
+			-> '(' ')'			*> pargs_
+			-> '(' FirstArg ')'		*> pargs_
+
+   FirstArg		-> ArgNum			//=> arg_first_
+   ArgNum            	-> <integer>                    //=*> arg_integer_(1)
+
+   ArgVar            	-> <alpha>                      //=*> arg_alpha_(1)
+			-> <lexical>                    //=*> arg_terminal_(1)
+                  	-> <literal>                    //=*> arg_terminal_(1)
+                  	-> <semantic>                   //=*> arg_terminal_(1)
+                  	-> '<eof>'                      //=*> arg_terminal_(1)
+
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+

@@ -135,6 +135,7 @@ const sampleList = [
 	["Linden Script parser", "lsl_ext.g", "test.lsl", "ace/mode/text"],
 	["Lox parser", "lox-lalrpop.g", "test.lox", "ace/mode/javascript"],
 	["LPegrex parser (partially working)", "lpegrex.g", "test.lpegrex", "ace/mode/yaml"],
+	["LRSTAR parser (partially working)", "lrstar.g", "test.lrstar", "ace/mode/yaml"],
 	["LPython parser (not working)", "lpython.g", "test.python", "ace/mode/python"],
 	["Lua2ljs parser", "lua2ljs.g", "test.lua", "ace/mode/lua"],
 	["Lua-5.3 parser", "lua-5.3.g", "test.lua", "ace/mode/lua"],
