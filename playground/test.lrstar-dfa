@@ -1,0 +1,62 @@
+
+// LRX Lexer Grammar.
+
+	<eof>						-> \z
+
+	<alpha>        		->         alpha
+								->         alpha '_'
+								->     '_' alpha
+								->     '_' alpha '_'
+								->         alpha '_' '_'
+								-> '_' '_' alpha
+								-> '_' '_' alpha '_' '_'
+
+	<lexical>      		-> '<' <alpha> '>'
+
+	<semantic>     		-> '{' <alpha> '}'
+
+	alpha          		-> letter
+								-> alpha letter
+								-> alpha digit
+								-> alpha '_' letter
+								-> alpha '_' digit
+
+	<integer>      		-> digit+
+
+	<literal>      		-> ''' lchar+ '''
+
+	lchar          		-> '\' '''
+   							->	'\' '"'
+   							->	'\' '\'
+								-> lany
+
+	lany     				= 33..254 - ''' - '"' - '\'
+
+	<string>       		-> '"' '"'
+								-> '"' schar+ '"'
+
+	schar          		-> '\' '''
+   							->	'\' '"'
+   							->	'\' '\'
+								-> sany
+
+	sany     				= 32..254 - ''' - '"' - '\'
+
+	{whitespace}			-> ( \t | \n | \r | ' ' )+
+	{commentline} 			-> '/' '/' neol*
+	{commentblock}			-> '/' '*' na* '*'+ (nans na* '*'+)* '/'
+
+	any						=  0..255 - \z				// any character except end of file
+	na             		= any - '*'					// not asterisk
+	nans           		= any - '*' - '/'			// not asterisk not slash
+	neol           		= any - \n					// not end of line
+
+	letter         		= 'a'..'z' | 'A'..'Z'
+	digit          		= '0'..'9'
+
+	\t							= 9
+	\n							= 10
+	\r							= 13
+	\z							= 26
+
+/* End of Lexical Grammar. */
