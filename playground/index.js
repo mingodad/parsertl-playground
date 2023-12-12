@@ -84,6 +84,7 @@ const sampleList = [
 	["CocoR parser (partially working)", "cocor.g", "test.cocor", "ace/mode/yaml"],
 	["condb2 sql parser", "condb2-sql.g", "test.sqlite3", "ace/mode/sql"],
 	["CoqPP parser", "coqpp_parse.g", "test.coqpp", "ace/mode/yaml"],
+	["Cowgol parser", "cowgol-cowfe.g", "test.cowgol-cowfe", "ace/mode/ada"],
 	["Cpp5-v2 parser (not working)", "cpp5-v2.g", "test.cpp", "ace/mode/c_cpp"],
 	["C parser frama-c (partially working)", "cparser-frama-c.g", "test.frama-c", "ace/mode/c_cpp"],
 	["CSS parser from VLC", "CSSGrammar-vlc.g", "style.css", "ace/mode/css"],
