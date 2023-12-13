@@ -1,0 +1,313 @@
+class Foo <int Bar> {
+  int Baz = Bar;
+}
+
+class Foo {
+  int Bar = 5;
+  int Baz = Bar;
+}
+
+def Bar : SomeClass {
+  int X = 5;
+}
+/*
+def Foo {
+  SomeClass Baz = Bar;
+}
+*/
+
+multiclass Foo <int Bar> {
+  def : SomeClass<Bar>;
+}
+
+class A <dag d> {
+  dag the_dag = d;
+}
+
+def rec1 : A<(ops rec1)>;
+
+class C {
+  bit V = true;
+}
+
+def X : C;
+def Y : C {
+  let V = false;
+  string Greeting = "Hello!";
+}
+
+class FPFormat <bits<3> val> {
+  bits<3> Value = val;
+}
+
+def NotFP      : FPFormat<0>;
+def ZeroArgFP  : FPFormat<1>;
+def OneArgFP   : FPFormat<2>;
+def OneArgFPRW : FPFormat<3>;
+def TwoArgFP   : FPFormat<4>;
+def CompareFP  : FPFormat<5>;
+def CondMovFP  : FPFormat<6>;
+def SpecialFP  : FPFormat<7>;
+
+class ModRefVal <bits<2> val> {
+  bits<2> Value = val;
+}
+
+def None   : ModRefVal<0>;
+def Mod    : ModRefVal<1>;
+def Ref    : ModRefVal<2>;
+def ModRef : ModRefVal<3>;
+
+class ModRefBits <ModRefVal mrv> {
+  // Break the value up into its bits, which can provide a nice
+  // interface to the ModRefVal values.
+  bit isMod = mrv.Value{0};
+  bit isRef = mrv.Value{1};
+}
+
+// Example uses.
+def foo   : ModRefBits<Mod>;
+def bar   : ModRefBits<Ref>;
+def snork : ModRefBits<ModRef>;
+
+/*
+let isTerminator = true, isReturn = true, isBarrier = true, hasCtrlDep = true in
+  def RET : I<0xC3, RawFrm, (outs), (ins), "ret", [(X86retflag 0)]>;
+
+let isCall = true in
+  // All calls clobber the non-callee saved registers...
+  let Defs = [EAX, ECX, EDX, FP0, FP1, FP2, FP3, FP4, FP5, FP6, ST0,
+              MM0, MM1, MM2, MM3, MM4, MM5, MM6, MM7, XMM0, XMM1, XMM2,
+              XMM3, XMM4, XMM5, XMM6, XMM7, EFLAGS] in {
+    def CALLpcrel32 : Ii32<0xE8, RawFrm, (outs), (ins i32imm:$dst, variable_ops),
+                           "call\t${dst:call}", []>;
+    def CALL32r     : I<0xFF, MRM2r, (outs), (ins GR32:$dst, variable_ops),
+                        "call\t{*}$dst", [(X86call GR32:$dst)]>;
+    def CALL32m     : I<0xFF, MRM2m, (outs), (ins i32mem:$dst, variable_ops),
+                        "call\t{*}$dst", []>;
+  }
+*/
+
+def ops;
+def GPR;
+def Imm;
+class inst <int opc, string asmstr, dag operandlist>;
+/*
+multiclass ri_inst <int opc, string asmstr> {
+  def _rr : inst<opc, !strconcat(asmstr, " $dst, $src1, $src2"),
+                   (ops GPR:$dst, GPR:$src1, GPR:$src2)>;
+  def _ri : inst<opc, !strconcat(asmstr, " $dst, $src1, $src2"),
+                   (ops GPR:$dst, GPR:$src1, Imm:$src2)>;
+}
+
+// Define records for each instruction in the RR and RI formats.
+defm ADD : ri_inst<0b111, "add">;
+defm SUB : ri_inst<0b101, "sub">;
+defm MUL : ri_inst<0b100, "mul">;
+*/
+
+class XD {
+  bits<4> Prefix = 11;
+}
+class XS {
+  bits<4> Prefix = 12;
+}
+class I <bits<4> op> {
+  bits<4> opcode = op;
+}
+
+multiclass R {
+  def rr : I<4>;
+  def rm : I<2>;
+}
+
+multiclass Y {
+  defm SS : R, XD;    // First multiclass R, then regular class XD.
+  defm SD : R, XS;
+}
+
+defm Instr : Y;
+/*
+multiclass basic_r <bits<4> opc> {
+  let Predicates = [HasSSE2] in {
+    def rr : Instruction<opc, "rr">;
+    def rm : Instruction<opc, "rm">;
+  }
+  let Predicates = [HasSSE3] in
+    def rx : Instruction<opc, "rx">;
+}
+
+multiclass basic_ss <bits<4> opc> {
+  let IsDouble = false in
+    defm SS : basic_r<opc>;
+
+  let IsDouble = true in
+    defm SD : basic_r<opc>;
+}
+
+defm ADD : basic_ss<0xf>;
+*/
+
+class PersonName<string name> {
+  assert !le(!size(name), 32), "person name is too long: " # name;
+  string Name = name;
+}
+
+class Person<string name, int age> : PersonName<name> {
+  assert !and(!ge(age, 1), !le(age, 120)), "person age is invalid: " # age;
+  int Age = age;
+}
+
+class C <int x> {
+  int Y = x;
+  int Yplus1 = !add(Y, 1);
+  int xplus1 = !add(x, 1);
+}
+
+let Y = 10 in {
+  def rec1 : C<5> {
+  }
+}
+
+def rec2 : C<5> {
+  let Y = 10;
+}
+
+class isValidSize<int size> {
+  bit ret = !cond(!eq(size,  1): 1,
+                  !eq(size,  2): 1,
+                  !eq(size,  4): 1,
+                  !eq(size,  8): 1,
+                  !eq(size, 16): 1,
+                  true: 0);
+}
+/*
+def Data1 {
+  int Size = ...;
+  bit ValidSize = isValidSize<Size>.ret;
+}
+*/
+
+defvar suffix = "_suffstring";
+defvar some_ints = [0, 1, 2, 3];
+
+/*
+def test {
+  string strings = suffix # suffix;
+  list<int> integers = some_ints # [4, 5, 6];
+}
+*/
+
+/*
+def ADD32rr { // InstructionEncoding Instruction X86Inst I ITy Sched BinOpRR BinOpRR_RF
+  int Size = 0;
+  string DecoderNamespace = "";
+  list<Predicate> Predicates = [];
+  string DecoderMethod = "";
+  bit hasCompleteDecoder = 1;
+  string Namespace = "X86";
+  dag OutOperandList = (outs GR32:$dst);
+  dag InOperandList = (ins GR32:$src1, GR32:$src2);
+  string AsmString = "add{l}  {$src2, $src1|$src1, $src2}";
+  EncodingByHwMode EncodingInfos = ?;
+  list<dag> Pattern = [(set GR32:$dst, EFLAGS, (X86add_flag GR32:$src1, GR32:$src2))];
+  list<Register> Uses = [];
+  list<Register> Defs = [EFLAGS];
+  int CodeSize = 3;
+  int AddedComplexity = 0;
+  bit isPreISelOpcode = 0;
+  bit isReturn = 0;
+  bit isBranch = 0;
+  bit isEHScopeReturn = 0;
+  bit isIndirectBranch = 0;
+  bit isCompare = 0;
+  bit isMoveImm = 0;
+  bit isMoveReg = 0;
+  bit isBitcast = 0;
+  bit isSelect = 0;
+  bit isBarrier = 0;
+  bit isCall = 0;
+  bit isAdd = 0;
+  bit isTrap = 0;
+  bit canFoldAsLoad = 0;
+  bit mayLoad = ?;
+  bit mayStore = ?;
+  bit mayRaiseFPException = 0;
+  bit isConvertibleToThreeAddress = 1;
+  bit isCommutable = 1;
+  bit isTerminator = 0;
+  bit isReMaterializable = 0;
+  bit isPredicable = 0;
+  bit isUnpredicable = 0;
+  bit hasDelaySlot = 0;
+  bit usesCustomInserter = 0;
+  bit hasPostISelHook = 0;
+  bit hasCtrlDep = 0;
+  bit isNotDuplicable = 0;
+  bit isConvergent = 0;
+  bit isAuthenticated = 0;
+  bit isAsCheapAsAMove = 0;
+  bit hasExtraSrcRegAllocReq = 0;
+  bit hasExtraDefRegAllocReq = 0;
+  bit isRegSequence = 0;
+  bit isPseudo = 0;
+  bit isExtractSubreg = 0;
+  bit isInsertSubreg = 0;
+  bit variadicOpsAreDefs = 0;
+  bit hasSideEffects = ?;
+  bit isCodeGenOnly = 0;
+  bit isAsmParserOnly = 0;
+  bit hasNoSchedulingInfo = 0;
+  InstrItinClass Itinerary = NoItinerary;
+  list<SchedReadWrite> SchedRW = [WriteALU];
+  string Constraints = "$src1 = $dst";
+  string DisableEncoding = "";
+  string PostEncoderMethod = "";
+  bits<64> TSFlags = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0 };
+  string AsmMatchConverter = "";
+  string TwoOperandAliasConstraint = "";
+  string AsmVariantName = "";
+  bit UseNamedOperandTable = 0;
+  bit FastISelShouldIgnore = 0;
+  bits<8> Opcode = { 0, 0, 0, 0, 0, 0, 0, 1 };
+  Format Form = MRMDestReg;
+  bits<7> FormBits = { 0, 1, 0, 1, 0, 0, 0 };
+  ImmType ImmT = NoImm;
+  bit ForceDisassemble = 0;
+  OperandSize OpSize = OpSize32;
+  bits<2> OpSizeBits = { 1, 0 };
+  AddressSize AdSize = AdSizeX;
+  bits<2> AdSizeBits = { 0, 0 };
+  Prefix OpPrefix = NoPrfx;
+  bits<3> OpPrefixBits = { 0, 0, 0 };
+  Map OpMap = OB;
+  bits<3> OpMapBits = { 0, 0, 0 };
+  bit hasREX_WPrefix = 0;
+  FPFormat FPForm = NotFP;
+  bit hasLockPrefix = 0;
+  Domain ExeDomain = GenericDomain;
+  bit hasREPPrefix = 0;
+  Encoding OpEnc = EncNormal;
+  bits<2> OpEncBits = { 0, 0 };
+  bit HasVEX_W = 0;
+  bit IgnoresVEX_W = 0;
+  bit EVEX_W1_VEX_W0 = 0;
+  bit hasVEX_4V = 0;
+  bit hasVEX_L = 0;
+  bit ignoresVEX_L = 0;
+  bit hasEVEX_K = 0;
+  bit hasEVEX_Z = 0;
+  bit hasEVEX_L2 = 0;
+  bit hasEVEX_B = 0;
+  bits<3> CD8_Form = { 0, 0, 0 };
+  int CD8_EltSize = 0;
+  bit hasEVEX_RC = 0;
+  bit hasNoTrackPrefix = 0;
+  bits<7> VectSize = { 0, 0, 1, 0, 0, 0, 0 };
+  bits<7> CD8_Scale = { 0, 0, 0, 0, 0, 0, 0 };
+  string FoldGenRegForm = ?;
+  string EVEX2VEXOverride = ?;
+  bit isMemoryFoldable = 1;
+  bit notEVEX2VEXConvertible = 0;
+}
+*/
