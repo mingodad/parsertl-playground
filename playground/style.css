@@ -99,7 +99,7 @@ body {
   display: none;
   z-index: -1;
 }
-@media only screen and (max-width: 768px)  {
+@media only screen and (max-width: 1024px)  {
 	/* smartphones, Android phones, landscape iPhone */
 	.editor-header {height:3em;}
 }
