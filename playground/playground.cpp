@@ -256,6 +256,8 @@ static void print_parsetree( const ParseTreeUserData& ast, const parsertl::rules
         {
             return;
         }
+        bool hasAlias = !ast.alias.empty();
+        if(hasAlias && ast.alias == "#__skip") return;
         parsetree_indent( level );
         if(isTerminal)
         {
@@ -264,7 +266,7 @@ static void print_parsetree( const ParseTreeUserData& ast, const parsertl::rules
         }
         else
         {
-            if(ast.alias.size()) printf("%s\n", ast.alias.c_str());
+            if(hasAlias) printf("%s\n", ast.alias.c_str());
             else printf("%s\n", symbols[ast.symbol_id].c_str());
         }
     }
