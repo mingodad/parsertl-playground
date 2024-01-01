@@ -280,10 +280,10 @@ abstract_expression :
 	| TEMPLATE parenthesis_clause
 	;
 
-type1_parameters :
-	parameter_declaration_list ';'
-	| type1_parameters parameter_declaration_list ';'
-	;
+//type1_parameters :
+//	parameter_declaration_list ';'
+//	| type1_parameters parameter_declaration_list ';'
+//	;
 
 mark_type1 :
 	/*empty*/
