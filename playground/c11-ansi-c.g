@@ -698,7 +698,7 @@ WS  [ \t\v\n\r\f]
 "|"					'|'
 "?"					'?'
 
-{L}{A}*					symbol_table()
+{L}{A}*					IDENTIFIER //symbol_table()
 
 {WS}+					skip()  /* whitespace separates tokens */
 .					ILLEGAL_CHARACTER
