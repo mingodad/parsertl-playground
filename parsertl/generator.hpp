@@ -149,7 +149,12 @@ namespace parsertl
             }
             else
             {
-                const std::size_t index_ = rules_.nt_locations()[start_].
+                const auto &rules_nt_locations = rules_.nt_locations();
+                if(rules_nt_locations.size() == 0)
+                {
+                    return;
+                }
+                const std::size_t index_ = rules_nt_locations[start_].
                     _first_production;
 
                 dfa_.back()._basis.emplace_back(index_, 0);
