@@ -689,9 +689,9 @@ anon_instantiation_expression :
 	instantiation_anon
 	;
 
-anon_instantiation_expression_error :
-	//instantiation_anon_error error
-	;
+//anon_instantiation_expression_error :
+//	//instantiation_anon_error error
+//	;
 
 primary_expression_error :
 	'(' expression
@@ -728,9 +728,9 @@ argument_expression_list :
 
 argument_expression_list_error :
 	assignment_expression_error
-	| anon_instantiation_expression_error
+	//| anon_instantiation_expression_error
 	| argument_expression_list ',' assignment_expression_error
-	| argument_expression_list ',' anon_instantiation_expression_error
+	//| argument_expression_list ',' anon_instantiation_expression_error
 	| argument_expression_list ','
 	;
 
@@ -867,17 +867,17 @@ conditional_expression :
 	| logical_or_expression_error '?' expression ':' conditional_expression
 	| logical_or_expression_error '?' expression_error ':' conditional_expression
 	| logical_or_expression '?' expression_anon_inst ':' conditional_expression
-	| logical_or_expression '?' expression_anon_inst_error ':' conditional_expression
+	//| logical_or_expression '?' expression_anon_inst_error ':' conditional_expression
 	| logical_or_expression_error '?' expression_anon_inst ':' conditional_expression
-	| logical_or_expression_error '?' expression_anon_inst_error ':' conditional_expression
+	//| logical_or_expression_error '?' expression_anon_inst_error ':' conditional_expression
 	| logical_or_expression '?' expression ':' anon_instantiation_expression
 	| logical_or_expression '?' expression_error ':' anon_instantiation_expression
 	| logical_or_expression_error '?' expression ':' anon_instantiation_expression
 	| logical_or_expression_error '?' expression_error ':' anon_instantiation_expression
 	| logical_or_expression '?' expression_anon_inst ':' anon_instantiation_expression
-	| logical_or_expression '?' expression_anon_inst_error ':' anon_instantiation_expression
+	//| logical_or_expression '?' expression_anon_inst_error ':' anon_instantiation_expression
 	| logical_or_expression_error '?' expression_anon_inst ':' anon_instantiation_expression
-	| logical_or_expression_error '?' expression_anon_inst_error ':' anon_instantiation_expression
+	//| logical_or_expression_error '?' expression_anon_inst_error ':' anon_instantiation_expression
 	;
 
 assignment_expression :
@@ -937,7 +937,7 @@ common_unary_expression_error :
 	INC_OP unary_expression_error
 	| DEC_OP unary_expression_error
 	| unary_operator cast_expression_error
-	| unary_operator anon_instantiation_expression_error
+	//| unary_operator anon_instantiation_expression_error
 	| SIZEOF unary_expression_error
 	//| SIZEOF '(' guess_type_name ')' error
 	//| SIZEOF '(' CLASS type ')' error
@@ -1000,34 +1000,34 @@ equality_expression_error :
 	| equality_expression NE_OP relational_expression_error
 	| equality_expression_error EQ_OP relational_expression_error
 	| equality_expression_error NE_OP relational_expression_error
-	| equality_expression EQ_OP anon_instantiation_expression_error
-	| equality_expression NE_OP anon_instantiation_expression_error
-	| equality_expression_error EQ_OP anon_instantiation_expression_error
-	| equality_expression_error NE_OP anon_instantiation_expression_error
+	//| equality_expression EQ_OP anon_instantiation_expression_error
+	//| equality_expression NE_OP anon_instantiation_expression_error
+	//| equality_expression_error EQ_OP anon_instantiation_expression_error
+	//| equality_expression_error NE_OP anon_instantiation_expression_error
 	;
 
 and_expression_error :
 	equality_expression_error
 	| and_expression '&' equality_expression_error
 	| and_expression_error '&' equality_expression_error
-	| and_expression '&' anon_instantiation_expression_error
-	| and_expression_error '&' anon_instantiation_expression_error
+	//| and_expression '&' anon_instantiation_expression_error
+	//| and_expression_error '&' anon_instantiation_expression_error
 	;
 
 exclusive_or_expression_error :
 	and_expression_error
 	| exclusive_or_expression '^' and_expression_error
 	| exclusive_or_expression_error '^' and_expression_error
-	| exclusive_or_expression '^' anon_instantiation_expression_error
-	| exclusive_or_expression_error '^' anon_instantiation_expression_error
+	//| exclusive_or_expression '^' anon_instantiation_expression_error
+	//| exclusive_or_expression_error '^' anon_instantiation_expression_error
 	;
 
 inclusive_or_expression_error :
 	exclusive_or_expression_error
 	| inclusive_or_expression '|' exclusive_or_expression_error
 	| inclusive_or_expression_error '|' exclusive_or_expression_error
-	| inclusive_or_expression '|' anon_instantiation_expression_error
-	| inclusive_or_expression_error '|' anon_instantiation_expression_error
+	//| inclusive_or_expression '|' anon_instantiation_expression_error
+	//| inclusive_or_expression_error '|' anon_instantiation_expression_error
 	;
 
 logical_and_expression_error :
@@ -1053,21 +1053,21 @@ conditional_expression_error :
 	| logical_or_expression_error '?' expression ':'
 	| logical_or_expression_error '?' expression_error ':'
 	| logical_or_expression '?' expression_anon_inst ':' logical_or_expression_error
-	| logical_or_expression '?' expression_anon_inst_error ':' logical_or_expression_error
+	//| logical_or_expression '?' expression_anon_inst_error ':' logical_or_expression_error
 	| logical_or_expression_error '?' expression_anon_inst ':' logical_or_expression_error
-	| logical_or_expression_error '?' expression_anon_inst_error ':' logical_or_expression_error
+	//| logical_or_expression_error '?' expression_anon_inst_error ':' logical_or_expression_error
 	| logical_or_expression '?' expression_anon_inst ':'
-	| logical_or_expression '?' expression_anon_inst_error ':'
+	//| logical_or_expression '?' expression_anon_inst_error ':'
 	| logical_or_expression_error '?' expression_anon_inst ':'
-	| logical_or_expression_error '?' expression_anon_inst_error ':'
-	| logical_or_expression '?' expression ':' anon_instantiation_expression_error
-	| logical_or_expression '?' expression_error ':' anon_instantiation_expression_error
-	| logical_or_expression_error '?' expression ':' anon_instantiation_expression_error
-	| logical_or_expression_error '?' expression_error ':' anon_instantiation_expression_error
-	| logical_or_expression '?' expression_anon_inst ':' anon_instantiation_expression_error
-	| logical_or_expression '?' expression_anon_inst_error ':' anon_instantiation_expression_error
-	| logical_or_expression_error '?' expression_anon_inst ':' anon_instantiation_expression_error
-	| logical_or_expression_error '?' expression_anon_inst_error ':' anon_instantiation_expression_error
+	//| logical_or_expression_error '?' expression_anon_inst_error ':'
+	//| logical_or_expression '?' expression ':' anon_instantiation_expression_error
+	//| logical_or_expression '?' expression_error ':' anon_instantiation_expression_error
+	//| logical_or_expression_error '?' expression ':' anon_instantiation_expression_error
+	//| logical_or_expression_error '?' expression_error ':' anon_instantiation_expression_error
+	//| logical_or_expression '?' expression_anon_inst ':' anon_instantiation_expression_error
+	//| logical_or_expression '?' expression_anon_inst_error ':' anon_instantiation_expression_error
+	//| logical_or_expression_error '?' expression_anon_inst ':' anon_instantiation_expression_error
+	//| logical_or_expression_error '?' expression_anon_inst_error ':' anon_instantiation_expression_error
 	| logical_or_expression '?' ':'
 	| logical_or_expression_error '?' ':'
 	| logical_or_expression '?'
@@ -1078,8 +1078,8 @@ assignment_expression_error :
 	conditional_expression_error
 	| unary_expression assignment_operator assignment_expression_error
 	| unary_expression_error assignment_operator assignment_expression_error
-	| unary_expression assignment_operator anon_instantiation_expression_error
-	| unary_expression_error assignment_operator anon_instantiation_expression_error
+	//| unary_expression assignment_operator anon_instantiation_expression_error
+	//| unary_expression_error assignment_operator anon_instantiation_expression_error
 	;
 
 expression_error :
@@ -1092,12 +1092,12 @@ expression_error :
 	| expression expression_error
 	;
 
-expression_anon_inst_error :
-	anon_instantiation_expression_error
-	//| anon_instantiation_expression error
-	| expression ',' anon_instantiation_expression_error
-	| expression_error ',' anon_instantiation_expression_error
-	;
+//expression_anon_inst_error :
+//	anon_instantiation_expression_error
+//	//| anon_instantiation_expression error
+//	| expression ',' anon_instantiation_expression_error
+//	| expression_error ',' anon_instantiation_expression_error
+//	;
 
 constant_expression :
 	conditional_expression
@@ -1513,23 +1513,23 @@ new_specifiers :
 	| new_specifiers identifier '<' template_arguments_list '>'
 	;
 
-identifier_list_error :
-	//identifier_list ',' error
-	//| identifier_list_error ',' error
-	;
+//identifier_list_error :
+//	//identifier_list ',' error
+//	//| identifier_list_error ',' error
+//	;
 
 identifier_list :
 	identifier
 	| identifier_list ',' identifier
-	| identifier_list_error ',' identifier
+	//| identifier_list_error ',' identifier
 	| parameter_list ',' identifier
-	| parameter_list_error ',' identifier
+	//| parameter_list_error ',' identifier
 	;
 
 direct_declarator_nofunction_type_ok :
 	direct_declarator_nofunction
 	| base_strict_type
-	| UINT
+	//| UINT //what is this doing here ??
 	| base_strict_type '[' constant_expression ']'
 	| base_strict_type '[' constant_expression_error ']'
 	| base_strict_type '[' type ']'
@@ -1558,16 +1558,16 @@ direct_declarator_function_start :
 
 direct_declarator_function :
 	direct_declarator_function_start parameter_type_list ')'
-	| direct_declarator_function_start parameter_type_list_error ')'
+	//| direct_declarator_function_start parameter_type_list_error ')'
 	| direct_declarator_function_start identifier_list ')'
-	| direct_declarator_function_start identifier_list_error ')'
+	//| direct_declarator_function_start identifier_list_error ')'
 	| direct_declarator_function_start ')'
 	;
 
 direct_declarator_function_error :
-	direct_declarator_function_start identifier_list_error
+	//direct_declarator_function_start identifier_list_error
 	//| direct_declarator_function_start error
-	| direct_declarator_function_start parameter_list '('
+	 direct_declarator_function_start parameter_list '('
 	| direct_declarator_function_start guess_declaration_specifiers identifier '('
 	;
 
@@ -1582,16 +1582,16 @@ direct_declarator_function_start_type_ok :
 
 direct_declarator_function_type_ok :
 	direct_declarator_function_start_type_ok parameter_type_list ')'
-	| direct_declarator_function_start_type_ok parameter_type_list_error ')'
+	//| direct_declarator_function_start_type_ok parameter_type_list_error ')'
 	| direct_declarator_function_start_type_ok identifier_list ')'
-	| direct_declarator_function_start_type_ok identifier_list_error ')'
+	//| direct_declarator_function_start_type_ok identifier_list_error ')'
 	| direct_declarator_function_start_type_ok ')'
 	;
 
 direct_declarator_function_error_type_ok :
-	direct_declarator_function_start_type_ok identifier_list_error
+	//direct_declarator_function_start_type_ok identifier_list_error
 	//| direct_declarator_function_start_type_ok error
-	| direct_declarator_function_start_type_ok parameter_list '('
+	 direct_declarator_function_start_type_ok parameter_list '('
 	| direct_declarator_function_start_type_ok guess_declaration_specifiers identifier '('
 	;
 
@@ -1605,7 +1605,7 @@ ext_decl :
 	| EXT_STORAGE
 	| ext_decl EXT_STORAGE
 	| ext_decl EXT_DECL
-	| attrib
+	//| attrib //redundant
 	| multi_attrib
 	| ASM '(' string_literal ')'
 	;
@@ -1658,10 +1658,10 @@ direct_abstract_declarator :
 	| direct_abstract_declarator '[' constant_expression_error ']'
 	| '(' ')'
 	| '(' parameter_type_list ')'
-	| '(' parameter_type_list_error ')'
+	//| '(' parameter_type_list_error ')'
 	| direct_abstract_declarator '(' ')'
 	| direct_abstract_declarator '(' parameter_type_list ')'
-	| direct_abstract_declarator '(' parameter_type_list_error ')'
+	//| direct_abstract_declarator '(' parameter_type_list_error ')'
 	;
 
 direct_abstract_declarator_noarray :
@@ -1669,10 +1669,10 @@ direct_abstract_declarator_noarray :
 	| '(' ext_decl abstract_declarator_noarray ')'
 	| '(' ')'
 	| '(' parameter_type_list ')'
-	| '(' parameter_type_list_error ')'
+	//| '(' parameter_type_list_error ')'
 	| direct_abstract_declarator_noarray '(' ')'
 	| direct_abstract_declarator_noarray '(' parameter_type_list ')'
-	| direct_abstract_declarator_noarray '(' parameter_type_list_error ')'
+	//| direct_abstract_declarator_noarray '(' parameter_type_list_error ')'
 	;
 
 pointer :
@@ -1750,8 +1750,7 @@ declarator_nofunction_type_ok :
 
 initializer :
 	assignment_expression
-	| '{' initializer_list '}'
-	| '{' initializer_list ',' '}'
+	| initializer_noexp
 	;
 
 initializer_noexp :
@@ -1774,7 +1773,7 @@ initializer_condition :
 
 initializer_condition_error :
 	conditional_expression_error
-	| anon_instantiation_expression_error
+	//| anon_instantiation_expression_error
 	;
 
 initializer_list :
@@ -1835,49 +1834,49 @@ parameter_declaration :
 	| CLASS
 	;
 
-parameter_declaration_error :
-	//guess_declaration_specifiers declarator_type_ok error
-	//| guess_declaration_specifiers abstract_declarator error
-	;
+//parameter_declaration_error :
+//	//guess_declaration_specifiers declarator_type_ok error
+//	//| guess_declaration_specifiers abstract_declarator error
+//	;
 
 parameter_list :
 	parameter_declaration
 	| parameter_list ',' parameter_declaration
 	//| parameter_list error ',' parameter_declaration
-	| parameter_list_error ',' parameter_declaration
+	//| parameter_list_error ',' parameter_declaration
 	//| parameter_list_error error ',' parameter_declaration
 	//| error ',' parameter_declaration
 	| identifier_list ',' parameter_declaration
 	//| identifier_list error ',' parameter_declaration
-	| identifier_list_error ',' parameter_declaration
+	//| identifier_list_error ',' parameter_declaration
 	//| identifier_list_error error ',' parameter_declaration
 	;
 
-parameter_list_error :
-	parameter_declaration_error
-	| parameter_list ',' parameter_declaration_error
-	| parameter_list_error ',' parameter_declaration_error
-	//| parameter_list_error error ',' parameter_declaration_error
-	//| error ',' parameter_declaration_error
-	| identifier_list ',' parameter_declaration_error
-	| identifier_list_error ',' parameter_declaration_error
-	//| identifier_list_error error ',' parameter_declaration_error
-	;
+//parameter_list_error :
+//	parameter_declaration_error
+//	| parameter_list ',' parameter_declaration_error
+//	| parameter_list_error ',' parameter_declaration_error
+//	//| parameter_list_error error ',' parameter_declaration_error
+//	//| error ',' parameter_declaration_error
+//	| identifier_list ',' parameter_declaration_error
+//	//| identifier_list_error ',' parameter_declaration_error
+//	//| identifier_list_error error ',' parameter_declaration_error
+//	;
 
 parameter_type_list :
 	parameter_list
 	| parameter_list ',' ELLIPSIS
-	| parameter_list_error ',' ELLIPSIS
+	//| parameter_list_error ',' ELLIPSIS
 	| identifier_list ',' ELLIPSIS
-	| identifier_list_error ',' ELLIPSIS
+	//| identifier_list_error ',' ELLIPSIS
 	//| error ',' ELLIPSIS
 	;
 
-parameter_type_list_error :
-	parameter_list_error
-	//| parameter_list ',' error
-	//| parameter_list_error error
-	;
+//parameter_type_list_error :
+//	parameter_list_error
+//	//| parameter_list ',' error
+//	//| parameter_list_error error
+//	;
 
 statement :
 	labeled_statement
@@ -2125,12 +2124,12 @@ jump_statement :
 	| RETURN expression ';'
 	| RETURN expression_error ';'
 	| RETURN anon_instantiation_expression ';'
-	| RETURN anon_instantiation_expression_error ';'
+	//| RETURN anon_instantiation_expression_error ';'
 	;
 
 jump_statement_error :
 	RETURN expression_error
-	| RETURN anon_instantiation_expression_error
+	//| RETURN anon_instantiation_expression_error
 	| RETURN
 	| GOTO
 	;
