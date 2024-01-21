@@ -993,7 +993,15 @@ namespace parsertl
                 }
 
                 token_ = iter_->str();
-                id_ = insert_terminal(token_);
+                bool wasInserted;
+                id_ = insert_terminal(token_, wasInserted);
+                if(!wasInserted && associativity_ == associativity::token_assoc)
+                {
+                    std::ostringstream ss_;
+
+                    ss_ << "Token \"" << token_ << "\" already declared.";
+                    throw runtime_error(ss_.str());
+                }
 
                 token_info& token_info_ = info(id_);
 
@@ -1035,18 +1043,34 @@ namespace parsertl
             }
         }
 
+        id_type insert_terminal(const string& str_, bool &wasInserted)
+        {
+            auto rc =  _terminals.insert
+            (string_id_type_pair(str_,
+                static_cast<id_type>(_terminals.size())));
+            wasInserted = rc.second;
+            return rc.first->second;
+        }
+
         id_type insert_terminal(const string& str_)
         {
-            return _terminals.insert
+            bool wasInserted;
+            return insert_terminal(str_, wasInserted);
+        }
+
+        id_type insert_non_terminal(const string& str_, bool &wasInserted)
+        {
+            auto rc = _non_terminals.insert
             (string_id_type_pair(str_,
-                static_cast<id_type>(_terminals.size()))).first->second;
+                static_cast<id_type>(_non_terminals.size())));
+            wasInserted = rc.second;
+            return rc.first->second;
         }
 
         id_type insert_non_terminal(const string& str_)
         {
-            return _non_terminals.insert
-            (string_id_type_pair(str_,
-                static_cast<id_type>(_non_terminals.size()))).first->second;
+            bool wasInserted;
+            return insert_non_terminal(str_, wasInserted);
         }
 
         const char_type* str_end(const char_type* str_)

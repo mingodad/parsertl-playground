@@ -134,7 +134,6 @@ ther in a spirit of brotherhood.
 %token "to"
 %token "were"
 %token "his"
-%token "in"
 %token "and was"
 %token "com"
 

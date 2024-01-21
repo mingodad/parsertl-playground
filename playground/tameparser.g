@@ -1,4 +1,4 @@
-%token language import language import lexer_symbols lexer
+%token language import lexer_symbols lexer
 %token ignore weak keywords grammar replace parser
 %token test from case sensitive insensitive precedence
 %token left right non_associative non_assoc conflict

@@ -78,7 +78,6 @@
 %token TOK_PRE_ELSE
 %token TOK_PRE_ENDIF
 %token TOK_PRE_UNDEF
-%token TOK_PRE_INCLUDE
 %token TOK_MO_HASH
 %token TOK_MO_HASHHASH
 %token TOK_AT

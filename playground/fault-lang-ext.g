@@ -39,7 +39,6 @@
 %token EXPO
 %token FALSE
 %token FLOAT_LIT
-%token FLOAT_LIT
 %token FLOW
 %token FOR
 %token FUNC

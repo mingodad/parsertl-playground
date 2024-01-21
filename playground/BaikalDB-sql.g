@@ -438,7 +438,6 @@
 %token ')'
 %token '{'
 %token '}'
-%token ESCAPE
 %token '['
 
 %nonassoc /*1*/ empty

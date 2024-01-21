@@ -1,7 +1,7 @@
 //From: https://github.com/lcompilers/lpython/blob/main/src/lpython/parser/parser.yy
 
-%token_indent TK_INDENT
-%token_dedent TK_DEDENT
+//%token_indent TK_INDENT
+//%token_dedent TK_DEDENT
 
 /*Tokens*/
 %token END_OF_FILE
