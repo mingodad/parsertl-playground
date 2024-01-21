@@ -3,6 +3,7 @@
 /*
 Changed '[' wordlist ']' to '<' wordlist '>' and '[' expressionlist ']' to '<' expressionlist '>'
 due to ambiguity with CHARCLASS .
+The shit/reduce conflict is due to not using a production terminator.
 */
 
 %token RULE_NAME
