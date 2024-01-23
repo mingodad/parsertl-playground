@@ -107,21 +107,6 @@ namespace parsertl
             return _table.empty();
         }
 
-        entry at(const std::size_t state_) const
-        {
-            const auto& s_ = _table[state_];
-            auto iter_ = std::find_if(s_.begin(), s_.end(),
-                [](const auto& pair)
-                {
-                    return pair.first == 0;
-                });
-
-            if (iter_ == s_.end())
-                return entry();
-            else
-                return iter_->second;
-        }
-
         entry at(const std::size_t state_, const std::size_t token_id_) const
         {
             const auto& s_ = _table[state_];
@@ -135,6 +120,11 @@ namespace parsertl
                 return entry();
             else
                 return iter_->second;
+        }
+
+        entry at(const std::size_t state_) const
+        {
+            return at(state_, 0);
         }
 
         void set(const std::size_t state_, const std::size_t token_id_,
