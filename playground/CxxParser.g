@@ -264,7 +264,7 @@ boolean_literal :
 	;
 
 translation_unit :
-	declaration_seq.opt
+	declaration_seq_opt
 	;
 
 primary_expression :
@@ -276,7 +276,7 @@ primary_expression :
 
 abstract_expression :
 	parenthesis_clause
-	| '[' /*2N*/ expression.opt ']'
+	| '[' /*2N*/ expression_opt ']'
 	| TEMPLATE parenthesis_clause
 	;
 
@@ -295,7 +295,7 @@ postfix_expression :
 	//| postfix_expression parenthesis_clause mark_type1 '+' /*2N*/ type1_parameters mark '{' /*2N*/ error
 	//| postfix_expression parenthesis_clause mark_type1 '+' /*2N*/ type1_parameters mark error
 	//| postfix_expression parenthesis_clause mark_type1 '+' /*2N*/ error
-	| postfix_expression '[' /*2N*/ expression.opt ']'
+	| postfix_expression '[' /*2N*/ expression_opt ']'
 	| postfix_expression '.' declarator_id
 	| postfix_expression '.' scoped_pseudo_destructor_id
 	| postfix_expression ARROW declarator_id
@@ -309,7 +309,7 @@ postfix_expression :
 	| TYPEID parameters_clause
 	;
 
-expression_list.opt :
+expression_list_opt :
 	/*empty*/
 	| expression_list
 	;
@@ -341,14 +341,14 @@ delete_expression :
 	;
 
 new_expression :
-	NEW new_type_id new_initializer.opt
-	| NEW parameters_clause new_type_id new_initializer.opt
+	NEW new_type_id new_initializer_opt
+	| NEW parameters_clause new_type_id new_initializer_opt
 	| NEW parameters_clause
-	| NEW parameters_clause parameters_clause new_initializer.opt
+	| NEW parameters_clause parameters_clause new_initializer_opt
 	;
 
 new_type_id :
-	type_specifier ptr_operator_seq.opt
+	type_specifier ptr_operator_seq_opt
 	| type_specifier new_declarator
 	| type_specifier new_type_id
 	;
@@ -363,9 +363,9 @@ direct_new_declarator :
 	| direct_new_declarator '[' /*2N*/ constant_expression ']'
 	;
 
-new_initializer.opt :
+new_initializer_opt :
 	/*empty*/
-	| '(' /*4N*/ expression_list.opt ')'
+	| '(' /*4N*/ expression_list_opt ')'
 	;
 
 cast_expression :
@@ -463,7 +463,7 @@ assignment_operator :
 	| ASS_XOR
 	;
 
-expression.opt :
+expression_opt :
 	/*empty*/
 	| expression
 	;
@@ -567,14 +567,14 @@ labeled_statement :
 	;
 
 compound_statement :
-	'{' /*2N*/ statement_seq.opt '}'
-	//| '{' /*2N*/ statement_seq.opt looping_statement '#' bang error '}'
+	'{' /*2N*/ statement_seq_opt '}'
+	//| '{' /*2N*/ statement_seq_opt looping_statement '#' bang error '}'
 	;
 
-statement_seq.opt :
+statement_seq_opt :
 	/*empty*/
-	| statement_seq.opt looping_statement
-	//| statement_seq.opt looping_statement '#' bang error ';'
+	| statement_seq_opt looping_statement
+	//| statement_seq_opt looping_statement '#' bang error ';'
 	;
 
 selection_statement :
@@ -583,7 +583,7 @@ selection_statement :
 	| SWITCH '(' /*4N*/ condition ')' looping_statement
 	;
 
-condition.opt :
+condition_opt :
 	/*empty*/
 	| condition
 	;
@@ -595,7 +595,7 @@ condition :
 iteration_statement :
 	WHILE '(' /*4N*/ condition ')' looping_statement
 	| DO looping_statement WHILE '(' /*4N*/ expression ')' ';'
-	| FOR '(' /*4N*/ for_init_statement condition.opt ';' expression.opt ')' looping_statement
+	| FOR '(' /*4N*/ for_init_statement condition_opt ';' expression_opt ')' looping_statement
 	;
 
 for_init_statement :
@@ -605,7 +605,7 @@ for_init_statement :
 jump_statement :
 	BREAK ';'
 	| CONTINUE ';'
-	| RETURN expression.opt ';'
+	| RETURN expression_opt ';'
 	| GOTO identifier ';'
 	;
 
@@ -614,14 +614,14 @@ declaration_statement :
 	;
 
 compound_declaration :
-	'{' /*2N*/ nest declaration_seq.opt '}'
-	//| '{' /*2N*/ nest declaration_seq.opt util looping_declaration '#' bang error '}'
+	'{' /*2N*/ nest declaration_seq_opt '}'
+	//| '{' /*2N*/ nest declaration_seq_opt util looping_declaration '#' bang error '}'
 	;
 
-declaration_seq.opt :
+declaration_seq_opt :
 	/*empty*/
-	| declaration_seq.opt util looping_declaration
-	//| declaration_seq.opt util looping_declaration '#' bang error ';'
+	| declaration_seq_opt util looping_declaration
+	//| declaration_seq_opt util looping_declaration '#' bang error ';'
 	;
 
 looping_declaration :
@@ -668,14 +668,14 @@ simple_declaration :
 	| decl_specifier_prefix simple_declaration
 	;
 
-suffix_built_in_decl_specifier.raw :
+suffix_built_in_decl_specifier_raw :
 	built_in_type_specifier
-	| suffix_built_in_decl_specifier.raw built_in_type_specifier
-	| suffix_built_in_decl_specifier.raw decl_specifier_suffix
+	| suffix_built_in_decl_specifier_raw built_in_type_specifier
+	| suffix_built_in_decl_specifier_raw decl_specifier_suffix
 	;
 
 suffix_built_in_decl_specifier :
-	suffix_built_in_decl_specifier.raw
+	suffix_built_in_decl_specifier_raw
 	| TEMPLATE suffix_built_in_decl_specifier
 	;
 
@@ -685,17 +685,17 @@ suffix_named_decl_specifier :
 	| suffix_named_decl_specifier decl_specifier_suffix
 	;
 
-suffix_named_decl_specifier.bi :
+suffix_named_decl_specifier_bi :
 	suffix_named_decl_specifier
-	| suffix_named_decl_specifier suffix_built_in_decl_specifier.raw
+	| suffix_named_decl_specifier suffix_built_in_decl_specifier_raw
 	;
 
 suffix_named_decl_specifiers :
-	suffix_named_decl_specifier.bi
-	| suffix_named_decl_specifiers suffix_named_decl_specifier.bi
+	suffix_named_decl_specifier_bi
+	| suffix_named_decl_specifiers suffix_named_decl_specifier_bi
 	;
 
-suffix_named_decl_specifiers.sf :
+suffix_named_decl_specifiers_sf :
 	scoped_special_function_id
 	| suffix_named_decl_specifiers
 	| suffix_named_decl_specifiers scoped_special_function_id
@@ -703,8 +703,8 @@ suffix_named_decl_specifiers.sf :
 
 suffix_decl_specified_ids :
 	suffix_built_in_decl_specifier
-	| suffix_built_in_decl_specifier suffix_named_decl_specifiers.sf
-	| suffix_named_decl_specifiers.sf
+	| suffix_built_in_decl_specifier suffix_named_decl_specifiers_sf
+	| suffix_named_decl_specifiers_sf
 	;
 
 suffix_decl_specified_scope :
@@ -887,14 +887,14 @@ ptr_operator_seq :
 	| ptr_operator ptr_operator_seq
 	;
 
-ptr_operator_seq.opt :
+ptr_operator_seq_opt :
 	%prec SHIFT_THERE /*1N*/ /*empty*/
-	| ptr_operator ptr_operator_seq.opt
+	| ptr_operator ptr_operator_seq_opt
 	;
 
-cv_qualifier_seq.opt :
+cv_qualifier_seq_opt :
 	/*empty*/
-	| cv_qualifier_seq.opt cv_qualifier
+	| cv_qualifier_seq_opt cv_qualifier
 	;
 
 cv_qualifier :
@@ -903,28 +903,28 @@ cv_qualifier :
 	;
 
 type_id :
-	type_specifier abstract_declarator.opt
+	type_specifier abstract_declarator_opt
 	| type_specifier type_id
 	;
 
-abstract_declarator.opt :
+abstract_declarator_opt :
 	/*empty*/
-	| ptr_operator abstract_declarator.opt
+	| ptr_operator abstract_declarator_opt
 	| direct_abstract_declarator
 	;
 
-direct_abstract_declarator.opt :
+direct_abstract_declarator_opt :
 	/*empty*/
 	| direct_abstract_declarator
 	;
 
 direct_abstract_declarator :
-	direct_abstract_declarator.opt parenthesis_clause
-	| direct_abstract_declarator.opt '[' /*2N*/ ']'
-	| direct_abstract_declarator.opt '[' /*2N*/ constant_expression ']'
+	direct_abstract_declarator_opt parenthesis_clause
+	| direct_abstract_declarator_opt '[' /*2N*/ ']'
+	| direct_abstract_declarator_opt '[' /*2N*/ constant_expression ']'
 	;
 
-attribute_list.opt :
+attribute_list_opt :
 	attribute_list
 	| /*empty*/
 	;
@@ -944,8 +944,8 @@ identifier_list :
 	;
 
 parenthesis_clause :
-	parameters_clause cv_qualifier_seq.opt attribute_list.opt
-	| parameters_clause cv_qualifier_seq.opt exception_specification
+	parameters_clause cv_qualifier_seq_opt attribute_list_opt
+	| parameters_clause cv_qualifier_seq_opt exception_specification
 	;
 
 parameters_clause :
@@ -965,7 +965,7 @@ parameter_declaration_list :
 
 abstract_pointer_declaration :
 	ptr_operator_seq
-	| multiplicative_expression star_ptr_operator ptr_operator_seq.opt
+	| multiplicative_expression star_ptr_operator ptr_operator_seq_opt
 	;
 
 abstract_parameter_declaration :
@@ -1026,7 +1026,7 @@ function_try_block :
 	;
 
 function_block :
-	ctor_initializer.opt function_body
+	ctor_initializer_opt function_body
 	;
 
 function_body :
@@ -1084,14 +1084,14 @@ class_key :
 	;
 
 class_specifier :
-	class_specifier_head member_specification.opt '}'
-	//| class_specifier_head member_specification.opt util looping_member_declaration '#' bang error '}'
+	class_specifier_head member_specification_opt '}'
+	//| class_specifier_head member_specification_opt util looping_member_declaration '#' bang error '}'
 	;
 
-member_specification.opt :
+member_specification_opt :
 	/*empty*/
-	| member_specification.opt util looping_member_declaration
-	//| member_specification.opt util looping_member_declaration '#' bang error ';'
+	| member_specification_opt util looping_member_declaration
+	//| member_specification_opt util looping_member_declaration '#' bang error ';'
 	;
 
 looping_member_declaration :
@@ -1172,11 +1172,11 @@ conversion_function_id :
 	;
 
 conversion_type_id :
-	type_specifier ptr_operator_seq.opt
+	type_specifier ptr_operator_seq_opt
 	| type_specifier conversion_type_id
 	;
 
-ctor_initializer.opt :
+ctor_initializer_opt :
 	/*empty*/
 	| ctor_initializer
 	;
@@ -1197,7 +1197,7 @@ mem_initializer_list_head :
 	;
 
 mem_initializer :
-	mem_initializer_id '(' /*4N*/ expression_list.opt ')'
+	mem_initializer_id '(' /*4N*/ expression_list_opt ')'
 	;
 
 mem_initializer_id :
