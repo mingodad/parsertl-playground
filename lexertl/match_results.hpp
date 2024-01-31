@@ -29,6 +29,7 @@ namespace lexertl
 
         id_type id = 0;
         id_type user_id = npos();
+        id_type fallback_id = npos();
         id_type state = 0;
         bool bol = true;
         iter_type first = iter_type();
@@ -64,6 +65,7 @@ namespace lexertl
         {
             id = 0;
             user_id = npos();
+            fallback_id = npos();
             first = eoi;
             second = eoi;
             bol = true;
@@ -74,6 +76,7 @@ namespace lexertl
         {
             id = 0;
             user_id = npos();
+            fallback_id = npos();
             first = start_;
             second = start_;
             eoi = end_;
@@ -96,10 +99,16 @@ namespace lexertl
             return LEXERTL_SKIP;
         }
 
+        static id_type reject()
+        {
+            return LEXERTL_REJECT;
+        }
+
         bool operator ==(const match_results& rhs_) const
         {
             return id == rhs_.id &&
                 user_id == rhs_.user_id &&
+                fallback_id == rhs_.fallback_id &&
                 first == rhs_.first &&
                 second == rhs_.second &&
                 eoi == rhs_.eoi &&

@@ -113,7 +113,7 @@ namespace lexertl
             return _flags;
         }
 
-        id_type eoi() const
+        static id_type eoi()
         {
             return 0;
         }

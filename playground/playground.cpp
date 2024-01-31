@@ -34,6 +34,10 @@ EM_JS(void, showDiffTime, (const char *title), {
 #include <parsertl/parse.hpp>
 #include <parsertl/state_machine.hpp>
 #include <parsertl/lookup.hpp>
+#include <lexertl/serialise.hpp>
+#include <parsertl/serialise.hpp>
+
+#include "lexertl/generate_cpp.hpp"
 
 #ifdef DEBUGMEM_H_INCLUDED
 bool g_verboseOutput;
@@ -78,6 +82,7 @@ struct GlobalState
     bool verboseOutput = true;
     bool icase;
     bool dump_master_grammar = false;
+    bool dump_naked_grammar = false;
     bool dump_grammar_lexer;
     bool dump_grammar_lsm;
     bool dump_grammar_gsm;
@@ -86,6 +91,8 @@ struct GlobalState
     bool dump_grammar_parse_trace;
     bool dump_input_parse_tree;
     bool dump_input_parse_trace;
+    bool generate_standalone_parser = false;
+    bool hasUnknownTokens = false;
     bool pruneParserTree = false;
 
 //#ifdef WASM_PLAYGROUND
@@ -441,6 +448,125 @@ static void dump_parse_trace(const char* data_start, const char* data_end,
     }
 }
 
+void generate_cpp_tokens(const parsertl::rules grules, std::ostream& os_)
+{
+    const auto& token_info = grules.tokens_info();
+    parsertl::rules::string_vector symbols;
+    grules.terminals(symbols);
+    os_ << "enum etk_Symbols {\n";
+    int idx = 0;
+    for(auto &symbol : symbols)
+    {
+        auto &tki = token_info[idx];
+        os_ << "  /*" <<  idx++;
+        if(tki._fallback)
+        {
+            os_ << ":" << tki._fallback;
+        }
+        os_ << "*/ etk_";
+        if((symbol[0] >= 'A' && symbol[0] <= 'Z') || (symbol[0] >= 'a' && symbol[0] <= 'z'))
+        {
+            os_ <<  symbol << ",\n";
+        }
+        else
+        {
+            os_ <<  (idx-1) << ", // " << symbol <<  "\n";
+        }
+    }
+    os_ << "};\n\n";
+
+    os_ << "const char *etk_Symbols_names[" << symbols.size() << "] = {\n";
+    idx = 0;
+    for(auto &symbol : symbols)
+    {
+        auto &tki = token_info[idx];
+        os_ << "  /*" <<  idx++;
+        if(tki._fallback)
+        {
+            os_ << ":" << tki._fallback;
+        }
+        os_ << "*/ \"";
+        for(auto c : symbol)
+        {
+            switch(c)
+            {
+                case '"':
+                case '\\':
+                    os_ << "\\";
+                    break;
+            }
+            os_ << c;
+        }
+        os_ << "\",\n";
+    }
+    os_ << "};\n\n";
+}
+
+void generate_cpp_symbols(const parsertl::rules grules, std::ostream& os_)
+{
+    const auto& token_info = grules.tokens_info();
+    parsertl::rules::string_vector symbols;
+    size_t terminal_count = grules.terminals_count();
+    size_t non_terminal_count = grules.non_terminals_count();
+    grules.symbols(symbols);
+    
+    os_ << "static size_t terminal_count = " << terminal_count << ";\n";
+    os_ << "static size_t non_terminal_count = " << non_terminal_count << ";\n";
+    os_ << "enum esym_Symbols {\n";
+    size_t idx = 0;
+    for(auto &symbol : symbols)
+    {
+        os_ << "  /*" <<  idx++;
+        if(idx < terminal_count)
+        {
+            auto &tki = token_info[idx];
+            if(tki._fallback)
+            {
+                os_ << ":" << tki._fallback;
+            }
+        }
+        os_ << "*/ esym_";
+        if((symbol[0] >= 'A' && symbol[0] <= 'Z') || (symbol[0] >= 'a' && symbol[0] <= 'z'))
+        {
+            os_ <<  symbol << ",\n";
+        }
+        else
+        {
+            os_ <<  (idx-1) << ", // " << symbol <<  "\n";
+        }
+    }
+    os_ << "};\n\n";
+
+    os_ << "const char *esym_Symbols_names[" << symbols.size() << "] = {\n";
+    idx = 0;
+    for(auto &symbol : symbols)
+    {
+        os_ << "  /*" <<  idx++;
+        if(idx < terminal_count)
+        {
+            auto &tki = token_info[idx];
+            if(tki._fallback)
+            {
+                os_ << ":" << tki._fallback;
+            }
+        }
+        os_ << "*/ \"";
+        for(auto c : symbol)
+        {
+            switch(c)
+            {
+                case '"':
+                case '\\':
+                    os_ << "\\";
+                    break;
+            }
+            os_ << c;
+        }
+        os_ << "\",\n";
+    }
+    os_ << "};\n\n";
+}
+
 struct BuildUserParser
 {
     GlobalState& gs;
@@ -519,6 +645,7 @@ struct BuildUserParser
             gs.grammar_data + gs.grammar_data_size, gs.master_parser.lsm);
         results.reset(iter_lex->id, gs.master_parser.gsm);
 
+        gs.hasUnknownTokens = false;
         while (results.entry.action != parsertl::action::error &&
             results.entry.action != parsertl::action::accept)
         {
@@ -546,6 +673,10 @@ struct BuildUserParser
             parsertl::lookup(iter_lex, gs.master_parser.gsm, results,
                 productions);
         }
+        if(gs.hasUnknownTokens)
+        {
+            std::runtime_error("User grammar has unknown tokens.");
+        }
 
         if (results.entry.action == parsertl::action::error)
         {
@@ -563,13 +694,13 @@ struct BuildUserParser
             return false;
         }
 
+        std::string warnings;
         if (gs.user_parser.grules.grammar().empty())
         {
             gs.user_parser.lrules.push(".{+}[\r\n]", lexertl::rules::skip());
         }
         else
         {
-            std::string warnings;
             parsertl::rules::string_vector terminals;
             const auto& grammar = gs.user_parser.grules.grammar();
             const auto& ids = gs.user_parser.lrules.ids();
@@ -626,6 +757,10 @@ struct BuildUserParser
 #ifdef WASM_PLAYGROUND
         switch_output("parse_debug");
 #endif
+            if(warnings.size())
+            {
+                std::cout << warnings << std::endl;
+            }
             parsertl::dfa dfa_;
             parsertl::generator::build_dfa(gs.user_parser.grules, dfa_);
             parsertl::debug::dump(gs.user_parser.grules, dfa_, std::cout);
@@ -662,12 +797,550 @@ struct BuildUserParser
             return false;
         }
 
+        if(gs.generate_standalone_parser)
+        {
+#ifdef WASM_PLAYGROUND
+        switch_output("parse_ebnf_yacc");
+#endif
+            auto& stream_ = std::cout;
+            //parsertl::save2sql(gs.user_parser.gsm, std::cout);
+            //lexertl::save2sql(gs.user_parser.lsm, std::cout);
+            stream_ << "//./parsertl-playground -generateParser grammar.g test.empty\n"
+                                "//g++ -g standalone-parser.cpp -o standalone-parser\n"
+                                "//./carbon-parser prelude.carbon\n"
+                                "#include <stdio.h>\n"
+                                "#include <string.h>\n"
+                                "#include <stdlib.h>\n"
+                                "#include <vector>\n"
+                                "#include <stack>\n"
+                                "#include <string>\n"
+                                "#include <algorithm>\n\n";
+            
+            generate_cpp_symbols(gs.user_parser.grules, stream_);
+            const auto productions = gs.user_parser.grules.grammar();
+            
+            stream_ << "static const char *sm_rules_alias[" << productions.size() << "] = {\n";
+            int idx = 0;
+            for (const auto& prod : productions)
+            {
+                stream_ << "  /*" << idx++ << "*/ ";
+                if(prod._alias.empty()) stream_ << "nullptr,\n";
+                else stream_ << '"' << prod._alias << "\",\n";
+            }
+            stream_ << "};\n\n";
+            
+            parsertl::save2cpp(gs.user_parser.gsm, stream_);
+            lexertl::table_based_cpp::generate_cpp("UserLexer", gs.user_parser.lsm, false, stream_);
+
+	    stream_ <<
+"typedef struct\n"
+"{\n"
+"    size_t line, column;\n"
+"    const char *last_line_pos;\n"
+"} LineColumn;\n"
+"\n"
+"void get_line_colum(const char *data, const char *start_pos, const char *this_pos, LineColumn *lc)\n"
+"{\n"
+"	const char *last_pos = start_pos;\n"
+"	const char * pos;\n"
+"	size_t line_no = 0;\n"
+"	while(TRUE)\n"
+"	{\n"
+"		//print(pos, last_pos, this_pos);\n"
+"		pos = strchr(last_pos, '\\n');\n"
+"		if(pos != NULLPTR && pos <  this_pos)\n"
+"		{\n"
+"			++line_no;\n"
+"			last_pos = lc->last_line_pos = pos+1;\n"
+"		}\n"
+"		else break;\n"
+"	}\n"
+"	lc->line += line_no;\n"
+"	lc->column = this_pos - lc->last_line_pos+1;\n"
+"}\n"
+"\n"
+"typedef struct {\n"
+"	size_t size;\n"
+"	char *str;\n"
+"} StrData;\n"
+"\n"
+"static StrData readcontent(const char *filename)\n"
+"{\n"
+"    StrData data;\n"
+"    data.str = NULL;\n"
+"    data.size = 0;\n"
+"    FILE *fp;\n"
+"\n"
+"    fp = fopen(filename, \"r\");\n"
+"    if(fp) {\n"
+"        fseek(fp, 0, SEEK_END);\n"
+"        data.size = ftell(fp);\n"
+"        rewind(fp);\n"
+"\n"
+"        data.str = (char*) malloc(sizeof(char) * (data.size+1));\n"
+"	if(data.str)\n"
+"	{\n"
+"		size_t sz = fread(data.str, 1, data.size, fp);\n"
+"		if(sz == data.size)\n"
+"		{\n"
+"			data.str[data.size] = '\\0';\n"
+"		}\n"
+"		else\n"
+"		{\n"
+"			free(data.str);\n"
+"			data.str = nullptr;\n"
+"		}\n"
+"	}\n"
+"\n"
+"        fclose(fp);\n"
+"    }\n"
+"    return data;\n"
+"}\n"
+"\n"
+"\n"
+"void dumpGrammarEBNF(FILE *out)\n"
+"{\n"
+"    id_type last_lhs = 0;\n"
+"    size_t i = 0;\n"
+"    for(; i< sm_rules_size; ++i)\n"
+"    {\n"
+"        const SmRule *rule = sm_rules+i;\n"
+"        const char *lhs_name = esym_Symbols_names[rule->lhs];\n"
+"        if(lhs_name[0] == '$') continue;\n"
+"        if(last_lhs == rule->lhs)\n"
+"        {\n"
+"            fprintf(out, \"    | \");\n"
+"        }\n"
+"        else\n"
+"        {\n"
+"            fprintf(out, \"%s ::=\\n    \", lhs_name);\n"
+"        }\n"
+"        if(rule->rhs_count == 0)\n"
+"        {\n"
+"            fprintf(out, \"/*empty*/ \");\n"
+"        }\n"
+"        else\n"
+"        {\n"
+"            for(size_t j=rule->rhs_all_offset, jmax=rule->rhs_all_offset+rule->rhs_count; j< jmax; ++j)\n"
+"            {\n"
+"                const char *rhs_name = esym_Symbols_names[rules_rhs_all[j]];\n"
+"                fprintf(out, \"%s \", rhs_name);\n"
+"            }\n"
+"        }\n"
+"        fprintf(out, \"\\n\");\n"
+"        last_lhs = rule->lhs;\n"
+"    }\n"
+"}\n"
+"\n"
+"enum e_parser_action\n"
+"{\n"
+"    error_e_parser_action,\n"
+"    shift_e_parser_action,\n"
+"    reduce_e_parser_action,\n"
+"    go_to_e_parser_action,\n"
+"    accept_e_parser_action\n"
+"};\n"
+"enum e_parser_error_type\n"
+"{\n"
+"    syntax_error_e_parser_error_type,\n"
+"    non_associative_e_parser_error_type,\n"
+"    unknown_token_e_parser_error_type\n"
+"};\n"
+"\n"
+"typedef struct {\n"
+"    std::vector<id_type> stack;\n"
+"    id_type token_id;\n"
+"    SmAction entry;\n"
+"} parsertl_match_results;\n"
+"\n"
+"const SmAction action_error = {0, error_e_parser_action, syntax_error_e_parser_error_type};\n"
+"\n"
+"const SmAction *sm_table_at(const size_type state, id_type token_id)\n"
+"{\n"
+"    const SmTable *s = sm_table+state;\n"
+"    for(size_type i=s->action_all_offset, imax=s->action_all_offset+s->size; i < imax; ++i)\n"
+"    {\n"
+"        const SmAction *action = sm_action_all+i;\n"
+"        if(action->symbol_id == token_id)\n"
+"        {\n"
+"            return action;\n"
+"        }\n"
+"    }\n"
+"    return &action_error;\n"
+"}\n"
+"\n"
+"struct ParseTreeUserData {\n"
+"    std::vector<ParseTreeUserData> children;\n"
+"    int symbol_id;\n"
+"    std::string alias;\n"
+"    std::string value; ///< The value at this node (empty if this node's symbol is non-terminal).\n"
+"    ParseTreeUserData():children(0),symbol_id(-1) {}\n"
+"    ParseTreeUserData(int id):children(0),symbol_id(id) {}\n"
+"    ParseTreeUserData(int id, const std::string& v):children(0),symbol_id(id), value(v) {}\n"
+"};\n"
+"\n"
+"static void parsetree_indent( int level )\n"
+"{\n"
+"    for ( int i = 0; i < level; ++i )\n"
+"    {\n"
+"        printf( \" |\" );\n"
+"    }\n"
+"}\n"
+"\n"
+"static const char* escapeForParserTree(const std::string& value)\n"
+"{\n"
+"    if(value == \"\\n\") return \"\\\\n\";\n"
+"    else if(value == \"\\r\\n\") return \"\\\\r\\\\n\";\n"
+"    else if(value == \"\\t\") return \"\\\\t\";\n"
+"    else if(value == \"\\r\") return \"\\\\r\";\n"
+"    return value.c_str();\n"
+"}\n"
+"\n"
+"static void print_parsetree( const ParseTreeUserData& ast, const char *const* symbols, int level, bool bPrune )\n"
+"{\n"
+"    if(ast.symbol_id >= 0)\n"
+"    {\n"
+"        bool isTerminal = !ast.value.empty();\n"
+"        if(bPrune && !isTerminal && ast.children.size() == 0)\n"
+"        {\n"
+"            return;\n"
+"        }\n"
+"        bool hasAlias = !ast.alias.empty();\n"
+"        if(hasAlias && ast.alias == \"#__skip\") return;\n"
+"        parsetree_indent( level );\n"
+"        if(isTerminal)\n"
+"        {\n"
+"            printf(\"%s -> %s\\n\", symbols[ast.symbol_id],\n"
+"                    escapeForParserTree(ast.value));\n"
+"        }\n"
+"        else\n"
+"        {\n"
+"            if(hasAlias) printf(\"%s\\n\", ast.alias.c_str());\n"
+"            else printf(\"%s\\n\", symbols[ast.symbol_id]);\n"
+"        }\n"
+"    }\n"
+"\n"
+"    if(bPrune && ast.children.size() == 1)\n"
+"    {\n"
+"        const ParseTreeUserData *ast_tmp = &ast;\n"
+"        while(ast_tmp->children.size() == 1) ast_tmp = &ast_tmp->children[0];\n"
+"        print_parsetree( *ast_tmp, symbols, ast.symbol_id >= 0 ? (level + 1) : level, bPrune );\n"
+"    }\n"
+"    else\n"
+"    {\n"
+"        for (const auto& child : ast.children)\n"
+"        {\n"
+"            print_parsetree( child, symbols, ast.symbol_id >= 0 ? (level + 1) : level, bPrune );\n"
+"        }\n"
+"    }\n"
+"}\n"
+"#define WITH_PARSE_TREE\n"
+"int InputParse(FILE *out, lexertl_match_results *lresults, bool printParserTree)\n"
+"{\n"
+"#ifdef WITH_PARSE_TREE\n"
+"    std::vector<ParseTreeUserData> syn_tree;\n"
+"#endif\n"
+"    parsertl_match_results parser_results;\n"
+"    parser_results.stack.push_back(0);\n"
+"    parser_results.entry.action = error_e_parser_action;\n"
+"    parser_results.entry.param = unknown_token_e_parser_error_type;\n"
+"    parser_results.token_id = results_npos;\n"
+"\n"
+"    UserLexer(lresults);\n"
+"    if(lresults->id != 0)\n"
+"    {\n"
+"        parser_results.token_id = lresults->id;\n"
+"        parser_results.entry =\n"
+"                *sm_table_at(parser_results.stack.back(), lresults->id);\n"
+"    }\n"
+"    while (parser_results.entry.action != error_e_parser_action)\n"
+"    {\n"
+"        switch (parser_results.entry.action)\n"
+"        {\n"
+"        case shift_e_parser_action:\n"
+"#ifdef WITH_PARSE_TREE\n"
+"             if(printParserTree)\n"
+"            {\n"
+"                const std::string str(lresults->first, lresults->second);\n"
+"                syn_tree.emplace_back(lresults->id, str);\n"
+"            }\n"
+"#endif\n"
+"            parser_results.stack.push_back(parser_results.entry.param);\n"
+"\n"
+"            if (lresults->id != 0)\n"
+"                UserLexer(lresults);\n"
+"\n"
+"            parser_results.token_id = lresults->id;\n"
+"\n"
+"            if (parser_results.token_id == results_npos)\n"
+"            {\n"
+"                parser_results.entry.action = error_e_parser_action;\n"
+"                parser_results.entry.param =\n"
+"                    static_cast<id_type>\n"
+"                    (unknown_token_e_parser_error_type);\n"
+"            }\n"
+"            else\n"
+"            {\n"
+"                auto entry =\n"
+"                    sm_table_at(parser_results.stack.back(), parser_results.token_id);\n"
+"\n"
+"                if(entry->action == error_e_parser_action)\n"
+"                {\n"
+"                    //try fallback\n"
+"                    if(lresults->user_id != results_npos)\n"
+"                    {\n"
+"                        parser_results.token_id = lresults->user_id;\n"
+"                        entry =\n"
+"                            sm_table_at(parser_results.stack.back(), lresults->user_id);\n"
+"                    }\n"
+"                }\n"
+"                parser_results.entry = *entry;\n"
+"            }\n"
+"            break;\n"
+"        case reduce_e_parser_action:\n"
+"        {\n"
+"            const auto& rule = sm_rules[parser_results.entry.param];\n"
+"#ifdef WITH_PARSE_TREE\n"
+"            if(printParserTree)\n"
+"	    {\n"
+"                ParseTreeUserData ud(rule.lhs);\n"
+"                if(sm_rules_alias[parser_results.entry.param]){\n"
+"                    ud.alias = sm_rules_alias[parser_results.entry.param];\n"
+"                }\n"
+"\n"
+"                if(rule.rhs_count > 0)\n"
+"                {\n"
+"                    auto rhs_id_vec_iter = rule.rhs_all_offset;\n"
+"                    auto rhs_id_vec_iter_end = rule.rhs_all_offset+rule.rhs_count;\n"
+"                    auto syn_tree_iter = syn_tree.end()-rule.rhs_count;\n"
+"                    bool isLeftRecursion = rule.lhs == rules_rhs_all[rhs_id_vec_iter];\n"
+"                    if(isLeftRecursion)\n"
+"                    {\n"
+"                        ud.children.swap(syn_tree_iter->children);\n"
+"                        ++syn_tree_iter;\n"
+"                        ++rhs_id_vec_iter;\n"
+"                    }\n"
+"                    while(rhs_id_vec_iter++ != rhs_id_vec_iter_end)\n"
+"                    {\n"
+"                        ud.children.emplace_back(std::move(*syn_tree_iter));\n"
+"                        ++syn_tree_iter;\n"
+"                    }\n"
+"                    syn_tree.erase(syn_tree.end()-rule.rhs_count, syn_tree.end());\n"
+"                }\n"
+"                syn_tree.emplace_back(std::move(ud));\n"
+"            }\n"
+"#endif\n"
+"            const std::size_t size_ = rule.rhs_count;\n"
+"\n"
+"            if (size_)\n"
+"            {\n"
+"                parser_results.stack.resize(parser_results.stack.size() - size_);\n"
+"            }\n"
+"\n"
+"            parser_results.token_id = sm_rules[parser_results.entry.param].lhs;\n"
+"            parser_results.entry =\n"
+"                *sm_table_at(parser_results.stack.back(), parser_results.token_id);\n"
+"            break;\n"
+"        }\n"
+"        case go_to_e_parser_action:\n"
+"        {\n"
+"            parser_results.stack.push_back(parser_results.entry.param);\n"
+"            parser_results.token_id = lresults->id;\n"
+"            auto entry = sm_table_at(parser_results.stack.back(), parser_results.token_id);\n"
+"            if(entry->action == error_e_parser_action)\n"
+"            {\n"
+"                //try fallback\n"
+"                if(lresults->user_id != results_npos)\n"
+"                {\n"
+"                    parser_results.token_id = lresults->user_id;\n"
+"                    entry =\n"
+"                        sm_table_at(parser_results.stack.back(), lresults->user_id);\n"
+"                }\n"
+"            }\n"
+"            parser_results.entry = *entry;\n"
+"            break;\n"
+"        }\n"
+"        default:\n"
+"            // accept\n"
+"            // error\n"
+"            break;\n"
+"        }\n"
+"\n"
+"        if (parser_results.entry.action == accept_e_parser_action)\n"
+"        {\n"
+"            const std::size_t size_ =\n"
+"                sm_rules[parser_results.entry.param].rhs_count;\n"
+"\n"
+"            if (size_)\n"
+"            {\n"
+"                parser_results.stack.resize(parser_results.stack.size() - size_);\n"
+"            }\n"
+"\n"
+"            break;\n"
+"        }\n"
+"    }\n"
+"#ifdef WITH_PARSE_TREE\n"
+"    if (printParserTree && !syn_tree.empty())\n"
+"    {\n"
+"        print_parsetree(syn_tree.front(), esym_Symbols_names, 0, true);\n"
+"    }\n"
+"#endif\n"
+"    return parser_results.entry.action;\n"
+"}\n"
+"\n"
+"void dumpGrammarSM(FILE *out)\n"
+"{\n"
+"    for(size_type i=0; i < sm_rows; ++i)\n"
+"    {\n"
+"        const SmTable *state = sm_table+i;\n"
+"        fprintf(out, \"state %u\\n\", i);\n"
+"        for(size_type j=state->action_all_offset,\n"
+"                jmax=state->action_all_offset+state->size; j < jmax ; ++j)\n"
+"        {\n"
+"            const SmAction *action = sm_action_all+j;\n"
+"            const char *lhs_name = esym_Symbols_names[action->symbol_id];\n"
+"            const char *action_name;\n"
+"            const char *param_name;\n"
+"            switch(action->action)\n"
+"            {\n"
+"                case error_e_parser_action:\n"
+"                    action_name = \"error\";\n"
+"                    break;\n"
+"                case shift_e_parser_action:{\n"
+"                    action_name = \"shift\";\n"
+"                    param_name = \"@state\";\n"
+"                    break;\n"
+"                }\n"
+"                case reduce_e_parser_action: {\n"
+"                    action_name = \"reduce\";\n"
+"                    const SmRule *rule = sm_rules+action->param;\n"
+"                    param_name = esym_Symbols_names[rule->lhs];\n"
+"                    break;\n"
+"                }\n"
+"                case go_to_e_parser_action:\n"
+"                    action_name = \"goto\";\n"
+"                    param_name = \"@state\";\n"
+"                    break;\n"
+"                case accept_e_parser_action:\n"
+"                    action_name = \"accept\";\n"
+"                    break;\n"
+"                default:\n"
+"                    action_name = param_name = \"??\";\n"
+"            }\n"
+"            fprintf(out, \"%u:%s %u:%s %u:%s\\n\",\n"
+"                    action->symbol_id, lhs_name, action->action,\n"
+"                    action_name, action->param, param_name);\n"
+"        }\n"
+"        fprintf(out, \"\\n\");\n"
+"    }\n"
+"}\n"
+"\n"
+"void dumpLexerSM(FILE *out, size_type state)\n"
+"{\n"
+"    const id_type *lookup = lexer_lookups[state];\n"
+"    const id_type dfa_alphabet = lexer_dfa_alphabets[state];\n"
+"    const id_type *dfa = lexer_dfas[state];\n"
+"    const id_type *ptr = dfa + dfa_alphabet;\n"
+"    int end_state = *ptr != 0;\n"
+"    id_type id = *(ptr + 1);\n"
+"    id_type uid = *(ptr + 2);\n"
+"    id_type start_state = state;\n"
+"    for(size_type i=0; i < lexer_dfa_lookup_count; ++i)\n"
+"    {\n"
+"        const id_type ch = lookup[i];\n"
+"    }\n"
+"}\n"
+"\n"
+"int main(int argc, char *argv[])\n"
+"{\n"
+"    int rc = 0;\n"
+"    if(argc < 2)\n"
+"    {\n"
+"	    printf(\"usage: %s input_file_name\\n\", argv[0]);\n"
+"	    return 1;\n"
+"    }\n"
+"    const char *input_pathname = argv[1];\n"
+"\n"
+"    //dumpLexerSM(stdout, 0);\n"
+"    //dumpGrammarSM(stdout);\n"
+"\n"
+"    //dumpGrammarEBNF(stdout);\n"
+"    StrData data = readcontent(input_pathname);\n"
+"    if (!data.str)\n"
+"    {\n"
+"        fprintf(stderr, \"Error: failed to open %s\\n\", input_pathname);\n"
+"        return 1;\n"
+"    }\n"
+"    const char *input_data = data.str;\n"
+"    const size_t input_data_size = data.size;\n"
+"\n"
+"    LineColumn line_column = {.line = 1, .column= 1, .last_line_pos = input_data};\n"
+"    const char *start_pos = input_data;\n"
+"    lexertl_match_results results;\n"
+"    memset(&results, 0, sizeof(lexertl_match_results));\n"
+"    results.first = results.second = input_data;\n"
+"    results.eoi = input_data + input_data_size;\n"
+"    results.bol = TRUE;\n"
+"    rc = InputParse(stdout, &results, false);\n"
+"    if(rc == error_e_parser_action)\n"
+"    {\n"
+"    	get_line_colum(input_data, start_pos, results.first, &line_column);\n"
+"    	start_pos = results.first;\n"
+"	fprintf(stdout, \"%s:%zu:%zu:%d:%d:%d:%.*s -> synatx error\\n\",\n"
+"                input_pathname,\n"
+"		line_column.line, line_column.column,\n"
+"    		results.state, results.id,\n"
+"    		(results.user_id == results_npos ? 0 : results.user_id),\n"
+"	        (int)(results.second-results.first), results.first);\n"
+"    }\n"
+"    else\n"
+"    {\n"
+"        fprintf(stdout, \"Parser input success %d\\n\", rc == accept_e_parser_action);\n"
+"        rc = 0;\n"
+"    }\n"
+"#if 0\n"
+"    while(UserLexer(&results), results.id != 0)\n"
+"    {\n"
+"    	get_line_colum(input_data, start_pos, results.first, &line_column);\n"
+"    	start_pos = results.first;\n"
+"	fprintf(stdout, \"%zu:%zu:%d:%d:%d:%.*s\\n\",\n"
+"		line_column.line, line_column.column,\n"
+"    		results.state, results.id,\n"
+"    		(results.user_id == results_npos ? 0 : results.user_id),\n"
+"	        (int)(results.second-results.first), results.first);\n"
+"    }\n"
+"#endif\n"
+"    free(data.str);\n"
+"\n"
+"    return rc;\n"
+"}\n";	    
+            //gs.user_parser.lsm.minimise();
+            //generate_cpp_tokens(gs.user_parser.grules, std::cout);
+            //lexertl::table_based_cpp::generate_cpp("UserLexer", gs.user_parser.lsm, false, std::cout);
+            
+            //parsertl::dfa dfa_;
+            //parsertl::generator::build_dfa(gs.user_parser.grules, dfa_);
+            //parsertl::debug::dumpSql(gs.user_parser.grules, dfa_, std::cout);
+            return false;
+        }
+        
         if(gs.dump_grammar_lsm)
         {
 #ifdef WASM_PLAYGROUND
         switch_output("parse_debug");
 #endif
             lexertl::debug::dump(gs.user_parser.lsm, gs.user_parser.lrules, std::cout);
+            return false;
+        }
+        if(gs.dump_naked_grammar)
+        {
+#ifdef WASM_PLAYGROUND
+        switch_output("parse_debug");
+#endif
+            parsertl::debug::dump(gs.user_parser.grules, std::cout, false);
+            parsertl::rules::string_vector terminals;
+            gs.user_parser.grules.terminals(terminals);
+            lexertl::debug::dump(gs.user_parser.lrules, std::cout, terminals);
             return false;
         }
         return true;
@@ -681,6 +1354,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
 
     static const char* initial_state_str = "INITIAL";
     static const char* current_state_str = ".";
+    gs.hasUnknownTokens = false;
 
     grules.token("Charset ExitState Macro MacroName "
         "NL Repeat StartState String ProdAlias");
@@ -704,7 +1378,15 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     {
         const std::string tokens = state.dollar(1);
 
-        state.gs.user_parser.grules.fallback(tokens);
+        try {
+            state.gs.user_parser.grules.fallback(tokens);
+        }
+        catch (const std::exception &e)
+        {
+            std::cerr << e.what() << '\n';
+            state.gs.hasUnknownTokens = true;
+            return;
+        }
     };
     // Read and store %left entries
     gs.master_parser.actions[grules.push("directive", "\"%left\" tokens NL")] =
@@ -875,8 +1557,18 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         else if(rc_token.id == state.gs.token_Literal
                 || rc_token.id == state.gs.token_Name)
         {
+            lexertl::rules::id_type token_id;
+            try {
+                token_id = state.gs.user_parser.grules.token_id(rc_token.str());
+            }
+            catch (const std::exception &e)
+            {
+                std::cerr << e.what() << '\n';
+                state.gs.hasUnknownTokens = true;
+                return;
+            }
             state.gs.user_parser.lrules.push(start_state,
-                regex, state.gs.user_parser.grules.token_id(rc_token.str()),
+                regex, token_id,
                 current_state_str);
         }
         else
@@ -919,8 +1611,18 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
                 else if(rc_token.id == state.gs.token_Literal
                         || rc_token.id == state.gs.token_Name)
                 {
+                    lexertl::rules::id_type token_id;
+                    try {
+                        token_id = state.gs.user_parser.grules.token_id(rc_token.str());
+                    }
+                    catch (const std::exception &e)
+                    {
+                        std::cerr << e.what() << '\n';
+                        state.gs.hasUnknownTokens = true;
+                        return;
+                    }
                     state.gs.user_parser.lrules.push(start_state.c_str(),
-                        regex, state.gs.user_parser.grules.token_id(rc_token.str()),
+                        regex, token_id,
                         exit_state.c_str());
                 }
                 else
@@ -960,8 +1662,18 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
         else if(rc_token.id == state.gs.token_Literal
                 || rc_token.id == state.gs.token_Name)
         {
+            lexertl::rules::id_type token_id;
+            try {
+                token_id = state.gs.user_parser.grules.token_id(rc_token.str());
+            }
+            catch (const std::exception &e)
+            {
+                std::cerr << e.what() << '\n';
+                state.gs.hasUnknownTokens = true;
+                return;
+            }
             state.gs.user_parser.lrules.push(start_state.c_str(),
-                regex, state.gs.user_parser.grules.token_id(rc_token.str()),
+                regex, token_id,
                 current_state_str);
         }
         else
@@ -1005,8 +1717,18 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
                 else if(rc_token.id == state.gs.token_Literal
                         || rc_token.id == state.gs.token_Name)
                 {
+                    lexertl::rules::id_type token_id;
+                    try {
+                        token_id = state.gs.user_parser.grules.token_id(rc_token.str());
+                    }
+                    catch (const std::exception &e)
+                    {
+                        std::cerr << e.what() << '\n';
+                        state.gs.hasUnknownTokens = true;
+                        return;
+                    }
                     state.gs.user_parser.lrules.push(start_state,
-                        regex, state.gs.user_parser.grules.token_id(rc_token.str()),
+                        regex, token_id,
                         exit_state.c_str());
                 }
                 else
@@ -1281,6 +2003,7 @@ int main_base(int argc, char* argv[], GlobalState& gs)
 
     switch_output("compile_status");
 #else
+    int rc = 0;
 #ifndef DEBUGMEM_H_INCLUDED
     start_time = clock();
 #endif
@@ -1311,7 +2034,10 @@ int main_base(int argc, char* argv[], GlobalState& gs)
         {
             parser_throw_error("parsing the user grammar", iter_lexg, gs.grammar_data);
         }
-        else std::cout << "Parser user grammar success: " << success << "\n";
+        else if(!gs.generate_standalone_parser)
+        {
+            std::cerr << "Parser user grammar success: " << success << "\n";
+        }
 
         BuildUserParser bup(gs);
         bup.build();
@@ -1320,9 +2046,10 @@ int main_base(int argc, char* argv[], GlobalState& gs)
                 || gs.dump_grammar_lexer
                 || gs.dump_grammar_lsm
                 || gs.dump_grammar_gsm
+                || gs.generate_standalone_parser
                 || gs.dumpAsEbnfRR)
         {
-            return -1;
+            return 0;
         }
         size_t productions_count = gs.user_parser.grules.grammar().size();
         if(gs.verboseOutput)
@@ -1411,6 +2138,9 @@ int main_base(int argc, char* argv[], GlobalState& gs)
     catch (const std::exception &e)
     {
         std::cout << e.what() << '\n';
+#ifndef WASM_PLAYGROUND
+        rc = 1;
+#endif        
     }
 
 #ifdef WASM_PLAYGROUND
@@ -1418,7 +2148,7 @@ int main_base(int argc, char* argv[], GlobalState& gs)
     //set_result("parse", parse_result ? 0 : err);
     return err;
 #else
-    return 0;
+    return rc;
 #endif
 }
 
@@ -1433,6 +2163,7 @@ extern "C" int main_playground(
         ,int dump_input_lexer
         ,int dump_input_parse_tree
         ,int dump_input_parse_trace
+        ,int generate_standalone_parser
         ,int dumpAsEbnfRR)
 {
     const char *argv[] = {"parsertl", "-f", "grammar.g", "input.txt"};
@@ -1451,6 +2182,7 @@ extern "C" int main_playground(
     gs.dump_input_lexer = dump_input_lexer;
     gs.dump_input_parse_tree = dump_input_parse_tree;
     gs.dump_input_parse_trace = dump_input_parse_trace;
+    gs.generate_standalone_parser = generate_standalone_parser;
     gs.dumpAsEbnfRR = dumpAsEbnfRR;
     gs.pruneParserTree = (dump_grammar_parse_tree == 1 || dump_input_parse_tree == 1);
 
@@ -1463,20 +2195,22 @@ static void showHelp(const char* prog_name)
 {
     std::cout << "usage: " << prog_name << " [options] grammar_fname input_fname\n"
             "options can be:\n"
-            "-dumpil        Dump input lexer\n"
-            "-dumpiptree    Dump input parser tree\n"
-            "-dumpiptrace   Dump input parser trace\n"
-            "-dumpgl        Dump grammar lexer\n"
-            "-dumpgptree    Dump grammar parser tree\n"
-            "-dumpgptrace   Dump grammar parser trace\n"
-            "-dumpglsm      Dump grammar lexer state machine\n"
-            "-dumpgsm       Dump grammar parser state machine\n"
-            "-dumpAsEbnfRR  Dump grammar as EBNF for railroad diagram\n"
-            "-dumpAsYacc    Dump grammar as Yacc\n"
-            "-dumpAsLex     Dump grammar as Lex\n"
-            "-dumpMaster    Dump master grammar\n"
-            "-pruneptree    Do not show empty parser tree nodes\n"
-            "-verbose       Show several metrics for debug\n"
+            "-dumpil              Dump input lexer\n"
+            "-dumpiptree          Dump input parser tree\n"
+            "-dumpiptrace         Dump input parser trace\n"
+            "-dumpgl              Dump grammar lexer\n"
+            "-dumpgptree          Dump grammar parser tree\n"
+            "-dumpgptrace         Dump grammar parser trace\n"
+            "-dumpglsm            Dump grammar lexer state machine\n"
+            "-dumpgsm             Dump grammar parser state machine\n"
+            "-dumpAsEbnfRR        Dump grammar as EBNF for railroad diagram\n"
+            "-dumpAsYacc          Dump grammar as Yacc\n"
+            "-dumpAsLex           Dump grammar as Lex\n"
+            "-dumpNaked           Dump naked grammar\n"
+            "-dumpMaster          Dump master grammar\n"
+            "-generateParser      Generate a standalone C++ parser\n"
+            "-pruneptree          Do not show empty parser tree nodes\n"
+            "-verbose             Show several metrics for debug\n"
             ;
 }
 
@@ -1548,6 +2282,14 @@ int main(int argc, char *argv[])
         else if (strcmp("-dumpMaster", param) == 0)
         {
             gs.dump_master_grammar = true;
+        }
+        else if (strcmp("-dumpNaked", param) == 0)
+        {
+            gs.dump_naked_grammar = true;
+        }
+        else if (strcmp("-generateParser", param) == 0)
+        {
+            gs.generate_standalone_parser = true;
         }
         else if (strcmp("-pruneptree", param) == 0)
         {
@@ -1652,9 +2394,10 @@ int main(int argc, char *argv[])
     catch (const std::exception &e)
     {
         std::cout << e.what() << '\n';
+        return 1;
     }
 
     //return main_playground(nullptr, 0, nullptr, 0, false, false, false, false, true);
-    return 1;
+    return 0;
 }
 #endif

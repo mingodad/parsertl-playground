@@ -331,6 +331,7 @@ function parse() {
   const generate_yacc = $('#generate-action').val() == 'yacc';
   const generate_lex = $('#generate-action').val() == 'lex';
   const generate_yacc_html = $('#generate-action').val() == 'yacc_html';
+  const generate_cpp_parser = $('#generate-action').val() == 'cpp_parser';
 
   $grammarInfo.html('');
   $grammarValidation.hide();
@@ -399,6 +400,7 @@ function parse() {
         dump_input_lexer,
         dump_input_parse_tree,
         dump_input_parse_trace,
+        generate_cpp_parser,
         dump_ebnf_yacc);
 
     $('#overlay').css({

@@ -27,85 +27,92 @@ namespace lexertl
             const internals& internals_ = sm_.data();
             std::size_t additional_tabs_ = 0;
 
-            os_ << "template<typename iter_type, typename id_type>\n";
-            os_ << "void " << name_ << " (lexertl::";
-
+            os_ << "#define FALSE 0\n"
+                "#define TRUE 1\n"
+                "#define NULLPTR NULL\n"
+                "typedef char char_type;\n"
+                "typedef const char_type*  iter_type;\n"
+                "typedef unsigned char index_type;\n"
+                "\n"
+                "static const id_type results_npos = 0x" << std::hex << sm_.npos() << ";\n"
+                "static const id_type results_skip = 0x" << std::hex << sm_.skip() << ";\n"
+                "static const id_type results_reject = 0x" << std::hex << sm_.reject() << ";\n"
+                "\n";
             if (internals_._features & *feature_bit::recursive)
             {
-                os_ << "recursive_match_results";
+                os_ << "using id_type_pair = std::pair<id_type, id_type>;\n";
             }
-            else
+            os_ <<
+                "typedef struct {\n"
+                "    iter_type eoi, first, second;\n"
+                "    id_type id, user_id, state, bol;\n";
+            if (internals_._features & *feature_bit::recursive)
             {
-                os_ << "match_results";
+                os_ << "    std::stack<id_type_pair> stack;\n";
             }
+            os_ << "} lexertl_match_results;\n"
+                "\n";
 
-            os_ << "<iter_type, id_type> &results_)\n";
+
+            dump_tables(sm_, 0, pointers_, os_);
+
+            os_ << "\n";
+            os_ << "void " << name_ << " (lexertl_match_results *results)\n";
             os_ << "{\n";
-            os_ << "    using results = lexertl::";
-
-            if (internals_._features & *feature_bit::recursive)
-            {
-                os_ << "recursive_match_results";
-            }
-            else
-            {
-                os_ << "match_results";
-            }
-
-            os_ << "<iter_type, id_type>;\n";
-            os_ << "    using char_type = typename results::char_type;\n";
-            os_ << "    typename results::iter_type end_token_ = "
-                "results_.second;\n";
+            os_ << "    iter_type end_token = results->second;\n";
 
             if (internals_._features & *feature_bit::skip)
             {
-                os_ << "skip:\n";
+                os_ << "    auto saved_bol = results->bol;\n"
+                       "skip:\n"
+                       "    /* adjust saved_curr after skip to prevent infinty loop\n"
+                       "     * when using reject() */\n"
+                       "    auto saved_curr = results->second;\n";
             }
 
-            os_ << "    typename results::iter_type curr_ = "
-                "results_.second;\n\n";
-            os_ << "    results_.first = curr_;\n\n";
+            os_ << "    iter_type curr = results->second;\n\n";
+            os_ << "    results->first = curr;\n\n";
 
             if (internals_._features & *feature_bit::again)
             {
                 os_ << "again:\n";
             }
 
-            os_ << "    if (curr_ == results_.eoi)\n";
+            os_ << "    if (curr == results->eoi)\n";
             os_ << "    {\n";
             // We want a number regardless of id_type.
-            os_ << "        results_.id = " << static_cast<std::size_t>
+            os_ << "        results->id = " << static_cast<std::size_t>
                 (internals_._eoi) << ";\n";
-            os_ << "        results_.user_id = results::npos();\n";
+            os_ << "        results->user_id = results_npos;\n";
             os_ << "        return;\n";
-            os_ << "    }\n\n";
+            os_ << "    }\n";
+
+            if (internals_._features & *feature_bit::reject)
+            {
+                os_ << "reject:\n\n";
+            }
 
             if (internals_._features & *feature_bit::bol)
             {
-                os_ << "    bool bol_ = results_.bol;\n";
+                os_ << "    bool bol = results->bol;\n";
             }
 
-            dump_tables(sm_, 1, pointers_, os_);
+            os_ << "    const id_type *lookup = "
+                "lexer_lookups[results->state];\n";
+            os_ << "    const id_type dfa_alphabet = lexer_dfa_alphabets"
+                "[results->state];\n";
+            os_ << "    const ";
 
-            if (internals_._dfa.size() > 1)
+            if (pointers_)
             {
-                os_ << "    const id_type *lookup_ = "
-                    "lookups_[results_.state];\n";
-                os_ << "    const id_type dfa_alphabet_ = dfa_alphabets_"
-                    "[results_.state];\n";
-                os_ << "    const ";
-
-                if (pointers_)
-                {
-                    os_ << "void * const";
-                }
-                else
-                {
-                    os_ << "id_type";
-                }
-
-                os_ << " *dfa_ = dfas_[results_.state];\n";
+                os_ << "void * const";
             }
+            else
+            {
+                os_ << "id_type";
+            }
+
+            os_ << " *dfa = lexer_dfas[results->state];\n";
 
             os_ << "    const ";
 
@@ -118,12 +125,12 @@ namespace lexertl
                 os_ << "id_type";
             }
 
-            os_ << " *ptr_ = dfa_ + dfa_alphabet_;\n";
-            os_ << "    bool end_state_ = *ptr_ != 0;\n";
+            os_ << " *ptr = dfa + dfa_alphabet;\n";
+            os_ << "    bool end_state = *ptr != 0;\n";
 
             if (internals_._features & *feature_bit::recursive)
             {
-                os_ << "    bool pop_ = (";
+                os_ << "    bool pop = (";
 
                 if (pointers_)
                 {
@@ -131,7 +138,7 @@ namespace lexertl
                     os_ << "static_cast<id_type>(reinterpret_cast<ptrdiff_t>(";
                 }
 
-                os_ << "*ptr_";
+                os_ << "*ptr";
 
                 if (pointers_)
                 {
@@ -148,7 +155,7 @@ namespace lexertl
                 os_ << ") != 0;\n";
             }
 
-            os_ << "    id_type id_ = ";
+            os_ << "    id_type id = ";
 
             if (pointers_)
             {
@@ -156,7 +163,7 @@ namespace lexertl
                 os_ << "static_cast<id_type>(reinterpret_cast<ptrdiff_t>(";
             }
 
-            os_ << "*(ptr_ + " << *state_index::id << ")";
+            os_ << "*(ptr + " << *state_index::id << ")";
 
             if (pointers_)
             {
@@ -164,7 +171,7 @@ namespace lexertl
             }
 
             os_ << ";\n";
-            os_ << "    id_type uid_ = ";
+            os_ << "    id_type uid = ";
 
             if (pointers_)
             {
@@ -172,7 +179,7 @@ namespace lexertl
                 os_ << "static_cast<id_type>(reinterpret_cast<ptrdiff_t>(";
             }
 
-            os_ << "*(ptr_ + " << *state_index::user_id << ")";
+            os_ << "*(ptr + " << *state_index::user_id << ")";
 
             if (pointers_)
             {
@@ -183,7 +190,7 @@ namespace lexertl
 
             if (internals_._features & *feature_bit::recursive)
             {
-                os_ << "    id_type push_dfa_ = ";
+                os_ << "    id_type push_dfa = ";
 
                 if (pointers_)
                 {
@@ -191,7 +198,7 @@ namespace lexertl
                     os_ << "static_cast<id_type>(reinterpret_cast<ptrdiff_t>(";
                 }
 
-                os_ << "*(ptr_ + " << *state_index::push_dfa << ")";
+                os_ << "*(ptr + " << *state_index::push_dfa << ")";
 
                 if (pointers_)
                 {
@@ -203,12 +210,12 @@ namespace lexertl
 
             if (internals_._dfa.size() > 1)
             {
-                os_ << "    id_type start_state_ = results_.state;\n";
+                os_ << "    id_type start_state = results->state;\n";
             }
 
             if (internals_._features & *feature_bit::bol)
             {
-                os_ << "    bool end_bol_ = bol_;\n";
+                os_ << "    bool end_bol = bol;\n";
             }
 
             if (internals_._features & *feature_bit::eol)
@@ -224,14 +231,14 @@ namespace lexertl
                     os_ << "id_type ";
                 }
 
-                os_ << "EOL_state_ = 0;\n";
+                os_ << "EOL_state = 0;\n";
             }
 
             os_ << '\n';
 
             if (internals_._features & *feature_bit::bol)
             {
-                os_ << "    if (bol_)\n";
+                os_ << "    if (bol)\n";
                 os_ << "    {\n";
                 os_ << "        const ";
 
@@ -244,37 +251,37 @@ namespace lexertl
                     os_ << "id_type ";
                 }
 
-                os_ << "state_ = *dfa_;\n\n";
-                os_ << "        if (state_)\n";
+                os_ << "state = *dfa;\n\n";
+                os_ << "        if (state)\n";
                 os_ << "        {\n";
-                os_ << "            ptr_ = ";
+                os_ << "            ptr = ";
 
                 if (pointers_)
                 {
-                    os_ << "reinterpret_cast<void * const *>(state_);\n";
+                    os_ << "reinterpret_cast<void * const *>(state);\n";
                 }
                 else
                 {
-                    os_ << "&dfa_[state_ * dfa_alphabet_];\n";
+                    os_ << "&dfa[state * dfa_alphabet];\n";
                 }
 
                 os_ << "        }\n";
                 os_ << "    }\n\n";
             }
 
-            os_ << "    while (curr_ != results_.eoi)\n";
+            os_ << "    while (curr != results->eoi)\n";
             os_ << "    {\n";
 
             if (internals_._features & *feature_bit::eol)
             {
-                os_ << "        EOL_state_ = ";
+                os_ << "        EOL_state = ";
 
                 if (pointers_)
                 {
                     os_ << "reinterpret_cast<const void * const *>(";
                 }
 
-                os_ << "ptr_[" << *state_index::eol << ']';
+                os_ << "ptr[" << *state_index::eol << ']';
 
                 if (pointers_)
                 {
@@ -282,17 +289,17 @@ namespace lexertl
                 }
 
                 os_ << ";\n\n";
-                os_ << "        if (EOL_state_ && *curr_ == '\\n')\n";
+                os_ << "        if (EOL_state && *curr == '\\n')\n";
                 os_ << "        {\n";
-                os_ << "            ptr_ = ";
+                os_ << "            ptr = ";
 
                 if (pointers_)
                 {
-                    os_ << "EOL_state_";
+                    os_ << "EOL_state";
                 }
                 else
                 {
-                    os_ << "&dfa_[EOL_state_ * dfa_alphabet_]";
+                    os_ << "&dfa[EOL_state * dfa_alphabet]";
                 }
 
                 os_ << ";\n";
@@ -314,14 +321,14 @@ namespace lexertl
             }
 
             os_ << '\n';
-            os_ << "        if (*ptr_)\n";
+            os_ << "        if (*ptr)\n";
             os_ << "        {\n";
-            os_ << "            end_state_ = true;\n";
+            os_ << "            end_state = true;\n";
 
 
             if (internals_._features & *feature_bit::recursive)
             {
-                os_ << "            pop_ = (";
+                os_ << "            pop = (";
 
                 if (pointers_)
                 {
@@ -329,7 +336,7 @@ namespace lexertl
                     os_ << "static_cast<id_type>(reinterpret_cast<ptrdiff_t>(";
                 }
 
-                os_ << "*ptr_";
+                os_ << "*ptr";
 
                 if (pointers_)
                 {
@@ -346,7 +353,7 @@ namespace lexertl
                 os_ << ") != 0;\n";
             }
 
-            os_ << "            id_ = ";
+            os_ << "            id = ";
 
             if (pointers_)
             {
@@ -354,7 +361,7 @@ namespace lexertl
                 os_ << "static_cast<id_type>(reinterpret_cast<ptrdiff_t>(";
             }
 
-            os_ << "*(ptr_ + " << *state_index::id << ")";
+            os_ << "*(ptr + " << *state_index::id << ")";
 
             if (pointers_)
             {
@@ -362,7 +369,7 @@ namespace lexertl
             }
 
             os_ << ";\n";
-            os_ << "            uid_ = ";
+            os_ << "            uid = ";
 
             if (pointers_)
             {
@@ -370,7 +377,7 @@ namespace lexertl
                 os_ << "static_cast<id_type>(reinterpret_cast<ptrdiff_t>(";
             }
 
-            os_ << "*(ptr_ + " << *state_index::user_id << ")";
+            os_ << "*(ptr + " << *state_index::user_id << ")";
 
             if (pointers_)
             {
@@ -381,7 +388,7 @@ namespace lexertl
 
             if (internals_._features & *feature_bit::recursive)
             {
-                os_ << "            push_dfa_ = ";
+                os_ << "            push_dfa = ";
 
                 if (pointers_)
                 {
@@ -389,7 +396,7 @@ namespace lexertl
                     os_ << "static_cast<id_type>(reinterpret_cast<ptrdiff_t>(";
                 }
 
-                os_ << "*(ptr_ + " << *state_index::push_dfa << ')';
+                os_ << "*(ptr + " << *state_index::push_dfa << ')';
 
                 if (pointers_)
                 {
@@ -401,7 +408,7 @@ namespace lexertl
 
             if (internals_._dfa.size() > 1)
             {
-                os_ << "            start_state_ = ";
+                os_ << "            start_state = ";
 
                 if (pointers_)
                 {
@@ -409,7 +416,7 @@ namespace lexertl
                     os_ << "static_cast<id_type>(reinterpret_cast<ptrdiff_t>(";
                 }
 
-                os_ << "*(ptr_ + " << *state_index::next_dfa << ')';
+                os_ << "*(ptr + " << *state_index::next_dfa << ')';
 
                 if (pointers_)
                 {
@@ -421,10 +428,10 @@ namespace lexertl
 
             if (internals_._features & *feature_bit::bol)
             {
-                os_ << "            end_bol_ = bol_;\n";
+                os_ << "            end_bol = bol;\n";
             }
 
-            os_ << "            end_token_ = curr_;\n";
+            os_ << "            end_token = curr;\n";
             os_ << "        }\n";
             os_ << "    }\n\n";
             output_quit(os_, std::integral_constant<bool,
@@ -432,16 +439,16 @@ namespace lexertl
 
             if (internals_._features & *feature_bit::eol)
             {
-                os_ << "    if (curr_ == results_.eoi)\n";
+                os_ << "    if (curr == results->eoi)\n";
                 os_ << "    {\n";
-                os_ << "        EOL_state_ = ";
+                os_ << "        EOL_state = ";
 
                 if (pointers_)
                 {
                     os_ << "reinterpret_cast<const void * const *>(";
                 }
 
-                os_ << "ptr_[" << *state_index::eol << ']';
+                os_ << "ptr[" << *state_index::eol << ']';
 
                 if (pointers_)
                 {
@@ -450,28 +457,28 @@ namespace lexertl
 
                 os_ << ";\n";
                 os_ << "\n";
-                os_ << "        if (EOL_state_)\n";
+                os_ << "        if (EOL_state)\n";
                 os_ << "        {\n";
-                os_ << "            ptr_ = ";
+                os_ << "            ptr = ";
 
                 if (pointers_)
                 {
-                    os_ << "EOL_state_";
+                    os_ << "EOL_state";
                 }
                 else
                 {
-                    os_ << "&dfa_[EOL_state_ * dfa_alphabet_]";
+                    os_ << "&dfa[EOL_state * dfa_alphabet]";
                 }
 
                 os_ << ";\n\n";
-                os_ << "            if (*ptr_)\n";
+                os_ << "            if (*ptr)\n";
                 os_ << "            {\n";
-                os_ << "                end_state_ = true;\n";
+                os_ << "                end_state = true;\n";
 
 
                 if (internals_._features & *feature_bit::recursive)
                 {
-                    os_ << "                pop_ = (";
+                    os_ << "                pop = (";
 
                     if (pointers_)
                     {
@@ -480,7 +487,7 @@ namespace lexertl
                             "(reinterpret_cast<ptrdiff_t>(";
                     }
 
-                    os_ << "*ptr_";
+                    os_ << "*ptr";
 
                     if (pointers_)
                     {
@@ -497,7 +504,7 @@ namespace lexertl
                     os_ << ") != 0;\n";
                 }
 
-                os_ << "                id_ = ";
+                os_ << "                id = ";
 
                 if (pointers_)
                 {
@@ -505,7 +512,7 @@ namespace lexertl
                     os_ << "static_cast<id_type>(reinterpret_cast<ptrdiff_t>(";
                 }
 
-                os_ << "*(ptr_ + " << *state_index::id << ")";
+                os_ << "*(ptr + " << *state_index::id << ")";
 
                 if (pointers_)
                 {
@@ -513,7 +520,7 @@ namespace lexertl
                 }
 
                 os_ << ";\n";
-                os_ << "                uid_ = ";
+                os_ << "                uid = ";
 
                 if (pointers_)
                 {
@@ -521,7 +528,7 @@ namespace lexertl
                     os_ << "static_cast<id_type>(reinterpret_cast<ptrdiff_t>(";
                 }
 
-                os_ << "*(ptr_ + " << *state_index::user_id << ")";
+                os_ << "*(ptr + " << *state_index::user_id << ")";
 
                 if (pointers_)
                 {
@@ -532,7 +539,7 @@ namespace lexertl
 
                 if (internals_._features & *feature_bit::recursive)
                 {
-                    os_ << "                push_dfa_ = ";
+                    os_ << "                push_dfa = ";
 
                     if (pointers_)
                     {
@@ -541,7 +548,7 @@ namespace lexertl
                             "(reinterpret_cast<ptrdiff_t>(";
                     }
 
-                    os_ << "*(ptr_ + " << *state_index::push_dfa << ')';
+                    os_ << "*(ptr + " << *state_index::push_dfa << ')';
 
                     if (pointers_)
                     {
@@ -553,7 +560,7 @@ namespace lexertl
 
                 if (internals_._dfa.size() > 1)
                 {
-                    os_ << "                start_state_ = ";
+                    os_ << "                start_state = ";
 
                     if (pointers_)
                     {
@@ -562,7 +569,7 @@ namespace lexertl
                             "(reinterpret_cast<ptrdiff_t>(";
                     }
 
-                    os_ << "*(ptr_ + " << *state_index::next_dfa << ')';
+                    os_ << "*(ptr + " << *state_index::next_dfa << ')';
 
                     if (pointers_)
                     {
@@ -574,70 +581,78 @@ namespace lexertl
 
                 if (internals_._features & *feature_bit::bol)
                 {
-                    os_ << "                end_bol_ = bol_;\n";
+                    os_ << "                end_bol = bol;\n";
                 }
 
-                os_ << "                end_token_ = curr_;\n";
+                os_ << "                end_token = curr;\n";
                 os_ << "            }\n";
                 os_ << "        }\n";
                 os_ << "    }\n\n";
             }
 
-            os_ << "    if (end_state_)\n";
+            os_ << "    if (end_state)\n";
             os_ << "    {\n";
             os_ << "        // Return longest match\n";
 
             if (internals_._features & *feature_bit::recursive)
             {
-                os_ << "        if (pop_)\n";
+                os_ << "        if (pop)\n";
                 os_ << "        {\n";
-                os_ << "            start_state_ =  results_."
+                os_ << "            start_state =  results->"
                     "stack.top().first;\n";
-                os_ << "            results_.stack.pop();\n";
+                os_ << "            results->stack.pop();\n";
                 os_ << "        }\n";
-                os_ << "        else if (push_dfa_ != results_.npos())\n";
+                os_ << "        else if (push_dfa != results_npos)\n";
                 os_ << "        {\n";
-                os_ << "            results_.stack.push(typename results::"
-                    "id_type_pair\n";
-                os_ << "                (push_dfa_, id_));\n";
+                os_ << "            results->stack.push(id_type_pair(push_dfa, id));\n";
                 os_ << "        }\n\n";
             }
 
             if (internals_._dfa.size() > 1)
             {
-                os_ << "        results_.state = start_state_;\n";
+                os_ << "        results->state = start_state;\n";
             }
 
             if (internals_._features & *feature_bit::bol)
             {
-                os_ << "        results_.bol = end_bol_;\n";
+                os_ << "        results->bol = end_bol;\n";
             }
 
-            os_ << "        results_.second = end_token_;\n";
+            os_ << "        results->second = end_token;\n";
 
             if (internals_._features & *feature_bit::skip)
             {
                 // We want a number regardless of id_type.
-                os_ << "\n        if (id_ == results_.skip()) goto skip;\n";
+                os_ << "\n        if (id == results_skip) goto skip;\n";
+            }
+            if (internals_._features & *feature_bit::reject)
+            {
+                os_ << "	else if (id == results_reject)\n"
+                       "        {\n"
+                       "            curr = results->second = results->first = saved_curr;\n"
+                       "            results->bol = saved_bol;\n"
+                       "            results->id = results_npos;\n"
+                       "            goto reject;\n"
+                       "        }\n";
             }
 
             if (internals_._features & *feature_bit::again)
             {
                 // We want a number regardless of id_type.
-                os_ << "\n        if (id_ == "
+                os_ << "\n        if (id == "
                     << static_cast<std::size_t>(internals_._eoi);
 
                 if (internals_._features & *feature_bit::recursive)
                 {
-                    os_ << " || (pop_ && !results_.stack.empty() &&\n";
+                    os_ << " || (pop && !results->stack.empty() &&\n";
                     // We want a number regardless of id_type.
-                    os_ << "            results_.stack.top().second == "
+                    os_ << "            results->stack.top().second == "
                         << static_cast<std::size_t>(internals_._eoi) << ')';
                 }
 
                 os_ << ")\n";
                 os_ << "        {\n";
-                os_ << "            curr_ = end_token_;\n";
+                os_ << "            curr = end_token;\n";
                 os_ << "            goto again;\n";
                 os_ << "        }\n";
             }
@@ -646,20 +661,20 @@ namespace lexertl
             os_ << "    else\n";
             os_ << "    {\n";
             os_ << "        // No match causes char to be skipped\n";
-            os_ << "        results_.second = end_token_;\n";
+            os_ << "        results->second = end_token;\n";
 
             if (internals_._features & *feature_bit::bol)
             {
-                os_ << "        results_.bol = *results_.second == '\\n';\n";
+                os_ << "        results->bol = *results->second == '\\n';\n";
             }
 
-            os_ << "        results_.first = results_.second;\n";
-            os_ << "        ++results_.second;\n";
-            os_ << "        id_ = results::npos();\n";
-            os_ << "        uid_ = results::npos();\n";
+            os_ << "        results->first = results->second;\n";
+            os_ << "        ++results->second;\n";
+            os_ << "        id = results_npos;\n";
+            os_ << "        uid = results_npos;\n";
             os_ << "    }\n\n";
-            os_ << "    results_.id = id_;\n";
-            os_ << "    results_.user_id = uid_;\n";
+            os_ << "    results->id = id;\n";
+            os_ << "    results->user_id = uid;\n";
             os_ << "}\n";
         }
 
@@ -671,35 +686,26 @@ namespace lexertl
             const auto& internals_ = sm_.data();
             const std::size_t lookup_divisor_ = 8;
             // Lookup is always 256 entries long now
-            const std::size_t lookup_quotient_ = 256 / lookup_divisor_;
+            const std::size_t lookup_quotient_ = LEXERTL_LOOKUP_SIZE / lookup_divisor_;
             const std::size_t dfas_ = internals_._lookup.size();
 
             output_tabs(tabs_, os_);
-            os_ << "static const id_type lookup";
-
-            if (dfas_ > 1)
-            {
-                os_ << "s_[][" << 256;
-            }
-            else
-            {
-                os_ << "_[";
-            }
-
-            os_ << "] = \n";
+            os_ << "static const size_type lexer_dfa_count = " << std::dec << dfas_ << ";\n";
+            os_ << "static const size_type lexer_dfa_lookup_count = "  << std::dec << LEXERTL_LOOKUP_SIZE << ";\n";
+            os_ << "static const id_type lexer_lookups[" << std::dec << dfas_ << "][" << LEXERTL_LOOKUP_SIZE << "] =\n";
             output_tabs(tabs_ + 1, os_);
-
-            if (dfas_ > 1)
-            {
-                os_ << '{';
-            }
+            os_ << '{';
 
             for (std::size_t l_ = 0; l_ < dfas_; ++l_)
             {
                 const id_type* ptr_ = &internals_._lookup[l_].front();
 
                 // We want numbers regardless of id_type.
-                os_ << "{0x" << std::hex << static_cast<std::size_t>(*ptr_++);
+                os_ << "{ // ["  << std::dec << l_ << "] " << lookup_quotient_
+                        << " rows by " << lookup_divisor_ << " cols\n";
+                output_tabs(tabs_ + 1, os_);
+                os_ << "/*0*/ ";
+                os_ << "0x" << std::hex << static_cast<std::size_t>(*ptr_++);
 
                 for (std::size_t col_ = 1; col_ < lookup_divisor_; ++col_)
                 {
@@ -712,6 +718,7 @@ namespace lexertl
                 {
                     os_ << ",\n";
                     output_tabs(tabs_ + 1, os_);
+                    os_ << "/*" << std::dec << row_ <<  "*/ ";
                     // We want numbers regardless of id_type.
                     os_ << "0x" << std::hex <<
                         static_cast<std::size_t>(*ptr_++);
@@ -724,6 +731,8 @@ namespace lexertl
                     }
                 }
 
+                os_ << "\n";
+                output_tabs(tabs_ + 1, os_);
                 os_ << '}';
 
                 if (l_ + 1 < dfas_)
@@ -732,42 +741,24 @@ namespace lexertl
                     output_tabs(tabs_ + 1, os_);
                 }
             }
+            os_ << "};\n";
 
-            if (dfas_ > 1)
-            {
-                os_ << '}';
-            }
-
-            os_ << ";\n";
             output_tabs(tabs_, os_);
-            os_ << "static const id_type dfa_alphabet";
-
-            if (dfas_ > 1)
-            {
-                os_ << "s_[" << std::dec << dfas_ << "] = {";
-            }
-            else
-            {
-                os_ << "_ = ";
-            }
+            os_ << "static const id_type lexer_dfa_alphabets[" << std::dec << dfas_ << "] = {";
 
             // We want numbers regardless of id_type.
             os_ << "0x" << std::hex << static_cast<std::size_t>
-                (internals_._dfa_alphabet[0]);
+                (internals_._dfa_alphabet[0])
+                << " /*" << std::dec << internals_._dfa_alphabet[0] << "*/";
 
             for (std::size_t col_ = 1; col_ < dfas_; ++col_)
             {
                 // We want numbers regardless of id_type.
                 os_ << ", 0x" << std::hex <<
-                    static_cast<std::size_t>(internals_._dfa_alphabet[col_]);
+                    static_cast<std::size_t>(internals_._dfa_alphabet[col_])
+                    << " /*" << std::dec << internals_._dfa_alphabet[col_] << "*/";
             }
-
-            if (dfas_ > 1)
-            {
-                os_ << '}';
-            }
-
-            os_ << ";\n";
+            os_ << "};\n";
 
             // DFAs are usually different sizes, so dump separately
             for (std::size_t dfa_ = 0; dfa_ < dfas_; ++dfa_)
@@ -787,7 +778,7 @@ namespace lexertl
                 }
                 else
                 {
-                    os_ << "id_type ";
+                    os_ << "id_type lexer_";
                 }
 
                 os_ << dfa_name_;
@@ -798,14 +789,22 @@ namespace lexertl
 
                     ss_ << dfa_;
                     dfa_name_ += ss_.str();
-                    os_ << dfa_;
+                    os_ << std::dec << dfa_;
+                }
+                else
+                {
+                    os_ << "0";
                 }
 
                 dfa_name_ += '_';
-                os_ << "_[] = {";
+                os_ << "[" << std::dec << (rows_* dfa_alphabet_) << "] = { // "
+                        << std::dec  << rows_ << " rows by "
+                        << dfa_alphabet_ << " cols\n";
+                output_tabs(tabs_ + 1, os_);
 
                 for (std::size_t row_ = 0; row_ < rows_; ++row_)
                 {
+                    os_ << "/*" << std::dec << row_ <<  "*/ ";
                     dump_row(row_ == 0, ptr_, dfa_name_, dfa_alphabet_,
                         pointers_, os_);
 
@@ -815,33 +814,31 @@ namespace lexertl
                         output_tabs(tabs_ + 1, os_);
                     }
                 }
-
+                os_ << "\n";
+                output_tabs(tabs_ + 1, os_);
                 os_ << "};\n";
             }
 
-            if (dfas_ > 1)
+            output_tabs(tabs_, os_);
+            os_ << "static const ";
+
+            if (pointers_)
             {
-                output_tabs(tabs_, os_);
-                os_ << "static const ";
-
-                if (pointers_)
-                {
-                    os_ << "void * const";
-                }
-                else
-                {
-                    os_ << "id_type";
-                }
-
-                os_ << " *dfas_[] = {dfa0_";
-
-                for (std::size_t col_ = 1; col_ < dfas_; ++col_)
-                {
-                    os_ << ", dfa" << col_ << '_';
-                }
-
-                os_ << "};\n";
+                os_ << "void * const";
             }
+            else
+            {
+                os_ << "id_type";
+            }
+
+            os_ << " *lexer_dfas["  << std::dec << dfas_ <<  "] = {lexer_dfa0";
+
+            for (std::size_t col_ = 1; col_ < dfas_; ++col_)
+            {
+                os_ << ", lexer_dfa" << col_;
+            }
+
+            os_ << "};\n";
 
             os_ << std::dec;
         }
@@ -921,6 +918,10 @@ namespace lexertl
                 for (id_type alphabet_ = 1; alphabet_ < dfa_alphabet_;
                     ++alphabet_, ++ptr_)
                 {
+                    if(dfa_alphabet_ >= 20 && ((alphabet_ % 10) == 0))
+                    {
+                        os_ << " /*" << std::dec << alphabet_ << "*/ ";
+                    }
                     // We want numbers regardless of id_type.
                     os_ << ", 0x" << std::hex <<
                         static_cast<std::size_t>(*ptr_);
@@ -942,8 +943,8 @@ namespace lexertl
             std::ostream& os_, const std::false_type&)
         {
             output_tabs(additional_tabs_, os_);
-            os_ << "        const typename results::char_type prev_char_ = "
-                "*curr_++;\n";
+            os_ << "        const char_type prev_char = "
+                "*curr++;\n";
             output_tabs(additional_tabs_, os_);
             os_ << "        const ";
 
@@ -956,7 +957,7 @@ namespace lexertl
                 os_ << "id_type ";
             }
 
-            os_ << "state_ = ";
+            os_ << "state = ";
 
             if (pointers_)
             {
@@ -965,7 +966,7 @@ namespace lexertl
                 os_ << '(';
             }
 
-            os_ << "ptr_[lookup_";
+            os_ << "ptr[lookup";
 
             if (!pointers_)
             {
@@ -973,7 +974,7 @@ namespace lexertl
                 output_tabs(additional_tabs_, os_);
             }
 
-            os_ << "[static_cast<typename results::index_type>";
+            os_ << "[static_cast<index_type>";
 
             if (pointers_)
             {
@@ -981,7 +982,7 @@ namespace lexertl
                 output_tabs(additional_tabs_, os_);
             }
 
-            os_ << "(prev_char_)]]";
+            os_ << "(prev_char)]]";
 
             if (pointers_)
             {
@@ -993,18 +994,18 @@ namespace lexertl
             if (features_ & *feature_bit::bol)
             {
                 output_tabs(additional_tabs_, os_);
-                os_ << "        bol_ = prev_char_ == '\\n';\n\n";
+                os_ << "        bol = prev_char == '\\n';\n\n";
             }
 
             output_tabs(additional_tabs_, os_);
-            os_ << "        if (state_ == 0)\n";
+            os_ << "        if (state == 0)\n";
             output_tabs(additional_tabs_, os_);
             os_ << "        {\n";
 
             if (features_ & *feature_bit::eol)
             {
                 output_tabs(additional_tabs_, os_);
-                os_ << "            EOL_state_ = 0;\n";
+                os_ << "            EOL_state = 0;\n";
             }
 
             output_tabs(additional_tabs_, os_);
@@ -1012,15 +1013,15 @@ namespace lexertl
             output_tabs(additional_tabs_, os_);
             os_ << "        }\n\n";
             output_tabs(additional_tabs_, os_);
-            os_ << "        ptr_ = ";
+            os_ << "        ptr = ";
 
             if (pointers_)
             {
-                os_ << "state_";
+                os_ << "state";
             }
             else
             {
-                os_ << "&dfa_[state_ * dfa_alphabet_]";
+                os_ << "&dfa[state * dfa_alphabet]";
             }
 
             os_ << ";\n";
@@ -1032,25 +1033,25 @@ namespace lexertl
             std::ostream& os_, const std::true_type&)
         {
             output_tabs(additional_tabs_, os_);
-            os_ << "        const std::size_t bytes_ =\n";
+            os_ << "        const std::size_t bytes =\n";
             output_tabs(additional_tabs_, os_);
-            os_ << "            sizeof(typename results::char_type) < 3 ?\n";
+            os_ << "            sizeof(char_type) < 3 ?\n";
             output_tabs(additional_tabs_, os_);
-            os_ << "            sizeof(typename results::char_type) : 3;\n";
+            os_ << "            sizeof(char_type) : 3;\n";
             output_tabs(additional_tabs_, os_);
-            os_ << "        const std::size_t shift_[] = {0, 8, 16};\n";
+            os_ << "        const std::size_t shift[] = {0, 8, 16};\n";
             output_tabs(additional_tabs_, os_);
-            os_ << "        typename results::char_type prev_char_ = "
-                "*curr_++;\n\n";
+            os_ << "        char_type prev_char = "
+                "*curr++;\n\n";
 
             if (features_ & *feature_bit::bol)
             {
                 output_tabs(additional_tabs_, os_);
-                os_ << "        bol_ = prev_char_ == '\\n';\n\n";
+                os_ << "        bol = prev_char == '\\n';\n\n";
             }
 
             output_tabs(additional_tabs_, os_);
-            os_ << "        for (std::size_t i_ = 0; i_ < bytes_; ++i_)\n";
+            os_ << "        for (std::size_t i = 0; i < bytes; ++i)\n";
             output_tabs(additional_tabs_, os_);
             os_ << "        {\n";
             output_tabs(additional_tabs_, os_);
@@ -1065,7 +1066,7 @@ namespace lexertl
                 os_ << "id_type ";
             }
 
-            os_ << "state_ = ";
+            os_ << "state = ";
 
             if (pointers_)
             {
@@ -1074,10 +1075,10 @@ namespace lexertl
                 os_ << '(';
             }
 
-            os_ << "ptr_[lookup_[static_cast\n";
+            os_ << "ptr[lookup[static_cast\n";
             output_tabs(additional_tabs_, os_);
-            os_ << "                <unsigned char>((prev_char_ >>\n"
-                "                shift_[bytes_ - 1 - i_]) & 0xff)]]";
+            os_ << "                <unsigned char>((prev_char >>\n"
+                "                shift[bytes - 1 - i]) & 0xff)]]";
 
             if (pointers_)
             {
@@ -1086,14 +1087,14 @@ namespace lexertl
 
             os_ << ";\n\n";
             output_tabs(additional_tabs_, os_);
-            os_ << "            if (state_ == 0)\n";
+            os_ << "            if (state == 0)\n";
             output_tabs(additional_tabs_, os_);
             os_ << "            {\n";
 
             if (features_ & *feature_bit::eol)
             {
                 output_tabs(additional_tabs_, os_);
-                os_ << "                EOL_state_ = 0;\n";
+                os_ << "                EOL_state = 0;\n";
             }
 
             output_tabs(additional_tabs_, os_);
@@ -1101,15 +1102,15 @@ namespace lexertl
             output_tabs(additional_tabs_, os_);
             os_ << "            }\n\n";
             output_tabs(additional_tabs_, os_);
-            os_ << "            ptr_ = ";
+            os_ << "            ptr = ";
 
             if (pointers_)
             {
-                os_ << "state_";
+                os_ << "state";
             }
             else
             {
-                os_ << "&dfa_[state_ * dfa_alphabet_]";
+                os_ << "&dfa[state * dfa_alphabet]";
             }
 
             os_ << ";\n";
