@@ -18,6 +18,9 @@ namespace lexertl
 #define LEXERTL_SYMBOL_TABLE static_cast<id_type>(~6)
 #define LEXERTL_INDENT_TRACK static_cast<id_type>(~7)
 
+// lookup *always* has a size 256 now.
+#define LEXERTL_LOOKUP_SIZE 256
+
     enum class regex_flags
     {
         icase = 1, dot_not_newline = 2, dot_not_cr_lf = 4,

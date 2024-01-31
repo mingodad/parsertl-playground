@@ -34,7 +34,7 @@ namespace lexertl
             string_token_vector token_vector_(alphabet_, string_token());
             observer_ptr<const id_type> ptr_ = &internals_._lookup[i_].front();
 
-            for (std::size_t c_ = 0; c_ < 256; ++c_, ++ptr_)
+            for (std::size_t c_ = 0; c_ < LEXERTL_LOOKUP_SIZE; ++c_, ++ptr_)
             {
                 if (*ptr_ >= *state_index::transitions)
                 {

@@ -46,7 +46,7 @@ namespace lexertl
                 for (std::size_t index_ = 0; index_ < num_; ++index_)
                 {
                     // lookup *always* has a size 256 now.
-                    _lookup.push_back(id_type_vector(256,
+                    _lookup.push_back(id_type_vector(LEXERTL_LOOKUP_SIZE,
                         static_cast<id_type>(*state_index::dead_state)));
                     _dfa_alphabet.push_back(0);
                     _dfa.emplace_back();
