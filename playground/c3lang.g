@@ -588,21 +588,18 @@ arg :
 arg_list :
 	arg
 	| arg_list ',' arg
+	| arg_list ','
+	;
+
+opt_arg_list :
+	arg_list
+	| empty
 	;
 
 call_arg_list :
-	arg_list
-	| arg_list ';'
-	| arg_list ';' parameters
-	| ';'
-	| ';' parameters
-	| empty
-	;
-
-opt_arg_list_trailing :
-	arg_list
-	| arg_list ','
-	| empty
+	opt_arg_list
+	| opt_arg_list ';'
+	| opt_arg_list ';' parameters
 	;
 
 interfaces :
@@ -629,7 +626,6 @@ enum_list :
 enum_constant :
 	CONST_IDENT opt_attributes
 	| CONST_IDENT '(' arg_list ')' opt_attributes
-	| CONST_IDENT '(' arg_list ',' ')' opt_attributes
 	;
 
 identifier_list :
@@ -719,7 +715,7 @@ var_decl :
 	;
 
 initializer_list :
-	'{' opt_arg_list_trailing '}'
+	'{' opt_arg_list '}'
 	;
 
 ct_case_stmt :
@@ -1220,11 +1216,15 @@ fn_parameter_list :
 	| '(' ')'
 	;
 
+parameter_default :
+	parameter
+	| parameter '=' expr
+	;
+
 parameters :
-	parameter '=' expr
-	| parameter
-	| parameters ',' parameter
-	| parameters ',' parameter '=' expr
+	parameter_default
+	| parameters ',' parameter_default
+	| parameters ','
 	;
 
 parameter :
@@ -1257,6 +1257,7 @@ func_definition :
 const_declaration :
 	CONST CONST_IDENT opt_attributes '=' expr ';'
 	| CONST type CONST_IDENT opt_attributes '=' expr ';'
+	| CONST type CONST_IDENT opt_attributes ';'
 	;
 
 func_typedef :
