@@ -509,7 +509,7 @@ void generate_cpp_symbols(const parsertl::rules grules, std::ostream& os_)
     size_t terminal_count = grules.terminals_count();
     size_t non_terminal_count = grules.non_terminals_count();
     grules.symbols(symbols);
-    
+
     os_ << "static size_t terminal_count = " << terminal_count << ";\n";
     os_ << "static size_t non_terminal_count = " << non_terminal_count << ";\n";
     os_ << "enum esym_Symbols {\n";
@@ -811,14 +811,15 @@ struct BuildUserParser
                                 "#include <stdio.h>\n"
                                 "#include <string.h>\n"
                                 "#include <stdlib.h>\n"
+                                "#include <sys/stat.h>\n"
                                 "#include <vector>\n"
                                 "#include <stack>\n"
                                 "#include <string>\n"
                                 "#include <algorithm>\n\n";
-            
+
             generate_cpp_symbols(gs.user_parser.grules, stream_);
             const auto productions = gs.user_parser.grules.grammar();
-            
+
             stream_ << "static const char *sm_rules_alias[" << productions.size() << "] = {\n";
             int idx = 0;
             for (const auto& prod : productions)
@@ -828,7 +829,7 @@ struct BuildUserParser
                 else stream_ << '"' << prod._alias << "\",\n";
             }
             stream_ << "};\n\n";
-            
+
             parsertl::save2cpp(gs.user_parser.gsm, stream_);
             lexertl::table_based_cpp::generate_cpp("UserLexer", gs.user_parser.lsm, false, stream_);
 
@@ -870,29 +871,33 @@ struct BuildUserParser
 "    data.str = NULL;\n"
 "    data.size = 0;\n"
 "    FILE *fp;\n"
+"    struct stat statbuf;\n"
 "\n"
-"    fp = fopen(filename, \"r\");\n"
-"    if(fp) {\n"
-"        fseek(fp, 0, SEEK_END);\n"
-"        data.size = ftell(fp);\n"
-"        rewind(fp);\n"
+"    if((stat(filename, &statbuf) == 0) && S_ISREG(statbuf.st_mode))\n"
+"   {"
+"        fp = fopen(filename, \"r\");\n"
+"        if(fp) {\n"
+"            fseek(fp, 0, SEEK_END);\n"
+"            data.size = ftell(fp);\n"
+"            rewind(fp);\n"
 "\n"
-"        data.str = (char*) malloc(sizeof(char) * (data.size+1));\n"
-"	if(data.str)\n"
-"	{\n"
-"		size_t sz = fread(data.str, 1, data.size, fp);\n"
-"		if(sz == data.size)\n"
-"		{\n"
-"			data.str[data.size] = '\\0';\n"
-"		}\n"
-"		else\n"
-"		{\n"
-"			free(data.str);\n"
-"			data.str = nullptr;\n"
-"		}\n"
-"	}\n"
+"           data.str = (char*) malloc(sizeof(char) * (data.size+1));\n"
+"           if(data.str)\n"
+"          {\n"
+"                size_t sz = fread(data.str, 1, data.size, fp);\n"
+"                if(sz == data.size)\n"
+"                {\n"
+"                	data.str[data.size] = '\\0';\n"
+"                }\n"
+"                else\n"
+"                {\n"
+"                	free(data.str);\n"
+"                	data.str = nullptr;\n"
+"                }\n"
+"            }\n"
 "\n"
-"        fclose(fp);\n"
+"            fclose(fp);\n"
+"        }\n"
 "    }\n"
 "    return data;\n"
 "}\n"
@@ -930,6 +935,36 @@ struct BuildUserParser
 "        fprintf(out, \"\\n\");\n"
 "        last_lhs = rule->lhs;\n"
 "    }\n"
+"}\n"
+"\n"
+"void dumpGrammarReduceActions(FILE *out)\n"
+"{\n"
+"    size_t i = 0;\n"
+"    fprintf(out, \"switch(rule_no) {\\n\");\n"
+"    for(; i< sm_rules_size; ++i)\n"
+"    {\n"
+"        const SmRule *rule = sm_rules+i;\n"
+"        const char *lhs_name = esym_Symbols_names[rule->lhs];\n"
+"        if(lhs_name[0] == '$') continue;\n"
+"	fprintf(out, \"    case %zu: // %s :\", i, lhs_name);\n"
+"        if(rule->rhs_count == 0)\n"
+"        {\n"
+"            fprintf(out, \" /*empty*/\");\n"
+"        }\n"
+"        else\n"
+"        {\n"
+"            for(size_t j=rule->rhs_all_offset, jmax=rule->rhs_all_offset+rule->rhs_count; j< jmax; ++j)\n"
+"            {\n"
+"                const char *rhs_name = esym_Symbols_names[rules_rhs_all[j]];\n"
+"                fprintf(out, \" %s\", rhs_name);\n"
+"            }\n"
+"        }\n"
+"        fprintf(out, \"\\n\");\n"
+"	fprintf(out, \"    break;\\n\");\n"
+"    }\n"
+"    fprintf(out, \"    default:\\n\"\n"
+"		       \"         printf(\\\"Unknown rule: %%zd\\\\n\\\", i);\\n\"\n"
+"                      \"}\\n\");\n"
 "}\n"
 "\n"
 "enum e_parser_action\n"
@@ -1277,7 +1312,6 @@ struct BuildUserParser
 "    LineColumn line_column = {.line = 1, .column= 1, .last_line_pos = input_data};\n"
 "    const char *start_pos = input_data;\n"
 "    lexertl_match_results results;\n"
-"    memset(&results, 0, sizeof(lexertl_match_results));\n"
 "    results.first = results.second = input_data;\n"
 "    results.eoi = input_data + input_data_size;\n"
 "    results.bol = TRUE;\n"
@@ -1313,17 +1347,17 @@ struct BuildUserParser
 "    free(data.str);\n"
 "\n"
 "    return rc;\n"
-"}\n";	    
+"}\n";
             //gs.user_parser.lsm.minimise();
             //generate_cpp_tokens(gs.user_parser.grules, std::cout);
             //lexertl::table_based_cpp::generate_cpp("UserLexer", gs.user_parser.lsm, false, std::cout);
-            
+
             //parsertl::dfa dfa_;
             //parsertl::generator::build_dfa(gs.user_parser.grules, dfa_);
             //parsertl::debug::dumpSql(gs.user_parser.grules, dfa_, std::cout);
             return false;
         }
-        
+
         if(gs.dump_grammar_lsm)
         {
 #ifdef WASM_PLAYGROUND

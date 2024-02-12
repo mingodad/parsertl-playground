@@ -43,15 +43,17 @@ namespace lexertl
                 os_ << "using id_type_pair = std::pair<id_type, id_type>;\n";
             }
             os_ <<
-                "typedef struct {\n"
+                "struct lexertl_match_results {\n"
                 "    iter_type eoi, first, second;\n"
                 "    id_type id, user_id, state, bol;\n";
             if (internals_._features & *feature_bit::recursive)
             {
                 os_ << "    std::stack<id_type_pair> stack;\n";
             }
-            os_ << "} lexertl_match_results;\n"
-                "\n";
+            os_ << "    lexertl_match_results():eoi(0),first(0),second(0),\n"
+			"    id(0),user_id(0),state(0),bol(0){}\n"
+                        "};\n"
+                        "\n";
 
 
             dump_tables(sm_, 0, pointers_, os_);
