@@ -272,12 +272,16 @@ base_expr :
 	| INTEGER
 	| bytes_expr
 	| NUL
-	| BUILTIN CONST_IDENT
-	| BUILTIN IDENT
 	| CHAR_LITERAL
 	| REAL
 	| TRUE
 	| FALSE
+	| base_expr_assignable
+	;
+
+base_expr_assignable :
+	BUILTIN CONST_IDENT
+	| BUILTIN IDENT
 	| path ident_expr
 	| ident_expr
 	| local_ident_expr
@@ -348,7 +352,7 @@ call_trailing :
 	;
 
 call_stmt_expr :
-	base_expr
+	base_expr_assignable
 	| call_stmt_expr call_trailing
 	;
 
@@ -1604,7 +1608,7 @@ b64\`{B64}+\` BYTES
 0[xX]{HINT}"."{HINT}{P}{REALTYPE}? REAL
 
 \"(\\.|[^\\"])*\"	STRING_LITERAL
-\'(\\.|[^\\'])*\'	CHAR_LITERAL
+\'(\\[ux]{HEX}+|\\.|[^\\'])\'	CHAR_LITERAL
 
 "`"<RAW_STRING>
 <RAW_STRING>{
