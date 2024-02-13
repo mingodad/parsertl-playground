@@ -807,7 +807,7 @@ struct BuildUserParser
             //lexertl::save2sql(gs.user_parser.lsm, std::cout);
             stream_ << "//./parsertl-playground -generateParser grammar.g test.empty\n"
                                 "//g++ -g standalone-parser.cpp -o standalone-parser\n"
-                                "//./carbon-parser prelude.carbon\n"
+                                "//./standalone-parser input_to_test\n"
                                 "#include <stdio.h>\n"
                                 "#include <string.h>\n"
                                 "#include <stdlib.h>\n"
@@ -1320,7 +1320,7 @@ struct BuildUserParser
 "    {\n"
 "    	get_line_colum(input_data, start_pos, results.first, &line_column);\n"
 "    	start_pos = results.first;\n"
-"	fprintf(stdout, \"%s:%zu:%zu:%d:%d:%d:%.*s -> synatx error\\n\",\n"
+"	fprintf(stdout, \"%s:%zu:%zu:%d:%d:%d:%.*s -> syntax error\\n\",\n"
 "                input_pathname,\n"
 "		line_column.line, line_column.column,\n"
 "    		results.state, results.id,\n"
