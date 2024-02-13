@@ -2001,7 +2001,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     lrules.push("REGEX,RULE", "[*][?]", grules.token_id("\"*?\""), ".");
     lrules.push("REGEX,RULE", "[+]", grules.token_id("'+'"), ".");
     lrules.push("REGEX,RULE", "[+][?]", grules.token_id("\"+?\""), ".");
-    lrules.push("REGEX,RULE", "{escape}|(\\[\\^?({escape}|{posix}|"
+    lrules.push("REGEX,RULE", "{escape}|(\\[^?({escape}|{posix}|"
         "[^\\\\\\]])*\\])|[^\\s]", grules.token_id("Charset"), ".");
     lrules.push("REGEX,RULE", "[{][A-Z_a-z][-0-9A-Z_a-z]*[}]",
         grules.token_id("Macro"), ".");
