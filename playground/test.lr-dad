@@ -1,0 +1,6 @@
+module m;
+import i1;
+import i2;
+import i3;
+import i4;
+import i5;
