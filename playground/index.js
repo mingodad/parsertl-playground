@@ -82,6 +82,7 @@ const sampleList = [
 	["CG-CQL-old parser", "cql.g", "test.cql", "ace/mode/sql"],
 	["Chapel parser", "chapel.g", "test.chapel", "ace/mode/c_cpp"],
 	["CLanguage parser", "clanguage.g", "test.clanguage", "ace/mode/c_cpp"],
+	["CLaro-lang parser", "claro-lang.g", "test.claro-lang", "ace/mode/c_cpp"],
 	["CocoR parser (partially working)", "cocor.g", "test.cocor", "ace/mode/yaml"],
 	["condb2 sql parser", "condb2-sql.g", "test.sqlite3", "ace/mode/sql"],
 	["CoqPP parser", "coqpp_parse.g", "test.coqpp", "ace/mode/yaml"],
