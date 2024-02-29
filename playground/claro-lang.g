@@ -588,7 +588,7 @@ match_case_patterns_list :
 
 match_case_pattern_struct_field_list :
     identifier ASSIGNMENT match_case_patterns
-  | match_case_pattern_struct_field_list identifier COMMA ASSIGNMENT match_case_patterns
+  | match_case_pattern_struct_field_list COMMA identifier ASSIGNMENT match_case_patterns
   ;
 
 while_stmt :
