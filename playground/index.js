@@ -141,6 +141,7 @@ const sampleList = [
 	["Left recursion demo", "tree-sitter-lr-dad.g", "test.lr-dad", "ace/mode/yaml"],
 	["Lezer parser (partially working)", "lezer.g", "test.lezer", "ace/mode/yaml"],
 	["LFortran parser (partially working)", "lfortran.g", "test.fortran", "ace/mode/fortran"],
+	["Libfsm lx parser", "libfsm-lx.g", "test.libfsm-lx", "ace/mode/text"],
 	["Linden Script parser", "lsl_ext.g", "test.lsl", "ace/mode/text"],
 	["Lox parser", "lox-lalrpop.g", "test.lox", "ace/mode/javascript"],
 	["LPegrex parser (partially working)", "lpegrex.g", "test.lpegrex", "ace/mode/yaml"],
