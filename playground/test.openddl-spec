@@ -1,0 +1,45 @@
+// This is a simple example structure containing four 32-bit floating-point values.
+
+Vertex $apex
+{
+  float {1.0, 2.0, 3.0}
+}
+
+ uint32
+{
+    1094861636,
+    0x41424344,
+    0o10120441504,
+    0b0100_0001_0100_0010_0100_0011_0100_0100,
+    'ABCD'
+}
+
+Person $charles
+{
+    Name {string {"Charles"}}
+    Friends {ref {$alice, $bob}}
+}
+
+Person $alice {}
+Person $bob {}
+
+VertexArray
+{
+  float[3]
+  {
+      {1.0, 2.0, 3.0},
+      {0.5, 0.0, 0.5},
+      {0.0, -1.0, 4.0}
+  }
+}
+
+Path
+{
+  float[2]*
+  {
+      M{1.0, 1.0}, L{2.0, 1.0}, C{3.0, 1.0}, {3.0, 2.0}, {2.0, 3.0}
+  }
+}
+
+Mesh (lod = 2, part = "Left Hand"){}
+
