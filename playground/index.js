@@ -128,6 +128,7 @@ const sampleList = [
 	["Island parser example", "island-example-koopa.g", "test.island-example-koopa", "ace/mode/text"],
 	["Ispc parser", "ispc.g", "test.ispc", "ace/mode/c_cpp"],
 	["Jacc parser", "jacc-grammar.g", "test.jacc-grammar", "ace/mode/yaml"],
+	["Jaime Gaza Syntax parser", "jaimegarza-syntax.g", "test.jaimegarza-syntax", "ace/mode/yaml"],
 	["Java11 parser", "java11.g", "test.java", "ace/mode/java"],
 	["JavascriptCore parser", "javascript-core.g", "test.js.txt", "ace/mode/javascript"],
 	["Jq parser (partially working)", "jq-parser.g", "test.jq", "ace/mode/text"],

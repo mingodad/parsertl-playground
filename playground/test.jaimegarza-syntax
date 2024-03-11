@@ -1,0 +1,1021 @@
+%{
+//From: https://github.com/jaimegarza/syntax/blob/da2c8e8ade84514b1c1d2ef0e826d2c8bfd4ded3/src/main/grammar/syntax.sy
+/*
+ Syntax is distributed under the Revised, or 3-clause BSD license
+ ===============================================================================
+ Copyright (c) 1985, 2012, 2016, Jaime Garza
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
+     * Redistributions of source code must retain the above copyright
+       notice, this list of conditions and the following disclaimer.
+     * Redistributions in binary form must reproduce the above copyright
+       notice, this list of conditions and the following disclaimer in the
+       documentation and/or other materials provided with the distribution.
+     * Neither the name of Jaime Garza nor the
+       names of its contributors may be used to endorse or promote products
+       derived from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+ DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ ===============================================================================
+*/
+package me.jaimegarza.syntax.generator;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+import me.jaimegarza.syntax.exception.ParsingException;
+import me.jaimegarza.syntax.model.parser.Associativity;
+import me.jaimegarza.syntax.model.parser.ErrorToken;
+import me.jaimegarza.syntax.model.parser.NonTerminal;
+import me.jaimegarza.syntax.model.parser.Rule;
+import me.jaimegarza.syntax.model.parser.RuleItem;
+import me.jaimegarza.syntax.model.parser.Symbol;
+import me.jaimegarza.syntax.model.parser.Terminal;
+import me.jaimegarza.syntax.model.parser.Type;
+import me.jaimegarza.syntax.model.graph.Construct;
+import me.jaimegarza.syntax.model.graph.Nfa;
+import me.jaimegarza.syntax.model.graph.Dfa;
+import me.jaimegarza.syntax.model.graph.NfaNode;
+import me.jaimegarza.syntax.model.graph.DfaNode;
+import me.jaimegarza.syntax.model.graph.symbol.CharacterClass;
+import me.jaimegarza.syntax.env.Environment;
+import me.jaimegarza.syntax.util.NfaUtil;
+
+/**
+ * Parser for a grammar.<p>
+ *
+ * Phases:
+ *
+ * <ol>
+ *   <li><b>Code Parser</b> (This Phase)
+ *   <li>Structural Analysis
+ *   <li>Table Generation
+ *   <li>Writing Code
+ * </ol>
+ * @author jaimegarza@gmail.com
+ *
+ */
+@SuppressWarnings("unused")
+public class SyntaxCodeParser extends AbstractCodeParser {
+
+  private String currentTypeName = null;
+  private CharacterClass currentCharacterClass = null;
+  private LexerMode lexerMode = LexerMode.NORMAL;
+  private Nfa currentNfa = null;
+  private Terminal currentTerminal = null;
+  private Dfa currentDfa = null;
+  private String currentRegex;
+
+  private enum LexerMode {
+    NORMAL, REGEX, CHARACTER_CLASS
+  }
+
+  public SyntaxCodeParser(Environment env) {
+    super(env);
+  }
+
+%}
+
+%declare <stateNumber>
+%declare <value>
+%declare <mustClose>
+%declare <id>
+%declare <c>
+%declare <cc>
+%declare <construct>
+%stack {
+    public int stateNumber;
+    public int value;
+    public boolean mustClose;
+    public String id;
+    public char c;
+    public List<String> ids = new LinkedList<String>();
+    public Symbol symbol;
+    public CharacterClass cc;
+    public Construct construct;
+
+    StackElement(int state, int value, boolean mustClose, String id, char c) {
+      super();
+      this.stateNumber = state;
+      this.value = value;
+      this.mustClose = mustClose;
+      this.id = id;
+      this.c = c;
+    }
+
+    StackElement(Construct construct) {
+      super();
+      this.construct = construct;
+    }
+
+    StackElement(CharacterClass cc, String id) {
+      super();
+      this.cc = cc;
+      this.id = id;
+    }
+
+    StackElement() {
+      super();
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder();
+      boolean comma = false;
+      if (stateNumber != -1) {
+        sb.append("state: ").append(stateNumber);
+        comma = true;
+      }
+      if (comma)
+        sb.append(", ");
+      sb.append("value: ").append(value).append(", mustClose: ").append(mustClose);
+      if (c != '\0')
+        sb.append(", c:\'").append(""+c).append("\'");;
+      if (id != null) {
+        sb.append(", id:").append(id);
+      }
+      if (symbol != null) {
+        sb.append(", symbol:").append(symbol);
+      }
+      if (cc != null) {
+        sb.append(", cc:").append(cc);
+      }
+      if (construct != null) {
+        sb.append(", construct:").append(construct);
+      }
+
+      return sb.toString();
+    }
+}
+
+%token            MARK             : "'%%'"
+%token            START            : "'%start'"
+%token  <id>      TOKEN            : "token"
+%token            TYPE             : "'%type'"
+%token            UNION            : "'%union'"
+%token  <id>      TYPENAME         : "type definition"
+%token            TERM             : "'%token'"
+%token            LEFT             : "'%left'"
+%token            RIGHT            : "'%right'"
+%token            BINARY           : "'%binary'"
+%token            ERRDEF           : "'%error'"
+%token  <value>   NUM              : "number"
+%token            PREC             : "'%prec'"
+%token            NAME             : "'%name'"
+%token            ERROR            : "error"
+%token            LEXER            : "%lexer"
+%token            DECLARE          : "%declare"
+%token            GROUP            : "%group"
+
+%token <c>        PIPE             : "'|'"
+%token <c>        STAR             : "'*'"
+%token <c>        PLUS             : "'+'"
+%token <c>        HUH              : "'?'"
+%token <c>        ANY              : "'.'"
+%token <c>        CHAR             : "character"
+%token <cc>       CHARACTER_CLASS  : "a valid character class"
+
+%token            LEXCODE          : "lexical code"
+
+%token            ';'              : "semicolon"
+%right            ':'              : "colon"
+%right            '='              : "equals sign",
+                  '['              : "token mode marker",
+                  ']'              : "closing token mode marker"
+%token            ','              : "comma"
+%token            '|'              : "rule separator ('|')"
+%token            '('              : "opening parenthesis"
+%token            ')'              : "closing parenthesis"
+%token            '/'              : "regular expression marker ('/')"
+
+%type   <value>     Number;
+%type   <value>     Token;
+%type   <id>        TokenName;
+%type   <symbol>    TokenDef;
+
+%type   <construct> BasicElement;
+%type   <construct> Concatenation;
+%type   <construct> UnaryRegex;
+%type   <construct> RegExp;
+
+%type   <ids>       GroupTokens;
+%type   <id>        GroupToken;
+
+%name Declarations          : "declarations";
+%name Declaration           : "a declaration";
+%name Actions               : "code section";
+%name Token                 : "a token definition";
+%name Symbol                : "token, precedence declaration or '='";
+%name GrammarRule           : "parser rule definition";
+%name LexicAction           : "lexical token definition";
+%name Name                  : "a token:name pair";
+%name RegExp                : "regular expression";
+%name Concatenation         : "concatenation expression";
+%name UnaryRegex            : "unary regex expression";
+%name BasicElement          : "basic element";
+%name GroupTokens           : "group of tokens"
+%name GroupToken            : "token in a group"
+%name TokenName             : "name of the token"
+%name NonTerminals          : "group of non-terminal tokens"
+%name TokenNames            : "token names"
+%name Precedence            : "precedence definition"
+%name Definition            : "a definition"
+%name REquals               : "an equals sign (starting of a token action)"
+%name Equals                : "an equals sign (starting of a token action)"
+%name Type                  : "type definition"
+%name Tokens                : "token declarations"
+%name RStart                : "'/'"
+%name REnd                  : "'/'"
+%name Rules                 : "rule definitions"
+%name Rule                  : "rule definition"
+%name Descriptor            : "syntax grammar"
+%name SectionMarker         : "end of declarations marker '%%'"
+%name Productions           : "productions"
+%name Number                : "number"
+
+%start Descriptor
+
+%error ';'
+
+%%
+Descriptor    :  Declarations SectionMarker Productions Actions
+              |  SectionMarker  Productions Actions
+              ;
+
+SectionMarker : MARK                         = generateLexerFooter();
+              ;
+
+Actions       :                              = {
+                                                 generateCodeGeneratorFooter();
+                                                 finalActions = false;
+                                               }
+              |  MARK                        = {
+                                                 generateCodeGeneratorFooter();
+                                                 finalActions = true;
+                                               }
+              ;
+
+Declarations  :  Declarations Declaration
+              |  Declaration
+              ;
+
+Declaration   :  ';'
+              |  START TOKEN                 = if (!declareStart($TOKEN)) return false;
+              |  LEXCODE TOKEN
+              |  TYPE TYPENAME               = currentTypeName = $TYPENAME;
+                         NonTerminals        = currentTypeName = null;
+              |  DECLARE TYPENAME            = declareOneType($TYPENAME);
+              |  NAME TokenNames
+              |  UNION                       = if (!generateStructure()) return false;
+              |  Precedence Definition       = currentType = null;
+              |  '{'                         = if (!generateDeclaration()) return false;
+              |  LEXER Equals TOKEN
+              |  GROUP TOKEN ':' TOKEN
+                                GroupTokens  = if(!groupTokens($GroupTokens, $TOKEN[1], $TOKEN[2])) return false;
+              ;
+
+Precedence    :  TERM                        = {
+                                                 ruleAssociativity = Associativity.NONE;
+                                                 isErrorToken = false;
+                                               }
+              |  LEFT                        = {
+                                                 rulePrecedence++;
+                                                 ruleAssociativity = Associativity.LEFT;
+                                                 isErrorToken = false;
+                                               }
+              |  RIGHT                       = {
+                                                 rulePrecedence++;
+                                                 ruleAssociativity = Associativity.RIGHT;
+                                                 isErrorToken = false;
+                                               }
+              |  BINARY                      = {
+                                                 rulePrecedence++;
+                                                 ruleAssociativity = Associativity.BINARY;
+                                                 isErrorToken = false;
+                                               }
+              |  ERRDEF                      = {
+                                                 ruleAssociativity = Associativity.NONE;
+                                                 isErrorToken = true;
+                                               }
+              ;
+
+NonTerminals  :  NonTerminals ',' TOKEN      = if (!declareOneNonTerminal(currentTypeName, $TOKEN)) return false;
+              |  TOKEN                       = if (!declareOneNonTerminal(currentTypeName, $TOKEN)) return false;
+              ;
+
+TokenNames    :  TokenNames ',' Name
+              |  Name
+              ;
+
+Name          : TOKEN ':' TOKEN              = if (!nameOneNonTerminal($TOKEN[1], $TOKEN[2])) return false;
+              ;
+
+GroupTokens   : GroupTokens ',' GroupToken   = $GroupTokens.add($GroupToken);
+              | GroupToken                   = {
+                                                 $GroupTokens = new LinkedList<String>();
+                                                 $GroupTokens.add($GroupToken);
+                                               }
+              ;
+
+GroupToken    : TOKEN                        = {
+                                                 if (declareOneTerminal($TOKEN, false, Associativity.NONE, rulePrecedence, null, -1, null) == null) return false;
+                                                 $GroupToken = $TOKEN;
+                                               }
+              ;
+
+Definition    :  Type Tokens
+              ;
+
+Type          :  TYPENAME                    = {
+                                                 currentType = new Type($1);
+                                                 if (runtimeData.getTypes().contains(currentType)) {
+                                                   currentType = runtimeData.getTypes().get(runtimeData.getTypes().indexOf(currentType));
+                                                 } else {
+                                                   runtimeData.getTypes().add(currentType);
+                                                 }
+                                               }
+              |                              = currentType = null;
+              ;
+
+Tokens        :  Tokens ',' Token
+              |  Token
+              ;
+
+Token         :  TokenDef LexicAction
+              ;
+
+TokenDef      : TOKEN Number TokenName       = {
+                                                 int number = -1;
+                                                 if ($Number != -1) {
+                                                   number = $Number;
+                                                 } else if ($<>1.value != -1) {
+                                                   number = $<>1.value;
+                                                 }
+                                                 currentTerminal = declareOneTerminal($TOKEN, isErrorToken, ruleAssociativity, rulePrecedence, currentType, number, $TokenName);
+                                                 if (currentTerminal == null) return false;
+                                                 $TokenDef = currentTerminal;
+                                               }
+              ;
+
+Number        :  NUM
+              |                              = $<>$ = new StackElement(0, -1, false, "", '\0');
+              ;
+
+TokenName     : ':' TOKEN                    = $$ = $2;
+              | %prec ':'                    = $<>$ = new StackElement(0, 0, false, "", '\0');
+              ;
+
+LexicAction   : Equals TOKEN                 = $$ = null;
+              | RStart RExp REnd %prec '='   = generateDefaultRegexCode(currentDfa.getStart().getId(), currentTerminal);
+              | RStart RExp REnd REquals TOKEN
+              | %prec '='                    = $<>$ = new StackElement(0, -1, false, "", '\0');
+              ;
+
+REquals       : '='                          = generateRegexCode("default", currentDfa.getStart().getId(), currentTerminal);
+              | '[' TOKEN ']' '='            = generateRegexCode($TOKEN, currentDfa.getStart().getId(), currentTerminal);
+              ;
+
+Equals        : '='                          = generateLexerCode("default", currentTerminal);
+              | '[' TOKEN ']' '='            = generateLexerCode($TOKEN, currentTerminal);
+              ;
+
+RStart        : '/' TOKEN                    = currentNfa = new Nfa();
+              ;
+
+REnd          : '/' TOKEN
+              ;
+
+RExp          : RegExp                       = {
+                                                 currentDfa = NfaUtil.finalize(currentNfa, currentRegex, $RegExp);
+                                                 runtimeData.addRegularExpression(currentDfa);
+                                               }
+              ;
+
+RegExp        : RegExp PIPE Concatenation    = $$ = NfaUtil.alternate(currentNfa, $RegExp, $Concatenation);
+              | Concatenation                = $$ = $Concatenation;
+              ;
+
+Concatenation : Concatenation UnaryRegex     = $$ = NfaUtil.concatenate(currentNfa, $Concatenation, $UnaryRegex);
+              | UnaryRegex                   = $$ = $UnaryRegex;
+              ;
+
+UnaryRegex    : BasicElement STAR            = $$ = NfaUtil.zeroOrMany(currentNfa, $BasicElement);
+              | BasicElement PLUS            = $$ = NfaUtil.oneOrMany(currentNfa, $BasicElement);
+              | BasicElement HUH             = $$ = NfaUtil.optional(currentNfa, $BasicElement);
+              | BasicElement                 = $$ = $BasicElement;
+              ;
+
+BasicElement  : '(' RegExp ')'               = $$ = $RegExp;
+              | CHAR                         = $$ = NfaUtil.character(currentNfa, $CHAR);
+              | '[' CHARACTER_CLASS ']'      = $$ = NfaUtil.characterClass(currentNfa, $CHARACTER_CLASS);
+              | ANY                          = $$ = NfaUtil.any(currentNfa);
+              ;
+
+Productions   :  Productions TOKEN ':' Rules ';'  = if (!setLeftHandOfLastRule($2)) return false;
+              |  TOKEN ':' Rules ';'              = if (!setLeftHandOfLastRule($1)) return false;
+              ;
+
+Rules         :  Rules '|' GrammarRule       = {
+                                                 newRule();
+                                                 bActionDone = false;
+                                               }
+              |  GrammarRule                 = {
+                                                 newRule();
+                                                 currentRuleIndex = runtimeData.getRules().size() - 1;
+                                                 bActionDone = false;
+                                               }
+              ;
+
+GrammarRule   :  Rule
+              |                              = {
+                                                 bActionDone = false;
+                                               }
+              ;
+
+Rule          :  Rule Symbol
+              |  Symbol
+              ;
+
+Symbol        :  TOKEN                       = {
+                                                 if ($TOKEN.length() == 0) {
+                                                   break;
+                                                 }
+                                                 if (!declareOneItem($TOKEN, $<value>TOKEN, $<mustClose>TOKEN)) return false;
+                                               }
+              |  PREC TOKEN                  = if(!computeAssociativityAndPrecedence($TOKEN)) return false;
+              |  '='                         = {
+                                                 int i = runtimeData.currentRuleItems != null ? runtimeData.currentRuleItems.size() : 0;
+                                                 if (!ruleAction(runtimeData.getRules().size(), i, currentNonTerminalName)) {
+                                                   return false;
+                                                 }
+                                                 bActionDone = true;
+                                               }
+             ;
+
+%%
+
+  /**
+   * Get next token
+   *
+   * @param init is set to true in the first call
+   * @return the next token, changing mode as needed
+   */
+  protected int parserElement(boolean init) {
+    int rc;
+
+    if (init) {
+      getNextChar(init);
+    }
+    switch (lexerMode) {
+      case REGEX:
+        rc = getRegexSymbol();
+        if (environment.isDebug()) {
+          System.out.printf("* RegexScanner: %s(%d) %s\n", getTokenName(rc), rc, rc == CHAR ? "\'" + lexicalValue.c + "\'":"");
+        }
+        break;
+
+      case CHARACTER_CLASS:
+        rc = getCharacterClassSymbol();
+        lexicalValue = new StackElement(currentCharacterClass, runtimeData.currentStringValue);
+        if (environment.isDebug()) {
+          System.out.printf("* CharacterClassScanner %s(%d): %s\n", getTokenName(rc), rc, runtimeData.currentStringValue);
+        }
+        break;
+
+      case NORMAL:
+      default:
+        rc = getNormalSymbol();
+        lexicalValue = new StackElement(-1, tokenNumber, mustClose, runtimeData.currentStringValue, '\0');
+        if (environment.isDebug()) {
+          System.out.printf("* StdScanner: %s(%d) {%s}\n",
+            getTokenName(rc), rc, lexicalValue != null ? lexicalValue.toString() : "");
+        }
+        break;
+    }
+    return rc;
+  }
+
+  /**
+   * report an error
+   *
+   * @param state the state of the error
+   * @param sym causing token
+   * @param stackTop the position in the stack when the error happened
+   * @param errorMessage is the suggested message
+   * @return always zero
+   */
+  protected int parserError(int state, int sym, int stackTop, String errorMessage) {
+    if (errorMessage != null) {
+      environment.error(-1, "Syntax error %d :\'%s\'.", state, errorMessage);
+    } else {
+      System.err.printf("%s(%05d) : Unknown error on state %d\n", environment.getSourceFile().toString(),
+          runtimeData.lineNumber + 1, state);
+    }
+    isError = true;
+    return 0; /*
+               * with actions, it recovers weird. Need to change the action
+               * stuff to the scanner
+               */
+  }
+
+  /**
+   * Get a symbol while in a character class
+   * @return the next token
+   */
+  public int getCharacterClassSymbol() {
+
+	while (2 > 1) { //forever
+      if (currentChar == '\0') {
+        isError = true;
+        environment.error(-1, "Statement \"" + runtimeData.currentStringValue + "\" not properly ended with ']'.");
+        return ERROR;
+      }
+
+      if (currentChar == ']') {
+        // do not advance string
+        lexerMode = LexerMode.REGEX;
+        return CHARACTER_CLASS;
+      }
+
+      char c1 = currentChar;
+      currentRegex += currentChar;
+      getNextCharacter();
+      if (currentChar == '-') {
+        currentRegex += currentChar;
+        getNextCharacter();
+        if (currentChar == ']' || currentChar == '\0') { // last char, so use as a char
+          // do not advance string
+          currentCharacterClass.character(c1);
+          currentCharacterClass.character('-');
+          runtimeData.currentStringValue += "" + c1 + '-';
+        } else {
+          char c2 = currentChar;
+          runtimeData.currentStringValue += "" + c1 + '-' + c2;
+          currentCharacterClass.range(c1, c2);
+          currentRegex += currentChar;
+          getNextCharacter();
+        }
+      } else {
+        // already advanced
+        currentCharacterClass.character(c1);
+        runtimeData.currentStringValue += "" + c1;
+      }
+    }
+  }
+
+
+  /**
+   * Get the next character
+   * @param init indicates if this is the first call
+   * @return the next character in the stream
+   */
+  public char getNextChar(boolean init) {
+    return getNextCharacter();
+  }
+
+  public int getRegexSymbol() {
+    char c2;
+
+    lexicalValue = new StackElement();
+
+    if (isRegexSlash) {
+      isRegexSlash = false;
+      runtimeData.currentStringValue = "";
+      return TOKEN;
+    }
+
+    if (currentChar == '|') {
+      currentRegex += currentChar;
+      getNextCharacter();
+      return PIPE;
+    }
+    if (currentChar == '(') {
+      currentRegex += currentChar;
+      getNextCharacter();
+      return '(';
+    }
+    if (currentChar == ')') {
+      currentRegex += currentChar;
+      getNextCharacter();
+      return ')';
+    }
+    if (currentChar == '*') {
+      currentRegex += currentChar;
+      getNextCharacter();
+      return STAR;
+    }
+    if (currentChar == '+') {
+      currentRegex += currentChar;
+      getNextCharacter();
+      return PLUS;
+    }
+    if (currentChar == '?') {
+      currentRegex += currentChar;
+      getNextCharacter();
+      return HUH;
+    }
+    if (currentChar == '.') {
+      currentRegex += currentChar;
+      getNextCharacter();
+      return ANY;
+    }
+    if (currentChar == '/') {
+      lexerMode = LexerMode.NORMAL;
+      isRegexSlash = true;
+      getNextCharacter();
+      return '/';
+    }
+    if (currentChar == '[') {
+      runtimeData.currentStringValue = "";
+      currentCharacterClass = new CharacterClass();
+      lexerMode = LexerMode.CHARACTER_CLASS;
+      currentRegex += currentChar;
+      getNextCharacter();
+      if (currentChar == '^') {
+        runtimeData.currentStringValue += '^';
+        currentCharacterClass.negate();
+        currentRegex += currentChar;
+        getNextCharacter();
+      }
+      if (currentChar == '-') {
+        runtimeData.currentStringValue += '-';
+        currentCharacterClass.character('-');
+        currentRegex += currentChar;
+        getNextCharacter();
+      } else if (currentChar == ']') {
+        runtimeData.currentStringValue += ']';
+        currentCharacterClass.character(']');
+        currentRegex += currentChar;
+        getNextCharacter();
+        if (currentChar == '-') {
+          runtimeData.currentStringValue += '-';
+          currentCharacterClass.character('-');
+          currentRegex += currentChar;
+          getNextCharacter();
+        }
+      }
+      return '[';
+    }
+    if (currentChar == ']') {
+     currentRegex += currentChar;
+      getNextCharacter();
+      return ']';
+    }
+
+    if (currentChar == '\\') {
+      currentRegex += currentChar;
+      getNextCharacter();
+      c2 = decodeEscape();
+      if (c2 == 0) {
+        return '\0';
+      }
+    }
+    /*
+     * StxValue.node = malloc(sizeof(REGEXNODE)); StxValue.node.parent = NULL;
+     * StxValue.node.child1 = NULL; StxValue.node.child2 = NULL;
+     * StxValue.node.nodeType = NODE_LEX; StxValue.node.ranges =
+     * malloc(sizeof(REGEXRANGE)); StxValue.node.ranges.next = NULL;
+     * StxValue.node.ranges.prev = NULL; StxValue.node.ranges.charStart = c2;
+     * StxValue.node.ranges.charEnd = c2;
+     */
+    lexicalValue = new StackElement(-1, tokenNumber, false, "", currentChar);
+    currentRegex += currentChar;
+    getNextCharacter();
+    return CHAR;
+  }
+
+  @Override
+  public int getNormalSymbol() {
+    char c2;
+    String s2;
+    boolean end;
+
+    s2 = runtimeData.currentStringValue;
+    runtimeData.currentStringValue = "";
+
+    if (markers >= 2) {
+      return 0;
+    }
+
+    if (isCurlyBrace) {
+      isCurlyBrace = false;
+      return ';';
+    }
+
+    if (isEqual) {
+      isEqual = false;
+      runtimeData.currentStringValue = "";
+      return TOKEN;
+    }
+
+    if (isRegexSlash) {
+      isRegexSlash = false;
+      runtimeData.currentStringValue = "";
+      return TOKEN;
+    }
+
+    while (2 > 1) {
+      while (Character.isWhitespace(currentChar)) {
+        getNextCharacter();
+      }
+      if (currentChar == '/') {
+        if ((getNextCharacter()) == '*') {
+          getNextCharacter();
+          end = false;
+          while (!end) {
+            while (currentChar == '*') {
+              if ((getNextCharacter()) == '/') {
+                end = true;
+              }
+            }
+            getNextCharacter();
+          }
+        } else {
+          ungetChar(currentChar);
+          currentChar = '/';
+          break;
+        }
+      } else {
+        break;
+      }
+    }
+
+    if (currentChar == '\0') {
+      return 0;
+    }
+
+    if (currentChar == '%' || currentChar == '\\') {
+      getNextCharacter();
+      switch (currentChar) {
+        case '0':
+          getNextCharacter();
+          return TERM;
+        case '<':
+          getNextCharacter();
+          return LEFT;
+        case '2':
+          getNextCharacter();
+          return BINARY;
+        case '>':
+          getNextCharacter();
+          return RIGHT;
+        case '%':
+        case '\\':
+          getNextCharacter();
+          markers++;
+          return MARK;
+        case '=':
+          getNextCharacter();
+          return PREC;
+        case '@':
+          getNextCharacter();
+          return NAME;
+        case '{':
+          getNextCharacter();
+          isCurlyBrace = true;
+          return '{';
+        case '!':
+          getNextCharacter();
+          return ERRDEF;
+      }
+      while (Character.isLetterOrDigit(currentChar)) {
+        runtimeData.currentStringValue += currentChar;
+        getNextCharacter();
+      }
+      for (ReservedWord rw : reservedWords) {
+        if (runtimeData.currentStringValue.equals(rw.word)) {
+          if (rw.token == UNION) {
+            isCurlyBrace = true;
+          }
+          return rw.token;
+        }
+      }
+      isError = true;
+      environment.error(-1, "Reserved word \'%s\' is incorrect.", runtimeData.currentStringValue);
+      return ERROR;
+    }
+
+    if (currentChar == ';') {
+      getNextCharacter();
+      return ';';
+    }
+
+    if (currentChar == ',') {
+      getNextCharacter();
+      return ',';
+    }
+
+    if (currentChar == ':') {
+      currentNonTerminalName = s2;
+      getNextCharacter();
+      return ':';
+    }
+
+    if (currentChar == '|') {
+      getNextCharacter();
+      return '|';
+    }
+
+    if (currentChar == '[') {
+      getNextCharacter();
+      return '[';
+    }
+
+    if (currentChar == ']') {
+      getNextCharacter();
+      return ']';
+    }
+
+    if (currentChar == '=') {
+      getNextCharacter();
+      isEqual = true;
+      return '=';
+    }
+
+    if (currentChar == '{') {
+      isEqual = true;
+      return '=';
+    }
+
+    if (currentChar == '<') {
+      getNextCharacter();
+      runtimeData.currentStringValue = "";
+      while (currentChar != '\0' && currentChar != '>' && currentChar != '\n') {
+        runtimeData.currentStringValue += currentChar;
+        getNextCharacter();
+      }
+      if (currentChar != '>') {
+        isError = true;
+        environment.error(-1, "Statement < .. > not ended.");
+        return ERROR;
+      }
+      getNextCharacter();
+      return TYPENAME;
+    }
+
+    if (currentChar == '/') {
+      lexerMode = LexerMode.REGEX;
+      isRegexSlash = true;
+      currentRegex = "";
+      getNextCharacter();
+      return '/';
+    }
+
+    if (Character.isDigit(currentChar)) {
+      runtimeData.currentStringValue = "";
+      while (Character.isDigit(currentChar)) {
+        runtimeData.currentStringValue += currentChar;
+        getNextCharacter();
+      }
+      tokenNumber = Integer.parseInt(runtimeData.currentStringValue);
+      return NUM;
+    }
+
+    mustClose = false;
+    if (currentChar == '\'' || currentChar == '"') {
+      c2 = currentChar;
+      mustClose = true;
+      getNextCharacter();
+    } else {
+      c2 = ':';
+    }
+
+    runtimeData.currentStringValue = "";
+    do { /* TOKEN */
+      runtimeData.currentStringValue += currentChar;
+      getNextCharacter();
+      if (currentChar == '\0') {
+        break;
+      }
+      if (!mustClose && "%\\;,:[]|={</ \r\t\n".indexOf(currentChar) >= 0) {
+        break;
+      }
+    } while (currentChar != c2);
+
+    if (mustClose && currentChar != c2) {
+      isError = true;
+      environment.error(-1, "Statement ' .. ' or \" .. \" not ended.");
+      return ERROR;
+    }
+    tokenNumber = -1;
+    if (runtimeData.currentStringValue.equals("\\a")) {
+      tokenNumber = 7;
+    } else if (runtimeData.currentStringValue.equals("\\b")) {
+      tokenNumber = '\b';
+    } else if (runtimeData.currentStringValue.equals("\\n")) {
+      tokenNumber = '\n';
+    } else if (runtimeData.currentStringValue.equals("\\t")) {
+      tokenNumber = '\t';
+    } else if (runtimeData.currentStringValue.equals("\\f")) {
+      tokenNumber = '\f';
+    } else if (runtimeData.currentStringValue.equals("\\r")) {
+      tokenNumber = '\r';
+    } else if (runtimeData.currentStringValue.length() >= 2 && runtimeData.currentStringValue.substring(0, 2).equals("\\x")) {
+      int p = 2;
+      tokenNumber = 0;
+      while (2 > 1) {
+        if (runtimeData.currentStringValue.charAt(p) >= '0' && runtimeData.currentStringValue.charAt(p) <= '9') {
+          tokenNumber = tokenNumber * 16 + runtimeData.currentStringValue.charAt(p++) - '0';
+        } else if (runtimeData.currentStringValue.charAt(p) >= 'A' && runtimeData.currentStringValue.charAt(p) <= 'F') {
+          tokenNumber = tokenNumber * 16 + runtimeData.currentStringValue.charAt(p++) - 'A' + 10;
+        } else if (runtimeData.currentStringValue.charAt(p) >= 'a' && runtimeData.currentStringValue.charAt(p) <= 'f') {
+          tokenNumber = tokenNumber * 16 + runtimeData.currentStringValue.charAt(p++) - 'a' + 10;
+        } else {
+          break;
+        }
+      }
+    } else if (runtimeData.currentStringValue.length() >= 2 && runtimeData.currentStringValue.substring(0, 2).equals("\\0")) {
+      int p = 2;
+      tokenNumber = 0;
+      while (runtimeData.currentStringValue.charAt(p) >= '0' && runtimeData.currentStringValue.charAt(p) <= '7') {
+        tokenNumber = tokenNumber * 8 + runtimeData.currentStringValue.charAt(p++) - '0';
+      }
+    }
+
+    if (mustClose) {
+      getNextCharacter();
+      if (runtimeData.currentStringValue.length() == 1) {
+        tokenNumber = runtimeData.currentStringValue.charAt(0);
+      }
+    }
+
+    return TOKEN;
+  }
+
+  /**
+   * Execute this phase
+   * @throws ParsingException on error.  Check cause and message.
+   */
+  public void execute() throws ParsingException {
+    if (environment.isVerbose()) {
+      System.out.println("Parse");
+    }
+    setVerbose(environment.isDebug());
+    runtimeData.lineNumber = 1;
+    DfaNode.reset();
+    NfaNode.reset();
+    markers = 0;
+    Terminal terminal = new Terminal("$");
+    runtimeData.getTerminals().add(terminal);
+    terminal.setCount(0);
+    terminal.setToken(0);
+    if (parse() == 0 || isError) {
+      throw new ParsingException("Parser returned errors.  Please see messages from parser");
+    }
+    reviewDeclarations();
+    computeRootSymbol();
+    generateTopRecoveryTable();
+    finalizeSymbols();
+    finalizeRules();
+    generateTokenDefinitions();
+    runtimeData.setNumberOfErrors(errorCount);
+    runtimeData.setFinalActions(finalActions);
+  }
+
+  static class ReservedWord {
+    String word;
+    int token;
+
+    ReservedWord(String word, int token) {
+      super();
+      this.word = word;
+      this.token = token;
+    }
+  }
+
+  static final ReservedWord reservedWords[] = {
+    new ReservedWord("token", TERM),
+    new ReservedWord("term", TERM),
+    new ReservedWord("left", LEFT),
+    new ReservedWord("nonassoc", BINARY),
+    new ReservedWord("binary", BINARY),
+    new ReservedWord("right", RIGHT),
+    new ReservedWord("prec", PREC),
+    new ReservedWord("start", START),
+    new ReservedWord("type", TYPE),
+    new ReservedWord("symbol", TYPE),
+    new ReservedWord("declare", DECLARE),
+    new ReservedWord("union", UNION),
+    new ReservedWord("stack", UNION),
+    new ReservedWord("class", UNION),
+    new ReservedWord("struct", UNION),
+    new ReservedWord("name", NAME),
+    new ReservedWord("error", ERRDEF),
+    new ReservedWord("lexer", LEXER),
+    new ReservedWord("group", GROUP)
+  };
+
+}
