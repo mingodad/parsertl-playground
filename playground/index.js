@@ -119,6 +119,7 @@ const sampleList = [
 	["GramGrep parser", "grammar.g", "calculator.g", "ace/mode/yaml"],
 	["Graphql parser", "libgraphql.g", "test.libgraphql", "ace/mode/yaml"],
 	["Gringo-Clingo parser non grounding (partially working)", "gringo-ngp.g", "test.gringo-ngp", "ace/mode/text"],
+	["Happy parser", "happy-parser.g", "test.happy-parser", "ace/mode/yaml"],
 	["Hawq SQL parser (be patient)", "hawq-sql.g", "test.sql", "ace/mode/sql"],
 	["Hime parser", "hime-grammar.g", "test.hime-grammar", "ace/mode/yaml"],
 	["HQL (ECL) parser (be patient)", "hqlgram.g", "test.hqlgram", "ace/mode/pascal"],
