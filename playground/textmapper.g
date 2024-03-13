@@ -1,11 +1,11 @@
-
+//From: https://github.com/inspirer/textmapper/blob/496b2847269e448d652abfff98ae5160736e82df/parsers/tm/tm.y
+//for fn in `find textmapper -name '*.tm'`; do echo $fn:1:1; ./parsertl-playground textmapper3.g $fn; done
 /*Tokens*/
-
 %token OR
 %token AND
 %token OROR
 %token ANDAND
-%token INVALID_TOKEN
+//%token INVALID_TOKEN
 %token SCON
 %token ICON
 %token TEMPLATES
@@ -37,7 +37,9 @@
 %token EXCL
 %token TILDE
 %token DOLLAR
-%token ATSIGN
+//%token ATSIGN
+%token DIV
+%token LBRACE
 %token ERROR
 %token ID
 %token AS
@@ -81,9 +83,9 @@
 %token SPACE
 %token CHAR_X
 %token CODE
-%token LBRACE
 %token REGEXP
-%token DIV
+//%token YY_PARSE_file
+//%token YY_PARSE_nonterm
 
 %left /*1*/ OR
 %left /*2*/ AND
@@ -282,17 +284,7 @@ stateref_list_Comma_separated :
 	;
 
 lexeme :
-	start_conditions identifier rawTypeopt reportClause COLON pattern integer_literal lexeme_attrs command
-	| start_conditions identifier rawTypeopt reportClause COLON pattern integer_literal lexeme_attrs
-	| start_conditions identifier rawTypeopt reportClause COLON pattern integer_literal command
-	| start_conditions identifier rawTypeopt reportClause COLON pattern integer_literal
-	| start_conditions identifier rawTypeopt reportClause COLON pattern lexeme_attrs command
-	| start_conditions identifier rawTypeopt reportClause COLON pattern lexeme_attrs
-	| start_conditions identifier rawTypeopt reportClause COLON pattern command
-	| start_conditions identifier rawTypeopt reportClause COLON pattern
-	| start_conditions identifier rawTypeopt reportClause COLON lexeme_attrs
-	| start_conditions identifier rawTypeopt reportClause COLON
-	| start_conditions identifier rawTypeopt COLON pattern integer_literal lexeme_attrs command
+	start_conditions identifier rawTypeopt COLON pattern integer_literal lexeme_attrs command
 	| start_conditions identifier rawTypeopt COLON pattern integer_literal lexeme_attrs
 	| start_conditions identifier rawTypeopt COLON pattern integer_literal command
 	| start_conditions identifier rawTypeopt COLON pattern integer_literal
@@ -302,16 +294,6 @@ lexeme :
 	| start_conditions identifier rawTypeopt COLON pattern
 	| start_conditions identifier rawTypeopt COLON lexeme_attrs
 	| start_conditions identifier rawTypeopt COLON
-	| identifier rawTypeopt reportClause COLON pattern integer_literal lexeme_attrs command
-	| identifier rawTypeopt reportClause COLON pattern integer_literal lexeme_attrs
-	| identifier rawTypeopt reportClause COLON pattern integer_literal command
-	| identifier rawTypeopt reportClause COLON pattern integer_literal
-	| identifier rawTypeopt reportClause COLON pattern lexeme_attrs command
-	| identifier rawTypeopt reportClause COLON pattern lexeme_attrs
-	| identifier rawTypeopt reportClause COLON pattern command
-	| identifier rawTypeopt reportClause COLON pattern
-	| identifier rawTypeopt reportClause COLON lexeme_attrs
-	| identifier rawTypeopt reportClause COLON
 	| identifier rawTypeopt COLON pattern integer_literal lexeme_attrs command
 	| identifier rawTypeopt COLON pattern integer_literal lexeme_attrs
 	| identifier rawTypeopt COLON pattern integer_literal command
@@ -331,7 +313,6 @@ lexeme_attrs :
 lexeme_attribute :
 	CLASS
 	| SPACE
-	| LAYOUT
 	;
 
 lexer_directive :
@@ -372,15 +353,7 @@ grammar_part_OrSyntaxError :
 	;
 
 nonterm :
-	annotations identifier nonterm_params rawType reportClause COLON rules SEMICOLON
-	| annotations identifier nonterm_params rawType COLON rules SEMICOLON
-	| annotations identifier nonterm_params reportClause COLON rules SEMICOLON
-	| annotations identifier nonterm_params COLON rules SEMICOLON
-	| annotations identifier rawType reportClause COLON rules SEMICOLON
-	| annotations identifier rawType COLON rules SEMICOLON
-	| annotations identifier reportClause COLON rules SEMICOLON
-	| annotations identifier COLON rules SEMICOLON
-	| identifier nonterm_params rawType reportClause COLON rules SEMICOLON
+	identifier nonterm_params rawType reportClause COLON rules SEMICOLON
 	| identifier nonterm_params rawType COLON rules SEMICOLON
 	| identifier nonterm_params reportClause COLON rules SEMICOLON
 	| identifier nonterm_params COLON rules SEMICOLON
@@ -390,6 +363,10 @@ nonterm :
 	| identifier COLON rules SEMICOLON
 	| EXTEND identifier reportClause COLON rules SEMICOLON
 	| EXTEND identifier COLON rules SEMICOLON
+	| INLINE identifier nonterm_params reportClause COLON rules SEMICOLON
+	| INLINE identifier nonterm_params COLON rules SEMICOLON
+	| INLINE identifier reportClause COLON rules SEMICOLON
+	| INLINE identifier COLON rules SEMICOLON
 	;
 
 assoc :
@@ -399,9 +376,7 @@ assoc :
 	;
 
 param_modifier :
-	EXPLICIT
-	| GLOBAL
-	| LOOKAHEAD
+	LOOKAHEAD
 	;
 
 template_param :
@@ -494,14 +469,14 @@ rhsParts :
 	;
 
 rhsPart :
-	rhsAnnotated
+	rhsAssignment
 	| command
 	| rhsStateMarker
 	| rhsLookahead
 	;
 
 rhsPart_OrSyntaxError :
-	rhsAnnotated
+	rhsAssignment
 	| command
 	| rhsStateMarker
 	| rhsLookahead
@@ -524,11 +499,6 @@ lookahead_predicate :
 
 rhsStateMarker :
 	DOT identifier
-	;
-
-rhsAnnotated :
-	rhsAssignment
-	| annotations rhsAssignment
 	;
 
 rhsAssignment :
@@ -578,21 +548,6 @@ setExpression :
 	setPrimary
 	| setExpression OR /*1L*/ setExpression
 	| setExpression AND /*2L*/ setExpression
-	;
-
-annotation_list :
-	annotation_list annotation
-	| annotation
-	;
-
-annotations :
-	annotation_list
-	;
-
-annotation :
-	ATSIGN identifier ASSIGN expression
-	| ATSIGN identifier
-	| ATSIGN syntax_problem
 	;
 
 nonterm_param_list_Comma_separated :
@@ -769,7 +724,7 @@ ID  [a-zA-Z_]([a-zA-Z_\-0-9]*[a-zA-Z_0-9])?|'(\\.|[^'\n\r\\])*'
 "+"	PLUS
 "$"	DOLLAR
 "~"	TILDE
-"@="	ATSIGN
+//"@="	ATSIGN
 "=="	ASSIGNASSIGN
 "!="	EXCLASSIGN
 
@@ -794,6 +749,6 @@ ID  [a-zA-Z_]([a-zA-Z_\-0-9]*[a-zA-Z_0-9])?|'(\\.|[^'\n\r\\])*'
 
 \%\%(?s:.)+ TEMPLATES
 
-.	INVALID_TOKEN
+//.	INVALID_TOKEN
 
 %%
