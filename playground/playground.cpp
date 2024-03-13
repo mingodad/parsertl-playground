@@ -1928,7 +1928,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     lrules.insert_macro("posix", "\\[:{posix_name}:\\]");
     lrules.insert_macro("state_name", "[A-Z_a-z][0-9A-Z_a-z]*");
     lrules.insert_macro("NL", "\n|\r\n");
-    lrules.insert_macro("literal_common", "\\\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x{hex}+)");
+    lrules.insert_macro("literal_common", "\\\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x{hex}{2})");
 
     lrules.push("INITIAL,OPTION,RXDIRECTIVES", "[ \t]+", lexertl::rules::skip(), ".");
     lrules.push("{NL}", grules.token_id("NL"));
