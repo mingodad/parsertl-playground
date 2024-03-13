@@ -104,12 +104,13 @@ repeat : '?' | "??" | '*' | "*?" | '+' | "+?" | Repeat ;
 %x OPTION GRULE MACRO REGEX RULE ID RXDIRECTIVES PRODALIAS
 
 c_comment  [/]{2}.*|[/][*](?s:.)*?[*][/]
-escape \\(.|x[0-9A-Fa-f]+|c[@a-zA-Z])
+hex [0-9A-Fa-f]
+escape \\(.|x{hex}+|c[@a-zA-Z])
 posix_name alnum|alpha|blank|cntrl|digit|graph|lower|print|punct|space|upper|xdigit
 posix \[:{posix_name}:\]
 state_name [A-Z_a-z][0-9A-Z_a-z]*
 NL  \n|\r\n
-literal_common	\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\d+)
+literal_common	\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x{hex}+)
 
 %%
 

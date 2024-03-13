@@ -1921,13 +1921,14 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     lrules.push_state("RXDIRECTIVES");
     lrules.push_state("PRODALIAS");
     lrules.insert_macro("c_comment", "[/]{2}.*|[/][*](?s:.)*?[*][/]");
-    lrules.insert_macro("escape", "\\\\(.|x[0-9A-Fa-f]+|c[@a-zA-Z])");
+    lrules.insert_macro("hex", "[0-9A-Fa-f]");
+    lrules.insert_macro("escape", "\\\\(.|x{hex}+|c[@a-zA-Z])");
     lrules.insert_macro("posix_name", "alnum|alpha|blank|cntrl|digit|graph|"
         "lower|print|punct|space|upper|xdigit");
     lrules.insert_macro("posix", "\\[:{posix_name}:\\]");
     lrules.insert_macro("state_name", "[A-Z_a-z][0-9A-Z_a-z]*");
     lrules.insert_macro("NL", "\n|\r\n");
-    lrules.insert_macro("literal_common", "\\\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x\\d+)");
+    lrules.insert_macro("literal_common", "\\\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x{hex}+)");
 
     lrules.push("INITIAL,OPTION,RXDIRECTIVES", "[ \t]+", lexertl::rules::skip(), ".");
     lrules.push("{NL}", grules.token_id("NL"));
