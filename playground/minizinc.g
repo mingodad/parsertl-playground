@@ -1,6 +1,6 @@
 //From: https://github.com/MiniZinc/libminizinc/blob/master/lib/parser.yxx
 
-%token ILLEGAL_CHARACTER
+//%token ILLEGAL_CHARACTER
 
 /*Tokens*/
 %token MZN_INTEGER_LITERAL
@@ -110,7 +110,6 @@
 %token MZN_NOT
 %token MZN_PLUSPLUS
 %token MZN_COLONCOLON
-%token PREC_ANNO
 %token MZN_EQUIV_QUOTED
 %token MZN_IMPL_QUOTED
 %token MZN_RIMPL_QUOTED
@@ -152,6 +151,8 @@
 %token ','
 %token ':'
 %token '|'
+
+%fallback MZN_IDENTIFIER MZN_INT
 
 %right /*1*/ PREC_ANNO
 %left /*2*/ MZN_EQUIV
@@ -285,7 +286,14 @@ solve_item :
 
 output_item :
 	MZN_OUTPUT expr
-	| MZN_OUTPUT MZN_COLONCOLON /*17L*/ string_expr expr
+	| MZN_OUTPUT MZN_COLONCOLON /*17L*/ output_annotation expr
+	;
+
+output_annotation :
+	string_expr
+	| MZN_IDENTIFIER '(' ')'
+	| MZN_IDENTIFIER '(' expr_list ')'
+	| '(' expr ')'
 	;
 
 predicate_item :
@@ -561,6 +569,7 @@ expr_atom_head_nonstring :
 	| MZN_UNDERSCORE access_tail
 	| MZN_UNDERSCORE MZN_POW_MINUS1 /*12L*/
 	| MZN_UNDERSCORE access_tail MZN_POW_MINUS1 /*12L*/
+	| MZN_UNDERSCORE '(' expr ')'
 	| MZN_BOOL_LITERAL
 	| MZN_BOOL_LITERAL MZN_POW_MINUS1 /*12L*/
 	| MZN_INTEGER_LITERAL
@@ -899,7 +908,7 @@ id_or_quoted_op :
 %x multilinecomment
 %x doccomment
 %x doccomment_file
-%x quoted_exp
+//%x quoted_exp
 
 %%
 
@@ -1109,26 +1118,41 @@ _?[A-Za-z][A-Za-z0-9_]*  MZN_IDENTIFIER
 
 "(" '('
 ")" ')'
-<quoted_exp>")"<<> ')'
 
-<INITIAL>\"<string>
-<string,string_quote>[^\\"\xa\xd\x0]+<.>
-<string,string_quote>\\n<.>
-<string,string_quote>\\t<.>
-<string,string_quote>\\x[0-9a-fA-F][0-9a-fA-F]?<.>  /*MZN_INVALID_STRING_LITERAL*/
-<string,string_quote>\\[0-7][0-7]?[0-7]?<.>  /*MZN_INVALID_STRING_LITERAL*/
+//\"(\\.|[^"\r\n\\"])*\"    MZN_STRING_LITERAL
+\"<>string>
+<string>{
+    \"<<>   MZN_STRING_LITERAL
+    \\"("<>string_quote>
+    .<.>
+}
+<string_quote>{
+    "("<>string_quote>
+    ")"<<>
+    \"<>string>
+    .<.>
+}
 
-<string,string_quote>\\[\\"']<.>
-<string>\\"("<>quoted_exp>       MZN_STRING_QUOTE_START
-<string_quote>\\"("<>quoted_exp> MZN_STRING_QUOTE_MID
-<string>\"<<>          MZN_STRING_LITERAL
-<string_quote>\"<<>          MZN_STRING_QUOTE_END
-<string,string_quote>.<.> /*{ return (unsigned char)yytext[0]; }*/
-/*<string,string_quote>[\xa\xd\x0] { return MZN_END_OF_LINE_IN_STRING; }*/
-/*<string,string_quote><<EOF>> { yy_pop_state(yyscanner); return MZN_UNTERMINATED_STRING; }*/
+//<quoted_exp>")"<<> ')'
+//
+//<INITIAL>\"<string>
+//<string,string_quote>[^\\"\xa\xd\x0]+<.>
+//<string,string_quote>\\n<.>
+//<string,string_quote>\\t<.>
+//<string,string_quote>\\x[0-9a-fA-F][0-9a-fA-F]?<.>  /*MZN_INVALID_STRING_LITERAL*/
+//<string,string_quote>\\[0-7][0-7]?[0-7]?<.>  /*MZN_INVALID_STRING_LITERAL*/
+//
+//<string,string_quote>\\[\\"']<.>
+//<string>\\"("<>quoted_exp>       MZN_STRING_QUOTE_START
+//<string_quote>\\"("<>quoted_exp> MZN_STRING_QUOTE_MID
+//<string>\"<<>          MZN_STRING_LITERAL
+//<string_quote>\"<<>          MZN_STRING_QUOTE_END
+//<string,string_quote>.<.> /*{ return (unsigned char)yytext[0]; }*/
+///*<string,string_quote>[\xa\xd\x0] { return MZN_END_OF_LINE_IN_STRING; }*/
+///*<string,string_quote><<EOF>> { yy_pop_state(yyscanner); return MZN_UNTERMINATED_STRING; }*/
 
 `[A-Za-z][A-Za-z0-9_]*`  MZN_QUOTED_IDENTIFIER
 
-.                 ILLEGAL_CHARACTER
+//.                 ILLEGAL_CHARACTER
 
 %%

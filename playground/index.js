@@ -166,7 +166,7 @@ const sampleList = [
 	["MetaDSL parser", "MetaDSL.g", "test.MetaDSL", "ace/mode/txt"],
 	["Minic parser", "minic.g", "test.minic", "ace/mode/c_cpp"],
 	["Minilog parser", "minilog.g", "test.minilog", "ace/mode/text"],
-	["Minizinc parser (not working)", "minizinc.g", "test.mzn", "ace/mode/text"],
+	["Minizinc parser (partially working)", "minizinc.g", "test.mzn", "ace/mode/text"],
 	["Mlton parser", "mlton.g", "test.mlton", "ace/mode/ocaml"],
 	["MLyacc parser", "mlyacc.g", "test.mlyacc", "ace/mode/yaml"],
 	["MSTA parser", "msta.g", "test.msta", "ace/mode/yaml"],
