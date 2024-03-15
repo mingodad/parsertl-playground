@@ -48,7 +48,8 @@ onbeforeunload= function(event) { updateLocalStorage(); };
 
 const sampleList = [
 	//title, grammar, input, input ace syntax
-	["Abnf parser", "abnf.g", "test.abnf", "ace/mode/ada"],
+	["Abnf parser", "abnf.g", "test.abnf", "ace/mode/text"],
+	["Abnf-ebnf parser", "abnf-ebnf.g", "test.abnf-ebnf", "ace/mode/text"],
 	["Ada parser", "ada-adayacc.g", "test.adb", "ace/mode/ada"],
 	["Age parser", "cypher_gram.g", "test.cypher_gram", "ace/mode/sql"],
 	["Akwa parser (not working)", "akwa.g", "test.awk", "ace/mode/text"],
