@@ -285,7 +285,7 @@ sign	[+-]
 "uint8"	"uint8"
 "z"	'z'
 
-"false"|"0"|"true"|"1"	bool_literal
+"false"|"true"	bool_literal
 
 ([A-Za-z0-9]|"+"|"/")+"=""="	base64_data
 
