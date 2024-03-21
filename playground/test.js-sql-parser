@@ -1,0 +1,310 @@
+select a from b where c > 1 group by d order by e desc;
+select distinct max_statement_time = 1.2 a;
+select all 0x1f;
+select distinctrow "xx", a in (1,2);
+
+      select
+        tag_basic.gender as gender,
+        tag_basic.age as age,
+        trade_m.cate_id as cate_id,
+        trade_m.brand_id as bid,
+        sum(trade_m.amt_alipay) as amt_alipay
+      from
+        tags
+      where
+        trade_m.thedate in (201501, '201502',201503)
+      group by
+       tag_basic.gender, tag_basic.age, trade_m.cate_id, trade_m.brand_id
+      order by
+       sum(tag_trade_m.amt_alipay) desc;
+
+select function(), function(1, "sd", 0x1F);
+
+      SELECT
+        DISTINCT high_priority MAX_STATEMENT_TIME=1 STRAIGHT_JOIN SQL_SMALL_RESULT SQL_BIG_RESULT SQL_BUFFER_RESULT SQL_CACHE SQL_CALC_FOUND_ROWS fm_customer.lname AS name1,
+        fm_customer.fname AS name2,
+        fm_customer.address1 AS addr1,
+        fm_customer.phone1 AS tel1,
+        fm_customer.yearly_income AS amount,
+        fm_customer.num_cars_owned AS car_num
+      FROM fm_customer
+      INNER JOIN fm_sales_link
+      ON fm_customer.customer_id = fm_sales_link.fm_customer.customer_id
+         AND fm_sales_link.store_sales IS NOT NULL
+         AND fm_sales_link.store_cost IS NOT NULL
+         AND fm_sales_link.unit_sales IS NOT NULL
+      INNER JOIN fm_store
+      ON fm_sales_link.fm_store.store_id = fm_store.store_id
+         AND fm_store.store_name IS NOT NULL;
+
+      SELECT   P1.PAYMENTNO, P1.AMOUNT,
+      (P1.AMOUNT * 100) / SUM(P2.AMOUNT)
+      FROM     PENALTIES AS P1, PENALTIES AS P2
+      GROUP BY P1.PAYMENTNO, P1.AMOUNT
+      ORDER BY P1.PAYMENTNO;
+
+     SELECT  PLAYERS.PLAYERNO, NAME,
+       (SELECT   COUNT(*)
+        FROM     PENALTIES
+        WHERE    PLAYERS.PLAYERNO =
+                 PENALTIES.PLAYERNO) AS NUMBER_OF_PENALTIES,
+       (SELECT   COUNT(*)
+        FROM     TEAMS
+        WHERE    PLAYERS.PLAYERNO =
+                 TEAMS.PLAYERNO) AS NUMBER_OF_TEAMS
+        FROM    PLAYERS;
+
+      SELECT rd.*, rd.rd_numberofrooms - (
+        SELECT SUM(rn.reservation_numberofrooms) AS count_reserve_room
+        FROM reservation rn
+        WHERE rn.reservation_rd_id = rd.rd_id
+          AND (str_to_date('$data_Check_in_date', '%d-%m-%y') BETWEEN str_to_date(rn.reservation_check_in_date, '%d-%m-%y') AND str_to_date(rn.reservation_check_out_date, '%d-%m-%y')
+          OR str_to_date('$data_Check_out_date', '%d-%m-%y') BETWEEN str_to_date(rn.reservation_check_in_date, '%d-%m-%y') AND str_to_date(rn.reservation_check_out_date, '%d-%m-%y')
+          OR str_to_date('$data_Check_in_date', '%d-%m-%y') <= str_to_date(rn.reservation_check_in_date, '%d-%m-%y')
+          AND str_to_date('$data_Check_out_date', '%d-%m-%y'))
+      ) AS reserve
+      FROM room_details rd
+      LEFT JOIN reservation rn ON rd.rd_id = rn.reservation_rd_id
+      WHERE NOT EXISTS (
+        SELECT rn.*
+        FROM reservation rn
+        WHERE (rn.reservation_rd_id = rd.rd_id
+          AND ((str_to_date('$data_Check_in_date', '%d-%m-%y') BETWEEN str_to_date(rn.reservation_check_in_date, '%d-%m-%y') AND str_to_date(rn.reservation_check_out_date, '%d-%m-%y')
+            OR str_to_date('$data_Check_out_date', '%d-%m-%y') BETWEEN str_to_date(rn.reservation_check_in_date, '%d-%m-%y') AND str_to_date(rn.reservation_check_out_date, '%d-%m-%y')
+            OR str_to_date('$data_Check_in_date', '%d-%m-%y') <= str_to_date(rn.reservation_check_in_date, '%d-%m-%y')
+              AND str_to_date('$data_Check_out_date', '%d-%m-%y') >= str_to_date(rn.reservation_check_out_date, '%d-%m-%y')))
+          AND (rd.rd_numberofrooms <= (
+            SELECT SUM(rn.reservation_numberofrooms) AS count_reserve_room
+            FROM reservation rn
+            WHERE rn.reservation_rd_id = rd.rd_id
+              AND (str_to_date('$data_Check_in_date', '%d-%m-%y') BETWEEN str_to_date(rn.reservation_check_in_date, '%d-%m-%y') AND str_to_date(rn.reservation_check_out_date, '%d-%m-%y')
+              OR str_to_date('$data_Check_out_date', '%d-%m-%y') BETWEEN str_to_date(rn.reservation_check_in_date, '%d-%m-%y') AND str_to_date(rn.reservation_check_out_date, '%d-%m-%y')
+              OR str_to_date('$data_Check_in_date', '%d-%m-%y') <= str_to_date(rn.reservation_check_in_date, '%d-%m-%y')
+                AND str_to_date('$data_Check_out_date', '%d-%m-%y'))
+          )))
+      );
+
+SELECT `LEFT`(a, 3) FROM b;
+
+      select
+          a.product_id,
+          a.product_name,
+          count(a.ins_id) as ins_num,
+          count(a.f) as f_num,
+          count(a.m) as m_num,
+          count(a.p_1) as p_1_num,
+          count(a.p_2) as p_1_num,
+          count(a.p_3) as p_1_num,
+          count(a.gt3) as gt3_num,
+          count(lt25) as lt25_num,
+          count(gt25lt35) as gt25lt35_num,
+          count(gt35lt45) as gt25lt35_num,
+          count(gt45lt55) as gt25lt35_num,
+          count(gt55) as gt55_num
+      from(
+          select
+                  a.ins_id,
+                  b.product_id,
+                  b.product_name,
+                  c.cust_id,
+                  c.cust_name,
+                  c.cust_sex,
+                  c.cust_age,
+                  c.family_num,
+                  (case when c.cust_sex='f' then 1 else 0 end) as f,
+                  (case when c.cust_sex='m' then 1 else 0 end) as m,
+                  (case when c.family_num=1 then 1 else 0 end) as p_1,
+                  (case when c.family_num=2 then 1 else 0 end) as P_2,
+                  (case when c.family_num=3 then 1 else 0 end) as p_3,
+                  (case when c.family_num>3 then 1 else 0 end) as gt3,
+                  (case when c.cust_age<=25 then 1 else 0 end) as lt25,
+                  (case when c.cust_age>25 and c.cust_age<=35 then 1 else 0 end) as gt25lt35,
+                  (case when c.cust_age>35 and c.cust_age<=45 then 1 else 0 end) as gt35lt45,
+                  (case when c.cust_age>45 and c.cust_age<=55 then 1 else 0 end) as gt45lt55,
+                  (case when c.cust_age>55 then 1 else 0 end) as gt55
+          from
+                  insurance a,
+                  product b,
+                  customer c
+          where
+                  a.product_id=b.product_id
+                  and a.cust_id=c.cust_id
+      ) a
+      group by b.product_id, b.product_name;
+
+      SELECT
+          a.*, f.ORG_NAME DEPT_NAME,
+          IFNULL(d.CONT_COUNT, 0) SIGN_CONT_COUNT,
+          IFNULL(d.TOTAL_PRICE, 0) SIGN_CONT_MONEY,
+          IFNULL(c.CONT_COUNT, 0) SIGN_ARRI_CONT_COUNT,
+          IFNULL(c.TOTAL_PRICE, 0) SIGN_ARRI_CONT_MONEY,
+          IFNULL(b.CONT_COUNT, 0) TOTAL_ARRI_CONT_COUNT,
+          IFNULL(b.TOTAL_PRICE, 0) TOTAL_ARRI_MONEY,
+          0 PUBLISH_TOTAL_COUNT,
+          0 PROJECT_COUNT,
+          0 COMMON_COUNT,
+          0 STOCK_COUNT,
+          0 MERGER_COUNT,
+          0 INDUSTRY_COUNT,
+          0 BRAND_COUNT
+      FROM
+          (
+              SELECT
+                  u.USER_ID,
+                  u.REAL_NAME,
+                  u.ORG_PARENT_ID,
+                  o.ORG_NAME,
+                  u.ORG_ID
+              FROM
+                  SE_USER u
+              INNER JOIN SE_ORGANIZ o ON u.ORG_PARENT_ID = o.ORG_ID
+              WHERE
+                  u.`STATUS` = 1
+              AND u.`LEVEL` IN (1, 2, 3)
+              AND o.PARENT_ID <> 0
+          ) a
+      -- 查询部门名称
+      LEFT JOIN SE_ORGANIZ f ON a.ORG_ID = f.ORG_ID
+      -- 签约合同数与合同金额
+      LEFT JOIN (
+          SELECT
+              CUST_MGR_ID,
+              COUNT(CONT_ID) CONT_COUNT,
+              SUM(TOTAL_PRICE) TOTAL_PRICE
+          FROM
+              SE_CONTRACT
+          WHERE
+              DATE_FORMAT(CREATE_TIME, '%Y-%m-%d') = '2012-06-08'
+          GROUP BY
+              CUST_MGR_ID
+      ) d ON a.USER_ID = d.CUST_MGR_ID
+      -- 签约并回款合同数与回款金额
+      LEFT JOIN (
+          SELECT
+              CUST_MGR_ID,
+              COUNT(CONT_ID) CONT_COUNT,
+              SUM(TOTAL_PRICE) TOTAL_PRICE
+          FROM
+              SE_CONTRACT
+          WHERE
+              (STATUS = 6 OR STATUS = 10)
+          AND DATE_FORMAT(CREATE_TIME, '%Y-%m-%d') = '2012-06-08'
+          GROUP BY
+              CUST_MGR_ID
+      ) c ON a.USER_ID = c.CUST_MGR_ID
+      -- 总回款合同数与总回款金额
+      LEFT JOIN (
+          SELECT
+              c.CUST_MGR_ID,
+              COUNT(c.CONT_ID) CONT_COUNT,
+              SUM(c.TOTAL_PRICE) TOTAL_PRICE
+          FROM
+              SE_CONTRACT c
+          INNER JOIN SE_CONT_AUDIT a ON c.CONT_ID = a.CONT_ID
+          WHERE
+              (c. STATUS = 6 OR c. STATUS = 10)
+          AND a.IS_PASS = 1
+          AND DATE_FORMAT(a.AUDIT_TIME, '%Y-%m-%d') = '2012-06-08'
+          GROUP BY
+              c.CUST_MGR_ID
+      ) b ON a.USER_ID = b.CUST_MGR_ID
+      ORDER BY
+          a.ORG_PARENT_ID,
+          a.USER_ID;
+
+      SELECT
+          k.*,
+      IF (
+          k.LAST_PUBLISH_TOTAL_COUNT > 0,
+          ROUND((k.RISE_PUBLISH_TOTAL_COUNT / k.LAST_PUBLISH_TOTAL_COUNT) * 100, 2),
+          0
+      ) RELATIVE_PUBLISH_RATIO,
+      IF (
+          k.LAST_PROJECT_COUNT > 0,
+          ROUND((k.RISE_PROJECT_COUNT / k.LAST_PROJECT_COUNT) * 100, 2),
+          0
+      ) RELATIVE_PROJECT_RATIO,
+      IF (
+          k.LAST_COMMON_COUNT > 0,
+          ROUND((k.RISE_COMMON_COUNT / k.LAST_COMMON_COUNT) * 100, 2),
+          0
+      ) RELATIVE_COMMON_RATIO
+      FROM
+        (
+            SELECT
+                m.ORG_NAME,
+                IFNULL(n.LAST_PUBLISH_TOTAL_COUNT, 0) LAST_PUBLISH_TOTAL_COUNT,
+                IFNULL(n.LAST_PROJECT_COUNT, 0) LAST_PROJECT_COUNT,
+                IFNULL(n.LAST_COMMON_COUNT, 0) LAST_COMMON_COUNT,
+                m.PUBLISH_TOTAL_COUNT,
+                m.PROJECT_COUNT,
+                m.COMMON_COUNT,
+                IFNULL(m.PUBLISH_TOTAL_COUNT - n.LAST_PUBLISH_TOTAL_COUNT, 0) RISE_PUBLISH_TOTAL_COUNT,
+                IFNULL(m.PROJECT_COUNT - n.LAST_PROJECT_COUNT, 0) RISE_PROJECT_COUNT,
+                IFNULL(m.COMMON_COUNT - n.LAST_COMMON_COUNT, 0) RISE_COMMON_COUNT
+            FROM
+                (
+                    SELECT
+                        'c' AS ORG_NAME,
+                        SUM(PUBLISH_TOTAL_COUNT) AS PUBLISH_TOTAL_COUNT,
+                        SUM(PROJECT_COUNT) AS PROJECT_COUNT,
+                        SUM(COMMON_COUNT) AS COMMON_COUNT
+                    FROM
+                        SE_STAT_ORG
+                    WHERE
+                        DATE_FORMAT(RECORD_DATE, '%Y-%m') = '2012-07'
+                ) m
+            LEFT JOIN (
+                SELECT
+                    'c' AS ORG_NAME,
+                    SUM(PUBLISH_TOTAL_COUNT) AS LAST_PUBLISH_TOTAL_COUNT,
+                    SUM(PROJECT_COUNT) AS LAST_PROJECT_COUNT,
+                    SUM(COMMON_COUNT) AS LAST_COMMON_COUNT
+                FROM
+                    SE_STAT_ORG
+                WHERE
+                    DATE_FORMAT(RECORD_DATE, '%Y-%m') = '2012-06'
+            ) n ON m.ORG_NAME = n.ORG_NAME
+        ) k;
+
+      SELECT   P1.PAYMENTNO, P1.AMOUNT, (P1.AMOUNT * 100) / SUM(P2.AMOUNT)
+      FROM     PENALTIES AS P1, PENALTIES AS P2
+      GROUP BY P1.PAYMENTNO, P1.AMOUNT
+      HAVING MAX(P2.AMOUNT) > 0;
+
+select a from b limit 2, 3;
+select a from b where a <> 1 limit 2, 3;
+select a from b limit 2;
+SELECT COUNT(*) AS total, a b, b as c, c/2 d, d & e an FROM b;
+select a from dual union select a from foo;
+(select a from dual) union (select a from foo) order by a desc limit 100, 100;
+(select a from dual) union all (select a from foo) order by a limit 100;
+select a from dual order by a desc limit 1, 1 union distinct select a from foo order by a limit 1;
+
+select a as `A-A` from b limit 2;
+select a as `A#A` from b limit 2;
+select a as `A?A` from b limit 2;
+select a as `A/B` from b limit 2;
+select a as `A.A` from b limit 2;
+select a as `A|A` from b limit 2;
+select a as `A A` from b limit 2;
+
+    SELECT stime, A.names, B.names FROM (
+      SELECT stime, names FROM iaas_data.iaas_d3c0d0681cc1900
+    ) AS A LEFT JOIN (
+      SELECT stime, names FROM iaas_data.iaas_1071f89feaa0e100
+    ) AS B ON A.stime = B.stime;
+
+select a.* from a t1 join b t2 on t1.a = t2.a;
+select sum(quota_value) value, busi_col2 as sh, ${a} as a, YEAR(now()) from der_quota_summary where table_ename = 'gshmyyszje_derivedidx' and cd = (select id from t1 where a = ${t1});
+select sum(quota_value) b, busi_col2 as sh, '${a}' as a, YEAR(now()) from der_quota_summary where table_ename = 'gshmyyszje_derivedidx' and cd = (select id from t1 where a = '${t1}');
+select a as `A A`, b as `B B` from z;
+select a as `A A` from z order by `A A` desc;
+select a as `A A`, b as `B B` from z group by `A A`, `B B` order by `A A` desc;
+select a as "A A" from z;
+select a as "A A" from z order by "A A" desc;
+select a as 'A A' from z;
+select a as '"A#A' from z order by '"A#A' desc;
+select `aa#sfs`(a) as 'A A' from z;
+
+SELECT one.name, group_concat(j.value, ', ') FROM one, json_each(one.stringArray) AS j GROUP BY one.id;

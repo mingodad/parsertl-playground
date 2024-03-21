@@ -140,6 +140,8 @@ const sampleList = [
 	["Json5 parser", "json5.g", "test.json5.txt", "ace/mode/json"],
 	["Json lexer", "json-lexer.g", "test.json.txt", "ace/mode/json"],
 	["Json parser", "json.g", "test.json.txt", "ace/mode/json"],
+	["JsonLint parser", "jsonlint.g", "test.json.txt", "ace/mode/json"],
+	["JsSql parser", "js-sql-parser.g", "test.js-sql-parser", "ace/mode/sql"],
 	["Kinx parser (partially working)", "kinx.g", "test.kinx", "ace/mode/c_cpp"],
 	["Koka-lang parser (partially working)", "koka-lang.g", "test.koka-lang", "ace/mode/text"],
 	["LALR parser", "lalr.g", "test.lalr", "ace/mode/yaml"],
