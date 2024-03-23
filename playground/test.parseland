@@ -1,0 +1,16 @@
+// ConnectionState provides a set of constants for the current state of a connectable.
+enum ConnectionState
+{
+    DISCONNECTED,
+    CONNECTED,
+    ERROR
+}
+
+type Connection
+{
+    string              mName
+    ConnectionState     mState = ConnectionState::DISCONNECTED
+    User                mRecentUsers[] = {}
+    float               mCostPerMinute
+    int                 mKbPerSecond = 1000000  /* default to 1mb/s */
+}

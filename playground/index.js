@@ -189,6 +189,7 @@ const sampleList = [
 	["Openddl parser", "openddl-spec.g", "test.openddl-spec", "ace/mode/text"],
 	["Openscad parser (partially working)", "openscad.g", "test.openscad", "ace/mode/text"],
 	["P parser (partially working)", "p-parser.g", "test.p-parser", "ace/mode/c_cpp"],
+	["Parseland parser", "parseland.g", "test.parseland", "ace/mode/text"],
 	["PCC cccom parser (partially working)", "pcc-cccom.g", "test.c", "ace/mode/c_cpp"],
 	["PCC cxxcom parser (partially working)", "pcc-cxxcom.g", "test.c", "ace/mode/c_cpp"],
 	["Peg parser (partially working)", "peg.g", "test.peg", "ace/mode/yaml"],
