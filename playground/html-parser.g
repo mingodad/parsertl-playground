@@ -816,7 +816,7 @@ HTML_CHARSET	[[:space:][:alnum:]\-_:<>=%]
 <INITIAL>[^<]+<.>			SYM_TEXT
 
 <HTML_LEX_COMMENT>"-->"<INITIAL> skip()
-<HTML_LEX_COMMENT>(?s:.)<.>	skip()
+<HTML_LEX_COMMENT>(?s:.)<.>
 
 <HTML_LEX_META>">"<INITIAL>
 <HTML_LEX_META>.<.>	skip()
