@@ -241,7 +241,7 @@ dot_prop    [.][a-zA-Z]+
 
 [ \t\f\r]+	skip()
 #[^\n]*	skip()
-"/*"(?s:.)"*/"	skip()
+"/*"(?s:.)*?"*/"	skip()
 \\[\n]  skip()  /* line continuation */
 
 "above"	ABOVE
@@ -366,7 +366,7 @@ dot_prop    [.][a-zA-Z]+
 "DOT_XY"	DOT_XY
 "DOT_L"	DOT_L
 
-[0-9]+(\.[0-9]*)?(in|"%")*	NUMBER
+[0-9]+(\.[0-9]*)?("cm"|"mm"|"in"|"px"|"pt"|"pc"|"%")?	NUMBER
 \"(\\.|[^\"\n\r\\])*\"	STRING
 
 /* Order matter if identifier comes before keywords they are classified as identifier */
