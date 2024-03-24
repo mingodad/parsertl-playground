@@ -815,7 +815,7 @@ HTML_CHARSET	[[:space:][:alnum:]\-_:<>=%]
 <INITIAL>"<"<HTML_LEX_TAG_NAME>		SYM_TAG_START_FLAG
 <INITIAL>[^<]+<.>			SYM_TEXT
 
-<HTML_LEX_COMMENT>"-->"<INITIAL>
+<HTML_LEX_COMMENT>"-->"<INITIAL> skip()
 <HTML_LEX_COMMENT>(?s:.)<.>	skip()
 
 <HTML_LEX_META>">"<INITIAL>
