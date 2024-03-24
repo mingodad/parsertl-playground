@@ -277,7 +277,7 @@ dot_prop    [.][a-zA-Z]+
 "end"	END
 "even"	EVEN
 "fill"	FILL
-"first"	NTH
+"first"|([0-9]+("st"|"nd"|"rd"|"th"))	NTH
 "fit"	FIT
 "from"	FROM
 "go"	GO
@@ -294,6 +294,8 @@ dot_prop    [.][a-zA-Z]+
 "ljust"	LJUST
 "max"	FUNC2
 "min"	FUNC2
+"mono"	MONO
+"monospace"	MONO
 "n"	EDGEPT
 "ne"	EDGEPT
 "north"	EDGEPT
@@ -355,21 +357,21 @@ dot_prop    [.][a-zA-Z]+
 \<->	LRARROW
 \<-|"&larr;"|"&leftrightarrow;"	LARROW
 
-"\n"	EOL
-[A-Z][A-Z0-9]+{dot_prop}?	PLACENAME
-"CODEBLOCK"	CODEBLOCK
+"\n"|";"	EOL
+"{"(?s:.)*?"}"	CODEBLOCK
 ("arc"|"arrow"|"box"|"circle"|"cylinder"|"dot"|"ellipse"|"file"|"line"|"move"|"oval"|"spline"|"text"|"[]"|"noop")(\.[a-zA-Z]+)?	CLASSNAME
 "DOT_E"	DOT_E
-"mono"	MONO
 "on"	ON
 "DOT_U"	DOT_U
 "DOT_XY"	DOT_XY
 "DOT_L"	DOT_L
 
 [0-9]+(\.[0-9]*)?("cm"|"mm"|"in"|"px"|"pt"|"pc"|"%")?	NUMBER
+"0"[Xx][0-9A-Fa-f]* NUMBER
 \"(\\.|[^\"\n\r\\])*\"	STRING
 
 /* Order matter if identifier comes before keywords they are classified as identifier */
 [$]?[a-z_][a-zA-Z0-9_]*	ID
+[A-Z][A-Za-z0-9]*{dot_prop}?	PLACENAME
 
 %%
