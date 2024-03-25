@@ -188,6 +188,7 @@ const sampleList = [
 	["OctoSQL parser (partially working)", "OctoSQL-parser.g", "test.OctoSQL-parser", "ace/mode/sql"],
 	["Openddl parser", "openddl-spec.g", "test.openddl-spec", "ace/mode/text"],
 	["Openscad parser (partially working)", "openscad.g", "test.openscad", "ace/mode/text"],
+	["OpenShadingLanguage parser (partially working)", "OpenShadingLanguage.g", "test.OpenShadingLanguage", "ace/mode/c_cpp"],
 	["P parser (partially working)", "p-parser.g", "test.p-parser", "ace/mode/c_cpp"],
 	["Parseland parser", "parseland.g", "test.parseland", "ace/mode/text"],
 	["PCC cccom parser (partially working)", "pcc-cccom.g", "test.c", "ace/mode/c_cpp"],
