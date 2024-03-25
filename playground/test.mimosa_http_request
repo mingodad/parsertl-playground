@@ -1,0 +1,14 @@
+POST /login HTTP/1.1
+Host: localhost:19042
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:9.0.1) Gecko/20100101 Firefox/9.0.1
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en,fr;q=0.5
+Accept-Encoding: gzip, deflate
+Accept-Charset: UTF-8,*
+DNT: 1
+Connection: keep-alive
+Referer: https://localhost:19042/login
+Cookie: login=; auth=
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 38
+
