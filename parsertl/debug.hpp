@@ -35,9 +35,11 @@ namespace parsertl
             if(asEbnfRR)
             {
                 stream_ <<  "//\n"
-                            "// EBNF to be viewd at https://www.bottlecaps.de/rr/ui\n"
+                            "// EBNF to be viewd at\n"
+                            "//    (IPV6) https://www.bottlecaps.de/rr/ui\n"
+                            "//    (IPV4) https://rr.red-dove.com/ui\n"
                             "//\n"
-                            "// Copy and paste this at https://www.bottlecaps.de/rr/ui in the 'Edit Grammar' tab\n"
+                            "// Copy and paste this at one of the urls shown above in the 'Edit Grammar' tab\n"
                             "// then click the 'View Diagram' tab.\n"
                             "//\n\n";
             }
