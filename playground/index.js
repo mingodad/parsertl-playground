@@ -191,6 +191,7 @@ const sampleList = [
 	["Openscad parser (partially working)", "openscad.g", "test.openscad", "ace/mode/text"],
 	["OpenShadingLanguage parser (partially working)", "OpenShadingLanguage.g", "test.OpenShadingLanguage", "ace/mode/c_cpp"],
 	["P parser (partially working)", "p-parser.g", "test.p-parser", "ace/mode/c_cpp"],
+	["Panda3d cppparser (partially working)", "cppBison-panda3d.g", "test.c", "ace/mode/c_cpp"],
 	["Parseland parser", "parseland.g", "test.parseland", "ace/mode/text"],
 	["PCC cccom parser (partially working)", "pcc-cccom.g", "test.c", "ace/mode/c_cpp"],
 	["PCC cxxcom parser (partially working)", "pcc-cxxcom.g", "test.c", "ace/mode/c_cpp"],
