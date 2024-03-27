@@ -174,6 +174,7 @@ const sampleList = [
 	["Minizinc parser (partially working)", "minizinc.g", "test.mzn", "ace/mode/text"],
 	["Mlton parser", "mlton.g", "test.mlton", "ace/mode/ocaml"],
 	["MLyacc parser", "mlyacc.g", "test.mlyacc", "ace/mode/yaml"],
+	["Monetdb SQL parser (partially working)", "monetdb-sql_parser.g", "test.monetdb-sql_parser", "ace/mode/sql"],
 	["MSTA parser", "msta.g", "test.msta", "ace/mode/yaml"],
 	["mtail parser", "mtail.g", "test.mtail", "ace/mode/yaml"],
 	["Mulang parser (not working)", "mulang.g", "test.mulang", "ace/mode/text"],
