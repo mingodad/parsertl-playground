@@ -59,6 +59,7 @@
 %token KW_BEGIN_PUBLISH
 %token KW_BLOCKING
 %token KW_BOOL
+%token KW_BUILTIN_VA_LIST
 %token KW_CATCH
 %token KW_CHAR
 %token KW_CHAR8_T
@@ -129,6 +130,7 @@
 %token KW_PUBLIC
 %token KW_REGISTER
 %token KW_REINTERPRET_CAST
+%token KW_RESTRICT
 %token KW_RETURN
 %token KW_SHORT
 %token KW_SIGNED
@@ -210,7 +212,7 @@
 %%
 
 grammar :
-    cpp
+	cpp
 	| START_CPP cpp
 	| START_CONST_EXPR const_expr
 	| START_TYPE full_type
@@ -446,6 +448,8 @@ template_formal_parameter :
 	| KW_CONST template_formal_parameter_type formal_parameter_identifier template_parameter_maybe_initialize
 	| template_formal_parameter_type parameter_pack_identifier
 	| KW_CONST template_formal_parameter_type parameter_pack_identifier
+	| KW_VOLATILE template_formal_parameter_type formal_parameter_identifier template_parameter_maybe_initialize
+	| KW_VOLATILE template_formal_parameter_type parameter_pack_identifier
 	;
 
 template_formal_parameter_type :
@@ -553,13 +557,8 @@ structure_init_body :
 	;
 
 function_parameter :
-	optional_attributes type formal_parameter_identifier maybe_initialize
-	| optional_attributes KW_CONST type formal_parameter_identifier maybe_initialize
-	| optional_attributes KW_CONST KW_REGISTER type formal_parameter_identifier maybe_initialize
-	| optional_attributes type_pack parameter_pack_identifier maybe_initialize
-	| optional_attributes KW_CONST type_pack parameter_pack_identifier maybe_initialize
-	| optional_attributes KW_CONST KW_REGISTER type_pack parameter_pack_identifier maybe_initialize
-	| optional_attributes KW_REGISTER function_parameter
+	optional_attributes storage_class type formal_parameter_identifier maybe_initialize
+	| optional_attributes storage_class type_pack parameter_pack_identifier maybe_initialize
 	;
 
 formal_parameter :
@@ -572,6 +571,7 @@ not_paren_formal_parameter_identifier :
 	| name_no_final optional_attributes
 	| KW_CONST not_paren_formal_parameter_identifier %prec UNARY /*19R*/
 	| KW_VOLATILE not_paren_formal_parameter_identifier %prec UNARY /*19R*/
+	| KW_RESTRICT not_paren_formal_parameter_identifier %prec UNARY /*19R*/
 	| '*' /*17L*/ optional_attributes not_paren_formal_parameter_identifier %prec UNARY /*19R*/
 	| '&' /*11L*/ optional_attributes not_paren_formal_parameter_identifier %prec UNARY /*19R*/
 	| ANDAND /*8L*/ optional_attributes not_paren_formal_parameter_identifier %prec UNARY /*19R*/
@@ -584,6 +584,7 @@ formal_parameter_identifier :
 	| name_no_final optional_attributes
 	| KW_CONST formal_parameter_identifier %prec UNARY /*19R*/
 	| KW_VOLATILE formal_parameter_identifier %prec UNARY /*19R*/
+	| KW_RESTRICT formal_parameter_identifier %prec UNARY /*19R*/
 	| '*' /*17L*/ optional_attributes formal_parameter_identifier %prec UNARY /*19R*/
 	| '&' /*11L*/ optional_attributes formal_parameter_identifier %prec UNARY /*19R*/
 	| ANDAND /*8L*/ optional_attributes formal_parameter_identifier %prec UNARY /*19R*/
@@ -598,6 +599,7 @@ parameter_pack_identifier :
 	| ELLIPSIS /*1L*/ name optional_attributes
 	| KW_CONST parameter_pack_identifier %prec UNARY /*19R*/
 	| KW_VOLATILE parameter_pack_identifier %prec UNARY /*19R*/
+	| KW_RESTRICT parameter_pack_identifier %prec UNARY /*19R*/
 	| '*' /*17L*/ optional_attributes parameter_pack_identifier %prec UNARY /*19R*/
 	| '&' /*11L*/ optional_attributes parameter_pack_identifier %prec UNARY /*19R*/
 	| ANDAND /*8L*/ optional_attributes parameter_pack_identifier %prec UNARY /*19R*/
@@ -613,6 +615,7 @@ not_paren_empty_instance_identifier :
 	| ELLIPSIS /*1L*/ name optional_attributes
 	| KW_CONST not_paren_empty_instance_identifier %prec UNARY /*19R*/
 	| KW_VOLATILE not_paren_empty_instance_identifier %prec UNARY /*19R*/
+	| KW_RESTRICT not_paren_empty_instance_identifier %prec UNARY /*19R*/
 	| '*' /*17L*/ optional_attributes not_paren_empty_instance_identifier %prec UNARY /*19R*/
 	| '&' /*11L*/ optional_attributes not_paren_empty_instance_identifier %prec UNARY /*19R*/
 	| ANDAND /*8L*/ optional_attributes not_paren_empty_instance_identifier %prec UNARY /*19R*/
@@ -626,6 +629,7 @@ empty_instance_identifier :
 	| ELLIPSIS /*1L*/ name optional_attributes
 	| KW_CONST empty_instance_identifier %prec UNARY /*19R*/
 	| KW_VOLATILE empty_instance_identifier %prec UNARY /*19R*/
+	| KW_RESTRICT empty_instance_identifier %prec UNARY /*19R*/
 	| '*' /*17L*/ optional_attributes not_paren_empty_instance_identifier %prec UNARY /*19R*/
 	| '&' /*11L*/ optional_attributes not_paren_empty_instance_identifier %prec UNARY /*19R*/
 	| ANDAND /*8L*/ optional_attributes not_paren_empty_instance_identifier %prec UNARY /*19R*/
@@ -650,6 +654,7 @@ type :
 	| KW_DECLTYPE '(' /*20L*/ KW_AUTO ')'
 	| KW_UNDERLYING_TYPE '(' /*20L*/ full_type ')'
 	| KW_AUTO
+	| KW_BUILTIN_VA_LIST
 	;
 
 type_pack :
@@ -670,6 +675,7 @@ type_decl :
 	| KW_DECLTYPE '(' /*20L*/ KW_AUTO ')'
 	| KW_UNDERLYING_TYPE '(' /*20L*/ full_type ')'
 	| KW_AUTO
+	| KW_BUILTIN_VA_LIST
 	;
 
 predefined_type :
@@ -681,6 +687,7 @@ predefined_type :
 	| KW_DECLTYPE '(' /*20L*/ const_expr ')'
 	| KW_UNDERLYING_TYPE '(' /*20L*/ full_type ')'
 	| KW_AUTO
+	| KW_BUILTIN_VA_LIST
 	;
 
 var_type_decl :
@@ -872,6 +879,7 @@ element :
 	| KW_ALIGNOF
 	| KW_AUTO
 	| KW_BOOL /*1L*/
+	| KW_BUILTIN_VA_LIST
 	| KW_CATCH /*22N*/
 	| KW_CHAR /*1L*/
 	| KW_CHAR8_T /*1L*/
@@ -917,6 +925,7 @@ element :
 	| KW_PUBLISHED
 	| KW_REGISTER
 	| KW_REINTERPRET_CAST
+	| KW_RESTRICT
 	| KW_RETURN
 	| KW_SHORT /*1L*/
 	| KW_SIGNED /*1L*/
@@ -1281,6 +1290,7 @@ IDENTIFIER	[A-Za-z_][A-Za-z0-9_]*
 "__begin_publish"	KW_BEGIN_PUBLISH
 "__blocking"	KW_BLOCKING
 "bool"	KW_BOOL
+"__builtin_va_list"	KW_BUILTIN_VA_LIST
 "catch"	KW_CATCH
 "char"	KW_CHAR
 "char8_t"	KW_CHAR8_T
@@ -1353,6 +1363,9 @@ IDENTIFIER	[A-Za-z_][A-Za-z0-9_]*
 "public"	KW_PUBLIC
 "register"	KW_REGISTER
 "reinterpret_cast"	KW_REINTERPRET_CAST
+//"restrict"	KW_RESTRICT
+"__restrict"	KW_RESTRICT
+"__restrict__"	KW_RESTRICT
 "return"	KW_RETURN
 "short"	KW_SHORT
 "signed"	KW_SIGNED
