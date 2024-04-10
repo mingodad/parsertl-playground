@@ -1,0 +1,1049 @@
+% Turing+ v6.2, Sept 2022
+% Copyright 1986 University of Toronto, 2022 Queen's University at Kingston
+%
+% Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+% and associated documentation files (the “Software”), to deal in the Software without restriction,
+% including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+% and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so,
+% subject to the following conditions:
+%
+% The above copyright notice and this permission notice shall be included in all copies
+% or substantial portions of the Software.
+%
+% THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+% INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+% AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+% DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+% OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+%	Computer Systems Research Group
+%	University of Toronto
+%
+%	File:	New S/SL Processor V3.01
+%	Author:	James R. Cordy
+%	Date:	1 December 1979  (Revised 2 March 1983)
+
+%	Copyright (C) 1979, 1980, 1983  The University of Toronto
+
+
+input:
+
+    % Input in the S/SL processor:
+    %    Unlike the Turing compiler, the S/SL processor has
+    %    a single pass structure and hence the input Scanner
+    %    is included as part of the input mechanism.
+
+    tIdent	'ident'
+    tString	'string'
+    tInteger	'integer'
+    tColon	':'
+    tSemicolon	';'
+    tEqual	'='
+    tQuestionMark '?'
+    tPeriod	'.'
+    tErrorSignal '#'
+    tCall	'@'
+    tExit	'>'
+    tReturn	'>>'
+    tLeftParen	'('
+    tRightParen	')'
+    tCycle	'{'	% also 'DO'
+    tCycleEnd	'}'	% also 'OD'
+    tChoice	'['	% also 'IF'
+    tChoiceEnd	']'	% also 'FI'
+    tComma	','
+    tOr		'|'	% also '!'
+    tOtherwise	'*'
+
+    % Keywords:
+    %    The S/SL Scanner converts all input identifiers and
+    %    keywords to lower case and hence will recognize any
+    %    capitalization.
+
+    tInput	'INPUT'
+    tOutput	'OUTPUT'
+    tError	'ERROR'
+    tType	'TYPE'
+    tMechanism	'MECHANISM'
+    tRules	'RULES'
+    tEnd	'END'
+
+    tNewLine	'<NL>'	% logical new line
+    tEndOfFile;
+
+
+
+output:
+
+    % Output in the S/SL processor:
+    %   Unlike most compilers written in S/SL, th S/SL processor
+    %   output mechanism emits into an in-core table of values.
+    %   The emit primitive and emitting semantic operations write
+    %   into the output table sequentially as if it were a true
+    %   output stream.  The "resolve" semantic operations modify
+    %   sections of the table already emitted by replacing null
+    %   addresses and values previously emitted.  The "generate"
+    %   semantic operations generate text for output to the true
+    %   output stream of the processor, the constant and table
+    %   initialization code.
+
+    % Primitive operations of S/SL
+
+    aCall
+    aReturn
+    aRuleEnd
+    aJump
+    aInput
+    aInputAny
+    aInputChoice
+    aEmit
+    aError
+    aChoice
+    aChoiceEnd
+    aSetParameter
+    aSetResult
+    aSetParameterFromInput;
+
+
+
+error:
+
+    eCycleHasNoExits
+    eDuplicateLabel
+    eExitNotInCycle
+    eIllegalParameterClass
+    eIllegalResultClass
+    eIllegalNonvaluedReturn
+    eIllegalStringSynonym
+    eIllegalValuedReturn
+    eSymbolPreviouslyDefined
+    eUndefinedSymbol
+    eWrongDeclaredResultClass
+    eWrongLabelClass
+    eWrongParameterClass
+    eWrongResultClass
+    eWrongSymbolClass;
+
+
+
+% Semantic Mechanisms of the S/SL processor
+
+type Validity:
+    invalid
+    valid;
+
+
+type Integer:
+    zero = 0
+    undefined = -9999;
+
+
+
+% The Call Table:
+%    The Call Table is used to keep track of procedure calls in the
+%    output table which will have to be resolved to table addresses
+%    before the initialized table is generated.  The table address of
+%    the call and the Symbol Table index of the called procedure
+%    are saved in the Call Table entry for each procedure call.
+%    When the processor finishes processing the procedures section,
+%    it uses the oResolveCalls operation to resolve all the procedure
+%    calls before gnerating the output table.
+
+mechanism Call:
+
+    oEnterCall
+    oEmitNullCallAddress
+    oResolveCalls;
+
+
+
+% The Symbol Table:
+%    The Symbol Table mechanism is used to store information
+%    about identifiers and string synonyms declared in the S/SL
+%    program.  Each entry has the symbol's name (or string), definition
+%    class and associated value.  There are 12 predefined classes of
+%    defined symbols in S/SL.  These are: cInput, cOutput, cInputOutput,
+%    cError, cType, cMechanism, cUpdateOp, cParameterizedUpdateOp,
+%    cChoiceOp, cParameterizedChoiceOp, cRule and cChoiceRule.
+%    As well as these, each new type definition creates a new class
+%    of defined symbols.  The Symbol Table Mechanism keeps track of
+%    the "current" class of definition being processed and enters that
+%    class as the class of any new symbols entered in the Symbol Table.
+%    For each class, a "current" next value is maintained and is the
+%    default value for the next symbol entered of that class.
+%    The "current" next value is always the value of the last symbol
+%    declared in the class plus one.  The Symbol Table also has a
+%    "current" symbol entry which is set by the oLookupSymbol operation.
+%    Symbol Table operations always act on the "current" symbol
+%    entry by default.  The Symbol Table mechanism also maintains an
+%    "enclosing" symbol entry which is the mechanism or rule currently
+%    being defined.  Symbol Table operations use the word "New" for those
+%    operations which act on the entry last entered rather than the
+%    "current" entry.
+
+%    Note: To satisfy Pascal 10-character identifier uniqueness requirements,
+%    operation names which clash in the first 10 characters use x,y,z,v and w
+%    as the second character of the identifier.
+
+
+% Symbol classes
+
+type SymbolClass:
+    cNotFound	% special class of non-existent symbols
+    cInput
+    cOutput
+    cInputOutput
+    cError
+    cType
+    cMechanism
+    cUpdateOp
+    cParameterizedUpdateOp
+    cChoiceOp
+    cParameterizedChoiceOp
+    cRule
+    cChoiceRule;
+
+
+mechanism Symbol:
+
+% Current class operations
+
+    oSetClass(SymbolClass)
+    oSetClassFromSymbolClass
+    oxSetClassFromSymbolValue
+    oySetClassFromSymbolResultClass
+    ozSetClassFromSymbolParameterClass
+    ovSetClassFromChoiceClass
+    oChooseClass >> SymbolClass
+
+    oSetClassValue
+    owSetClassValueFromSymbolValue
+    oIncrementClassValue
+
+% Symbol operations
+
+    oEnterNewSymbol
+    oLookupSymbol
+    oChangeSymbolClass
+    oChooseSymbolClass >> SymbolClass
+    oVerifySymbolClass >> Validity
+    oxEnterNewSymbolValue
+    oEnterSecondNewSymbolValue	% second most recently entered
+    oEnterSymbolValueFromAddress
+    oxChooseSymbolValue >> Integer
+    oEmitSymbolValue
+    oxVerifySymbolClassValue >> Validity
+    oxEnterSymbolParameterClass
+    oyEnterSymbolResultClass
+    oyChooseSymbolResultClass >> SymbolClass
+    oSaveEnclosingSymbol
+    oRestoreEnclosingSymbol
+    oSaveCurrentSymbol
+    oRestoreCurrentSymbol;
+
+
+
+% The Cycle Stack:
+%    The Cycle Stack is used to keep track of loop constructs in the
+%    S/SL program.  Each time the beginning of a loop is encountered
+%    a new Cycle Stack entry is pushed, recording the start address of
+%    the loop and the starting index of the Exit Stack frame for the
+%    loop.  When the end of a loop is encountered, the repeat branch
+%    and loop exits are resolved using Cycle Stack operations and the
+%    stack is popped.  The Exit Stack is organized into frames displayed
+%    by the Cycle Stack and is used to keep the table addresses of loop
+%    exits which require table address resolution.
+
+mechanism Cycle:
+
+    oPushCycle
+    oPopCycle
+    oChooseCycleDepth >> Integer
+    oEmitCycleAddress
+    oEnterCycleExit
+    oResolveCycleExits
+    oxChooseCycleExits >> Integer;
+
+
+
+% The Choice Stack:
+%    The Choice Stack mechanism is used to keep track of input and
+%    semantic choices in the S/SL program.  Each time a choice is
+%    encountered in the program, a new Choice Stack entry is pushed,
+%    containing the class of the choice (i.e., is it an input choice or
+%    a "value" (semantic) choice), the start index of the Merge and Label Stack
+%    frames for the choice, and the table address of the choice.
+%    When the end of the choice is encountered, Choice Stack operations
+%    are used to resolve the "choice table" address, emit the choice table,
+%    and resolve the merge branches from the alternatives of the Choice.
+%    The Choice Stack entry is then popped.
+%    The Merge Stack is organized into frames displayed by the Choice
+%    Stack and is used to keep the table addresses of the merge branches
+%    which follow each alternative and require table address resolution.
+%    The Label Stack is organized into frames displayed by the Choice
+%    Stack and is used to build up the list of (label value, table address)
+%    pairs (the "choice table") for the choice.
+
+mechanism Choice:
+
+    oPushChoice
+    oPopChoice
+    oChangeChoiceClass
+    oChooseChoiceClass >> SymbolClass
+    oVerifyChoiceSymbolLabel >> Validity
+    oEnterChoiceSymbolLabel
+    oxEnterChoiceMerge
+    oResolveChoiceMerges
+    oEmitChoiceTable
+    oxResolveChoiceTableAddress
+    oEmitFirstChoiceValue
+    oxEmitFirstChoiceAddress;
+
+
+
+% The Rule Table:
+%    The output S/SL table is assembled one rule at a time.
+%    Each rule is saved in the Rule Table for later recall
+%    and final assembly into the generated output table.
+
+mechanism Rule:
+
+    oStartRules
+    oBeginRule
+    oSaveRule
+    oEndRules;
+
+
+
+% The Generate Operations:
+%    These operations generate the source language code for the internally
+%    compiled symbol definitions and S/SL table.
+
+mechanism Generate:
+
+    oGenerateDefinitions	% of symbols
+    oGenerateTable;		% S/SL table
+
+
+
+% Miscellaneous Emitting Operations:
+%    These operations are used to emit input or standard values
+%    to the output table.
+
+mechanism InputOutput:
+
+    oEmitValue
+    oEmitNullAddress;
+
+
+
+rules
+
+Program:
+    @InputOutputDefinitions
+    @ErrorDefinitions
+    @TypeAndMechanismDefinitions
+    @RuleDefinitions
+    oGenerateDefinitions
+    oGenerateTable;
+
+
+
+InputOutputDefinitions:
+    [
+	| 'INPUT':
+	    [
+		| 'OUTPUT':
+		    oSetClass(cInputOutput)
+		    @SymbolDefinitions
+		| *:
+		    oSetClass(cInput)
+		    @SymbolDefinitions
+		    @OutputDefinitions
+	    ]
+	| *:
+	    @OutputDefinitions
+    ];
+
+
+
+OutputDefinitions:
+    [
+	| 'OUTPUT':
+	    oSetClass(cOutput)
+	    @SymbolDefinitions
+	| *:
+    ]
+    [
+	| 'INPUT':
+	    'OUTPUT'
+	    oSetClass(cInputOutput)
+	    @SymbolDefinitions
+	| *:
+    ];
+
+
+
+SymbolDefinitions:
+    ':' '<NL>'
+    {[
+	| 'ident':
+	    @VerifyNewSymbol
+	    oEnterNewSymbol
+	    [
+		| 'string':
+		    [ oChooseClass
+			| cInput, cOutput, cInputOutput:
+			| *:
+			    #eIllegalStringSynonym
+		    ]
+		    @VerifyNewSymbol
+		    oEnterNewSymbol
+		    @Value
+		    oEnterSecondNewSymbolValue
+		| *:
+		    @Value
+	    ]
+	    '<NL>'
+	    oIncrementClassValue
+	| ';':
+	    >
+    ]};
+
+
+
+Value:
+    [
+	| '=':
+	    [
+		| 'integer':
+		    oSetClassValue
+		| 'ident', 'string':
+		    oLookupSymbol
+		    [ oChooseSymbolClass
+			| cNotFound:
+			    #eUndefinedSymbol
+			| *:
+		    ]
+		    owSetClassValueFromSymbolValue
+	    ]
+	| *:
+    ]
+    oxEnterNewSymbolValue;
+
+
+
+ErrorDefinitions:
+    [
+	| 'ERROR':
+	    oSetClass(cError)
+	    @SymbolDefinitions
+	| *:
+    ];
+
+
+
+TypeAndMechanismDefinitions:
+    {[
+	| 'TYPE':
+	    'ident'
+	    @VerifyNewSymbol
+	    oSetClass(cType)
+	    oEnterNewSymbol
+	    oxEnterNewSymbolValue
+	    oIncrementClassValue
+	    oxSetClassFromSymbolValue
+	    @SymbolDefinitions
+	| 'MECHANISM':
+	    'ident'
+	    @VerifyNewSymbol
+	    oSetClass(cMechanism)
+	    oEnterNewSymbol
+	    oSaveEnclosingSymbol
+	    @OperationDefinitions
+	| *:
+	    >
+    ]};
+
+
+
+OperationDefinitions:
+    ':' '<NL>'
+    {[
+	| 'ident':
+	    @VerifyNewSymbol
+	    oRestoreEnclosingSymbol
+	    oSetClass(cUpdateOp)	% assume update operation, change later
+	    oEnterNewSymbol
+	    oxEnterNewSymbolValue
+	    oSaveCurrentSymbol
+	    [
+		| '(':
+		    oSetClass(cParameterizedUpdateOp)
+		    oChangeSymbolClass
+		    'ident'
+		    oLookupSymbol
+		    [ oChooseSymbolClass
+			| cType:
+			    oxSetClassFromSymbolValue
+			| cNotFound:
+			    #eUndefinedSymbol
+			    oSetClass(cNotFound)
+			| *:
+			    #eIllegalParameterClass
+			    oSetClass(cNotFound)
+		    ]
+		    oRestoreCurrentSymbol
+		    oxEnterSymbolParameterClass
+		    ')'
+		| *:
+	    ]
+	    [
+		| '>>':
+		    [ oChooseSymbolClass
+			| cUpdateOp:
+			    oSetClass(cChoiceOp)
+			| cParameterizedUpdateOp:
+			    oSetClass(cParameterizedChoiceOp)
+		    ]
+		    oChangeSymbolClass
+		    'ident'
+		    oLookupSymbol
+		    [ oChooseSymbolClass
+			| cType:
+			    oxSetClassFromSymbolValue
+			| cNotFound:
+			    #eUndefinedSymbol
+			    oSetClass(cNotFound)
+			| *:
+			    #eIllegalResultClass
+			    oSetClass(cNotFound)
+		    ]
+		    oRestoreCurrentSymbol
+		    oyEnterSymbolResultClass
+		| *:
+	    ]
+	    oSetClassFromSymbolClass
+	    oIncrementClassValue
+	    '<NL>'
+	| ';':
+	    >
+    ]};
+
+
+
+RuleDefinitions:
+    'RULES' '<NL>'
+    oStartRules
+    {[
+	| 'ident':
+	    oLookupSymbol
+	    [
+		| '>>':
+		    oSetClass(cChoiceRule)
+		    [ oChooseSymbolClass
+			| cChoiceRule:
+			    [ oxChooseSymbolValue
+				| undefined:
+				| *:
+				    #eSymbolPreviouslyDefined
+			    ]
+			| cNotFound:
+			    oEnterNewSymbol
+			| *:
+			    #eSymbolPreviouslyDefined
+			    oEnterNewSymbol
+		    ]
+		    oySetClassFromSymbolResultClass
+		    oEnterSymbolValueFromAddress
+		    oSaveCurrentSymbol
+		    'ident'
+		    oLookupSymbol
+		    [ oChooseSymbolClass
+			| cType:
+			    [ oChooseClass
+				| cNotFound:
+				    oxSetClassFromSymbolValue
+				    oRestoreCurrentSymbol
+				    oyEnterSymbolResultClass
+				| *:
+				    [ oxVerifySymbolClassValue
+					| valid:
+					| *:
+					    #eWrongDeclaredResultClass
+				    ]
+			    ]
+			| cNotFound:
+			    #eUndefinedSymbol
+			| *:
+			    #eIllegalResultClass
+		    ]
+		    oRestoreCurrentSymbol
+		| *:
+		    oSetClass(cRule)
+		    [ oChooseSymbolClass
+			| cRule:
+			    [ oxChooseSymbolValue
+				| undefined:
+				| *:
+				    #eSymbolPreviouslyDefined
+			    ]
+			| cNotFound:
+			    oEnterNewSymbol
+			| *:
+			    #eSymbolPreviouslyDefined
+			    oEnterNewSymbol
+		    ]
+		    oEnterSymbolValueFromAddress
+	    ]
+	    oSaveEnclosingSymbol
+	    ':' '<NL>'
+	    oBeginRule
+	    @Actions ';'
+	    oRestoreEnclosingSymbol
+	    [ oChooseSymbolClass
+		| cRule:
+		    .aReturn
+		| cChoiceRule:
+		    .aRuleEnd
+	    ]
+	    oSaveRule
+	| 'END':
+	    >
+    ]}
+    oEndRules
+    oResolveCalls;
+
+
+
+Actions:
+    {
+	[
+	    | 'string':
+		@InputOperation
+	    | '?':
+		@InputAny
+	    | '.':
+		[
+		    | 'ident':
+		    | 'string':
+		]
+		@OutputOperation
+	    | '#':
+		'ident'
+		@ErrorSignal
+	    | '@':
+		'ident'
+		@RuleCall
+	    | '>>':
+		@ReturnOperation
+	    | 'ident':
+		@InputOrUpdateOperation
+	    | '{':
+		@CycleAction
+	    | '>':
+		@CycleExit
+	    | '[':
+		[
+		    | 'ident':
+			@SemanticChoice
+		    | '@':
+			@RuleChoice
+		    | '*':
+			@InputLookaheadChoice
+		    | *:
+			@InputChoice
+		]
+	    | *:
+		>
+	]
+	'<NL>'
+    };
+
+
+
+InputOperation:
+    .aInput
+    oLookupSymbol
+    [ oChooseSymbolClass
+	| cInput, cInputOutput:
+	| cNotFound:
+	    #eUndefinedSymbol
+	| *:
+	    #eWrongSymbolClass
+    ]
+    oEmitSymbolValue;
+
+
+
+InputAny:
+    .aInputAny;
+
+
+
+OutputOperation:
+    .aEmit
+    oLookupSymbol
+    [ oChooseSymbolClass
+	| cOutput, cInputOutput:
+	| cNotFound:
+	    #eUndefinedSymbol
+	| *:
+	    #eWrongSymbolClass
+    ]
+    oEmitSymbolValue;
+
+
+
+ErrorSignal:
+    .aError
+    oLookupSymbol
+    [ oChooseSymbolClass
+	| cError:
+	| cNotFound:
+	    #eUndefinedSymbol
+	| *:
+	    #eWrongSymbolClass
+    ]
+    oEmitSymbolValue;
+
+
+
+RuleCall:
+    .aCall
+    oEmitNullCallAddress
+    oLookupSymbol
+    [ oChooseSymbolClass
+	| cRule:
+	    oEnterCall
+	| cNotFound:
+	    oSetClass(cRule)
+	    oEnterNewSymbol
+	    oEnterCall
+	| *:
+	    #eWrongSymbolClass
+    ];
+
+
+
+ReturnOperation:
+    oRestoreEnclosingSymbol
+    [
+	| 'ident':
+	    [ oChooseSymbolClass
+		| cChoiceRule:
+		    oySetClassFromSymbolResultClass
+		    oLookupSymbol
+		    [ oChooseSymbolClass
+			| cNotFound:
+			    #eUndefinedSymbol
+			| *:
+			    [ oVerifySymbolClass
+				| valid:
+				| *:
+				    #eWrongResultClass
+			    ]
+		    ]
+		    .aSetResult
+		    oEmitSymbolValue
+		    .aReturn
+		| cRule:
+		    #eIllegalValuedReturn
+	    ]
+	| *:
+	    [ oChooseSymbolClass
+		| cRule:
+		    .aReturn
+		| cChoiceRule:
+		    #eIllegalNonvaluedReturn
+	    ]
+    ];
+
+
+
+InputOrUpdateOperation:
+    oLookupSymbol
+    [ oChooseSymbolClass
+	| cInput, cInputOutput:
+	    @InputOperation
+	| *:
+	    [
+		| '(':
+		    [ oChooseSymbolClass
+			| cParameterizedUpdateOp:
+			    ozSetClassFromSymbolParameterClass
+			    oSaveCurrentSymbol
+			    'ident'
+			    oLookupSymbol
+			    [ oChooseSymbolClass
+				| cNotFound:
+				    #eUndefinedSymbol
+				| *:
+				    [ oVerifySymbolClass
+					| valid:
+					| *:
+					    #eWrongParameterClass
+				    ]
+			    ]
+			    .aSetParameter
+			    oEmitSymbolValue
+			    oRestoreCurrentSymbol
+			    oEmitSymbolValue
+			| cNotFound:
+			    #eUndefinedSymbol
+			    'ident'
+			| *:
+			    #eWrongSymbolClass
+			    'ident'
+		    ]
+		    ')'
+		| *:
+		    [ oChooseSymbolClass
+			| cUpdateOp:
+			    oEmitSymbolValue
+			| cNotFound:
+			    #eUndefinedSymbol
+			| *:
+			    #eWrongSymbolClass
+		    ]
+	    ]
+    ];
+
+
+
+CycleAction:
+    oPushCycle
+    '<NL>'
+    @Actions
+    '}'
+    .aJump
+    oEmitCycleAddress
+    [ oxChooseCycleExits
+	| zero:
+	    #eCycleHasNoExits
+	| *:
+    ]
+    oResolveCycleExits
+    oPopCycle;
+
+
+
+CycleExit:
+    [ oChooseCycleDepth
+	| zero:
+	    #eExitNotInCycle
+	| *:
+	    .aJump
+	    oEmitNullAddress
+	    oEnterCycleExit
+    ];
+
+
+
+SemanticChoice:
+    oLookupSymbol
+    [
+	| '(':
+	    [ oChooseSymbolClass
+		| cParameterizedChoiceOp:
+		    ozSetClassFromSymbolParameterClass
+		    oSaveCurrentSymbol
+		    'ident'
+		    oLookupSymbol
+		    [ oChooseSymbolClass
+			| cNotFound:
+			    #eUndefinedSymbol
+			| *:
+			    [ oVerifySymbolClass
+				| valid:
+				| *:
+				    #eWrongParameterClass
+			    ]
+		    ]
+		    .aSetParameter
+		    oEmitSymbolValue
+		    oRestoreCurrentSymbol
+		    oySetClassFromSymbolResultClass
+		    oEmitSymbolValue
+		| cNotFound:
+		    #eUndefinedSymbol
+		    oSetClass(cNotFound)
+		    'ident'
+		| *:
+		    #eWrongSymbolClass
+		    oSetClass(cNotFound)
+		    'ident'
+	    ]
+	    ')'
+	| *:
+	    [ oChooseSymbolClass
+		| cChoiceOp:
+		    oEmitSymbolValue
+		    oySetClassFromSymbolResultClass
+		| cNotFound:
+		    #eUndefinedSymbol
+		    oSetClass(cNotFound)
+		| *:
+		    #eWrongSymbolClass
+		    oSetClass(cNotFound)
+	    ]
+    ]
+    .aChoice
+    oEmitNullAddress
+    @ChoiceBody;
+
+
+
+RuleChoice:
+    .aCall
+    oEmitNullCallAddress
+    'ident'
+    oLookupSymbol
+    [ oChooseSymbolClass
+	| cChoiceRule:
+	    oEnterCall
+	    oySetClassFromSymbolResultClass
+	| cNotFound:
+	    oSetClass(cChoiceRule)
+	    oEnterNewSymbol
+	    oEnterCall
+	    oSetClass(cNotFound)
+	| *:
+	    #eWrongSymbolClass
+	    oSetClass(cNotFound)
+    ]
+    .aChoice
+    oEmitNullAddress
+    @ChoiceBody;
+
+
+
+InputLookaheadChoice:
+    .aSetParameterFromInput
+    .aChoice
+    oEmitNullAddress
+    oSetClass(cInput)
+    @ChoiceBody;
+
+
+
+InputChoice:
+    .aInputChoice
+    oEmitNullAddress
+    oSetClass(cInput)
+    @ChoiceBody;
+
+
+
+ChoiceBody:
+    '<NL>'
+    oPushChoice
+    oSaveCurrentSymbol		% choice rule symbol if rule choice
+    '|' @Labels ':' '<NL>'
+    oRestoreCurrentSymbol	% choice rule symbol
+    [ oChooseSymbolClass
+	| cChoiceRule:
+	    [ oyChooseSymbolResultClass
+		| cNotFound:
+		    oyEnterSymbolResultClass	% resolve result class
+						% from label class
+		| *:
+	    ]
+	| *:
+    ]
+    @Actions
+    {[
+	| '|':
+	    .aJump
+	    oEmitNullAddress
+	    oxEnterChoiceMerge
+	    [
+		| '*':
+		    ':' '<NL>'
+		    oxResolveChoiceTableAddress
+		    oEmitChoiceTable
+		    @Actions
+		    >
+		| *:
+		    @Labels ':' '<NL>'
+		    @Actions
+	    ]
+	| *:
+	    .aJump
+	    oEmitNullAddress
+	    oxEnterChoiceMerge
+	    oxResolveChoiceTableAddress
+	    oEmitChoiceTable
+	    [ oChooseChoiceClass
+		| cInput:
+		    .aInput
+		    oEmitFirstChoiceValue
+		    .aJump
+		    oxEmitFirstChoiceAddress
+		| *:
+		    .aChoiceEnd
+	    ]
+	    >
+    ]}
+    ']'
+    oResolveChoiceMerges
+    oPopChoice;
+
+
+
+Labels:
+    ovSetClassFromChoiceClass
+    {[
+	| 'ident', 'string':
+	    oLookupSymbol
+	    [ oChooseChoiceClass
+		| cNotFound:
+		    oSetClassFromSymbolClass
+		    oChangeChoiceClass
+		| *:
+	    ]
+	    [ oChooseClass
+		| cInput:
+		    [ oChooseSymbolClass
+			| cInput, cInputOutput:
+			| cNotFound:
+			    #eUndefinedSymbol
+			| *:
+			    #eWrongLabelClass
+		    ]
+		| *:
+		    [ oChooseSymbolClass
+			| cNotFound:
+			    #eUndefinedSymbol
+			| *:
+			    [ oVerifySymbolClass
+				| valid:
+				| *:
+				    #eWrongLabelClass
+			    ]
+		    ]
+	    ]
+	    [ oVerifyChoiceSymbolLabel
+		| valid:
+		| *:
+		    #eDuplicateLabel
+	    ]
+	    oEnterChoiceSymbolLabel
+	    [
+		| ',':
+		| *:
+		    >
+	    ]
+    ]};
+
+
+
+VerifyNewSymbol:
+    oLookupSymbol
+    [ oChooseSymbolClass
+	| cNotFound:
+	| *:
+	    #eSymbolPreviouslyDefined
+    ];
+
+end
