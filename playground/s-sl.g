@@ -1,171 +1,227 @@
+//From: https://github.com/CordyJ/Open-TuringPlus/blob/main/doc/SSL_Specification.pdf
 //https://en.wikipedia.org/wiki/S/SL_programming_language
 //https://github.com/alegemaate/s-sl
 //https://github.com/open-watcom/open-watcom-v2/tree/master/bld/ssl
 // S/SL grammar
 
-%token id string number
+%token id string integer tInputAny tOtherwise
 %token tInput tOutput tError tType tMechanism tRules tEnd
+%token tCall tExit tReturn tErrorSignal tOr tCycle tCycleEnd  tChoice tChoiceEnd
+
+/*
+The Shift/Reduce conflict in action:tReturn is ok
+*/
 
 %%
 
 s_sl :
-    definitions tRules rules_decl tEnd
-    ;
+	definitions tRules rule_list tEnd
+	;
 
 definitions :
-    definition
-    | definitions definition
-    ;
+	definition
+	| definitions definition
+	;
 
 definition :
-    input_decl
-    | output_decl
-    | input_output_decl
-    | error_decl
-    | type_decl
-    | mechanism_decl
-    ;
+	inputDefinition
+	| outputDefinition
+	| inputOutputDefinition
+	| errorDefinition
+	| typeDefinition
+	| mechanismDefinition
+	;
 
-input_decl :
-    tInput ':' id_string_value_list ';'
-    ;
+inputDefinition :
+	tInput ':' tokenDefinitions ';'
+	;
 
-output_decl :
-    tOutput ':' id_value_list ';'
-    ;
+outputDefinition :
+	tOutput ':' tokenDefinitions ';'
+	;
 
-input_output_decl :
-    tInput tOutput ':' id_string_value_list ';'
-    ;
+inputOutputDefinition :
+	tInput tOutput ':' tokenDefinitions ';'
+	;
 
-error_decl :
-    tError ':' id_value_list ';'
-    ;
+errorDefinition :
+	tError ':' errorSignalDefinitions ';'
+	;
 
-type_decl :
-    tType id ':' type_values ';'
-    ;
+typeDefinition :
+	tType id ':' valueDefinitions ';'
+	;
 
-mechanism_decl :
-    tMechanism id ':' proc_func_list ';'
-    ;
+mechanismDefinition :
+	tMechanism id ':' operationDefinitions ';'
+	;
 
-rules_decl :
-    rule_decl
-    | rules_decl rule_decl
-    ;
+rule_list :
+	rule
+	| rule_list rule
+	;
 
-rule_decl :
-    proc_rule
-    | choice_rule
-    ;
+rule :
+	proc_rule
+	| choice_rule
+	;
 
 proc_rule :
-    id ':' rhs_id_string_list ';'
-    ;
+	id ':' actions ';'
+	;
 
 choice_rule :
-    id ">>" id ':' rhs_id_string_list ';'
-    ;
+	id tReturn id /*typeId*/ ':' actions ';'
+	;
 
-rhs_id_string_list :
-    rhs_id_string
-    | rhs_id_string_list rhs_id_string
-    ;
+actions :
+	action
+	| actions action
+	;
 
-rhs_id_string :
-    id
-    | '@' id
-    | '#' id
-    | '.' id
-    | string
-    | id '(' param_list ')'
-    | '@' id '(' param_list ')'
-    | rhs_choice
-    | rhs_cycle
-    | ">>"
-    | '>'
-    ;
+action :
+	id 					/*a: inputToken*/
+	| string 				/*a: inputToken*/
+	| tInputAny			/*a:*/
+	| '.' id 				/*b: outputToken*/
+	| '.' string 				/*b: outputToken*/
+	| tErrorSignal id 		/*c: errorId*/
+	| tCycle actions tCycleEnd /*d: */
+	| tExit				/*e:*/
+	| choice				/*f:*/
+	| tCall id 				/*g: procedureRuleId*/
+	| tReturn	/*it's ok to shift here*/			/*h:*/
+	| tReturn id 	/*J: valueId*/
+	| tReturn string 	/*J: valueId*/
+	| tReturn integer 	/*J: valueId*/
+	//|	/*k: updateOpId*/
+	| id '(' id ')'		/*l: parameterizedUpdateOpId(valueId)*/
+	| tCall id '(' param_list ')'
+	;
 
-rhs_cycle :
-    '{' rhs_id_string_list '}'
-    ;
+//cycle_actions :
+//	action
+//	| tExit				/*e:*/
+//	| tReturn				/*h:*/
+//	| cycle_actions tExit
+//	| cycle_actions tReturn
+//	| cycle_actions action
+//	;
 
-rhs_choice :
-    '[' rhs_choices ']'
-    | '[' id rhs_choices ']'
-    | '[' '@' id rhs_choices ']'
-    | '[' '*' rhs_choices ']'
-    ;
+choice :
+	tChoice input_choice_body tChoiceEnd /*f:*/
+	| tChoice tCall id /*choiceRuleId*/ value_choice_body tChoiceEnd /*i:*/
+	| tChoice id /*choiceOpId*/ value_choice_body tChoiceEnd /*m:*/
+	| tChoice id '(' id /*valueId*/ ')' /*parameterizedChoiceOpId*/ value_choice_body tChoiceEnd /*n:*/
+	| tChoice tOtherwise /*InputLookaheadChoice*/ input_choice_body tChoiceEnd
+	;
 
-rhs_choices :
-    rhs_one_choice
-    | rhs_choices rhs_one_choice
-    ;
+input_choice_body :
+	input_choice_cases
+	| input_choice_cases choice_otherwise
+	;
 
-rhs_one_choice :
-    '|' id_string_comma_list ':'
-    | '|' id_string_comma_list ':' rhs_id_string_list
-    | '|' rhs_choice
-    | '|' '*' ':'
-    | '|' '*' ':' rhs_id_string_list
-    ;
+input_choice_cases :
+	input_choice_case
+	| input_choice_cases input_choice_case
+	;
 
-id_string_comma_list :
-    id
-    | string
-    | id_string_comma_list ',' id
-    | id_string_comma_list ',' string
-    ;
+input_choice_case :
+	tOr inputToken_list ':'
+	| tOr inputToken_list ':' actions
+	;
 
-id_string_value_list :
-    id_string
-    | id_string '=' number
-    | id_string '=' id
-    | id_string_value_list id_string
-    | id_string_value_list id_string '=' number
-    | id_string_value_list id_string '=' id
-    ;
+choice_otherwise :
+	tOr tOtherwise ':'
+	| tOr tOtherwise ':' actions
+	;
 
-id_value_list :
-    id
-    | id '=' number
-    | id '=' id
-    | id_value_list id
-    | id_value_list id '=' number
-    | id_value_list id '=' id
-    ;
+value_choice_body :
+	value_choice_cases
+	| value_choice_cases choice_otherwise
+	;
 
-id_string :
-    id
-    | id string
-    ;
+value_choice_cases :
+	value_choice_case
+	| value_choice_cases value_choice_case
+	;
 
-type_values :
-    id
-    | id '=' number
-    | id '=' id
-    | type_values id
-    | type_values id '=' number
-    | type_values id '=' id
-    ;
+value_choice_case :
+	tOr valueId_list ':'
+	| tOr valueId_list ':' actions
+	;
 
-proc_func_list :
-    id
-    | proc_return
-    | id '(' param_list ')'
-    | proc_func_list id
-    | proc_func_list proc_return
-    ;
+inputToken_list :
+	id
+	| string
+	| inputToken_list ',' id
+	| inputToken_list ',' string
+	;
 
-proc_return :
-    id ">>" id
-    ;
+valueId_list :
+	id
+	| string
+	| integer
+	| valueId_list ',' id
+	| valueId_list ',' string
+	| valueId_list ',' integer
+	;
+
+tokenDefinitions :
+	tokenDefinition
+	| tokenDefinitions tokenDefinition
+	;
+
+tokenDefinition :
+	id
+	| id string /*synonym*/
+	| id '=' tokenValue
+	| id string '=' tokenValue
+	;
+
+tokenValue :
+	id
+	| integer
+	| string
+	;
+
+errorSignalDefinitions :
+	errorSignalDefinition
+	| errorSignalDefinitions errorSignalDefinition
+	;
+
+errorSignalDefinition :
+	id
+	| id '=' integer /*errorValue*/
+	| id '=' id /*reference errorValue*/
+	;
+
+valueDefinitions :
+	valueDefinition
+	| valueDefinitions valueDefinition
+	;
+
+valueDefinition :
+	id
+	| id '=' tokenValue
+	;
+
+operationDefinitions :
+	operationDefinition
+	| operationDefinitions operationDefinition
+	;
+
+operationDefinition :
+	id
+	| id '(' id /*typeId*/ ')'
+	| id tReturn id /*typeId*/
+	| id '(' id /*typeId*/ ')' tReturn id /*typeId*/
+	;
 
 param_list :
-    id
-    | param_list ',' id
-    ;
+	id
+	| param_list ',' id
+	;
 
 %%
 
@@ -183,16 +239,17 @@ param_list :
 "=" '='
 "(" '('
 ")" ')'
-"[" '['
-"]" ']'
-"{" '{'
-"}" '}'
-"*" '*'
-"|" '|'
-"@" '@'
-"#" '#'
-">" '>'
-">>"    ">>"
+"?"	tInputAny
+"*"	tOtherwise
+"["|"if" tChoice
+"]"|"fi" tChoiceEnd
+"{"|"do" tCycle
+"}"|"od" tCycleEnd
+"|"|"!" tOr
+"@" tCall
+"#" tErrorSignal
+">" tExit
+">>"    tReturn
 
 "INPUT" tInput
 "OUTPUT"    tOutput
@@ -202,7 +259,7 @@ param_list :
 "RULES" tRules
 "END"   tEnd
 
-"-"?[0-9]+  number
+"-"?[0-9]+  integer
 
 '(\\.|[^'\r\n\\])+' string
 
