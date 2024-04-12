@@ -86,8 +86,8 @@ action :
 	| choice				/*f:*/
 	| tCall id 				/*g: procedureRuleId*/
 	//|	/*k: updateOpId*/
-	| id '(' id ')'		/*l: parameterizedUpdateOpId(valueId)*/
-	| tCall id '(' param_list ')'
+	| id '(' tokenValue ')'		/*l: parameterizedUpdateOpId(valueId)*/
+	| tCall id '(' tokenValue ')'
 	;
 
 cycle_actions :
@@ -113,7 +113,7 @@ choice :
 	tChoice input_choice_body tChoiceEnd /*f:*/
 	| tChoice tCall id /*choiceRuleId*/ value_choice_body tChoiceEnd /*i:*/
 	| tChoice id /*choiceOpId*/ value_choice_body tChoiceEnd /*m:*/
-	| tChoice id '(' id /*valueId*/ ')' /*parameterizedChoiceOpId*/ value_choice_body tChoiceEnd /*n:*/
+	| tChoice id '(' tokenValue /*valueId*/ ')' /*parameterizedChoiceOpId*/ value_choice_body tChoiceEnd /*n:*/
 	| tChoice tOtherwise /*InputLookaheadChoice*/ input_choice_body tChoiceEnd
 	;
 
@@ -204,7 +204,9 @@ valueDefinitions :
 
 valueDefinition :
 	id
+	| string
 	| id '=' tokenValue
+	| string '=' tokenValue
 	;
 
 operationDefinitions :
@@ -217,11 +219,6 @@ operationDefinition :
 	| id '(' id /*typeId*/ ')'
 	| id tReturn id /*typeId*/
 	| id '(' id /*typeId*/ ')' tReturn id /*typeId*/
-	;
-
-param_list :
-	id
-	| param_list ',' id
 	;
 
 %%
