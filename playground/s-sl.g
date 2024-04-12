@@ -107,6 +107,7 @@ return_action :
 	| tReturn id 	/*J: valueId*/
 	| tReturn string 	/*J: valueId*/
 	| tReturn integer 	/*J: valueId*/
+	| tReturn id '(' tokenValue ')' 	/*only in openwatocm version*/
 	;
 
 choice :
@@ -212,6 +213,9 @@ valueDefinition :
 operationDefinitions :
 	operationDefinition
 	| operationDefinitions operationDefinition
+	/*only in open-watcom version*/
+	| operationDefinition '=' integer
+	| operationDefinitions operationDefinition '=' integer
 	;
 
 operationDefinition :
