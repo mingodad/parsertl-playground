@@ -8,10 +8,6 @@
 %token tInput tOutput tError tType tMechanism tRules tEnd
 %token tCall tExit tReturn tErrorSignal tOr tCycle tCycleEnd  tChoice tChoiceEnd
 
-/*
-The Shift/Reduce conflict in action:tReturn is ok
-*/
-
 %%
 
 s_sl :
@@ -71,7 +67,7 @@ proc_rule :
 	;
 
 choice_rule :
-	id tReturn id /*typeId*/ ':' actions ';'
+	id tReturn id /*typeId*/ ':' return_actions ';'
 	;
 
 actions :
@@ -86,27 +82,32 @@ action :
 	| '.' id 				/*b: outputToken*/
 	| '.' string 				/*b: outputToken*/
 	| tErrorSignal id 		/*c: errorId*/
-	| tCycle actions tCycleEnd /*d: */
-	| tExit				/*e:*/
+	| tCycle cycle_actions tCycleEnd /*d: */
 	| choice				/*f:*/
 	| tCall id 				/*g: procedureRuleId*/
-	| tReturn	/*it's ok to shift here*/			/*h:*/
-	| tReturn id 	/*J: valueId*/
-	| tReturn string 	/*J: valueId*/
-	| tReturn integer 	/*J: valueId*/
 	//|	/*k: updateOpId*/
 	| id '(' id ')'		/*l: parameterizedUpdateOpId(valueId)*/
 	| tCall id '(' param_list ')'
 	;
 
-//cycle_actions :
-//	action
-//	| tExit				/*e:*/
-//	| tReturn				/*h:*/
-//	| cycle_actions tExit
-//	| cycle_actions tReturn
-//	| cycle_actions action
-//	;
+cycle_actions :
+	return_actions
+	| tExit				/*e:*/
+	| return_actions tExit		/*e:*/
+	;
+
+return_actions :
+	actions
+	| return_action
+	| actions return_action
+	;
+
+return_action :
+	tReturn		/*h:*/
+	| tReturn id 	/*J: valueId*/
+	| tReturn string 	/*J: valueId*/
+	| tReturn integer 	/*J: valueId*/
+	;
 
 choice :
 	tChoice input_choice_body tChoiceEnd /*f:*/
@@ -128,12 +129,12 @@ input_choice_cases :
 
 input_choice_case :
 	tOr inputToken_list ':'
-	| tOr inputToken_list ':' actions
+	| tOr inputToken_list ':' cycle_actions
 	;
 
 choice_otherwise :
 	tOr tOtherwise ':'
-	| tOr tOtherwise ':' actions
+	| tOr tOtherwise ':' cycle_actions
 	;
 
 value_choice_body :
@@ -148,7 +149,7 @@ value_choice_cases :
 
 value_choice_case :
 	tOr valueId_list ':'
-	| tOr valueId_list ':' actions
+	| tOr valueId_list ':' cycle_actions
 	;
 
 inputToken_list :
