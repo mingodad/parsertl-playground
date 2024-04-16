@@ -38,6 +38,7 @@ outputDefinition :
 
 inputOutputDefinition :
 	tInput tOutput ':' tokenDefinitions ';'
+	| tOutput tInput ':' tokenDefinitions ';'
 	;
 
 errorDefinition :
