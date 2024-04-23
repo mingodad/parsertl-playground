@@ -1,0 +1,1 @@
+ explain char * const (*(* const bar)[5])(int );
