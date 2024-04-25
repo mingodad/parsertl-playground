@@ -797,6 +797,17 @@ struct BuildUserParser
             return false;
         }
 
+        if(gs.dumpAsEbnfRR == 5)
+        {
+#ifdef WASM_PLAYGROUND
+            switch_output("parse_ebnf_yacc");
+#endif
+            parsertl::dfa dfa_;
+            parsertl::generator::build_dfa(gs.user_parser.grules, dfa_);
+            parsertl::debug::dumpSql(gs.user_parser.grules, dfa_, std::cout);
+            return false;
+        }
+
         if(gs.generate_standalone_parser)
         {
 #ifdef WASM_PLAYGROUND
@@ -2241,6 +2252,7 @@ static void showHelp(const char* prog_name)
             "-dumpAsEbnfRR        Dump grammar as EBNF for railroad diagram\n"
             "-dumpAsYacc          Dump grammar as Yacc\n"
             "-dumpAsLex           Dump grammar as Lex\n"
+            "-dumpAsSql           Dump grammar as SQL\n"
             "-dumpNaked           Dump naked grammar\n"
             "-dumpMaster          Dump master grammar\n"
             "-generateParser      Generate a standalone C++ parser\n"
@@ -2313,6 +2325,10 @@ int main(int argc, char *argv[])
         else if (strcmp("-dumpAsLex", param) == 0)
         {
             gs.dumpAsEbnfRR = 3;
+        }
+        else if (strcmp("-dumpAsSql", param) == 0)
+        {
+            gs.dumpAsEbnfRR = 5;
         }
         else if (strcmp("-dumpMaster", param) == 0)
         {

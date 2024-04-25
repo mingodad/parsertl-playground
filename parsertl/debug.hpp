@@ -116,6 +116,314 @@ namespace parsertl
             }
         }
 
+        static void dumpSql(const rules& rules_, ostream& stream_)
+        {
+            const std::size_t start_ = rules_.start();
+            const production_vector& grammar_ = rules_.grammar();
+            const token_info_vector& tokens_info_ = rules_.tokens_info();
+            const std::size_t terminals_ = tokens_info_.size();
+            string_vector symbols_;
+            std::set<std::size_t> seen_;
+            token_map map_;
+            bool hasRecords;
+
+            rules_.symbols(symbols_);
+
+            stream_ <<
+                "\nBEGIN TRANSACTION;"
+                "\nCREATE TABLE symbol(\n"
+                "  id INTEGER PRIMARY KEY,\n"
+                "  name TEXT NOT NULL,\n"
+                "  isTerminal BOOLEAN NOT NULL,\n"
+                "  fallback INTEGER REFERENCES symbol DEFERRABLE INITIALLY DEFERRED\n"
+                ");\n";
+
+            int last_id = 0;
+            hasRecords = false;
+            for(const auto &terminal : rules_.terminals())
+            {
+                if(terminal.second > 0) //skip EOI
+                {
+                    if(!hasRecords) {
+                        hasRecords = true;
+                        stream_ << "\nINSERT INTO symbol(id, name, isTerminal, fallback) VALUES\n";
+                    }
+                    if(last_id)
+                    {
+                        stream_ << "\n,";
+                    }
+                    last_id = terminal.second;
+                    const token_info& token_info_ = tokens_info_[last_id];
+                    stream_ << "(" << last_id << ",'";
+                    for(const auto ch : terminal.first){
+                        if(ch == '\'') stream_ << "''";
+                        else stream_ << ch;
+                    }
+                    stream_ << "',1";
+                    if(token_info_._fallback)
+                    {
+                        stream_ << token_info_._fallback;
+                    }
+                    else
+                    {
+                        stream_ << ",NULL";
+                    }
+                    stream_ << ")";
+                }
+            }
+            if(hasRecords) stream_ << ";\n\n";
+
+            last_id = 0;
+            hasRecords = false;
+            for(const auto &non_terminal : rules_.non_terminals())
+            {
+                if(!hasRecords) {
+                    hasRecords = true;
+                    stream_ << "\nINSERT INTO symbol(id, name, isTerminal) VALUES\n";
+                }
+                if(last_id)
+                {
+                    stream_ << "\n,";
+                }
+                last_id = terminals_ + non_terminal.second;
+                stream_ << "(" << last_id << ",'"<< non_terminal.first << "',0)";
+            }
+            if(hasRecords) stream_ << ";\n\n";
+
+            stream_ << "\nCREATE TABLE precedence(\n"
+                "  id INTEGER PRIMARY KEY REFERENCES symbol DEFERRABLE INITIALLY DEFERRED,\n"
+                "  prec INTEGER NOT NULL,\n"
+                "  assoc CHAR NOT NULL CHECK(assoc IN('L','R','N','P'))\n"
+                ");\n";
+
+            // Skip EOI token
+            hasRecords = false;
+            for (std::size_t idx_ = 1, size_ = tokens_info_.size();
+                idx_ < size_; ++idx_)
+            {
+                const token_info& token_info_ = tokens_info_[idx_];
+                if(token_info_._associativity != rules::associativity::token_assoc)
+                {
+                    if(!hasRecords) {
+                        hasRecords = true;
+                        stream_ << "\nINSERT INTO precedence(id,prec,assoc) VALUES\n";
+                    }
+                    if(idx_ > 1)
+                    {
+                        stream_ << "\n,";
+                    }
+                    stream_ << "(" << idx_ << "," << token_info_._precedence << ",";
+                    switch(token_info_._associativity)
+                    {
+                        case rules::associativity::precedence_assoc:
+                            stream_ << "'P'";
+                            break;
+                        case rules::associativity::non_assoc:
+                            stream_ << "'N'";
+                            break;
+                        case rules::associativity::left_assoc:
+                            stream_ << "'L'";
+                            break;
+                        case rules::associativity::right_assoc:
+                            stream_ << "'R'";
+                            break;
+                        default:
+                            stream_ << "'Unknown'";
+                            break;
+                    }
+                    stream_ << ")";
+                }
+            }
+            if(hasRecords) stream_ << ";\n\n";
+
+            stream_ << "\nCREATE TABLE rule(\n"
+                "  ruleid INTEGER PRIMARY KEY,\n"
+                "  lhs INTEGER REFERENCES symbol(id),\n"
+                "  prec_id INTEGER REFERENCES symbol(id)\n"
+                ");\n";
+
+
+            int last_idx = 0;
+            hasRecords = false;
+            for (auto iter_ = grammar_.cbegin(), end_ = grammar_.cend();
+                iter_ != end_; ++iter_)
+            {
+                auto lhs_iter_ = iter_;
+                prod_size_t index_ = lhs_iter_ - grammar_.begin();
+                auto lhs_id = terminals_ + lhs_iter_->_lhs;
+
+                if(!hasRecords) {
+                    hasRecords = true;
+                    stream_ << "\nINSERT INTO rule(ruleid,lhs,prec_id) VALUES\n";
+                }
+                if(last_idx++)
+                {
+                    stream_ << "\n,";
+                }
+                stream_ << "(" << index_ << "," << lhs_id << ",";
+                if (iter_->_ctx_precedence_id > 0)
+                {
+                    stream_ << iter_->_ctx_precedence_id;
+                }
+                else
+                {
+                    stream_ << "NULL";
+                }
+                stream_ << ")";
+            }
+            if(hasRecords) stream_ << ";\n\n";
+
+            stream_ << "CREATE TABLE directives(\n"
+                "  id INTEGER PRIMARY KEY CHECK(id = 1),\n"
+                "  stack_size TEXT,\n"
+                "  start_symbol INTEGER REFERENCES symbol,\n"
+                "  wildcard INTEGER REFERENCES symbol\n"
+                ");\n";
+
+            stream_ << "INSERT INTO directives(id) values(1);\n";
+            stream_ << "UPDATE directives SET start_symbol=" << (terminals_ + start_) << ";\n";
+            //stream_ << "UPDATE directives SET wildcard=101;\n";
+
+            stream_ << "\nCREATE TABLE rulerhs(\n"
+                "  id INTEGER PRIMARY KEY,  ruleid INTEGER REFERENCES rule(ruleid),\n"
+                "  pos INTEGER,\n"
+                "  sym INTEGER REFERENCES symbol(id)\n"
+                ");\n";
+
+            last_idx = 0;
+            prod_size_t index2_ = 0;
+            hasRecords = false;
+            for (auto iter_ = grammar_.cbegin(), end_ = grammar_.cend();
+                iter_ != end_; ++iter_)
+            {
+                auto lhs_iter_ = iter_;
+                prod_size_t index_ = lhs_iter_ - grammar_.begin();
+
+                if(index_ == 0 || index_ > index2_)
+                {
+                    int lhs_pos = 0;
+                    prod_size_t index3_ = index_;
+                    while (index3_ != static_cast<prod_size_t>(~0))
+                    {
+                        if(!hasRecords) {
+                            hasRecords = true;
+                            stream_ << "\nINSERT INTO rulerhs(ruleid,pos,sym) VALUES\n";
+                        }
+                        if (lhs_iter_->_rhs.empty())
+                        {
+                            if(last_idx++)
+                            {
+                                stream_ << "\n,";
+                            }
+                            stream_ << "(" << index3_ << "," << lhs_pos++ << ",NULL)";
+                        }
+                        else
+                        {
+                            auto rhs_iter_ = lhs_iter_->_rhs.cbegin();
+                            auto rhs_end_ = lhs_iter_->_rhs.cend();
+
+                            for (; rhs_iter_ != rhs_end_; ++rhs_iter_)
+                            {
+                                const std::size_t id_ =
+                                    rhs_iter_->_type == symbol::type::TERMINAL ?
+                                    rhs_iter_->_id :
+                                    terminals_ + rhs_iter_->_id;
+
+                                // Don't dump '$'
+                                if (id_ > 0)
+                                {
+                                    if(last_idx++)
+                                    {
+                                        stream_ << "\n,";
+                                    }
+                                    stream_ << "(" << index3_ << "," << lhs_pos++ << "," << id_ << ")";
+                                }
+                            }
+                        }
+                        index2_ = index3_;
+                        index3_ = lhs_iter_->_next_lhs;
+                        if (index3_ != static_cast<prod_size_t>(~0))
+                        {
+                            lhs_iter_ = grammar_.cbegin() + index3_;
+                        }
+                    }
+                }
+            }
+            if(hasRecords) stream_ << ";\n\n";
+            stream_ <<
+                "CREATE VIEW rule_rhs_terminal_view AS\n"
+                "SELECT rr.ruleid, pos, group_concat(rs.name, '|') as name\n"
+                "FROM rulerhs AS rr LEFT JOIN symbol AS rs\n"
+                "  ON rr.sym=rs.id\n"
+                "GROUP BY ruleid, pos;\n"
+                "CREATE VIEW rule_view AS\n"
+                "SELECT srule || (case when lhs <> lhs2 then '\n"
+                "' else '' end) FROM (\n"
+                "  SELECT s.name || ' ::= ' || ifnull((\n"
+                "    SELECT group_concat(rs.name, ' ')\n"
+                "    FROM rule_rhs_terminal_view AS rs\n"
+                "    WHERE rs.ruleid=r.ruleid\n"
+                "    ORDER BY rs.pos), '/*empty*/') || ' .'\n"
+                "      || ifnull((' [' || sp.name || ']'), '') as srule,\n"
+                "    r.lhs, lead(r.lhs) OVER(ORDER BY r.ruleid) AS lhs2\n"
+                "  FROM rule AS r\n"
+                "    LEFT JOIN symbol AS s ON r.lhs=s.id\n"
+                "    LEFT JOIN symbol AS sp ON r.prec_id=sp.id\n"
+                "  ORDER BY r.ruleid\n"
+                ") t;\n"
+                "CREATE VIEW token_view AS\n"
+                "SELECT ('%token ' || '\n"
+                "  ' || group_concat(name || (CASE WHEN (cnt % 6) = 0 THEN '\n"
+                "  ' ELSE ' ' END), '') || ' .\n"
+                "  ') AS val FROM (\n"
+                "  SELECT row_number() OVER (ORDER BY s.id) AS cnt, s.name\n"
+                "  FROM symbol AS s WHERE isTerminal=TRUE\n"
+                "  ORDER BY id\n"
+                ") t;\n"
+                "CREATE VIEW fallback_view AS\n"
+                "SELECT ('%fallback ' || fb || '\n"
+                "  ' || group_concat(name || (CASE WHEN (cnt % 6) = 0 THEN '\n"
+                "  ' ELSE ' ' END), '') || ' .\n"
+                "  ') AS val FROM (\n"
+                "  SELECT sf.name AS fb, row_number() OVER (ORDER BY s.id) AS cnt, s.name\n"
+                "  FROM symbol s JOIN symbol sf ON s.fallback = sf.id\n"
+                ") t;\n"
+                "CREATE VIEW prec_view AS\n"
+                "WITH prec(id, name) AS (VALUES('L','%left'),('R','%right'),('N','%nonassoc'),('P','%precedence'))\n"
+                "SELECT prec.name || ' ' || group_concat(s.name, ' ') || ' .'\n"
+                "FROM precedence AS p\n"
+                "	LEFT JOIN prec ON p.assoc=prec.id\n"
+                "	LEFT JOIN symbol AS s on p.id=s.id\n"
+                "GROUP BY p.prec\n"
+                "ORDER BY p.prec;\n"
+                "CREATE VIEW grammar_view AS\n"
+                "SELECT * FROM token_view\n"
+                "UNION ALL\n"
+                "SELECT * FROM fallback_view\n"
+                "UNION ALL\n"
+                "SELECT * FROM prec_view\n"
+                "UNION ALL\n"
+                "SELECT '\n"
+                "%stack_size ' || stack_size || ' .\n"
+                "'\n"
+                "FROM directives\n"
+                "UNION ALL\n"
+                "SELECT '\n"
+                "%wildcard ' || s.name || ' .\n"
+                "'\n"
+                "FROM directives AS d join symbol AS s ON d.wildcard=s.id\n"
+                "UNION ALL\n"
+                "SELECT '\n"
+                "%start_symbol ' || s.name || '\n"
+                "'\n"
+                "FROM directives AS d join symbol AS s ON d.start_symbol=s.id\n"
+                "UNION ALL\n"
+                "SELECT * FROM rule_view;\n"
+                "COMMIT;\n"
+                "select * from grammar_view;\n"
+                ;
+        }
+
         static void dump(const rules& rules_, const dfa& dfa_, ostream& stream_,
                 bool withIndex=false)
         {
@@ -176,6 +484,13 @@ namespace parsertl
 
                 stream_ << static_cast<char_type>('\n');
             }
+        }
+
+        static void dumpSql(const rules& rules_, const dfa& dfa_, ostream& stream_)
+        {
+            string_vector symbols_;
+            rules_.symbols(symbols_);
+            dumpSql(rules_, stream_);
         }
 
     private:
