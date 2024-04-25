@@ -709,7 +709,9 @@ struct BuildUserParser
             parsertl::generator::build(gs.user_parser.grules, gs.user_parser.gsm, &warnings);
 
             if (!warnings.empty())
-                std::cerr << "Warnings from user_parser :\n" << warnings;
+                std::cerr << "Warnings from user_parser (" <<
+                        std::count(warnings.begin(), warnings.end(), '\n')
+                        << "):\n" << warnings;
 
             gs.user_parser.grules.terminals(terminals);
 
