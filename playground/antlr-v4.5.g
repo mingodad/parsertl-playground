@@ -155,12 +155,8 @@ idList_zom:
 	;
 
 action_:
-	  AT scopeName_opt identifier actionBlock
-	;
-
-scopeName_opt :
-	  %empty
-	| actionScopeName COLONCOLON
+    AT identifier actionBlock
+    | AT actionScopeName COLONCOLON identifier actionBlock
 	;
 
 actionScopeName:
