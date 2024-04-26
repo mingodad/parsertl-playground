@@ -301,12 +301,8 @@ ruleBlock:
 	;
 
 ruleAltList:
-	  labeledAlt ORlabeledAlt_zom
-	;
-
-ORlabeledAlt_zom:
-	  %empty
-	| ORlabeledAlt_zom OR labeledAlt
+	  labeledAlt
+	| ruleAltList OR labeledAlt
 	;
 
 labeledAlt:
@@ -319,7 +315,7 @@ POUNDidentifier_opt:
 	;
 
 lexerRuleSpec:
-	  fragment_opt TOKEN_REF optionsSpec_opt COLON lexerRuleBlock SEMI
+	  fragment_opt TOKEN_REF optionsSpec_opt COLON lexerAltList SEMI
 	;
 
 optionsSpec_opt:
@@ -332,17 +328,9 @@ fragment_opt:
 	| FRAGMENT
 	;
 
-lexerRuleBlock:
-	  lexerAltList
-	;
-
 lexerAltList:
-	  lexerAlt orLexerAltList
-	;
-
-orLexerAltList:
-	  %empty
-	| orLexerAltList OR lexerAlt
+	  lexerAlt
+	| lexerAltList OR lexerAlt
 	;
 
 lexerAlt:
@@ -358,17 +346,13 @@ lexerElements:
 
 lexerElement:
 	  lexerAtom ebnfSuffix_opt
-	| lexerBlock ebnfSuffix_opt
-	| actionBlock questio_opt
+	| LPAREN lexerAltList RPAREN ebnfSuffix_opt #lexerBlock
+	| actionBlock question_opt
 	;
 
 ebnfSuffix_opt :
 	  %empty
 	| ebnfSuffix
-	;
-
-lexerBlock:
-	  LPAREN lexerAltList RPAREN
 	;
 
 lexerCommands:
@@ -396,12 +380,8 @@ lexerCommandExpr:
 	;
 
 altList:
-	  alternative ORalternative_zom
-	;
-
-ORalternative_zom:
-	  %empty
-	| ORalternative_zom OR alternative
+	  alternative
+	| altList OR alternative
 	;
 
 alternative:
@@ -423,7 +403,7 @@ element:
 	  labeledElement ebnfSuffix_opt
 	| atom ebnfSuffix_opt
 	| ebnf
-	| actionBlock questio_opt
+	| actionBlock question_opt
 	;
 
 labeledElement:
@@ -441,25 +421,17 @@ assing:
 	;
 
 ebnf:
-	  block blockSuffix_opt
-	;
-
-blockSuffix_opt:
-	  %empty
-	| blockSuffix
-	;
-
-blockSuffix:
-	  ebnfSuffix
+	  block
+	| block ebnfSuffix
 	;
 
 ebnfSuffix:
-	  QUESTION questio_opt
-	| STAR questio_opt
-	| PLUS questio_opt
+	  QUESTION question_opt
+	| STAR question_opt
+	| PLUS question_opt
 	;
 
-questio_opt:
+question_opt:
 	  %empty
 	| QUESTION
 	;
@@ -485,12 +457,12 @@ notSet:
 	;
 
 blockSet:
-	  LPAREN setElement ORsetElement_zom RPAREN
+	  LPAREN setElementAlt RPAREN
 	;
 
-ORsetElement_zom:
-	  %empty
-	| ORsetElement_zom OR setElement
+setElementAlt:
+	  setElement
+	| setElementAlt OR setElement
 	;
 
 setElement:
