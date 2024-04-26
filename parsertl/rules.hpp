@@ -180,6 +180,7 @@ namespace parsertl
             _non_terminals.clear();
             _nt_locations.clear();
             _new_rule_ids.clear();
+            _generated_rules_reuse.clear();
             _generated_rules.clear();
             _start.clear();
             _grammar.clear();
@@ -506,10 +507,19 @@ namespace parsertl
                         ++counter_;
                         lexertl::stream_num(counter_, ss_);
                         pair_.first = lhs_ + char_type('_') + ss_.str();
-                        _generated_rules.insert(pair_.first);
                         pair_.second = empty_or_ + rhs_stack_.top();
-                        rhs_stack_.top() = pair_.first;
-                        new_rules_.push(pair_);
+                        auto const &search_reuse = _generated_rules_reuse.find(pair_.second);
+                        if (search_reuse == _generated_rules_reuse.end())
+                        {
+                            _generated_rules.insert(pair_.first);
+                            rhs_stack_.top() = pair_.first;
+                            new_rules_.push(pair_);
+                            _generated_rules_reuse.insert({pair_.second, pair_.first});
+                        }
+                        else
+                        {
+                            rhs_stack_.top() = search_reuse->second;
+                        }
                         break;
                     }
                     case ebnf_indexes::zom_1_idx:
@@ -524,11 +534,22 @@ namespace parsertl
                         ++counter_;
                         lexertl::stream_num(counter_, ss_);
                         pair_.first = lhs_ + char_type('_') + ss_.str();
-                        _generated_rules.insert(pair_.first);
-                        pair_.second = empty_or_ + pair_.first +
+                        pair_.second = empty_or_ + string("__Z_O_M__") +
                             char_type(' ') + rhs_stack_.top();
-                        rhs_stack_.top() = pair_.first;
-                        new_rules_.push(pair_);
+                        auto const &search_reuse = _generated_rules_reuse.find(pair_.second);
+                        if (search_reuse == _generated_rules_reuse.end())
+                        {
+                            _generated_rules_reuse.insert({pair_.second, pair_.first});
+                            _generated_rules.insert(pair_.first);
+                            pair_.second = empty_or_ + pair_.first +
+                                char_type(' ') + rhs_stack_.top();
+                            rhs_stack_.top() = pair_.first;
+                            new_rules_.push(pair_);
+                        }
+                        else
+                        {
+                            rhs_stack_.top() = search_reuse->second;
+                        }
                         break;
                     }
                     case ebnf_indexes::oom_1_idx:
@@ -543,11 +564,22 @@ namespace parsertl
                         ++counter_;
                         lexertl::stream_num(counter_, ss_);
                         pair_.first = lhs_ + char_type('_') + ss_.str();
-                        _generated_rules.insert(pair_.first);
-                        pair_.second = rhs_stack_.top() + or_ +
-                            pair_.first + char_type(' ') + rhs_stack_.top();
-                        rhs_stack_.top() = pair_.first;
-                        new_rules_.push(pair_);
+                        pair_.second = string("__O_O_M__") + or_ +
+                            pair_.first + char_type(' ') + string("__O_O_M__");
+                        auto const &search_reuse = _generated_rules_reuse.find(pair_.second);
+                        if (search_reuse == _generated_rules_reuse.end())
+                        {
+                            _generated_rules_reuse.insert({pair_.second, pair_.first});
+                            _generated_rules.insert(pair_.first);
+                            pair_.second = rhs_stack_.top() + or_ +
+                                pair_.first + char_type(' ') + rhs_stack_.top();
+                            new_rules_.push(pair_);
+                            rhs_stack_.top() = pair_.first;
+                        }
+                        else
+                        {
+                            rhs_stack_.top() = search_reuse->second;
+                        }
                         break;
                     }
                     case ebnf_indexes::bracketed_idx:
@@ -557,11 +589,21 @@ namespace parsertl
                         std::basic_ostringstream<char_type> ss_;
                         std::pair<string, string> pair_;
 
-                        ++counter_;
-                        lexertl::stream_num(counter_, ss_);
-                        pair_.first = lhs_ + char_type('_') + ss_.str();
-                        _generated_rules.insert(pair_.first);
                         pair_.second = rhs_stack_.top();
+                        auto const &search_reuse = _generated_rules_reuse.find(pair_.second);
+                        if (search_reuse == _generated_rules_reuse.end())
+                        {
+                            ++counter_;
+                            lexertl::stream_num(counter_, ss_);
+                            pair_.first = lhs_ + char_type('_') + ss_.str();
+                            _generated_rules.insert(pair_.first);
+                            _generated_rules_reuse.insert({pair_.second, pair_.first});
+                            new_rules_.push(pair_);
+                        }
+                        else
+                        {
+                            pair_.first = search_reuse->second;
+                        }
 
                         if (_flags & *rule_flags::enable_captures)
                         {
@@ -573,7 +615,6 @@ namespace parsertl
                             rhs_stack_.top() = pair_.first;
                         }
 
-                        new_rules_.push(pair_);
                         break;
                     }
                     case ebnf_indexes::prec_ident_idx:
@@ -957,6 +998,7 @@ namespace parsertl
         string_id_type_map _non_terminals;
         nt_location_vector _nt_locations;
         std::map<string, std::size_t> _new_rule_ids;
+        std::map<string, string> _generated_rules_reuse;
         std::set<string> _generated_rules;
         string _start;
         id_type _symbol_table_token = _token_lexer.npos();
