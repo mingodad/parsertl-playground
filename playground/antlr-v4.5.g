@@ -42,7 +42,7 @@
 
 //options { tokenVocab = ANTLRv4Lexer; }
 
-%token ILLEGAL_CHARACTER
+//%token ILLEGAL_CHARACTER
 %token INT STRING_LITERAL RBRACE SEMI ASSIGN DOT
 %token BEGIN_ACTION BEGIN_ARGUMENT
 %token TOKENS OPTIONS CHANNELS IMPORT FRAGMENT LEXER
@@ -55,340 +55,505 @@
 %token TOKEN_REF LEXER_CHAR_SET
 
 %%
-// The main entry point for parsing a v4 grammar.
-grammarSpec
-   : grammarDecl prequelConstruct* rules modeSpec* /*EOF*/
-   ;
 
-grammarDecl
-   : grammarType identifier SEMI
-   ;
+grammarSpec:
+	  grammarDecl prequelConstruct_zom rules modeSpec_zom
+	;
 
-grammarType
-   : LEXER GRAMMAR | PARSER GRAMMAR | GRAMMAR
-   ;
-   // This is the list of all constructs that can be declared before
-   // the set of rules that compose the grammar, and is invoked 0..n
-   // times by the grammarPrequel rule.
+modeSpec_zom:
+	  %empty
+	| modeSpec_zom modeSpec
+	;
 
-prequelConstruct
-   : optionsSpec
-   | delegateGrammars
-   | tokensSpec
-   | channelsSpec
-   | action_
-   ;
-   // ------------
-   // Options - things that affect analysis and/or code generation
+prequelConstruct_zom:
+	  %empty
+	| prequelConstruct_zom prequelConstruct
+	;
 
-optionsSpec
-   : OPTIONS (option SEMI)* RBRACE
-   ;
+grammarDecl:
+	  grammarType identifier SEMI
+	;
 
-option
-   : identifier ASSIGN optionValue
-   ;
+grammarType:
+	  LEXER GRAMMAR
+	| PARSER GRAMMAR
+	| GRAMMAR
+	;
 
-optionValue
-   : identifier (DOT identifier)*
-   | STRING_LITERAL
-   | actionBlock
-   | INT
-   ;
-   // ------------
-   // Delegates
+prequelConstruct:
+	  optionsSpec
+	| delegateGrammars
+	| tokensSpec
+	| channelsSpec
+	| action_
+	;
 
-delegateGrammars
-   : IMPORT delegateGrammar (COMMA delegateGrammar)* SEMI
-   ;
+optionsSpec:
+	  OPTIONS optionSEMI_zom RBRACE
+	;
 
-delegateGrammar
-   : identifier ASSIGN identifier
-   | identifier
-   ;
-   // ------------
-   // Tokens & Channels
+optionSEMI_zom :
+	  %empty
+	| optionSEMI_zom option SEMI
+	;
 
-tokensSpec
-   : TOKENS idList? RBRACE
-   ;
+option:
+	  identifier ASSIGN optionValue
+	;
 
-channelsSpec
-   : CHANNELS idList? RBRACE
-   ;
+optionValue:
+	  identifier DOTidentifier_zom
+	| STRING_LITERAL
+	| actionBlock
+	| INT
+	;
 
-idList
-   : identifier (COMMA identifier)* COMMA?
-   ;
-   // Match stuff like @parser::members {int i;}
+DOTidentifier_zom :
+	  %empty
+	| DOTidentifier_zom DOT identifier
+	;
 
-action_
-   : AT (actionScopeName COLONCOLON)? identifier actionBlock
-   ;
-   // Scope names could collide with keywords; allow them as ids for action scopes
+delegateGrammars:
+	  IMPORT delegateGrammar COMMAdelegateGrammar_zom SEMI
+	;
 
-actionScopeName
-   : identifier
-   | LEXER
-   | PARSER
-   ;
+COMMAdelegateGrammar_zom :
+	  %empty
+	| COMMAdelegateGrammar_zom COMMA delegateGrammar
+	;
 
-actionBlock
-   : BEGIN_ACTION ACTION_CONTENT* END_ACTION
-   ;
+delegateGrammar:
+	  identifier ASSIGN identifier
+	| identifier
+	;
 
-argActionBlock
-   : BEGIN_ARGUMENT ARGUMENT_CONTENT* END_ARGUMENT
-   ;
+tokensSpec:
+	  TOKENS idList_opt RBRACE
+	;
 
-modeSpec
-   : MODE identifier SEMI lexerRuleSpec*
-   ;
+idList_opt:
+	  %empty
+	| idList
+	;
 
-rules
-   : ruleSpec*
-   ;
+channelsSpec:
+	  CHANNELS idList_opt RBRACE
+	;
 
-ruleSpec
-   : parserRuleSpec
-   | lexerRuleSpec
-   ;
+idList:
+	  identifier idList_zom comma_opt
+	;
 
-parserRuleSpec
-   : ruleModifiers? RULE_REF argActionBlock? ruleReturns? throwsSpec? localsSpec? rulePrequel* COLON ruleBlock SEMI exceptionGroup
-   ;
+comma_opt :
+	  %empty
+	| COMMA
+	;
 
-exceptionGroup
-   : exceptionHandler* finallyClause?
-   ;
+idList_zom:
+	  %empty
+	| idList_zom COMMA identifier
+	;
 
-exceptionHandler
-   : CATCH argActionBlock actionBlock
-   ;
+action_:
+	  AT scopeName_opt identifier actionBlock
+	;
 
-finallyClause
-   : FINALLY actionBlock
-   ;
+scopeName_opt :
+	  %empty
+	| actionScopeName COLONCOLON
+	;
 
-rulePrequel
-   : optionsSpec
-   | ruleAction
-   ;
+actionScopeName:
+	  identifier
+	| LEXER
+	| PARSER
+	;
 
-ruleReturns
-   : RETURNS argActionBlock
-   ;
+actionBlock:
+	  BEGIN_ACTION ACTION_CONTENT_zom END_ACTION
+	;
 
-// --------------
-// Exception spec
-throwsSpec
-   : THROWS identifier (COMMA identifier)*
-   ;
+ACTION_CONTENT_zom:
+	  %empty
+	| ACTION_CONTENT_zom ACTION_CONTENT
+	;
 
-localsSpec
-   : LOCALS argActionBlock
-   ;
+argActionBlock:
+	  BEGIN_ARGUMENT ARGUMENT_CONTENT_zom END_ARGUMENT
+	;
 
-/** Match stuff like @init {int i;} */
-ruleAction
-   : AT identifier actionBlock
-   ;
+ARGUMENT_CONTENT_zom:
+	  %empty
+	| ARGUMENT_CONTENT_zom ARGUMENT_CONTENT
+	;
 
-ruleModifiers
-   : ruleModifier+
-   ;
-   // An individual access modifier for a rule. The 'fragment' modifier
-   // is an internal indication for lexer rules that they do not match
-   // from the input but are like subroutines for other lexer rules to
-   // reuse for certain lexical patterns. The other modifiers are passed
-   // to the code generation templates and may be ignored by the template
-   // if they are of no use in that language.
+modeSpec:
+	  MODE identifier SEMI lexerRuleSpec_zom
+	;
 
-ruleModifier
-   : PUBLIC
-   | PRIVATE
-   | PROTECTED
-   | FRAGMENT
-   ;
+lexerRuleSpec_zom:
+	  %empty
+	| lexerRuleSpec_zom lexerRuleSpec
+	;
 
-ruleBlock
-   : ruleAltList
-   ;
+rules:
+	  %empty
+	| rules ruleSpec
+	;
 
-ruleAltList
-   : labeledAlt (OR labeledAlt)*
-   ;
+ruleSpec:
+	  parserRuleSpec
+	| lexerRuleSpec
+	;
 
-labeledAlt
-   : alternative (POUND identifier)?
-   ;
-   // --------------------
-   // Lexer rules
+parserRuleSpec:
+	  ruleModifiers_opt RULE_REF argActionBlock_opt ruleReturns_opt throwsSpec_opt localsSpec_opt rulePrequel_zom COLON ruleBlock SEMI exceptionGroup
+	;
 
-lexerRuleSpec
-   : FRAGMENT? TOKEN_REF optionsSpec? COLON lexerRuleBlock SEMI
-   ;
+rulePrequel_zom:
+	  %empty
+	| rulePrequel_zom rulePrequel
+	;
 
-lexerRuleBlock
-   : lexerAltList
-   ;
+localsSpec_opt:
+	  %empty
+	| localsSpec
+	;
 
-lexerAltList
-   : lexerAlt (OR lexerAlt)*
-   ;
+throwsSpec_opt:
+	  %empty
+	| throwsSpec
+	;
 
-lexerAlt
-   : lexerElements lexerCommands?
-   |
-   // explicitly allow empty alts
-   ;
+ruleReturns_opt:
+	  %empty
+	| ruleReturns
+	;
 
-lexerElements
-   : lexerElement+
-   |
-   ;
+argActionBlock_opt:
+	  %empty
+	| argActionBlock
+	;
 
-lexerElement
-   : lexerAtom ebnfSuffix?
-   | lexerBlock ebnfSuffix?
-   | actionBlock QUESTION?
-   ;
-   // but preds can be anywhere
+ruleModifiers_opt:
+	  %empty
+	| ruleModifiers
+	;
 
-lexerBlock
-   : LPAREN lexerAltList RPAREN
-   ;
-   // E.g., channel(HIDDEN), skip, more, mode(INSIDE), push(INSIDE), pop
+exceptionGroup:
+	  exceptionHandler_zom finallyClause_opt
+	;
 
-lexerCommands
-   : RARROW lexerCommand (COMMA lexerCommand)*
-   ;
+finallyClause_opt:
+	  %empty
+	| finallyClause
+	;
 
-lexerCommand
-   : lexerCommandName LPAREN lexerCommandExpr RPAREN
-   | lexerCommandName
-   ;
+exceptionHandler_zom:
+	  %empty
+	| exceptionHandler_zom exceptionHandler
+	;
 
-lexerCommandName
-   : identifier
-   | MODE
-   ;
+exceptionHandler:
+	  CATCH argActionBlock actionBlock
+	;
 
-lexerCommandExpr
-   : identifier
-   | INT
-   ;
-   // --------------------
-   // Rule Alts
+finallyClause:
+	  FINALLY actionBlock
+	;
 
-altList
-   : alternative (OR alternative)*
-   ;
+rulePrequel:
+	  optionsSpec
+	| ruleAction
+	;
 
-alternative
-   : elementOptions? element+
-   |
-   // explicitly allow empty alts
-   ;
+ruleReturns:
+	  RETURNS argActionBlock
+	;
 
-element
-   : labeledElement (ebnfSuffix |)
-   | atom (ebnfSuffix |)
-   | ebnf
-   | actionBlock QUESTION?
-   ;
+throwsSpec:
+	  THROWS identifier COMMAidentifier_zom
+	;
 
-labeledElement
-   : identifier (ASSIGN | PLUS_ASSIGN) (atom | block)
-   ;
-   // --------------------
-   // EBNF and blocks
+COMMAidentifier_zom :
+	  %empty
+	| COMMAidentifier_zom COMMA identifier
+	;
 
-ebnf
-   : block blockSuffix?
-   ;
+localsSpec:
+	  LOCALS argActionBlock
+	;
 
-blockSuffix
-   : ebnfSuffix
-   ;
+ruleAction:
+	  AT identifier actionBlock
+	;
 
-ebnfSuffix
-   : QUESTION QUESTION?
-   | STAR QUESTION?
-   | PLUS QUESTION?
-   ;
+ruleModifiers:
+	  ruleModifier
+	| ruleModifiers ruleModifier
+	;
 
-lexerAtom
-   : characterRange
-   | terminal
-   | notSet
-   | LEXER_CHAR_SET
-   | DOT elementOptions?
-   ;
+ruleModifier:
+	  PUBLIC
+	| PRIVATE
+	| PROTECTED
+	| FRAGMENT
+	;
 
-atom
-   : terminal
-   | ruleref
-   | notSet
-   | DOT elementOptions?
-   ;
+ruleBlock:
+	  ruleAltList
+	;
 
-// --------------------
-// Inverted element set
-notSet
-   : NOT setElement
-   | NOT blockSet
-   ;
+ruleAltList:
+	  labeledAlt ORlabeledAlt_zom
+	;
 
-blockSet
-   : LPAREN setElement (OR setElement)* RPAREN
-   ;
+ORlabeledAlt_zom:
+	  %empty
+	| ORlabeledAlt_zom OR labeledAlt
+	;
 
-setElement
-   : TOKEN_REF elementOptions?
-   | STRING_LITERAL elementOptions?
-   | characterRange
-   | LEXER_CHAR_SET
-   ;
+labeledAlt:
+	  alternative POUNDidentifier_opt
+	;
 
-// -------------
-// Grammar Block
-block
-   : LPAREN (optionsSpec? ruleAction* COLON)? altList RPAREN
-   ;
+POUNDidentifier_opt:
+	  %empty
+	| POUND identifier
+	;
 
-// ----------------
-// Parser rule ref
-ruleref
-   : RULE_REF argActionBlock? elementOptions?
-   ;
+lexerRuleSpec:
+	  fragment_opt TOKEN_REF optionsSpec_opt COLON lexerRuleBlock SEMI
+	;
 
-// ---------------
-// Character Range
-characterRange
-   : STRING_LITERAL RANGE STRING_LITERAL
-   ;
+optionsSpec_opt:
+	  %empty
+	| optionsSpec
+	;
 
-terminal
-   : TOKEN_REF elementOptions?
-   | STRING_LITERAL elementOptions?
-   ;
+fragment_opt:
+	  %empty
+	| FRAGMENT
+	;
 
-// Terminals may be adorned with certain options when
-// reference in the grammar: TOK<,,,>
-elementOptions
-   : LT elementOption (COMMA elementOption)* GT
-   ;
+lexerRuleBlock:
+	  lexerAltList
+	;
 
-elementOption
-   : identifier
-   | identifier ASSIGN (identifier | STRING_LITERAL)
-   ;
+lexerAltList:
+	  lexerAlt orLexerAltList
+	;
 
-identifier
-   : RULE_REF
-   | TOKEN_REF
-   ;
+orLexerAltList:
+	  %empty
+	| orLexerAltList OR lexerAlt
+	;
+
+lexerAlt:
+	  lexerElements
+	|  lexerElements lexerCommands
+	| %empty
+	;
+
+lexerElements:
+	  lexerElement
+	| lexerElements lexerElement
+	;
+
+lexerElement:
+	  lexerAtom ebnfSuffix_opt
+	| lexerBlock ebnfSuffix_opt
+	| actionBlock questio_opt
+	;
+
+ebnfSuffix_opt :
+	  %empty
+	| ebnfSuffix
+	;
+
+lexerBlock:
+	  LPAREN lexerAltList RPAREN
+	;
+
+lexerCommands:
+	  RARROW lexerCommand COMMAlexerCommand_zom
+	;
+
+COMMAlexerCommand_zom:
+	  %empty
+	| COMMAlexerCommand_zom COMMA lexerCommand
+	;
+
+lexerCommand:
+	  lexerCommandName LPAREN lexerCommandExpr RPAREN
+	| lexerCommandName
+	;
+
+lexerCommandName:
+	  identifier
+	| MODE
+	;
+
+lexerCommandExpr:
+	  identifier
+	| INT
+	;
+
+altList:
+	  alternative ORalternative_zom
+	;
+
+ORalternative_zom:
+	  %empty
+	| ORalternative_zom OR alternative
+	;
+
+alternative:
+	  elementOptions_opt element_oom
+	| %empty
+	;
+
+element_oom:
+	  element
+	| element_oom element
+	;
+
+elementOptions_opt:
+	  %empty
+	| elementOptions
+	;
+
+element:
+	  labeledElement ebnfSuffix_opt
+	| atom ebnfSuffix_opt
+	| ebnf
+	| actionBlock questio_opt
+	;
+
+labeledElement:
+	  identifier assing atomOrBlock
+	;
+
+atomOrBlock:
+	  atom
+	| block
+	;
+
+assing:
+	  ASSIGN
+	| PLUS_ASSIGN
+	;
+
+ebnf:
+	  block blockSuffix_opt
+	;
+
+blockSuffix_opt:
+	  %empty
+	| blockSuffix
+	;
+
+blockSuffix:
+	  ebnfSuffix
+	;
+
+ebnfSuffix:
+	  QUESTION questio_opt
+	| STAR questio_opt
+	| PLUS questio_opt
+	;
+
+questio_opt:
+	  %empty
+	| QUESTION
+	;
+
+lexerAtom:
+	  characterRange
+	| terminal
+	| notSet
+	| LEXER_CHAR_SET
+	| DOT elementOptions_opt
+	;
+
+atom:
+	  terminal
+	| ruleref
+	| notSet
+	| DOT elementOptions_opt
+	;
+
+notSet:
+	  NOT setElement
+	| NOT blockSet
+	;
+
+blockSet:
+	  LPAREN setElement ORsetElement_zom RPAREN
+	;
+
+ORsetElement_zom:
+	  %empty
+	| ORsetElement_zom OR setElement
+	;
+
+setElement:
+	  TOKEN_REF elementOptions_opt
+	| STRING_LITERAL elementOptions_opt
+	| characterRange
+	| LEXER_CHAR_SET
+	;
+
+block:
+	  LPAREN ruleActionList altList RPAREN
+	;
+
+ruleActionList:
+	  %empty
+	| optionsSpec_opt ruleAction_zom COLON
+	;
+
+ruleAction_zom:
+	  %empty
+	| ruleAction_zom ruleAction
+	;
+
+ruleref:
+	  RULE_REF argActionBlock_opt elementOptions_opt
+	;
+
+characterRange:
+	  STRING_LITERAL RANGE STRING_LITERAL
+	;
+
+terminal:
+	  TOKEN_REF elementOptions_opt
+	| STRING_LITERAL elementOptions_opt
+	;
+
+elementOptions:
+	  LT elementOption COMMAelementOption_zom GT
+	;
+
+COMMAelementOption_zom:
+	  %empty
+	| COMMAelementOption_zom COMMA elementOption
+	;
+
+elementOption:
+	  identifier
+	| identifier ASSIGN idOrStr
+	;
+
+idOrStr:
+	  identifier
+	| STRING_LITERAL
+	;
+
+identifier:
+	  RULE_REF
+	| TOKEN_REF
+	;
 
 %%
 
@@ -747,6 +912,7 @@ channels { OFF_CHANNEL , COMMENT }
 {LBrack}([^\]\\]|{EscAny})+{RBrack}	LEXER_CHAR_SET
 
 /* Order matter if ILLEGAL_CHARACTER comes before identifier one letter identifer is classified as ILLEGAL_CHARACTER */
-.	ILLEGAL_CHARACTER
+//.	ILLEGAL_CHARACTER
 
 %%
+
