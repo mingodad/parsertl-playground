@@ -291,7 +291,6 @@ namespace parsertl
                 ");\n";
 
             last_idx = 0;
-            prod_size_t index2_ = 0;
             hasRecords = false;
             for (auto iter_ = grammar_.cbegin(), end_ = grammar_.cend();
                 iter_ != end_; ++iter_)
@@ -299,52 +298,39 @@ namespace parsertl
                 auto lhs_iter_ = iter_;
                 prod_size_t index_ = lhs_iter_ - grammar_.begin();
 
-                if(index_ == 0 || index_ > index2_)
+                int lhs_pos = 0;
+                if(!hasRecords) {
+                    hasRecords = true;
+                    stream_ << "\nINSERT INTO rulerhs(ruleid,pos,sym) VALUES\n";
+                }
+                if (lhs_iter_->_rhs.empty())
                 {
-                    int lhs_pos = 0;
-                    prod_size_t index3_ = index_;
-                    while (index3_ != static_cast<prod_size_t>(~0))
+                    if(last_idx++)
                     {
-                        if(!hasRecords) {
-                            hasRecords = true;
-                            stream_ << "\nINSERT INTO rulerhs(ruleid,pos,sym) VALUES\n";
-                        }
-                        if (lhs_iter_->_rhs.empty())
+                        stream_ << "\n,";
+                    }
+                    stream_ << "(" << index_ << "," << lhs_pos++ << ",NULL)";
+                }
+                else
+                {
+                    auto rhs_iter_ = lhs_iter_->_rhs.cbegin();
+                    auto rhs_end_ = lhs_iter_->_rhs.cend();
+
+                    for (; rhs_iter_ != rhs_end_; ++rhs_iter_)
+                    {
+                        const std::size_t id_ =
+                            rhs_iter_->_type == symbol::type::TERMINAL ?
+                            rhs_iter_->_id :
+                            terminals_ + rhs_iter_->_id;
+
+                        // Don't dump '$'
+                        if (id_ > 0)
                         {
                             if(last_idx++)
                             {
                                 stream_ << "\n,";
                             }
-                            stream_ << "(" << index3_ << "," << lhs_pos++ << ",NULL)";
-                        }
-                        else
-                        {
-                            auto rhs_iter_ = lhs_iter_->_rhs.cbegin();
-                            auto rhs_end_ = lhs_iter_->_rhs.cend();
-
-                            for (; rhs_iter_ != rhs_end_; ++rhs_iter_)
-                            {
-                                const std::size_t id_ =
-                                    rhs_iter_->_type == symbol::type::TERMINAL ?
-                                    rhs_iter_->_id :
-                                    terminals_ + rhs_iter_->_id;
-
-                                // Don't dump '$'
-                                if (id_ > 0)
-                                {
-                                    if(last_idx++)
-                                    {
-                                        stream_ << "\n,";
-                                    }
-                                    stream_ << "(" << index3_ << "," << lhs_pos++ << "," << id_ << ")";
-                                }
-                            }
-                        }
-                        index2_ = index3_;
-                        index3_ = lhs_iter_->_next_lhs;
-                        if (index3_ != static_cast<prod_size_t>(~0))
-                        {
-                            lhs_iter_ = grammar_.cbegin() + index3_;
+                            stream_ << "(" << index_ << "," << lhs_pos++ << "," << id_ << ")";
                         }
                     }
                 }
