@@ -76,6 +76,7 @@
 %token KWMULTRUNC
 %token KWMULTRUNCEQUALS
 %token KWNOTEQUAL
+%token KWNONE
 %token KWNULL
 %token KWOPERATOR
 %token KWOR
@@ -945,6 +946,7 @@ typeLiteral :
 	| INTTYPE
 	| KWSTRING
 	| KWBOOL
+	| KWNONE
 	| KWF32
 	| KWF64
 	;
@@ -1047,6 +1049,7 @@ newlines :
 "isnull"               KWISNULL
 "iterator"             KWITERATOR
 "mod"                  KWMOD
+"none"	KWNONE
 "null"                 KWNULL
 "operator"             KWOPERATOR
 "prependcode"          KWPREPENDCODE
