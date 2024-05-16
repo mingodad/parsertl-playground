@@ -102,6 +102,7 @@ const sampleList = [
 	["Datalog parser", "datalog.g", "test.datalog", "ace/mode/text"],
 	["Delphi parser (partially working)", "delphi.g", "test.delphi", "ace/mode/pascal"],
 	["Dino-lang parser", "dino-lang.g", "test.dino-lang", "ace/mode/c_cpp"],
+	["DMEngine parser", "dmengine-dm.g", "test.dmengine-dm", "ace/mode/sh"],
 	["Doxygen code scanner torture", "code-doxygen.g", "test.c", "ace/mode/c_cpp"],
 	["D parser (partially working)", "dlang-uaiso.g", "test.d", "ace/mode/c_cpp"],
 	["DuckDB SQL parser (be patient)", "duckdb-pgsql.g", "test.duckdb", "ace/mode/sql"],
