@@ -159,14 +159,14 @@ namespace parsertl
                         if(ch == '\'') stream_ << "''";
                         else stream_ << ch;
                     }
-                    stream_ << "',1";
+                    stream_ << "',1,";
                     if(token_info_._fallback)
                     {
                         stream_ << token_info_._fallback;
                     }
                     else
                     {
-                        stream_ << ",NULL";
+                        stream_ << "NULL";
                     }
                     stream_ << ")";
                 }
@@ -208,7 +208,7 @@ namespace parsertl
                         hasRecords = true;
                         stream_ << "\nINSERT INTO precedence(id,prec,assoc) VALUES\n";
                     }
-                    if(idx_ > 1)
+                    else
                     {
                         stream_ << "\n,";
                     }
