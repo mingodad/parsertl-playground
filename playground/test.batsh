@@ -1,0 +1,208 @@
+println(false);
+println(true);
+println(42);
+println(1 + (4 + 6) * 3);
+println(8 - 3 % 2);
+println(-9 - 9);
+println((2 + 8) / 3);
+println(2 === 2);
+println(6 !== 8);
+println(3 > 2);
+println(4 < 5);
+println(6 >= 2);
+println(19 <= 30);
+println(!true);
+println(!false);
+println(!(2 - 1));
+a = ["", "y", -1, 1];
+a[0] = 2 * 9;
+a[2] = "abx";
+a[4] = "5" ++ a[0];
+println(a[0], a[1], a[2], a[3], a[4]);
+a = [1, 2, 3];
+println(a[0], a[1], a[2]);
+println(("10" ++ a[0]) * 2);
+println(len(a));
+println(len(a) * 8);
+//println([1, 2, 3]);
+a = "Value: " ++ 1+(4+6)*3;
+println(a);
+b = 3 + 4;
+println(b);
+c = a;
+println(c);
+d = b ++ c;
+println(d);
+//Level 0 Start
+println("Hello");
+{
+  //Level 1 Start
+  println("Lo");
+  {
+    //Level 2 Start
+    println("and behold");
+    //Level 2 End
+  }
+  //Level 1 End
+}
+println("End");
+//Level 0 End
+call("println", "Println Called");
+cmd = "ec" ++ "ho";
+call(cmd, "Echo Called");
+retval = echo("Value 100%");
+println(retval);
+a = 3;
+// This is comment 1
+a = a * 5;
+// This is comment 2
+println(a);
+//This is comment 3
+ex = exists("Makefile");
+println(ex);
+exists("Makefile");
+if (exists("Makefile")) {
+  println("Yes");
+}
+if (exists("none")) {
+  println("Impossible");
+} else {
+  println("No");
+}
+// Function call
+function func1(p1, p2) {
+  println(p1, p2);
+}
+func1("Hello", "World");
+
+// Global and local variables
+v1 = "Global V1";
+v2 = "Global V2";
+v3 = "Global V3";
+function func2(p) {
+  v1 = "Local " ++ p;
+  println(v1);
+  println(v2);
+  global v3;
+  v3 = "V3 Modified.";
+}
+func2("Var");
+println(v1);
+println(v3);
+
+// Return value
+function func3(num) {
+  return num + 41;
+}
+func3(4);
+println();
+ret = func3(1);
+println("Returned:", ret);
+
+// Argument containing space
+function g(text) {
+  return text;
+}
+function f(text) {
+  return g(text);
+}
+test = f("Param with space");
+println(test);
+if (2 < 10) {
+  println("Yes");
+}
+
+if (true) {
+  if (false){
+    v=(4 + 1);
+  } else {
+    v = 2;
+  }
+} else {
+
+}
+println(v);
+
+if (2 > 1)
+  println("True");
+
+if (1 === 12) {
+  println("No");
+}
+
+if ("a" == "b") {
+  println("No");
+} else {
+  println("a is not b");
+}
+
+num = 43;
+if ("43" == num) {
+  println("43 == num");
+}
+if ("43" === num) {
+  println("43 === num");
+}
+function loop(num) {
+  println(num);
+  if (num > 0) {
+    loop(num - 1);
+  }
+}
+loop(10);
+
+function fact(num) {
+  if (num === 0) {
+    return 1;
+  } else {
+    return fact(num - 1) * num;
+  }
+}
+println(fact(5));
+
+function fibonacci(num) {
+  if (num === 0) {
+    return 0;
+  } else if (num === 1) {
+    return 1;
+  } else {
+    return fibonacci(num - 2) + fibonacci(num - 1);
+  }
+}
+
+i = 0;
+while (i < 7) {
+  println(fibonacci(i));
+  i = i + 1;
+}
+println("BYVoid");
+println("Slash/");
+println("Backslash\\");
+println("Quote\"'");
+println("Tab\tTab");
+//println("Newline\nLine2");
+//println("!");
+println("http://" ++ "www." ++ ("byvoid" ++ ".com"));
+println(6 / 2 ++ "BYVoid" ++ 3 + 5);
+println(3 + "3");
+println(3 + "3" ++ "2");
+println(3 + ("3" ++ "2"));
+println("BYVoid" == "BYVoid");
+i = 0;
+while (i < 5) {
+  print(i ++ " ");
+  i = i + 1;
+}
+println();
+
+// Fibonacci
+n = 0;
+i = 0;
+j = 1;
+while (n < 40) {
+  k = i + j;
+  i = j;
+  j = k;
+  n = n + 1;
+  println(k);
+}

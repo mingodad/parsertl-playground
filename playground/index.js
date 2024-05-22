@@ -66,6 +66,7 @@ const sampleList = [
 	["Austral parser (partially working)", "austral-parser.g", "test.austral", "ace/mode/text"],
 	["BaikalDB SQL parser", "BaikalDB-sql.g", "test.BaikalDB-sql", "ace/mode/sql"],
 	["Basil parser", "basil-grammar.g", "test.basil-grammar", "ace/mode/yaml"],
+	["Batsh parser", "batsh.g", "test.batsh", "ace/mode/c_cpp"],
 	["Bayeslite parser", "bayeslite.g", "test.bayeslite", "ace/mode/text"],
 	["BC calculator", "bc.g", "test.bc-calculator", "ace/mode/sh"],
 	["Beaver parser", "beaver-grammar.g", "test.beaver-grammar", "ace/mode/yaml"],
