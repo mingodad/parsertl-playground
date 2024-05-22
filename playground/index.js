@@ -115,7 +115,7 @@ const sampleList = [
 	["Expr-lang parser", "expr-lang.g", "test.expr-lang", "ace/mode/txt"],
 	["Fault-lang parser (partially working)", "fault-lang-ext.g", "test.fault-lang", "ace/mode/txt"],
 	["Faust parser", "faustparser.g", "test.faustparser", "ace/mode/txt"],
-	["Ffscript parser", "ffscript.g", "test.ffscript", "ace/mode/c_cpp"],
+	["ZScript parser", "ffscript.g", "test.ffscript", "ace/mode/c_cpp"],
 	["Firebird DSQL parser", "firebird-dsql.g", "test.firebird-dsql", "ace/mode/sql"],
 	["Flatbuffers parser", "flatbuffers.g", "test.flatbuffers", "ace/mode/txt"],
 	["Fortune sheet formula parser", "fortune-sheet-formula.g", "test.fortune-sheet-formula", "ace/mode/txt"],
