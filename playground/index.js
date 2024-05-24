@@ -168,6 +168,7 @@ const sampleList = [
 	["Lua-lark parser", "lua-parser-lark.g", "test.lua", "ace/mode/lua"],
 	["Lua parser", "lua.g", "test.lua", "ace/mode/lua"],
 	["LuaPP parser (partially working)", "luapp.g", "test.luapp", "ace/mode/lua"],
+	["LunarML parser (partially working)", "LunarML.g", "test.LunarML", "ace/mode/ocaml"],
 	["Make parser (from anjuta)", "mk-parser.g", "test.mk-parser", "ace/mode/Makefile"],
 	["MangoFix parser", "mangofix.g", "test.mangofix", "ace/mode/c_cpp"],
 	["Matrixone MYSQL parser (be patient)(partially working)", "matrixone-mysql.g", "test.mysql", "ace/mode/sql"],
