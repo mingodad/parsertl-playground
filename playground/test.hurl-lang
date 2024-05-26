@@ -1,0 +1,39 @@
+
+# fibonacci in hurl
+let fib = func(locals) {
+    let a = locals.1;
+    let b = locals.2;
+    let iters = locals.3;
+    let max_iter = locals.4;
+
+    toss [b, a + b, iters + 1, max_iter];
+    hurl iters < max_iter;
+};
+
+let fib_alt = func(locals) {
+    let a = locals.1;
+    let b = locals.2;
+
+    hurl [b, a + b];
+};
+
+println("Fibonacci:");
+try {
+    loop(fib, [0, 1, 1, 10]);
+} catch as retval {
+    println("Final: " + slice(retval, 1, 3));
+};
+
+try {
+    for(10, fib_alt, [0, 1]);
+} catch as retval {
+    println("Final: " + retval);
+};
+
+try {
+    until(func(locals) {
+        hurl locals.1 > 50;
+    }, fib_alt, [0, 1]);
+} catch as retval {
+    println("Final: " + retval);
+};
