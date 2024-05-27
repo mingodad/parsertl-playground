@@ -1,0 +1,221 @@
+html (lang: en, data-framework: dtu) {
+  head {
+    meta (charset: "utf-8"),
+    title { "DTU - TodoMVC" },
+    style {
+      All { box-sizing: border-box },
+      body {
+        text-align: center,
+        font(#px 14, "Helvetica Neue", Helvetica, Arial, sans-serif),
+        font-weight: normal,
+        line-height: normal,
+        line-height: #em 1.4,
+        background: #hex "f5f5f5",
+        color: #hex "4d4d4d",
+        min-width: #px 230,
+        max-width: #px 550,
+        margin(0, auto),
+        font-weight: 300,
+      },
+      h1 {
+        color: #rgba(175, 47, 47, 0.5),
+        font-size: #rem 5,
+        font-weight: 100,
+        margin(#em 1, 0),
+      },
+      class.new-todo {
+        padding(#em 1),
+        margin(#em 1, 0),
+        border: none,
+        background-color: #rgba(0,0,0,0.03),
+        box-shadow(inset, 0, #px -2, #px 1, #rgba(0,0,0,0.03)),
+        width: #pc 50,
+      },
+      id.clear-completed {
+        width: #pc 50,
+        padding: #em 0.5,
+      },
+      any(id.clear-completed, id.toggle-all, class.view) {
+        margin(#em 2, 0),
+      },
+      class.view {
+        display: flex,
+        justify-content: space-between,
+      },
+      any(id.show-all, id.show-completed, id.show-active) {
+        min-width: #ch 8,
+        display: inline-block,
+      },
+      class.destroy {
+        padding(#em 0.15, #em 0.5),
+        font-weight: bold,
+        border: none,
+        background-color: transparent,
+        cursor: pointer,
+      },
+      class.info {
+        color: #hex "bfbfbf",
+        font-size: #px 10,
+        text-shadow(0, #px 1, 0, #rgba(255, 255, 255, 0.5)),
+        text-align: center,
+      },
+      any(class.filters > li) {
+        list-style-type: none,
+        display: inline,
+        margin: #em 1,
+      },
+      any(class.filters > li > a) {
+        text-decoration: none,
+        padding: #em 0.5,
+        border(#px 1, solid, transparent),
+        color: #hex "555",
+      },
+      any(class.filters > li > class.selected) {
+        border(#px 1, solid, #hex "cccccc")
+      }
+    },
+  },
+  body {
+    section (class: "todoapp") {
+      header (class: "header") {
+        h1 { "todos" },
+        input (id: "new-todo", class: "new-todo", placeholder: "What needs to be done?", autofocus),
+      },
+      section (class: "main") {
+        input (id: "toggle-all", class: "toggle-all", type: "checkbox"),
+        label (for: "toggle-all") { "Mark all as complete" },
+        ul (id: "todo-list", class: "todo-list"),
+      },
+      footer (class: "footer") {
+        span (class: "todo-count"),
+        ul (class: "filters") {
+          li { a (id: "show-all", href: "#/", class: "selected") { "All" } },
+          li { a (id: "show-active", href: "#/active") { "Active" } },
+          li { a (id: "show-completed", href: "#/completed") { "Completed" } },
+        },
+        button (id: "clear-completed", class: "clear-completed") { "Clear completed" },
+      }
+    },
+    footer (class: "info") {
+      p {
+        "Created by ",
+        a (href: "http://twitter.com/warianoguerra") { "Mariano Guerra" }
+      },
+      p {
+        "Part of ",
+        a (href: "http://todomvc.com") { "TodoMVC" }
+      },
+    },
+    script {
+      fn.main (_e) {
+        let {
+          byId: fn (id) { return(document.getElementById(id)) },
+          ct: fn (v) { return (document.createTextNode(v)) },
+          input: byId("new-todo"),
+          todos: byId("todo-list"),
+          clearCompleted: byId("clear-completed"),
+          toggleAll: byId("toggle-all"),
+          showAll: byId("show-all"),
+          showActive: byId("show-active"),
+          showCompleted: byId("show-completed"),
+        },
+        input.addEventListener("keyup", fn (e) {
+          console.log("keyup", e),
+          if (e.keyCode === 13) {
+            console.log("enter", e),
+            let {node: ce("div", #{class: "view active"},
+              ce("input", #{class: "toggle", type: "checkbox"}),
+              ce("label", #{}, ct(input.value)),
+              ce("button", #{class: "destroy"}, ct("X")),
+            )},
+            todos.appendChild(node),
+            node.addEventListener("click", fn (e) {
+              if (e.target.tagName === "BUTTON") {
+                console.log("remove", e.target.parentNode),
+                e.target.parentNode.parentNode.removeChild(e.target.parentNode),
+              }
+            }),
+            input.value = "",
+          }
+        }),
+        clearCompleted.addEventListener("click", fn (e) {
+            let {
+              checked: document.querySelectorAll(".toggle:checked")
+            },
+            checked.forEach(fn (node) {
+              node.parentNode.parentNode.removeChild(node.parentNode)
+            }),
+        }),
+        toggleAll.addEventListener("change", fn (e) {
+            let {
+              checked: document.querySelectorAll(".toggle")
+            },
+            checked.forEach(fn (input) {
+              input.checked = e.target.checked
+            }),
+        }),
+        showAll.addEventListener("click", fn (e) {
+          removeClassToNodes("selected", ".filters a"),
+          setDisplayToNodes("flex", ".todo-list > div"),
+          e.target.classList.add("selected")
+        }),
+        showActive.addEventListener("click", fn (e) {
+          removeClassToNodes("selected", ".filters a"),
+          setDisplayToNodes("none", ".todo-list > div"),
+          setDisplayToNodes("flex", ".todo-list > .active"),
+          e.target.classList.add("selected")
+        }),
+        showCompleted.addEventListener("click", fn (e) {
+          removeClassToNodes("selected", ".filters a"),
+          setDisplayToNodes("none", ".todo-list > div"),
+          setDisplayToNodes("flex", ".todo-list > .completed"),
+          e.target.classList.add("selected")
+        }),
+        todos.addEventListener("change", fn (e) {
+          let { checkbox: e.target },
+          if (checkbox.tagName === "INPUT") {
+            let { task: checkbox.parentNode },
+            if (checkbox.checked) {
+              task.classList.remove("active"),
+              task.classList.add("completed"),
+            },
+            if (!checkbox.checked) {
+              task.classList.remove("completed"),
+              task.classList.add("active"),
+            }
+          }
+        }),
+        console.log("loaded"),
+      },
+      fn.removeClassToNodes(className, selector) {
+        let {nodes: document.querySelectorAll(selector)},
+        nodes.forEach(fn (node) {
+          node.classList.remove(className)
+        }),
+      },
+      fn.setDisplayToNodes(display, selector) {
+        let {nodes: document.querySelectorAll(selector)},
+        nodes.forEach(fn (node) {
+          node.style.display = display
+        }),
+      },
+      fn.ce(tagName, attrs, *childs) {
+        let {
+          node: document.createElement(tagName),
+          entries: Object.entries(attrs)
+        },
+
+        entries.forEach(fn (#[key, val]) {
+          node.setAttribute(key, val)
+        }),
+
+        childs.forEach(fn (child) {
+          node.appendChild(child)
+        }),
+
+        return(node)
+      },
+      window.addEventListener("load", main),
+    }
+  }
+}
