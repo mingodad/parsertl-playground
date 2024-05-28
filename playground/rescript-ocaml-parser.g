@@ -1652,7 +1652,7 @@ literal_modifier   [G-Zg-z]
 "->"	MINUSGREATER
 "."	DOT
 ".."	DOTDOT
-"."	DOTOP
+".OP"	DOTOP //FIXME
 ":"	COLON
 "::"	COLONCOLON
 ":="	COLONEQUAL

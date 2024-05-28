@@ -947,6 +947,9 @@ real  (~?)(({decnum}{frac}?{exp})|({decnum}{frac}{exp}?))
 
 {ws}+  skip()
 {eol}  skip()
+
+"(*#showBasis"{ws}+"\""[^"]*"\""{ws}*"*)" SHOW_BASIS
+//Should be after SHOW_BASIS to not shadow it
 "(*"(?s:.)*?"*)"    skip()
 
 
@@ -1043,6 +1046,5 @@ real  (~?)(({decnum}{frac}?{exp})|({decnum}{frac}{exp}?))
 
 \"(\\.|[^"\n\r\\])*\" STRING
 "#\""(\\.|[^"\n\r\\])\" CHAR
-"(*#showBasis"{ws}+"\""[^"]*"\""{ws}*"*)" SHOW_BASIS
 
 %%

@@ -4703,18 +4703,15 @@ other			.
 NOT\s+(BETWEEN|IN_P|LIKE|ILIKE|SIMILAR)<NOT_LA_ST>	reject()
 <NOT_LA_ST> {
 	NOT<INITIAL>	NOT_LA
-	.<INITIAL>	reject()
 }
 NULLS_P\s+(FIRST_P|LAST_P)<NULLS_LA_ST>	reject()
 <NULLS_LA_ST> {
 	NULLS_P<INITIAL>	NULLS_LA
-	.<INITIAL>	reject()
 }
 
 WITH\s+(TIME|ORDINALITY)<WITH_LA_ST>	reject()
 <WITH_LA_ST> {
 	WITH<INITIAL>	WITH_LA
-	.<INITIAL>	reject()
 }
 
 

@@ -372,9 +372,6 @@ OutputDefinitions:
 	| 'OUTPUT':
 	    oSetClass(cOutput)
 	    @SymbolDefinitions
-	| *:
-    ]
-    [
 	| 'INPUT':
 	    'OUTPUT'
 	    oSetClass(cInputOutput)

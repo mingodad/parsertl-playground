@@ -97,9 +97,10 @@
 %token YIELD
 
 %nonassoc /*1*/ IF_WITHOUT_ELSE
-%nonassoc /*2*/ ELSE
+%nonassoc /*2*/ ELSE OTHERWISE
 %nonassoc '=' SHLEQ SHREQ ADDEQ SUBEQ MULEQ DIVEQ MODEQ ANDEQ OREQ XOREQ LANDEQ LOREQ LUNDEFEQ
 %precedence SHIFT_HERE
+%right UMINUS
 
 %start Program
 
@@ -370,6 +371,7 @@ ObjectSpecialSyntax :
 
 CaseWhenExpression :
 	TernaryExpression
+	| CASE AssignExpression WhenClauseList %prec IF_WITHOUT_ELSE
 	| CASE AssignExpression WhenClauseList CaseElseClause
 	;
 
@@ -438,8 +440,7 @@ WhenCondition :
 	;
 
 CaseElseClause :
-	/*empty*/
-	| ELSE Colon_Opt WhenClauseBody
+	ELSE Colon_Opt WhenClauseBody
 	| OTHERWISE Colon_Opt WhenClauseBody
 	;
 
@@ -548,9 +549,9 @@ RegexMatch :
 	PrefixExpression
 	| RegexMatch REGEQ PrefixExpression
 	| RegexMatch REGNE PrefixExpression
-	| PrefixExpression DOTS2
+	| PrefixExpression DOTS2 %prec IF_WITHOUT_ELSE
 	| PrefixExpression DOTS2 PrefixExpression
-	| PrefixExpression DOTS3
+	| PrefixExpression DOTS3 %prec IF_WITHOUT_ELSE
 	| PrefixExpression DOTS3 PrefixExpression
 	;
 
@@ -1002,7 +1003,6 @@ TypeName :
 
 ArrayLevel :
 	/*empty*/
-	| LMBR RMBR
 	| ArrayLevel LMBR RMBR
 	;
 
@@ -1031,7 +1031,7 @@ CallArgumentList :
 CallArgument :
 	AssignExpression
 	| ObjectSpecialSyntax
-	| String
+	//| String
 	;
 
 GetLineNumber :

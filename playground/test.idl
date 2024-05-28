@@ -12,7 +12,7 @@
 library DNSTools
 {
     // TLib :     // TLib : OLE Automation : {00020430-0000-0000-C000-000000000046}
-    importlib("stdole2.tlb");
+    //importlib("stdole2.tlb");
 
     // Forward declare all types defined in this typelib
     interface IDgnEngineControlAuto;

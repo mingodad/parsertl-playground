@@ -28,7 +28,7 @@
 %token LSHIFT
 %token LSHIFT_EQUAL
 %token BREAK
-%token EQUAL
+//%token EQUAL
 %token NOT_EQUAL
 %token IMPORT
 %token PLUS_EQUAL
@@ -72,9 +72,7 @@
 %token '='
 //%token XOR_EQUAL
 %token ':'
-%token '|'
 %token '^'
-%token '&'
 %token '-'
 %token '+'
 %token '.'
@@ -95,14 +93,12 @@
 %left /*1*/ ','
 %left /*2*/ LOGICAL_OR
 %left /*3*/ LOGICAL_AND
-%right /*4*/ RSHIFT_EQUAL LSHIFT_EQUAL PLUS_EQUAL MULT_EQUAL DIV_EQUAL MINUS_EQUAL MOD_EQUAL BW_AND_EQUAL BW_OR_EQUAL BW_XOR_EQUAL '=' //XOR_EQUAL
+%right /*4*/ RSHIFT_EQUAL LSHIFT_EQUAL PLUS_EQUAL MULT_EQUAL DIV_EQUAL MINUS_EQUAL MOD_EQUAL BW_AND_EQUAL BW_OR_EQUAL BW_XOR_EQUAL //XOR_EQUAL
 %left /*5*/ ':'
 %left /*6*/ BOOLEAN_OR
 %left /*7*/ BOOLEAN_AND
-%left /*8*/ '|'
 %left /*9*/ '^'
-%left /*10*/ '&'
-%nonassoc /*11*/ EQUAL NOT_EQUAL IN
+%nonassoc /*11*/ '=' NOT_EQUAL IN
 %nonassoc /*12*/ LESS_EQUAL GREATER_EQUAL LESS GREATER
 %left /*13*/ RSHIFT LSHIFT
 %left /*14*/ '-' '+' '.'
@@ -381,7 +377,7 @@ inc_dec :
 	;
 
 comparison :
-	rvalue EQUAL /*11N*/ rvalue
+	rvalue '=' /*11N*/ rvalue
 	| rvalue NOT_EQUAL /*11N*/ rvalue
 	| rvalue GREATER /*12N*/ rvalue
 	| rvalue GREATER_EQUAL /*12N*/ rvalue
@@ -413,8 +409,8 @@ arithmetic :
 	;
 
 bitwise :
-	rvalue '&' /*10L*/ rvalue
-	| rvalue '|' /*8L*/ rvalue
+	rvalue BOOLEAN_AND /*10L*/ rvalue
+	| rvalue BOOLEAN_OR /*8L*/ rvalue
 	| rvalue '^' /*9L*/ rvalue
 	| rvalue LSHIFT /*13L*/ rvalue
 	| rvalue RSHIFT /*13L*/ rvalue
@@ -591,7 +587,6 @@ CONSTANT     [A-Z][A-Z0-9_]*
 "^"	'^'
 "~"	'~'
 "="	'='
-"|"	'|'
 "-"	'-'
 ","	','
 ";"	';'
@@ -606,14 +601,13 @@ CONSTANT     [A-Z][A-Z0-9_]*
 "{"	'{'
 "}"	'}'
 "*"	'*'
-"&"	'&'
 "%"	'%'
 "+"	'+'
 
 "&"	BOOLEAN_AND
 "|"	BOOLEAN_OR
 break	BREAK
-"&"	BW_AND_EQUAL
+"&="	BW_AND_EQUAL
 "|="	BW_OR_EQUAL
 "^⁼"	BW_XOR_EQUAL
 case	CASE

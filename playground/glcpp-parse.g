@@ -334,7 +334,7 @@ PATH			["][^./ _A-Za-z0-9+*%[(){}|&~=!:;,?-]*["]
 <HASH>pragma{HSPACE}*[\r\n]<EPRAGMA>	reject()
 <EPRAGMA>{
 	pragma	PRAGMA
-	,+<.>
+	[^\r\n]+<.>
 	[\r\n]<INITIAL>	reject()
 }
 
@@ -397,8 +397,7 @@ PATH			["][^./ _A-Za-z0-9+*%[(){}|&~=!:;,?-]*["]
 	/* An identifier immediately followed by '(' */
 <DEFINE>{IDENTIFIER}"("<DEFINE2> 	reject()
 <DEFINE2>{
-	{IDENTIFIER}	FUNC_IDENTIFIER
-	"("<INITIAL>	reject()
+	{IDENTIFIER}<INITIAL>	FUNC_IDENTIFIER
 }
 
 	/* An identifier not immediately followed by '(' */

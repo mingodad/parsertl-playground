@@ -1676,7 +1676,7 @@ TemplateSingleArg :
     /*--- Hacks ---*/
 
 <JOINBRACE>[ \t\n]	skip()
-<JOINBRACE>.<.>
+<JOINBRACE>[^{]<.>
 <JOINBRACE>"{"<INITIAL> IN_LBRACE_HACK
 
     /*--- Comments ---*/

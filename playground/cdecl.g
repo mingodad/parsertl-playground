@@ -157,7 +157,7 @@
 %token PY_warning
 %token Y_asm
 %token Y_const
-%token Y_DOT_DOT_DOT
+//%token Y_DOT_DOT_DOT
 %token Y_enum
 %token Y_signed
 %token Y_void
@@ -548,7 +548,7 @@ p_punctuator :
 	| Y_AMPER_EQUAL /*17R*/
 	| Y_CARET_EQUAL /*17R*/
 	| Y_COLON_COLON /*2L*/
-	| Y_DOT_DOT_DOT
+	| "..."
 	| Y_DOT_STAR /*5L*/
 	| Y_EQUAL_EQUAL /*11L*/
 	| Y_EXCLAM_EQUAL /*11L*/
@@ -2612,7 +2612,7 @@ deprecated	Y_deprecated
 destructor	Y_destructor
 Y_DESTRUCTOR_SNAME	Y_DESTRUCTOR_SNAME
 discard	Y_discard
-"..."	Y_DOT_DOT_DOT
+//"..."	Y_DOT_DOT_DOT
 ".*"	Y_DOT_STAR
 double	Y_double
 dynamic	Y_dynamic

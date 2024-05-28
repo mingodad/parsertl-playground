@@ -740,7 +740,7 @@ setitem :
 %%
 
 [ \t\r]+	skip()
-"#".*\n?   skip()
+^"#".*\n?   skip()
 \n  NL
 
 "AUTOBACKUP"     K_AUTOBACKUP

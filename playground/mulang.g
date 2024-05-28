@@ -965,7 +965,7 @@ BOM                     \xef\xbb\xbf
 "%"	'%'
 "!"	'!'
 "~"	'~'
-"\""	'\''
+"'"	'\''
 
 {Identifier}		MU_IDENTIFIER
 

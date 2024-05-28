@@ -1423,10 +1423,11 @@ T_INLINE_HTML	T_INLINE_HTML
 "-="	T_MINUS_EQUAL
 "%="	T_MOD_EQUAL
 "*="	T_MUL_EQUAL
-"\\"{LABEL}("\\"{LABEL})*	T_NAME_FULLY_QUALIFIED
-{LABEL}("\\"{LABEL})+	T_NAME_QUALIFIED
 "namespace"("\\"{LABEL})+	T_NAME_RELATIVE
 "namespace"	T_NAMESPACE
+/*namespace need be before LABEL bellow to not be shadowed*/
+"\\"{LABEL}("\\"{LABEL})*	T_NAME_FULLY_QUALIFIED
+{LABEL}("\\"{LABEL})+	T_NAME_QUALIFIED
 "new"	T_NEW
 T_NOELSE	T_NOELSE
 "__NAMESPACE__"	T_NS_C

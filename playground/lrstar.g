@@ -424,8 +424,7 @@ blocl_comment   "/*"(?s:.)*?"*/"
 {base_id}({white_space})*(":"|"->")<head_sym>	reject()
 <head_sym> {
     ("Goal"|"Start")<INITIAL>	GOALSYMBOL
-    {base_id}   HEADSYMBOL
-    (":"|"->")<INITIAL> reject()
+    {base_id}<INITIAL>   HEADSYMBOL
 }
 
 %%

@@ -1957,7 +1957,6 @@ IDENT	[a-zA-Z\x80-\xff_][a-zA-Z0-9\x80-\xff_]*
 "where"	WHERE
 "ref"	REF
 "typeof"	TYPEOF
-'{IDENT}	LIFETIME
 "'static"	STATIC_LIFETIME
 "continue"	CONTINUE
 "break"	BREAK
@@ -2016,9 +2015,6 @@ IDENT	[a-zA-Z\x80-\xff_][a-zA-Z0-9\x80-\xff_]*
 "~"	'~'
 "$"	'$'
 
-/* Order matter if identifier comes before keywords they are classified as identifier */
-{IDENT}	IDENT
-
 "#!"[^\n]+	SHEBANG_LINE
 "///"[^\n]*	INNER_DOC_COMMENT
 "//!"[^\n]*	OUTER_DOC_COMMENT
@@ -2031,6 +2027,10 @@ b'([^'\n\r]|\\[^\n\r])'	LIT_BYTE
 LIT_STR_RAW	LIT_STR_RAW
 LIT_BYTE_STR	LIT_BYTE_STR
 LIT_BYTE_STR_RAW	LIT_BYTE_STR_RAW
+
+/* Order matter if identifier comes before keywords they are classified as identifier */
+'{IDENT}	LIFETIME
+{IDENT}	IDENT
 
 .	ILLEGAL_CHARACTER
 

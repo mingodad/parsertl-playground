@@ -9,13 +9,10 @@
 
 /*Tokens*/
 %token T_CONSTVAL
-%token T_INT
 %token T_OCTET
-%token T_REAL
 %token T_REGEXP
 %token T_STRING
 %token T_SYMBOL
-%token T_VOID
 
 %start program
 
@@ -125,9 +122,9 @@ variable_id :
 variable_type :
 	/*empty*/
 	| ':' T_SYMBOL
-	| ':' T_VOID
-	| ':' T_INT
-	| ':' T_REAL
+	| ':' "void"
+	| ':' "int"
+	| ':' "real"
 	| ':' T_STRING
 	| ':' T_OCTET
 	;
@@ -603,11 +600,8 @@ const_dic_elm :
 "while"	"while"
 "with"	"with"
 
-"void"	T_VOID
 "octet"	T_OCTET
 "octet"	T_CONSTVAL
-"int"	T_INT
-"real"  T_REAL
 
 [0-9]+	T_CONSTVAL
 [0-9]+"."[0-9]+	T_CONSTVAL

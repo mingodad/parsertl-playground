@@ -684,10 +684,10 @@ WITHIN	K_WITHIN
 
 ([0-9]+\.[0-9]*|\.[0-9]+)([Ee](\+|\-)?[0-9]+)?	L_FLOAT
 [0-9]+	L_INTEGER
-{BASE_ID}	L_NAME
-\"{BASE_ID}\"	L_NAME
 L_NAMPAR	L_NAMPAR
 L_NUMPAR	L_NUMPAR
+{BASE_ID}	L_NAME
+\"{BASE_ID}\"	L_NAME
 '(''|[^'\n])*'	L_STRING
 
 %%

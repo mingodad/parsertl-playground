@@ -522,14 +522,16 @@ ident		[a-zA-Z_][a-zA-Z_0-9]*
 "$"[0-9] 	FIELD
 "(" 	LPAREN
 ")" 	RPAREN
+
+"FUNCT_ID" 	FUNCT_ID
+"LENGTH" 	LENGTH
+"LENGTH0" 	LENGTH0
+"<<"	COPROCESS_OUT
+
 [0-9]+(\.[0-9]+)? 	DOUBLE
 \"(\\.|[^\r\n\"\\])*\" 	STRING_
 \/(\\.|[^\r\n\/])+\/ 	RE
 {ident} 	ID
 "$"{ident} 	D_ID
-"FUNCT_ID" 	FUNCT_ID
-"LENGTH" 	LENGTH
-"LENGTH0" 	LENGTH0
-"<<"	COPROCESS_OUT
 
 %%

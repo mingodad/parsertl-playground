@@ -1420,7 +1420,7 @@ c_op :
 
 %%
 
-%x  QUAL1_BT QUAL2_BT
+%x  QUAL_BT
 
 newline     \r\n?|\r\n?
 notnewline  [^\n\r]
@@ -1547,33 +1547,30 @@ ident	("_"|{firstidchar}){idchar}*
 ////  Qualifiers (with lexbuf hack) /////////////
 /* HACK: If we see @taggedfoo then this should be lexed as '@' 'taggedfoo', not
  * '@tagged' 'foo' -- so we back up the lexer */
-"@"[A-Za-z]<QUAL1_BT> reject()
-<QUAL1_BT> {
+"@"[A-Za-z]<QUAL_BT> reject()
+<QUAL_BT> {
     "@" '@'
-    .<QUAL2_BT> reject()
-}
-<QUAL2_BT> {
-"aqual"<INITIAL>	ALIAS_QUAL
-"assert"("__")?<INITIAL>	ASSERT_QUAL
-"assert_false"<INITIAL>	ASSERT_FALSE_QUAL
-"autoreleased"<INITIAL>	AUTORELEASED_QUAL
-"checks"<INITIAL>	CHECKS_QUAL
-"effect"<INITIAL>	EFFECT_QUAL
-"ensures"<INITIAL>	ENSURES_QUAL
-"extensible"<INITIAL>	EXTENSIBLE_QUAL
-"fat"<INITIAL>	FAT_QUAL
-"notnull"<INITIAL>	NOTNULL_QUAL
-"nozeroterm"<INITIAL>	NOZEROTERM_QUAL
-"nozeroterm"<INITIAL> ZEROTERM_QUAL
-"nullable"<INITIAL>	NULLABLE_QUAL
-"numelts"<INITIAL>	NUMELTS_QUAL
-"region"<INITIAL>	REGION_QUAL
-"requires"<INITIAL>	REQUIRES_QUAL
-"subset"<INITIAL>	SUBSET_QUAL
-"tagged"<INITIAL>	TAGGED_QUAL
-"thin"<INITIAL>	THIN_QUAL
-"throws"<INITIAL>	THROWS_QUAL
-.<<INITIAL> reject()
+    "aqual"<INITIAL>	ALIAS_QUAL
+    "assert"("__")?<INITIAL>	ASSERT_QUAL
+    "assert_false"<INITIAL>	ASSERT_FALSE_QUAL
+    "autoreleased"<INITIAL>	AUTORELEASED_QUAL
+    "checks"<INITIAL>	CHECKS_QUAL
+    "effect"<INITIAL>	EFFECT_QUAL
+    "ensures"<INITIAL>	ENSURES_QUAL
+    "extensible"<INITIAL>	EXTENSIBLE_QUAL
+    "fat"<INITIAL>	FAT_QUAL
+    "notnull"<INITIAL>	NOTNULL_QUAL
+    "nozeroterm"<INITIAL>	NOZEROTERM_QUAL
+    "zeroterm"<INITIAL> ZEROTERM_QUAL
+    "nullable"<INITIAL>	NULLABLE_QUAL
+    "numelts"<INITIAL>	NUMELTS_QUAL
+    "region"<INITIAL>	REGION_QUAL
+    "requires"<INITIAL>	REQUIRES_QUAL
+    "subset"<INITIAL>	SUBSET_QUAL
+    "tagged"<INITIAL>	TAGGED_QUAL
+    "thin"<INITIAL>	THIN_QUAL
+    "throws"<INITIAL>	THROWS_QUAL
+    .<INITIAL> reject()
 }
 
 /* Operators */
@@ -1634,6 +1631,9 @@ ident	("_"|{firstidchar}){idchar}*
 "A"	'A'
 "V"	'V'
 
+TYPEDEF_NAME	TYPEDEF_NAME
+QUAL_TYPEDEF_NAME	QUAL_TYPEDEF_NAME
+
 /* Identifiers, type names, and keywords */
 {ident}	IDENTIFIER
 
@@ -1660,9 +1660,6 @@ ident	("_"|{firstidchar}){idchar}*
 L{string}	WSTRING
 {charc}	CHARACTER_CONSTANT
 L{charc}	WCHARACTER_CONSTANT
-
-TYPEDEF_NAME	TYPEDEF_NAME
-QUAL_TYPEDEF_NAME	QUAL_TYPEDEF_NAME
 
 
 %%

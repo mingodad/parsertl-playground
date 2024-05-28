@@ -13,7 +13,7 @@
 %left '^'
 %left '&'
 %left '%'
-%left UMINUS
+%right UNARY
 
 %start expressions
 
@@ -42,8 +42,8 @@ expression
   | expression '*' expression
   | expression '/' expression
   | expression '^' expression
-  | '-' expression
-  | '+' expression
+  | '-' expression %prec UNARY
+  | '+' expression %prec UNARY
   | FUNCTION '(' ')'
   | FUNCTION '(' expseq ')'
   | cell
@@ -105,16 +105,10 @@ FUNC   [A-Za-z]{1,}[A-Za-z_0-9.]+|[A-Za-z.]+
 "#"[A-Z0-9/]+[!?]?                                                                        ERROR
 "$"[A-Za-z]+"$"[0-9]+                                                                           ABSOLUTE_CELL
 "$"[A-Za-z]+[0-9]+                                                                              MIXED_CELL
-[A-Za-z]+"$"[0-9]+                                                                              MIXED_CELL
-[A-Za-z]+[0-9]+                                                                                 RELATIVE_CELL
-[A-Za-z]{1,}[A-Za-z_0-9]+                                                                       VARIABLE
-[A-Za-z_]+                                                                                      VARIABLE
-[0-9]+                                                                                          NUMBER
 "["(.*)?"]"                                                                                     ARRAY
 
 <FUNC_ST> {
     {FUNC}<INITIAL>    FUNCTION
-    .<INITIAL>  reject()
 }
 
 "&"                                                                                             '&'
@@ -142,5 +136,11 @@ FUNC   [A-Za-z]{1,}[A-Za-z_0-9.]+|[A-Za-z.]+
 
 //[#]                                                                                             '#'
 //<<EOF>>                                                                                         EOF
+
+[A-Za-z]+"$"[0-9]+                                                                              MIXED_CELL
+[A-Za-z]+[0-9]+                                                                                 RELATIVE_CELL
+[A-Za-z]{1,}[A-Za-z_0-9]+                                                                       VARIABLE
+[A-Za-z_]+                                                                                      VARIABLE
+[0-9]+                                                                                          NUMBER
 
 %%

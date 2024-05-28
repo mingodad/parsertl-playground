@@ -753,7 +753,7 @@ identifier            [A-Za-z_][A-Za-z0-9_]*
 /* TODO: Remove Print special casing once we have variadics or overloads. */
 intrinsic_identifier  (Print|__intrinsic_[A-Za-z0-9_]*)
 sized_type_literal    [iuf][1-9][0-9]*
-integer_literal       [0-9]+
+integer_literal       ([0-9]+|0x[A-Fa-f0-9]+|0b[01]+)
 horizontal_whitespace [ \t\r]
 whitespace            {horizontal_whitespace}|[\n]
 one_line_comment      \/\/[^\n]*\n

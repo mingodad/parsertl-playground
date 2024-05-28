@@ -88,8 +88,6 @@ block_comment	\/\*(?s:.)*?\*\/
 {line_comment}	skip()
 {block_comment}	skip()
 
-/*[\$_\p{L}]([\$_\p{L}]|[0-9])*	identifier*/
-[\$a-zA-Z_][\$a-zA-Z_0-9]*	identifier
 \"((\\[\"\\bfnrtv\n])|[^\"\\])*\"	string_dq
 '((\\['\\bfnrtv\n])|[^'\\])*'	string_sq
 \+|\-	num_sign
@@ -107,5 +105,8 @@ false	FALSE
 \}	RCURLY
 ,	COMMA
 :	COLON
+
+/*[\$_\p{L}]([\$_\p{L}]|[0-9])*	identifier*/
+[\$a-zA-Z_][\$a-zA-Z_0-9]*	identifier
 
 %%

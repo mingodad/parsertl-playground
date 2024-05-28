@@ -12,6 +12,7 @@
 
 s_sl :
 	definitions tRules rule_list tEnd
+	| definitions tRules rule_list
 	;
 
 definitions :

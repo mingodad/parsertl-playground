@@ -653,7 +653,7 @@ preproc :
 "while"	WHILE
 
 "+="	ADD_ASSIGN
-"&="	AND_ASSIGN
+"&&="	AND_ASSIGN
 "&&"	AND_OP
 "&="	BINARY_AND_ASSIGN
 "|="	BINARY_OR_ASSIGN

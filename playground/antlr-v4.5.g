@@ -876,7 +876,7 @@ channels { OFF_CHANNEL , COMMENT }
 
 /* Order matter if identifier comes before keywords they are classified as identifier */
 {ID}	TOKEN_REF
-{ID}	RULE_REF
+//{ID}	RULE_REF //FIXME
 {LBrack}([^\]\\]|{EscAny})+{RBrack}	LEXER_CHAR_SET
 
 /* Order matter if ILLEGAL_CHARACTER comes before identifier one letter identifer is classified as ILLEGAL_CHARACTER */

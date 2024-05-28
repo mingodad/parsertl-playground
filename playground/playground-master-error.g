@@ -116,7 +116,7 @@ posix_name alnum|alpha|blank|cntrl|digit|graph|lower|print|punct|space|upper|xdi
 posix \[:{posix_name}:\]
 state_name [A-Z_a-z][0-9A-Z_a-z]*
 NL  \n|\r\n
-literal_common	\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x{hex}+)
+literal_common	\\([^0-9cx]|[0-9]{1,3}|c[@a-zA-Z]|x{hex}{2})
 
 %%
 

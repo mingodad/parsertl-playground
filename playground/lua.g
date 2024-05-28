@@ -338,9 +338,6 @@ line_comment	\-\-[^\n\r]*
 
 %%
 
-{whitespace}	skip()
-{line_comment}	skip()
-
 /* Tokens */
 /*\("[^"]+"\)\s+{ TOKEN(\([^)]+\)); }*/
 and	AND
@@ -398,5 +395,8 @@ while	WHILE
 "--@"	SPECIAL
 
 .	ILLEGAL_CHARACTER
+
+{whitespace}	skip()
+{line_comment}	skip() //need be the last to not shadow SPECIAL
 
 %%

@@ -6721,9 +6721,6 @@ NOT\s+(BETWEEN|IN|LIKE|ILIKE|SIMILAR)<xnot_la> reject()
 ,	','
 :	':'
 
-/* Order matter if identifier comes before keywords they are classified as identifier */
-{identifier}	IDENT
-\"(\\[\"\\]|[^\"\n\r])*\"	IDENT
 {real}	FCONST
 {decimal} FCONST
 '(\\['\\]|[^'\n\r])*'	SCONST
@@ -6736,5 +6733,9 @@ BCONST	BCONST
 XCONST	XCONST
 [0-9]+	ICONST
 \$[0-9]+	PARAM
+
+/* Order matter if identifier comes before keywords they are classified as identifier */
+{identifier}	IDENT
+\"(\\[\"\\]|[^\"\n\r])*\"	IDENT
 
 %%

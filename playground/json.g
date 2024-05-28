@@ -4,14 +4,16 @@
 // Derived from http://json.org
 //grammar JSON;
 
-%token STRING NUMBER ILLEGAL_CHARACTER
+%token STRING NUMBER //ILLEGAL_CHARACTER
 
 %%
 
 json : value ;
-obj : '{' pair (',' pair)* '}' | '{' '}' ;
+obj : '{' pair_list '}' | '{' '}' ;
+pair_list : pair | pair_list ',' pair ;
 pair : STRING ':' value ;
-arr : '[' value (',' value)* ']' | '[' ']' ;
+arr : '[' value_list ']' | '[' ']' ;
+value_list : value | value_list ',' value ;
 value : STRING | NUMBER | obj | arr | "true" | "false" | "null" ;
 
 %%
@@ -46,6 +48,6 @@ true	"true"
 false	"false"
 null	"null"
 
-.	ILLEGAL_CHARACTER
+//.	ILLEGAL_CHARACTER
 
 %%

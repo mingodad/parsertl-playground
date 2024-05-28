@@ -62,9 +62,6 @@
 %token '*'
 %token '/'
 %token '%'
-%token NOT
-%token UMINUS
-%token BIT_NOT
 %token '('
 %token ')'
 %token ','
@@ -406,7 +403,6 @@ local_var	LOCAL
 "*="	MULT_EQ
 "!="	NEQ
 "!<"	NOMATCH
-"!"	NOT
 "||"	OR
 "+="	PLUS_EQ
 "++"	PLUS_PLUS

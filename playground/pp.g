@@ -229,8 +229,6 @@ ns_alias "namespace "{ns_name}[ ]*"="[ ]*{ns_name}[ ]*";"
 <define_state_definition>\r<.>	skip()
 <define_state_definition>.<.>
 
-(?s:.)      skip()
-
 <incl>\n<INITIAL>   skip()
 <incl>.<.>
 
@@ -249,5 +247,8 @@ ns_alias "namespace "{ns_name}[ ]*"="[ ]*{ns_name}[ ]*";"
 <c_comment>(?s:.)<.>	skip()
 
 ","	','
+
+/* lex rule bellow need be the last */
+(?s:.)      skip()
 
 %%

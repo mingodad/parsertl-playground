@@ -168,8 +168,7 @@ defined_as	"="|"=/"|"::="
 
 {rulename}\s+{defined_as}<RULE_LHS>	reject()
 <RULE_LHS>{
-	{rulename}	rulename_lhs
-	.<INITIAL>	reject()
+	{rulename}<INITIAL>	rulename_lhs
 }
 
 {rulename}	rulename
