@@ -131,7 +131,7 @@ namespace lexertl
                         ss_ << "A syntax error occurred: '" <<
                             lhs_token_->precedence_string() <<
                             "' against '" << rhs_token_->precedence_string() <<
-                            " in rule id " << id_ << '.';
+                            " in lex rule for token id " << id_ << '.';
                         throw runtime_error(ss_.str());
                         break;
                     }
@@ -142,8 +142,8 @@ namespace lexertl
                 {
                     std::ostringstream ss_;
 
-                    ss_ << "Empty rules are not allowed in rule id " <<
-                        id_ << '.';
+                    ss_ << "Empty lex rules are not allowed in "
+                            "lex rule for token id " << id_ << '.';
                     throw runtime_error(ss_.str());
                 }
 
@@ -188,8 +188,8 @@ namespace lexertl
                             ss_ << "Rules that match zero characters are not "
                                 "allowed as this can cause an infinite loop "
                                 "in user code. The match_zero_len flag "
-                                "overrides this check. Rule id " <<
-                                id_ << " and Dfa id " << dfa_ << '.';
+                                "overrides this check. Lex rule for token id "
+                                << id_ << " and Dfa id " << dfa_ << '.';
                             throw runtime_error(ss_.str());
                         }
                     }
@@ -607,7 +607,7 @@ namespace lexertl
             }
 
             void insert_range(const string_token& token_,
-                const string_token& token2_, string_token_vector data_[2])
+                const string_token& token2_, string_token_vector data_[2]) const
             {
                 auto iter_ = std::find_if(data_[0].cbegin(), data_[0].cend(),
                     [&token_](const std::unique_ptr<string_token>& rhs_)
@@ -650,7 +650,7 @@ namespace lexertl
 
             void insert_range(const string_token& token_,
                 const string_token& token2_, const string_token& token3_,
-                string_token_vector data_[3])
+                string_token_vector data_[3]) const
             {
                 auto iter_ = data_[0].cbegin();
                 auto end_ = data_[0].cend();

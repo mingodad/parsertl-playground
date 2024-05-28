@@ -73,6 +73,9 @@ namespace lexertl
             _statemap.clear();
             _macro_map.clear();
             _regexes.clear();
+            _regexes_str_src.clear();
+            _regexes_str_id.clear();
+            _macro_names.clear();
             _features.clear();
             _ids.clear();
             _user_ids.clear();
@@ -218,20 +221,20 @@ namespace lexertl
             return static_cast<id_type>(_lexer_state_names.size());
         }
 
-        void insert_macro(const rules_char_type* name_,
+        std::size_t insert_macro(const rules_char_type* name_,
             const rules_char_type* regex_)
         {
-            insert_macro(name_, string(regex_));
+            return insert_macro(name_, string(regex_));
         }
 
-        void insert_macro(const rules_char_type* name_,
+        std::size_t insert_macro(const rules_char_type* name_,
             const rules_char_type* regex_start_,
             const rules_char_type* regex_end_)
         {
-            insert_macro(name_, string(regex_start_, regex_end_));
+            return insert_macro(name_, string(regex_start_, regex_end_));
         }
 
-        void insert_macro(const rules_char_type* name_, const string& regex_)
+        std::size_t insert_macro(const rules_char_type* name_, const string& regex_)
         {
             validate(name_);
 
@@ -253,6 +256,11 @@ namespace lexertl
                 ss_ << "'.";
                 throw runtime_error(ss_.str());
             }
+            std::size_t rx_id = _regexes_str_src.size();
+            _regexes_str_id.push_back(0);
+            _regexes_str_src.push_back(regex_);
+            _macro_names.push_back(name_);
+            return rx_id;
         }
 
         // Add rule to INITIAL
@@ -262,14 +270,14 @@ namespace lexertl
             push(string(regex_), id_, user_id_);
         }
 
-        void push(const rules_char_type* regex_start_,
+        std::size_t push(const rules_char_type* regex_start_,
             const rules_char_type* regex_end_,
             const id_type id_, const id_type user_id_ = npos())
         {
-            push(string(regex_start_, regex_end_), id_, user_id_);
+            return push(string(regex_start_, regex_end_), id_, user_id_);
         }
 
-        void push(const string& regex_, const id_type id_,
+        std::size_t  push(const string& regex_, const id_type id_,
             const id_type user_id_ = npos())
         {
             check_for_invalid_id(id_);
@@ -305,50 +313,54 @@ namespace lexertl
             _next_dfas.front().push_back(0);
             _pushes.front().push_back(npos());
             _pops.front().push_back(false);
+            std::size_t rx_id = _regexes_str_src.size();
+            _regexes_str_id.push_back(id_);
+            _regexes_str_src.push_back(regex_);
+            return rx_id;
         }
 
         // Add rule with no id
-        void push(const rules_char_type* curr_dfa_,
+        std::size_t push(const rules_char_type* curr_dfa_,
             const rules_char_type* regex_, const rules_char_type* new_dfa_)
         {
-            push(curr_dfa_, string(regex_), new_dfa_);
+            return push(curr_dfa_, string(regex_), new_dfa_);
         }
 
-        void push(const rules_char_type* curr_dfa_,
+        std::size_t push(const rules_char_type* curr_dfa_,
             const rules_char_type* regex_start_,
             const rules_char_type* regex_end_, const rules_char_type* new_dfa_)
         {
-            push(curr_dfa_, string(regex_start_, regex_end_), new_dfa_);
+            return push(curr_dfa_, string(regex_start_, regex_end_), new_dfa_);
         }
 
-        void push(const rules_char_type* curr_dfa_, const string& regex_,
+        std::size_t push(const rules_char_type* curr_dfa_, const string& regex_,
             const rules_char_type* new_dfa_)
         {
-            push(curr_dfa_, regex_, eoi(), new_dfa_, false);
+            return push(curr_dfa_, regex_, eoi(), new_dfa_, false);
         }
 
         // Add rule with id
-        void push(const rules_char_type* curr_dfa_,
+        std::size_t push(const rules_char_type* curr_dfa_,
             const rules_char_type* regex_, const id_type id_,
             const rules_char_type* new_dfa_, const id_type user_id_ = npos())
         {
-            push(curr_dfa_, string(regex_), id_, new_dfa_, user_id_);
+            return push(curr_dfa_, string(regex_), id_, new_dfa_, user_id_);
         }
 
-        void push(const rules_char_type* curr_dfa_,
+        std::size_t push(const rules_char_type* curr_dfa_,
             const rules_char_type* regex_start_,
             const rules_char_type* regex_end_, const id_type id_,
             const rules_char_type* new_dfa_, const id_type user_id_ = npos())
         {
-            push(curr_dfa_, string(regex_start_, regex_end_),
+            return push(curr_dfa_, string(regex_start_, regex_end_),
                 id_, new_dfa_, user_id_);
         }
 
-        void push(const rules_char_type* curr_dfa_, const string& regex_,
+        std::size_t push(const rules_char_type* curr_dfa_, const string& regex_,
             const id_type id_, const rules_char_type* new_dfa_,
             const id_type user_id_ = npos())
         {
-            push(curr_dfa_, regex_, id_, new_dfa_, true, user_id_);
+            return push(curr_dfa_, regex_, id_, new_dfa_, true, user_id_);
         }
 
         void reverse()
@@ -380,6 +392,21 @@ namespace lexertl
         const token_vector_vector_vector& regexes() const
         {
             return _regexes;
+        }
+
+        const string_vector& regexes_str_src() const
+        {
+            return _regexes_str_src;
+        }
+
+        const id_vector& regexes_str_id() const
+        {
+            return _regexes_str_id;
+        }
+
+        const string_vector& macro_names() const
+        {
+            return _macro_names;
         }
 
         const id_vector& features() const
@@ -468,6 +495,9 @@ namespace lexertl
         std::size_t _flags;
         std::locale _locale;
         string_vector _lexer_state_names;
+        string_vector _regexes_str_src;
+        string_vector _macro_names;
+        id_vector _regexes_str_id;
 
         void tokenise(const string& regex_, token_vector& tokens_,
             const id_type id_, const rules_char_type* name_)
@@ -504,7 +534,8 @@ namespace lexertl
                     }
                     else
                     {
-                        ss_ << "rule id " << state_._id;
+                        ss_ << "rule id " << state_._id
+                            << ":" << regex_;
                     }
 
                     ss_ << '.';
@@ -561,7 +592,8 @@ namespace lexertl
                                 }
                                 else
                                 {
-                                    ss_ << "rule id " << state_._id;
+                                    ss_ << "rule id " << state_._id
+                                        << ":" << regex_;
                                 }
 
                                 ss_ << '.';
@@ -652,7 +684,8 @@ namespace lexertl
                             }
                             else
                             {
-                                ss_ << "rule id " << state_._id;
+                                ss_ << "rule id " << state_._id
+                                    << ":" << regex_;
                             }
 
                             ss_ << '.';
@@ -688,7 +721,8 @@ namespace lexertl
                         }
                         else
                         {
-                            ss_ << "rule id " << state_._id;
+                            ss_ << "rule id " << state_._id
+                                << ":" << regex_;
                         }
 
                         ss_ << '.';
@@ -714,7 +748,8 @@ namespace lexertl
                             }
                             else
                             {
-                                ss_ << "rule id " << state_._id;
+                                ss_ << "rule id " << state_._id
+                                    << ":" << regex_;
                             }
 
                             ss_ << '.';
@@ -724,6 +759,8 @@ namespace lexertl
                         break;
                     case '+':
                         lhs_->_str.insert(rhs_._str);
+                        break;
+                    default:
                         break;
                     }
 
@@ -744,7 +781,8 @@ namespace lexertl
                 }
                 else
                 {
-                    ss_ << "rule id " << state_._id;
+                    ss_ << "rule id " << state_._id
+                        << ":" << regex_;
                 }
 
                 ss_ << " is not allowed.";
@@ -836,7 +874,7 @@ namespace lexertl
             new_vector_.swap(vector_);
         }
 
-        void push(const rules_char_type* curr_dfa_, const string& regex_,
+        std::size_t push(const rules_char_type* curr_dfa_, const string& regex_,
             const id_type id_, const rules_char_type* new_dfa_,
             const bool check_, const id_type user_id_ = npos())
         {
@@ -866,9 +904,19 @@ namespace lexertl
                     ++temp_;
                 }
 
-                if (*temp_) push_dfa_ = temp_ + 1;
+                if (*temp_)
+                    push_dfa_ = temp_ + 1;
 
-                validate(new_dfa_, *temp_ ? temp_ : 0);
+                validate(new_dfa_, *temp_ ? temp_ : nullptr);
+
+                if (!push_ && push_dfa_)
+                {
+                    std::ostringstream ss_;
+
+                    ss_ << "Exit state is missing '>' for rule id " << id_
+                        << ":" << regex_ << '.';
+                    throw runtime_error(ss_.str());
+                }
 
                 if (push_dfa_)
                 {
@@ -1039,6 +1087,11 @@ namespace lexertl
                     push_dfa_id_ : curr_) : npos());
                 _pops[curr_].push_back(pop_);
             }
+
+            std::size_t rx_id = _regexes_str_src.size();
+            _regexes_str_id.push_back(id_);
+            _regexes_str_src.push_back(regex_);
+            return rx_id;
         }
 
         void validate(const rules_char_type* name_,

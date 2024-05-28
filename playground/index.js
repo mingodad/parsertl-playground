@@ -402,6 +402,7 @@ function parse() {
   window.setTimeout(() => {
     parse_start_time = new Date().getTime();
     let dump_grammar_lexer = false;
+    let dump_grammar_regexes = false;
     let dump_grammar_lsm = false;
     let dump_grammar_gsm = false;
     let dump_grammar_parse_tree = 0;
@@ -423,6 +424,7 @@ function parse() {
 		case 'gptreef': dump_grammar_parse_tree = 2; break;
 		case 'gptrace': dump_grammar_parse_trace = true; break;
 		case 'gl': dump_grammar_lexer = true; break;
+		case 'glrx': dump_grammar_regexes = true; break;
 		case 'glsm': dump_grammar_lsm = true; break;
 		case 'ggsm': dump_grammar_gsm = true; break;
 	}
@@ -437,6 +439,7 @@ function parse() {
         grammarText,
         codeText,
         dump_grammar_lexer,
+        dump_grammar_regexes,
         dump_grammar_lsm,
         dump_grammar_gsm,
         dump_grammar_parse_tree,

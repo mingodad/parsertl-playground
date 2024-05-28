@@ -86,6 +86,7 @@ struct GlobalState
     bool dump_grammar_lexer;
     bool dump_grammar_lsm;
     bool dump_grammar_gsm;
+    bool dump_grammar_regexes = false;
     bool dump_input_lexer;
     bool dump_grammar_parse_tree;
     bool dump_grammar_parse_trace;
@@ -193,7 +194,8 @@ static void parser_throw_error(const char* msg, const IT& iter_lex, const char* 
     throw std::runtime_error(ss.str());
 }
 
-static void dump_lexer(play_iterator& iter_lex, const parsertl::rules& grules, const char* input)
+template<typename IT>
+static void dump_lexer(IT& iter_lex, const parsertl::rules& grules, const char* input)
 {
     std::cout << "line:column:state:token:value\n";
     while(iter_lex->id != 0) {
@@ -415,16 +417,16 @@ static void dump_parse_trace(const char* data_start, const char* data_end,
 
                 std::cout << "-> reduce " << sm_entry.param << ":" <<
                         results.stack.size() << " by " <<
-                        symbols[idv_pair.first] << " ->";
+                        symbols[idv_pair._lhs] << " ->";
 
-                if (idv_pair.second.empty())
+                if (idv_pair._rhs.empty())
                 {
                     std::cout << " %empty";
                 }
                 else
                 {
-                    for (auto iter_ = idv_pair.second.cbegin(),
-                        end_ = idv_pair.second.cend(); iter_ != end_; ++iter_)
+                    for (auto iter_ = idv_pair._rhs.cbegin(),
+                        end_ = idv_pair._rhs.cend(); iter_ != end_; ++iter_)
                     {
                         std::cout << ' ' << symbols[*iter_];
                     }
@@ -722,7 +724,7 @@ struct BuildUserParser
                 {
                         used_tokens.insert(p._ctx_precedence_id);
                 }
-                for (const auto& rhs : p._rhs)
+                for (const auto& rhs : p._rhs._symbols)
                 {
                     if (rhs._type == parsertl::rules::symbol::type::TERMINAL)
                         used_tokens.insert(rhs._id);
@@ -767,6 +769,41 @@ struct BuildUserParser
             parsertl::generator::build_dfa(gs.user_parser.grules, dfa_);
             parsertl::debug::dump(gs.user_parser.grules, dfa_, std::cout);
             return false;
+        }
+
+        if(gs.dump_grammar_regexes)
+        {
+#ifdef WASM_PLAYGROUND
+        switch_output("parse_debug");
+#endif
+            parsertl::rules::string_vector terminals;
+            gs.user_parser.grules.terminals(terminals);
+            size_t rx_idx = 0;
+            const auto& regexes_str_id = gs.user_parser.lrules.regexes_str_id();
+            const auto& macro_names = gs.user_parser.lrules.macro_names();
+            std::cout << "<: regex_id , token_id :> regex (macro-name/token-name)\n";
+            for(const auto& rx: gs.user_parser.lrules.regexes_str_src()){
+                const auto terminal_id = regexes_str_id[rx_idx];
+                std::cout << "<:" << rx_idx << ":" << terminal_id << ":>" 
+                        << rx << "\t";
+                using id_type = play_match_results::id_type;
+                switch(terminal_id)
+                {
+                    case 0:
+                        if(rx_idx < macro_names.size())
+                            std::cout << macro_names[rx_idx];
+                        else std::cout << "<.>";
+                        break;
+                    case LEXERTL_SKIP: std::cout << "skip()"; break;
+                    case LEXERTL_REJECT: std::cout << "reject()"; break;
+                    default:
+                        if(terminal_id < terminals.size())
+                            std::cout << terminals[terminal_id];
+                        else std::cout << "??";
+                }
+                std::cout << std::endl;
+                ++rx_idx;
+            }
         }
 
 	//Fix fallback if exists
@@ -833,15 +870,25 @@ struct BuildUserParser
             generate_cpp_symbols(gs.user_parser.grules, stream_);
             const auto productions = gs.user_parser.grules.grammar();
 
-            stream_ << "static const char *sm_rules_alias[" << productions.size() << "] = {\n";
             int idx = 0;
             for (const auto& prod : productions)
             {
-                stream_ << "  /*" << idx++ << "*/ ";
-                if(prod._alias.empty()) stream_ << "nullptr,\n";
-                else stream_ << '"' << prod._alias << "\",\n";
+                if(!prod._alias.empty()) ++idx;
             }
-            stream_ << "};\n\n";
+            stream_ << "static const char *sm_rules_alias[" << productions.size() << "]";
+	    if(idx) // do not emit initialization code if there is no aliases
+	    {
+		stream_ << " = {\n";
+		idx = 0;
+		for (const auto& prod : productions)
+		{
+		    stream_ << "  /*" << idx++ << "*/ ";
+		    if(prod._alias.empty()) stream_ << "nullptr,\n";
+		    else stream_ << '"' << prod._alias << "\",\n";
+		}
+		stream_ << "}";
+	    }
+	    stream_ << ";\n\n";
 
             parsertl::save2cpp(gs.user_parser.gsm, stream_);
             lexertl::table_based_cpp::generate_cpp("UserLexer", gs.user_parser.lsm, false, stream_);
@@ -1938,6 +1985,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     lrules.insert_macro("escape", "\\\\(.|x{hex}+|c[@a-zA-Z])");
     lrules.insert_macro("posix_name", "alnum|alpha|blank|cntrl|digit|graph|"
         "lower|print|punct|space|upper|xdigit");
+    lrules.insert_macro("macro_name", R"([A-Z_a-z][-\w]*)");
     lrules.insert_macro("posix", "\\[:{posix_name}:\\]");
     lrules.insert_macro("state_name", "[A-Z_a-z][0-9A-Z_a-z]*");
     lrules.insert_macro("NL", "\n|\r\n");
@@ -1990,8 +2038,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     lrules.push("OPTION", "caseless", grules.token_id("\"caseless\""), ".");
     lrules.push("OPTION,RXDIRECTIVES", "{NL}", grules.token_id("NL"), "MACRO");
     lrules.push("MACRO,RULE", "%x", grules.token_id("\"%x\""), "RXDIRECTIVES");
-    lrules.push("MACRO", "[A-Z_a-z][0-9A-Z_a-z]*",
-        grules.token_id("MacroName"), "REGEX");
+    lrules.push("MACRO", "{macro_name}", grules.token_id("MacroName"), "REGEX");
     lrules.push("MACRO,REGEX", "{NL}", lexertl::rules::skip(), "MACRO");
 
     lrules.push("MACRO,RULE,REGEX,RXDIRECTIVES", "{c_comment}",
@@ -2017,7 +2064,7 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     lrules.push("REGEX,RULE", "[+][?]", grules.token_id("\"+?\""), ".");
     lrules.push("REGEX,RULE", "{escape}|(\\[^?({escape}|{posix}|"
         "[^\\\\\\]])*\\])|[^\\s]", grules.token_id("Charset"), ".");
-    lrules.push("REGEX,RULE", "[{][A-Z_a-z][-0-9A-Z_a-z]*[}]",
+    lrules.push("REGEX,RULE", "[{]{macro_name}[}]",
         grules.token_id("Macro"), ".");
     lrules.push("REGEX,RULE", "[{][0-9]+(,([0-9]+)?)?[}][?]?",
         grules.token_id("Repeat"), ".");
@@ -2092,6 +2139,7 @@ int main_base(int argc, char* argv[], GlobalState& gs)
         if(gs.dump_grammar_parse_tree
                 || gs.dump_grammar_parse_trace
                 || gs.dump_grammar_lexer
+                || gs.dump_grammar_regexes
                 || gs.dump_grammar_lsm
                 || gs.dump_grammar_gsm
                 || gs.generate_standalone_parser
@@ -2188,7 +2236,7 @@ int main_base(int argc, char* argv[], GlobalState& gs)
         std::cout << e.what() << '\n';
 #ifndef WASM_PLAYGROUND
         rc = 1;
-#endif        
+#endif
     }
 
 #ifdef WASM_PLAYGROUND
@@ -2204,6 +2252,7 @@ extern "C" int main_playground(
         const char *grammar_data
         ,const char *input_data
         ,int dump_grammar_lexer
+        ,int dump_grammar_regexes
         ,int dump_grammar_lsm
         ,int dump_grammar_gsm
         ,int dump_grammar_parse_tree
@@ -2223,6 +2272,7 @@ extern "C" int main_playground(
     gs.input_data = input_data;
     gs.input_data_size = strlen(input_data);
     gs.dump_grammar_lexer = dump_grammar_lexer;
+    gs.dump_grammar_regexes = dump_grammar_regexes;
     gs.dump_grammar_lsm = dump_grammar_lsm;
     gs.dump_grammar_gsm = dump_grammar_gsm;
     gs.dump_grammar_parse_tree = dump_grammar_parse_tree;
@@ -2250,6 +2300,7 @@ static void showHelp(const char* prog_name)
             "-dumpgptree          Dump grammar parser tree\n"
             "-dumpgptrace         Dump grammar parser trace\n"
             "-dumpglsm            Dump grammar lexer state machine\n"
+            "-dumpglrx            Dump grammar lexer regexes\n"            
             "-dumpgsm             Dump grammar parser state machine\n"
             "-dumpAsEbnfRR        Dump grammar as EBNF for railroad diagram\n"
             "-dumpAsYacc          Dump grammar as Yacc\n"
@@ -2291,6 +2342,10 @@ int main(int argc, char *argv[])
         else if (strcmp("-dumpglsm", param) == 0)
         {
             gs.dump_grammar_lsm = true;
+        }
+        else if (strcmp("-dumpglrx", param) == 0)
+        {
+            gs.dump_grammar_regexes = true;
         }
         else if (strcmp("-dumpgsm", param) == 0)
         {

@@ -63,6 +63,75 @@ namespace lexertl
     }
 
     template<typename char_type, typename id_type, class stream>
+    void save2sql(const basic_state_machine<char_type, id_type>& sm_,
+        stream& stream_)
+    {
+        using internals = detail::basic_internals<id_type>;
+        const internals& internals_ = sm_.data();
+
+        stream_ << "create table lexer_sm(\n"
+                "  id integer primary key,\n"
+                "  version integer,\n"
+                "  sizeof_char_type integer,\n"
+                "  sizeof_id_type integer,\n"
+                "  eoi integer,\n"
+                "  lookup_size integer\n"
+                ");\n"
+                "insert into parser_sm(version, sizeof_char_type, sizeof_id_type, eoi, lookup_size)\n"
+                "values(";
+        // Version number
+        stream_ << 1 << ',';
+        stream_ << sizeof(char_type) << ',';
+        stream_ << sizeof(id_type) << ',';
+        stream_ << internals_._eoi << '\n';
+        stream_ << internals_._lookup.size() << ");\n";
+
+        stream_ << "create table lexer_sm_lookup(\n"
+                "  id integer primary key,\n"
+                "  state integer,\n"
+                "  lookup integer,\n"
+                ");\n";
+
+        stream_ << "--internals_._lookup[0].size() = " <<
+                (internals_._lookup.size() ? internals_._lookup[0].size() : 0) << "\n";
+        stream_ << "insert into lexer_sm_lookup(row, lookup) values\n";
+        bool need_sep = false;
+        int row_id = 0;
+        int loop_count = 1;
+        for (const auto& vec_ : internals_._lookup)
+        {
+            for (const id_type id_ : vec_)
+            {
+                if(need_sep) stream_ << ",";
+                else need_sep = true;
+                stream_ << "(" << row_id << "," << id_ << ")";
+                if((loop_count++ % 6) == 0) stream_ << "\n";
+            }
+            ++row_id;
+        }
+        stream_ << ";\n";
+
+        stream_ << "create table lexer_sm_dfa_alphabet(\n"
+                "  id integer primary key,\n"
+                "  state integer,\n"
+                "  lookup integer,\n"
+                ");\n";
+        detail::output_vec<char_type>(internals_._dfa_alphabet, stream_);
+        stream_ << "-- internals_._features = " << internals_._features << '\n';
+        stream_ << "-- internals_._dfa.size() = " << internals_._dfa.size() << '\n';
+
+        stream_ << "create table lexer_sm_dfa(\n"
+                "  id integer primary key,\n"
+                "  state integer,\n"
+                "  lookup integer,\n"
+                ");\n";
+        for (const auto& vec_ : internals_._dfa)
+        {
+            detail::output_vec<char_type>(vec_, stream_);
+        }
+    }
+
+    template<typename char_type, typename id_type, class stream>
     void save(const basic_state_machine<char_type, id_type>& sm_,
         stream& stream_)
     {
@@ -105,13 +174,13 @@ namespace lexertl
         stream_ >> num_;
 
         if (num_ != sizeof(char_type))
-            throw runtime_error("char_type mismatch in lexertl::load()");
+            throw runtime_error("char_type mismatch in lexertl::load().");
 
         // sizeof(id_type)
         stream_ >> num_;
 
         if (num_ != sizeof(id_type))
-            throw runtime_error("id_type mismatch in lexertl::load()");
+            throw runtime_error("id_type mismatch in lexertl::load().");
 
         stream_ >> internals_._eoi;
         stream_ >> num_;

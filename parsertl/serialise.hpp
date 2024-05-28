@@ -26,8 +26,8 @@ namespace parsertl
 
         for (const auto& rule_ : sm_._rules)
         {
-            stream_ << rule_.first << '\n';
-            lexertl::detail::output_vec<char>(rule_.second, stream_);
+            stream_ << rule_._lhs << '\n';
+            lexertl::detail::output_vec<char>(rule_._rhs, stream_);
         }
 
         stream_ << sm_._captures.size() << '\n';
@@ -51,9 +51,9 @@ namespace parsertl
 
             for (const auto& pair_ : vec_)
             {
-                stream_ << pair_.first << ' ';
-                stream_ << static_cast<std::size_t>(pair_.second.action) << ' ';
-                stream_ << pair_.second.param << '\n';
+                stream_ << pair_._id << ' ';
+                stream_ << static_cast<std::size_t>(pair_._entry.action) << ' ';
+                stream_ << pair_._entry.param << '\n';
             }
         }
     }
@@ -64,7 +64,7 @@ namespace parsertl
         size_t rhs_count = 0;
         for (const auto& rule_ : sm_._rules)
         {
-            rhs_count += rule_.second.size();
+            rhs_count += rule_._rhs.size();
         }
         size_t action_count = 0;
         for (const auto& vec_ : sm_._table)
@@ -101,13 +101,13 @@ namespace parsertl
         size_t idx_sum = 0;
         for (const auto& rule_ : sm_._rules)
         {
-            stream_ << "  /*" << idx++ << ":" << rule_.first << ":" 
-                    << rule_.second.size() << ":" << idx_sum << "*/ ";
-            if(rule_.second.size())
+            stream_ << "  /*" << idx++ << ":" << rule_._lhs << ":"
+                    << rule_._rhs.size() << ":" << idx_sum << "*/ ";
+            if(rule_._rhs.size())
             {
-                idx_sum += rule_.second.size();
+                idx_sum += rule_._rhs.size();
                 bool need_sep = false;
-                for (const id_type rhs_id : rule_.second)
+                for (const id_type rhs_id : rule_._rhs)
                 {
                     if(need_sep) stream_ << ", ";
                     else need_sep = true;
@@ -129,10 +129,10 @@ namespace parsertl
         idx_sum = 0;
         for (const auto& rule_ : sm_._rules)
         {
-            stream_ << "  /*" << idx++ << "*/ {" << rule_.first << ", " 
-                    << rule_.second.size() << ", "
+            stream_ << "  /*" << idx++ << "*/ {" << rule_._lhs << ", "
+                    << rule_._rhs.size() << ", "
                     << idx_sum << "},\n";
-            idx_sum += rule_.second.size();
+            idx_sum += rule_._rhs.size();
         }
         stream_ << "};\n\n";
 
@@ -164,9 +164,9 @@ namespace parsertl
             {
                 if(need_sep) stream_ << "}, {";
                 else need_sep = true;
-                stream_ << pair_.first << ", ";
-                stream_ << static_cast<std::size_t>(pair_.second.action) << ", ";
-                stream_ << pair_.second.param;
+                stream_ << pair_._id << ", ";
+                stream_ << static_cast<std::size_t>(pair_._entry.action) << ", ";
+                stream_ << pair_._entry.param;
             }
             stream_ << "},\n";
         }
@@ -222,7 +222,7 @@ namespace parsertl
         {
             if(need_sep) stream_ << ",";
             else need_sep = true;
-            stream_ << "(" << rule_.first << ")";
+            stream_ << "(" << rule_._lhs << ")";
             if((loop_count++ % 6) == 0) stream_ << "\n";
         }
         stream_ << "insert into parser_sm_rules_rhs(lhs,rhs, pos) values\n";
@@ -230,14 +230,14 @@ namespace parsertl
         loop_count = 1;
         for (const auto& rule_ : sm_._rules)
         {
-            if(rule_.second.size())
+            if(rule_._rhs.size())
             {
                 int pos = 0;
-                for (const id_type id_ : rule_.second)
+                for (const id_type id_ : rule_._rhs)
                 {
                     if(need_sep) stream_ << ",";
                     else need_sep = true;
-                    stream_ << "(" << rule_.first << "," << id_ << "," << pos++ << ")";
+                    stream_ << "(" << rule_._lhs << "," << id_ << "," << pos++ << ")";
                     if((loop_count++ % 4) == 0) stream_ << "\n";
                 }
             }
@@ -245,7 +245,7 @@ namespace parsertl
             {
                 if(need_sep) stream_ << ",";
                 else need_sep = true;
-                stream_ << "(" << rule_.first << ",NULL, 0)";
+                stream_ << "(" << rule_._lhs << ",NULL, 0)";
                 if((loop_count++ % 4) == 0) stream_ << "\n";
             }
         }
@@ -298,9 +298,9 @@ namespace parsertl
             {
                 if(need_sep) stream_ << ",";
                 else need_sep = true;
-                stream_ << "(" << state_no << "," << pair_.first << ",";
-                stream_ << static_cast<std::size_t>(pair_.second.action) << ",";
-                stream_ << pair_.second.param << ")";
+                stream_ << "(" << state_no << "," << pair_._id << ",";
+                stream_ << static_cast<std::size_t>(pair_._entry.action) << ",";
+                stream_ << pair_._entry.param << ")";
                 if((loop_count++ % 4) == 0) stream_ << "\n";
             }
             ++state_no;
@@ -333,8 +333,8 @@ namespace parsertl
 
             auto& rule_ = sm_._rules.back();
 
-            stream_ >> rule_.first;
-            lexertl::detail::input_vec<char>(stream_, rule_.second);
+            stream_ >> rule_._lhs;
+            lexertl::detail::input_vec<char>(stream_, rule_._rhs);
         }
 
         stream_ >> num_;
@@ -384,11 +384,11 @@ namespace parsertl
                 auto& pair_ = vec_.back();
 
                 stream_ >> num_;
-                pair_.first = static_cast<id_type>(num_);
+                pair_._id = static_cast<id_type>(num_);
                 stream_ >> num_;
-                pair_.second.action = static_cast<action>(num_);
+                pair_._entry.action = static_cast<action>(num_);
                 stream_ >> num_;
-                pair_.second.param = static_cast<id_type>(num_);
+                pair_._entry.param = static_cast<id_type>(num_);
             }
         }
     }

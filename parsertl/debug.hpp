@@ -303,7 +303,7 @@ namespace parsertl
                     hasRecords = true;
                     stream_ << "\nINSERT INTO rulerhs(ruleid,pos,sym) VALUES\n";
                 }
-                if (lhs_iter_->_rhs.empty())
+                if (lhs_iter_->_rhs._symbols.empty())
                 {
                     if(last_idx++)
                     {
@@ -313,8 +313,8 @@ namespace parsertl
                 }
                 else
                 {
-                    auto rhs_iter_ = lhs_iter_->_rhs.cbegin();
-                    auto rhs_end_ = lhs_iter_->_rhs.cend();
+                    auto rhs_iter_ = lhs_iter_->_rhs._symbols.cbegin();
+                    auto rhs_end_ = lhs_iter_->_rhs._symbols.cend();
 
                     for (; rhs_iter_ != rhs_end_; ++rhs_iter_)
                     {
@@ -425,17 +425,17 @@ namespace parsertl
                 idx_ < dfa_size_; ++idx_)
             {
                 const dfa_state& state_ = dfa_[idx_];
-                const size_t_pair_vector& config_ = state_._closure;
+                const cursor_vector& config_ = state_._closure;
 
                 state(idx_, stream_);
 
                 for (const auto& pair_ : config_)
                 {
-                    const production& p_ = grammar_[pair_.first];
+                    const production& p_ = grammar_[pair_._id];
                     std::size_t j_ = 0;
 
                     stream_ << static_cast<char_type>('(') <<
-                        pair_.first <<
+                        pair_._id <<
                         static_cast<char_type>(')') <<
                         static_cast<char_type>(' ') <<
                         static_cast<char_type>(' ') <<
@@ -444,7 +444,7 @@ namespace parsertl
                         static_cast<char_type>(':');
                     dump_rhs(j_, p_, terminals_, pair_, symbols_, stream_);
 
-                    if (j_ == pair_.second)
+                    if (j_ == pair_._index)
                     {
                         stream_ << static_cast<char_type>(' ') <<
                             static_cast<char_type>('.');
@@ -460,11 +460,11 @@ namespace parsertl
                 {
                     stream_ << static_cast<char_type>(' ') <<
                         static_cast<char_type>(' ') <<
-                        symbols_[pair_.first] <<
+                        symbols_[pair_._id] <<
                         static_cast<char_type>(' ') <<
                         static_cast<char_type>('-') <<
                         static_cast<char_type>('>') <<
-                        static_cast<char_type>(' ') << pair_.second <<
+                        static_cast<char_type>(' ') << pair_._index <<
                         static_cast<char_type>('\n');
                 }
 
@@ -505,7 +505,9 @@ namespace parsertl
                     auto lhs_iter_ = iter_;
                     prod_size_t index_ = lhs_iter_ - grammar_.begin();
 
-                    stream_ << symbols_[terminals_ + lhs_iter_->_lhs];
+                    const auto& lhs_name = symbols_[terminals_ + lhs_iter_->_lhs];
+                    //if(lhs_name[0] == '$') continue; //skip $accept
+                    stream_ << lhs_name;
                     if(asEbnfRR)
                     {
                         stream_ << static_cast<char_type>(':') <<
@@ -549,15 +551,15 @@ namespace parsertl
             prod_size_t& index_, ostream& stream_, bool asEbnfRR = false,
             bool withIndex=false)
         {
-            if (lhs_iter_->_rhs.empty())
+            if (lhs_iter_->_rhs._symbols.empty())
             {
                 stream_ << static_cast<char_type>(' ');
                 empty(stream_, asEbnfRR);
             }
             else
             {
-                auto rhs_iter_ = lhs_iter_->_rhs.cbegin();
-                auto rhs_end_ = lhs_iter_->_rhs.cend();
+                auto rhs_iter_ = lhs_iter_->_rhs._symbols.cbegin();
+                auto rhs_end_ = lhs_iter_->_rhs._symbols.cend();
 
                 for (; rhs_iter_ != rhs_end_; ++rhs_iter_)
                 {
@@ -604,17 +606,17 @@ namespace parsertl
         }
 
         static void dump_rhs(std::size_t& j_, const production& p_,
-            const std::size_t terminals_, const size_t_pair& pair_,
+            const std::size_t terminals_, const cursor& pair_,
             const string_vector& symbols_, ostream& stream_)
         {
-            for (; j_ < p_._rhs.size(); ++j_)
+            for (; j_ < p_._rhs._symbols.size(); ++j_)
             {
-                const symbol& symbol_ = p_._rhs[j_];
+                const symbol& symbol_ = p_._rhs._symbols[j_];
                 const std::size_t id_ = symbol_._type ==
                     symbol::type::TERMINAL ? symbol_._id :
                     terminals_ + symbol_._id;
 
-                if (j_ == pair_.second)
+                if (j_ == pair_._index)
                 {
                     stream_ << static_cast<char_type>(' ') <<
                         static_cast<char_type>('.');

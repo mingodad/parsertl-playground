@@ -110,7 +110,7 @@ namespace parsertl
         std::size_t production_size(const sm_type& sm,
             const std::size_t index_) const
         {
-            return sm._rules[index_].second.size();
+            return sm._rules[index_]._rhs.size();
         }
 
         bool operator ==(const basic_match_results& rhs_) const

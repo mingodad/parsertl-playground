@@ -83,7 +83,27 @@ namespace parsertl
             prod_size_t _index;
             prod_size_t _precedence_id = 0;
             prod_size_t _ctx_precedence_id = 0;
-            symbol_vector _rhs;
+
+            struct rhs
+            {
+                symbol_vector _symbols;
+                string _prec;
+
+                bool operator==(const rhs& rhs_) const
+                {
+                    return _symbols == rhs_._symbols &&
+                        _prec == rhs_._prec;
+                }
+
+                bool operator<(const rhs& rhs_) const
+                {
+                    return _symbols < rhs_._symbols ||
+                        (_symbols == rhs_._symbols && _prec < rhs_._prec);
+                }
+            };
+
+
+            rhs _rhs;
             string  _alias;
 
             explicit production(const prod_size_t index_) :
@@ -94,7 +114,7 @@ namespace parsertl
             void clear()
             {
                 _lhs = static_cast<prod_size_t>(~0);
-                _rhs.clear();
+                _rhs._symbols.clear();
                 _alias.clear();
                 _precedence_id = 0;
                 _ctx_precedence_id = 0;
@@ -809,7 +829,7 @@ namespace parsertl
 
                 for (const auto& prod_ : _grammar)
                 {
-                    for (const auto& symbol_ : prod_._rhs)
+                    for (const auto& symbol_ : prod_._rhs._symbols)
                     {
                         if (symbol_._type == symbol::type::NON_TERMINAL &&
                             symbol_._id == nt_id && symbol_._id != prod_._lhs)
@@ -847,7 +867,7 @@ namespace parsertl
                 string rhs_ = _start;
 
                 push_production(accept_, rhs_);
-                _grammar.back()._rhs.emplace_back(symbol::type::TERMINAL,
+                _grammar.back()._rhs._symbols.emplace_back(symbol::type::TERMINAL,
                     insert_terminal(string(1, '$')));
             }
 
@@ -1168,14 +1188,14 @@ namespace parsertl
                         ++curr_bracket_;
                         bracket_stack_.push(curr_bracket_);
                         _captures.back().second.emplace_back(static_cast
-                            <id_type>(production_._rhs.size()),
+                            <id_type>(production_._rhs._symbols.size()),
                                 static_cast<id_type>(0));
                         break;
                     case ')':
                         _captures.back().second[static_cast<std::size_t>
                             (bracket_stack_.top()) - 1].second =
                             static_cast<id_type>(production_.
-                                _rhs.size() - 1);
+                                _rhs._symbols.size() - 1);
                         bracket_stack_.pop();
                         break;
                     case '|':
@@ -1215,7 +1235,7 @@ namespace parsertl
 
                             // NON_TERMINAL
                             location(id_);
-                            production_._rhs.
+                            production_._rhs._symbols.
                                 emplace_back(symbol::type::NON_TERMINAL, id_);
                         }
                         else
@@ -1228,7 +1248,7 @@ namespace parsertl
                                 production_._precedence_id = id_;
                             }
 
-                            production_._rhs.
+                            production_._rhs._symbols.
                                 emplace_back(symbol::type::TERMINAL, id_);
                         }
 
@@ -1249,7 +1269,7 @@ namespace parsertl
                             production_._precedence_id = id_;
                         }
 
-                        production_._rhs.
+                        production_._rhs._symbols.
                             emplace_back(symbol::type::TERMINAL, id_);
                         break;
                     }

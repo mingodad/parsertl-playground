@@ -10,12 +10,14 @@
 #include "lookup.hpp"
 #include "match_results.hpp"
 #include "token.hpp"
+#include "debug.hpp"
+#include "lexertl/debug.hpp"
 
 namespace parsertl
 {
     template<typename char_type, typename rules_type>
     void read_bison(const char_type* start_, const char_type* end_,
-        rules_type& rules_)
+        rules_type& rules_, bool dumpGrammar=false)
     {
         using bison_lrules = lexertl::basic_rules<char, char_type>;
         using bison_lsm = lexertl::basic_state_machine<char_type>;
@@ -73,7 +75,7 @@ namespace parsertl
         grules_.push("rule", "';'");
         grules_.push("productions", "productions '|' production prec "
             "| production prec");
-        grules_.push("production", "%empty | prod_list");
+        grules_.push("production", "%empty | '%empty' | prod_list");
         grules_.push("prod_list", "token "
             "| prod_list token");
         grules_.push("token", "LITERAL | NAME");
@@ -104,7 +106,7 @@ namespace parsertl
         lrules_.push("%right", grules_.token_id("'%right'"));
         lrules_.push("%start", grules_.token_id("'%start'"));
         lrules_.push("%token", grules_.token_id("'%token'"));
-        lrules_.push("%type", grules_.token_id("'%type'"));
+        lrules_.push("%type.*", grules_.token_id("'%type'"));
         lrules_.push("%union[^{]*[{](.|\n)*?[}]", lrules_.skip());
         lrules_.push("<[^>]+>", lrules_.skip());
         lrules_.push("%[{](.|\n)*?%[}]", lrules_.skip());
@@ -149,6 +151,15 @@ namespace parsertl
         lrules_.push("FINISH", "(?s:.)+", lrules_.skip(), "INITIAL");
 
         bison_lgenerator::build(lrules_, lsm_);
+
+        if(dumpGrammar)
+        {
+            parsertl::debug::dump(grules_, std::cout, false);
+            parsertl::rules::string_vector terminals;
+            grules_.terminals(terminals);
+            lexertl::debug::dump(lrules_, std::cout, terminals);
+            return;
+        }
 
         bison_criterator iter_(start_, end_, lsm_);
         using token = token<bison_criterator>;

@@ -26,9 +26,9 @@ namespace parsertl
             // Not owner
             const production* _production = nullptr;
             std::size_t _lhs = static_cast<std::size_t>(~0);
-            size_t_pair _lhs_indexes;
+            cursor _lhs_indexes;
             symbol_vector _rhs;
-            size_t_pair_vector _rhs_indexes;
+            cursor_vector _rhs_indexes;
 
             void swap(prod& rhs_) noexcept
             {
@@ -47,7 +47,8 @@ namespace parsertl
                     _production->_rhs < rhs_._production->_rhs) ||
                     (_production->_lhs == rhs_._production->_lhs &&
                     _production->_rhs == rhs_._production->_rhs &&
-                    _rhs_indexes.back().second < rhs_._rhs_indexes.back().second);
+                    _rhs_indexes.back()._index <
+                        rhs_._rhs_indexes.back()._index);
             }
         };
 
@@ -162,45 +163,43 @@ namespace parsertl
 
             hash_map_[hash_set(dfa_.back()._basis)].push_back(0);
 
-            using item_sets = std::vector<size_t_pair_vector>;
-            item_sets item_sets_;
-            size_t_vector symbols_;
+            using item_sets = std::vector<cursor_vector>;
 
             for (std::size_t s_ = 0; s_ < dfa_.size(); ++s_)
             {
                 dfa_state& state_ = dfa_[s_];
-                symbols_.clear();
-                item_sets_.clear();
+                item_sets item_sets_;
+                size_t_vector symbols_;
 
                 state_._closure.assign(state_._basis.begin(),
                     state_._basis.end());
                 closure(rules_, state_);
-
                 for (const auto& pair_ : state_._closure)
                 {
-                    const production &p_ = grammar_[pair_.first];
+                    const production &p_ = grammar_[pair_._id];
 
-                    if (pair_.second < p_._rhs.size())
+                    if (pair_._index < p_._rhs._symbols.size())
                     {
-                        const symbol& symbol_ = p_._rhs[pair_.second];
+                        const symbol& symbol_ = p_._rhs._symbols[pair_._index];
                         const std::size_t id_ =
                             symbol_._type == symbol::type::TERMINAL ?
                             symbol_._id : terminals_ + symbol_._id;
                         auto sym_iter_ = std::find(symbols_.begin(),
                             symbols_.end(), id_);
-                        size_t_pair new_pair_(pair_.first, pair_.second + 1);
+                        cursor new_pair_(pair_._id, pair_._index + 1);
 
                         if (sym_iter_ == symbols_.end())
                         {
                             symbols_.push_back(id_);
                             item_sets_.emplace_back();
+                            item_sets_.back().reserve(4);
                             item_sets_.back().push_back(new_pair_);
                         }
                         else
                         {
                             const std::size_t index_ =
                                 sym_iter_ - symbols_.begin();
-                            size_t_pair_vector& vec_ = item_sets_[index_];
+                            cursor_vector& vec_ = item_sets_[index_];
                             auto i_ = std::find(vec_.begin(), vec_.end(),
                                 new_pair_);
 
@@ -216,7 +215,7 @@ namespace parsertl
                     iter_ != end_; ++iter_)
                 {
                     std::size_t index_ = iter_ - symbols_.begin();
-                    size_t_pair_vector& basis_ = item_sets_[index_];
+                    cursor_vector& basis_ = item_sets_[index_];
 
                     std::sort(basis_.begin(), basis_.end());
                     index_ = add_dfa_state(dfa_, hash_map_, basis_);
@@ -229,7 +228,7 @@ namespace parsertl
             prod_vector& new_grammar_, std::size_t& new_start_,
             nt_info_vector& new_nt_info_)
         {
-            using trie = std::pair<std::size_t, size_t_pair>;
+            using trie = std::pair<std::size_t, cursor>;
             using trie_map = std::map<trie, std::size_t>;
             const grammar& grammar_ = rules_.grammar();
             size_t terminals_size;
@@ -247,11 +246,11 @@ namespace parsertl
                 for (std::size_t cidx_ = 0, csize_ = state_._closure.size();
                     cidx_ != csize_; ++cidx_)
                 {
-                    const size_t_pair& pair_ = state_._closure[cidx_];
+                    const cursor& pair_ = state_._closure[cidx_];
 
-                    if (pair_.second != 0) continue;
+                    if (pair_._index != 0) continue;
 
-                    const production& production_ = grammar_[pair_.first];
+                    const production& production_ = grammar_[pair_._id];
                     prod &prod_ = new_grammar_.emplace_back();
 
                     prod_._production = &production_;
@@ -261,18 +260,18 @@ namespace parsertl
                         const std::size_t id_ = terminals_size +
                             production_._lhs;
 
-                        prod_._lhs_indexes.first = sidx_;
+                        prod_._lhs_indexes._id = sidx_;
 
                         for (std::size_t tidx_ = 0,
                             tsize_ = state_._transitions.size();
                             tidx_ != tsize_; ++tidx_)
                         {
-                            const size_t_pair& pr_ =
+                            const cursor& pr_ =
                                 state_._transitions[tidx_];
 
-                            if (pr_.first == id_)
+                            if (pr_._id == id_)
                             {
-                                prod_._lhs_indexes.second = pr_.second;
+                                prod_._lhs_indexes._index = pr_._index;
                                 break;
                             }
                         }
@@ -298,15 +297,15 @@ namespace parsertl
 
                     std::size_t index_ = sidx_;
 
-                    if (production_._rhs.empty())
+                    if (production_._rhs._symbols.empty())
                     {
                         prod_._rhs_indexes.emplace_back(sidx_, sidx_);
                     }
 
                     for (std::size_t ridx_ = 0, rsize_ = production_._rhs.
-                        size(); ridx_ != rsize_; ++ridx_)
+                        _symbols.size(); ridx_ != rsize_; ++ridx_)
                     {
-                        const symbol& symbol_ = production_._rhs[ridx_];
+                        const symbol& symbol_ = production_._rhs._symbols[ridx_];
                         const dfa_state& st_ = dfa_[index_];
 
                         prod_._rhs_indexes.emplace_back(index_, 0);
@@ -319,16 +318,16 @@ namespace parsertl
                                 symbol_._type == symbol::type::TERMINAL ?
                                 symbol_._id :
                                 terminals_size + symbol_._id;
-                            const size_t_pair& pr_ = st_._transitions[tidx_];
+                            const cursor& pr_ = st_._transitions[tidx_];
 
-                            if (pr_.first == id_)
+                            if (pr_._id == id_)
                             {
-                                index_ = pr_.second;
+                                index_ = pr_._index;
                                 break;
                             }
                         }
 
-                        prod_._rhs_indexes.back().second = index_;
+                        prod_._rhs_indexes.back()._index = index_;
                         prod_._rhs.push_back(symbol_);
 
                         if (symbol_._type == symbol::type::NON_TERMINAL)
@@ -569,7 +568,7 @@ namespace parsertl
             for (const auto& p_ : new_grammar_)
             {
                 new_grammar_idx_vec.emplace_back(p_._production->_lhs, p_._lhs,
-                        p_._rhs_indexes.back().second, &(p_._production->_rhs));
+                        p_._rhs_indexes.back()._index, &(p_._production->_rhs._symbols));
             }
 
             auto cmp_grammar_idx = [] (grammar_idx const& a, grammar_idx const& b) {
@@ -593,14 +592,14 @@ namespace parsertl
                 // shift and gotos
                 for (const auto& tran_ : d_._transitions)
                 {
-                    const dfa_size_t id_ = tran_.first;
+                    const dfa_size_t id_ = tran_._id;
                     entry lhs_ = sm_.at(index_, id_);
                     const entry rhs_((id_ < terminals_) ?
                         // TERMINAL
                         action::shift :
                         // NON_TERMINAL
                         action::go_to,
-                        static_cast<id_type>(tran_.second));
+                        static_cast<id_type>(tran_._index));
 
                     if (fill_entry(0, rules_, d_._closure, symbols_,
                         lhs_, id_, rhs_, warnings_))
@@ -610,9 +609,9 @@ namespace parsertl
                 // reductions
                 for (const auto& c_ : d_._closure)
                 {
-                    const production& production_ = grammar_[c_.first];
+                    const production& production_ = grammar_[c_._id];
 
-                    if (production_._rhs.size() == c_.second)
+                    if (production_._rhs._symbols.size() == c_._index)
                     {
 #ifdef PARSERTL_WITH_BITSET
                         follow_set_.set_clear();
@@ -627,7 +626,7 @@ namespace parsertl
                                 cmp_grammar_idx);
                         while(it != new_grammar_idx_vec.end() && it->lhs == production_._lhs && index_ == it->rhs_back)
                         {
-                            if (production_._rhs == *(it->rhs))
+                            if (production_._rhs._symbols == *(it->rhs))
                             {
                                 const std::size_t lhs_id_ = it->prod_lhs;
 
@@ -650,7 +649,7 @@ namespace parsertl
                         {
                             if (production_._lhs == iter_->_production->_lhs &&
                                 production_._rhs == iter_->_production->_rhs &&
-                                index_ == iter_->_rhs_indexes.back().second)
+                                index_ == iter_->_rhs_indexes.back()._index)
                             {
                                 const std::size_t lhs_id_ = iter_->_lhs;
 
@@ -692,19 +691,19 @@ namespace parsertl
             {
                 auto& pair_ = sm_._rules.emplace_back();
 
-                pair_.first = static_cast<id_type>(terminals_ +
+                pair_._lhs = static_cast<id_type>(terminals_ +
                     production_._lhs);
 
-                for (const auto& symbol_ : production_._rhs)
+                for (const auto& symbol_ : production_._rhs._symbols)
                 {
                     if (symbol_._type == symbol::type::TERMINAL)
                     {
-                        pair_.second.
+                        pair_._rhs.
                             push_back(static_cast<id_type>(symbol_._id));
                     }
                     else
                     {
-                        pair_.second.push_back(static_cast<id_type>
+                        pair_._rhs.push_back(static_cast<id_type>
                             (terminals_ + symbol_._id));
                     }
                 }
@@ -766,14 +765,14 @@ namespace parsertl
 
             for (std::size_t c_ = 0; c_ < state_._closure.size(); ++c_)
             {
-                const size_t_pair pair_ = state_._closure[c_];
-                const production& p_ = grammar_[pair_.first];
-                const std::size_t rhs_size_ = p_._rhs.size();
+                const cursor pair_ = state_._closure[c_];
+                const production& p_ = grammar_[pair_._id];
+                const std::size_t rhs_size_ = p_._rhs._symbols.size();
 
-                if (pair_.second < rhs_size_)
+                if (pair_._index < rhs_size_)
                 {
                     // SHIFT
-                    const symbol& symbol_ = p_._rhs[pair_.second];
+                    const symbol& symbol_ = p_._rhs._symbols[pair_._index];
 
                     if (symbol_._type == symbol::type::NON_TERMINAL)
                     {
@@ -781,7 +780,7 @@ namespace parsertl
                             nt_locations_[symbol_._id]._first_production;
                             rule_ != npos(); rule_ = grammar_[rule_]._next_lhs)
                         {
-                            const size_t_pair new_pair_(rule_, 0);
+                            const cursor new_pair_(rule_, 0);
                             auto i_ = std::find(state_._closure.begin(),
                                 state_._closure.end(), new_pair_);
 
@@ -796,7 +795,7 @@ namespace parsertl
         }
 
         static std::size_t add_dfa_state(dfa& dfa_, hash_map& hash_map_,
-            size_t_pair_vector& basis_)
+            cursor_vector& basis_)
         {
             size_t_vector& states_ = hash_map_[hash_set(basis_)];
             std::size_t index_ = npos();
@@ -826,21 +825,21 @@ namespace parsertl
             return index_;
         }
 
-        static std::size_t hash_set(const size_t_pair_vector& vec_)
+        static std::size_t hash_set(const cursor_vector& vec_)
         {
             std::size_t hash_ = 0;
 
             for (const auto& pair_ : vec_)
             {
                 hash_ *= 571;
-                hash_ += pair_.first * 37 + pair_.second;
+                hash_ += pair_._id * 37 + pair_._index;
             }
 
             return hash_;
         }
 
         static bool fill_entry(const std::size_t rule_index, const rules& rules_,
-            const size_t_pair_vector& config_, const string_vector& symbols_,
+            const cursor_vector& config_, const string_vector& symbols_,
             entry& lhs_, const std::size_t id_, const entry& rhs_,
             std::string& warnings_)
         {
@@ -1015,7 +1014,7 @@ namespace parsertl
         }
 
         static void dump_action(const grammar& grammar_,
-            const std::size_t terminals_, const size_t_pair_vector& config_,
+            const std::size_t terminals_, const cursor_vector& config_,
             const string_vector& symbols_, const std::size_t id_,
             const entry& entry_, std::ostringstream& ss_)
         {
@@ -1023,12 +1022,12 @@ namespace parsertl
             {
                 for (const auto& c_ : config_)
                 {
-                    const production& production_ = grammar_[c_.first];
+                    const production& production_ = grammar_[c_._id];
 
-                    if (production_._rhs.size() > c_.second &&
-                        production_._rhs[c_.second]._id == id_)
+                    if (production_._rhs._symbols.size() > c_._index &&
+                        production_._rhs._symbols[c_._index]._id == id_)
                     {
-                        dump_production(production_, c_.second, terminals_,
+                        dump_production(production_, c_._index, terminals_,
                             symbols_, ss_);
                     }
                 }
@@ -1046,8 +1045,8 @@ namespace parsertl
             const std::size_t dot_, const std::size_t terminals_,
             const string_vector& symbols_, std::ostringstream& ss_)
         {
-            auto sym_iter_ = production_._rhs.cbegin();
-            auto sym_end_ = production_._rhs.cend();
+            auto sym_iter_ = production_._rhs._symbols.cbegin();
+            auto sym_end_ = production_._rhs._symbols.cend();
             std::size_t index_ = 0;
 
             ss_ << " (";

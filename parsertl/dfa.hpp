@@ -12,16 +12,43 @@
 
 namespace parsertl
 {
-    //using size_t_pair = std::pair<std::size_t, std::size_t>;
     using dfa_size_t = uint16_t;
-    using size_t_pair = std::pair<dfa_size_t, dfa_size_t>;
-    using size_t_pair_vector = std::vector<size_t_pair>;
+    struct cursor
+    {
+        dfa_size_t _id;
+        dfa_size_t _index;
+
+        cursor() :
+            _id(0),
+            _index(0)
+        {
+        }
+
+        cursor(const dfa_size_t id_, const dfa_size_t index_) :
+            _id(id_),
+            _index(index_)
+        {
+        }
+
+        bool operator==(const cursor& rhs_) const
+        {
+            return _id == rhs_._id && _index == rhs_._index;
+        }
+
+        bool operator<(const cursor& rhs_) const
+        {
+            return _id < rhs_._id ||
+                (_id == rhs_._id && _index < rhs_._index);
+        }
+    };
+
+    using cursor_vector = std::vector<cursor>;
 
     struct dfa_state
     {
-        size_t_pair_vector _basis;
-        size_t_pair_vector _closure;
-        size_t_pair_vector _transitions;
+        cursor_vector _basis;
+        cursor_vector _closure;
+        cursor_vector _transitions;
     };
 
     // Must be deque due to iterator usage in basic_generator::build_dfa().
