@@ -208,6 +208,7 @@ const sampleList = [
 	["Panda3d cppparser (partially working)", "cppBison-panda3d.g", "test.c", "ace/mode/c_cpp"],
 	["Panda3d dcparser", "panda3d-dcparser.g", "test.panda3d-dcparser", "ace/mode/c_cpp"],
 	["Panda3d eggparser", "panda3d-eggparser.g", "test.panda3d-eggparser", "ace/mode/text"],
+	["Parol parser", "parol.g", "test.parol", "ace/mode/yaml"],
 	["Parseland parser", "parseland.g", "test.parseland", "ace/mode/text"],
 	["PCC cccom parser (partially working)", "pcc-cccom.g", "test.c", "ace/mode/c_cpp"],
 	["PCC cxxcom parser (partially working)", "pcc-cxxcom.g", "test.c", "ace/mode/c_cpp"],
