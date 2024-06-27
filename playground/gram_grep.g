@@ -31,9 +31,9 @@ directive : "%x" names NL ;
 names : Name | names Name ;
 // Grammar rules
 grules : %empty | grules grule ;
-grule : Name ':' production opt_script ';' ;
+grule : Name ':' production ';' ;
 production : opt_prec_list | production '|' opt_prec_list ;
-opt_prec_list: opt_list opt_prec ;
+opt_prec_list: opt_list opt_prec opt_script ;
 opt_list : %empty | "%empty" | rhs_list ;
 rhs_list : rhs | rhs_list rhs ;
 rhs : Literal | Name | '[' production ']' | rhs '?' | rhs '*' | rhs '+' | '(' production ')' ;
@@ -52,6 +52,7 @@ cmd : "match" '=' Index ;
 cmd : "match" '=' "substr" '(' Index ',' Integer ',' Integer ')' ;
 cmd : "match" "+=" Index ;
 cmd : "match" "+=" "substr" '(' Index ',' Integer ',' Integer ')' ;
+mod_cmd : "print" '(' ScriptString ')' ;
 mod_cmd : "replace" '(' Index ',' ScriptString ')' ;
 mod_cmd : "replace" '(' Index ',' Index ',' ScriptString ')' ;
 mod_cmd : "replace" '(' Index '.' first_second ',' Index '.' first_second ',' ScriptString ')' ;
@@ -116,8 +117,8 @@ state_name [A-Z_a-z][0-9A-Z_a-z]*
 <GRULE>[+]<.>	'+'
 <GRULE>[|]<.>	'|'
 <GRULE>;<.>	';'
-<GRULE>[{]<.>	'{'
-<SCRIPT>[}]<.>	'}'
+<GRULE>[{]<SCRIPT>	'{'
+<SCRIPT>[}]<GRULE>	'}'
 <SCRIPT>=<.>	'='
 <SCRIPT>,<.>	','
 <SCRIPT>[(]<.>	'('
@@ -129,6 +130,7 @@ state_name [A-Z_a-z][0-9A-Z_a-z]*
 <SCRIPT>first<.>	"first"
 <SCRIPT>insert<.>	"insert"
 <SCRIPT>match<.>	"match"
+<SCRIPT>print<.>	"print"
 <SCRIPT>replace<.>	"replace"
 <SCRIPT>replace_all<.>	"replace_all"
 <SCRIPT>second<.>	"second"
