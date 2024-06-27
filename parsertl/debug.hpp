@@ -405,6 +405,12 @@ namespace parsertl
                 "FROM directives AS d join symbol AS s ON d.start_symbol=s.id\n"
                 "UNION ALL\n"
                 "SELECT * FROM rule_view;\n"
+                "CREATE VIEW symbol_usage_view as\n"
+                "SELECT count(*) AS usage, a.sym, b.isTerminal, b.name\n"
+                "FROM rulerhs AS a, symbol AS b\n"
+                "WHERE a.sym = b.id\n"
+                "GROUP BY a.sym\n"
+                "ORDER BY b.name;\n"
                 "COMMIT;\n"
                 "select * from grammar_view;\n"
                 ;
