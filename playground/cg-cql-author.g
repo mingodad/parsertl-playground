@@ -915,9 +915,9 @@ basic_expr :
 	| window_func_inv
 	| raise_expr
 	| '(' select_stmt ')'
-	| '(' select_stmt IF NOTHING expr ')'
-	| '(' select_stmt IF NOTHING OR /*4L*/ NULL_ expr ')'
-	| '(' select_stmt IF NOTHING THROW ')'
+	| '(' select_stmt IF NOTHING THEN expr ')'
+	| '(' select_stmt IF NOTHING OR /*4L*/ NULL_ THEN expr ')'
+	| '(' select_stmt IF NOTHING THEN THROW ')'
 	| EXISTS '(' select_stmt ')'
 	| CASE expr case_list END
 	| CASE expr case_list ELSE expr END
@@ -1046,6 +1046,7 @@ cte_tables :
 cte_decl :
 	name '(' name_list ')'
 	| name '(' '*' /*12L*/ ')'
+	| name
 	;
 
 shared_cte :
