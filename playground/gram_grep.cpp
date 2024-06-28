@@ -24,6 +24,15 @@ enum class file_type
     ansi, utf8, utf16, utf16_flip
 };
 
+enum config_flags
+{
+    none = 0,
+    whole_word = 1,
+    negate = 2,
+    negate_all = 4,
+    extend_search = 8
+};
+
 enum class match_type
 {
     // Must match order of variant in g_pipeline
@@ -34,9 +43,7 @@ using lexer_state_machine = lexertl::state_machine;
 
 struct base
 {
-    bool _negate = false;
-    bool _all = false;
-    bool _extend = false;
+    unsigned int _flags = config_flags::none;
 
     virtual ~base() = default;
 };
@@ -212,17 +219,12 @@ struct config
 {
     match_type _type;
     std::string _param;
-    bool _negate = false;
-    bool _all = false;
-    bool _extend = false;
+    unsigned int _flags = config_flags::none;
 
-    config(const match_type type, const std::string& param, const bool negate,
-        const bool all, const bool extend = false) :
+    config(const match_type type, const std::string& param, const unsigned int flags) :
         _type(type),
         _param(param),
-        _negate(negate),
-        _all(all),
-        _extend(extend)
+        _flags(flags)
     {
     }
 };
@@ -289,6 +291,7 @@ struct config_state
     lexertl::memory_file _mf;
     token::token_vector _productions;
     parsertl::match_results _results;
+    std::string _lhs;
     bool _print = false;
 
     void parse(const std::string& config_pathname)
@@ -624,9 +627,9 @@ bool process_parser(const parser& p, const char* start,
 
     if (success)
     {
-        if (p._negate)
+        if (p._flags & config_flags::negate)
         {
-            if (p._all)
+            if (p._flags & config_flags::negate_all)
                 success = false;
             else
             {
@@ -658,9 +661,9 @@ bool process_parser(const parser& p, const char* start,
                 ranges.back()._first = iter->first;
                 // Store end of match
                 ranges.back()._second = end->first;
-                ranges.emplace_back(p._extend ? end->first : iter->first,
-                    p._extend ? end->first : iter->first,
-                    p._extend ? ranges.back()._eoi : end->first);
+                ranges.emplace_back((p._flags & config_flags::extend_search) ? end->first : iter->first,
+                    (p._flags & config_flags::extend_search) ? end->first : iter->first,
+                    (p._flags & config_flags::extend_search) ? ranges.back()._eoi : end->first);
             }
             else
             {
@@ -674,9 +677,9 @@ bool process_parser(const parser& p, const char* start,
                 {
                     for (const auto& pair : cap[idx])
                     {
-                        ranges.emplace_back(p._extend ? pair.second : pair.first,
-                            p._extend ? pair.second : pair.first,
-                            p._extend ? ranges.back()._eoi : pair.second);
+                        ranges.emplace_back((p._flags & config_flags::extend_search) ? pair.second : pair.first,
+                            (p._flags & config_flags::extend_search) ? pair.second : pair.first,
+                            (p._flags & config_flags::extend_search) ? ranges.back()._eoi : pair.second);
                     }
                 }
             }
@@ -719,7 +722,7 @@ bool process_parser(const parser& p, const char* start,
             }
         }
     }
-    else if (p._negate)
+    else if (p._flags & config_flags::negate)
     {
         if (ranges.back()._first != ranges.back()._eoi)
         {
@@ -734,7 +737,7 @@ bool process_parser(const parser& p, const char* start,
     {
         captures.clear();
 
-        if (p._negate)
+        if (p._flags & config_flags::negate)
             captures.emplace_back(ranges.back()._first, ranges.back()._second);
         else
         {
@@ -909,9 +912,9 @@ bool process_lexer(const lexer& l, std::vector<match>& ranges,
 
     if (success)
     {
-        if (l._negate)
+        if (l._flags & config_flags::negate)
         {
-            if (l._all)
+            if (l._flags & config_flags::negate_all)
                 success = false;
             else
             {
@@ -937,12 +940,12 @@ bool process_lexer(const lexer& l, std::vector<match>& ranges,
             ranges.back()._first = iter->first;
             // Store end of match
             ranges.back()._second = iter->second;
-            ranges.emplace_back(l._extend ? iter->second : iter->first,
-                l._extend ? iter->second : iter->first,
-                l._extend ? ranges.back()._eoi : iter->second);
+            ranges.emplace_back((l._flags & config_flags::extend_search) ? iter->second : iter->first,
+                (l._flags & config_flags::extend_search) ? iter->second : iter->first,
+                (l._flags & config_flags::extend_search) ? ranges.back()._eoi : iter->second);
         }
     }
-    else if (l._negate)
+    else if (l._flags & config_flags::negate)
     {
         if (ranges.back()._first != ranges.back()._eoi)
         {
@@ -971,9 +974,9 @@ bool process_regex(const regex& r, std::vector<match>& ranges,
 
     if (success)
     {
-        if (r._negate)
+        if (r._flags & config_flags::negate)
         {
-            if (r._all)
+            if (r._flags & config_flags::negate_all)
                 success = false;
             else
             {
@@ -999,12 +1002,12 @@ bool process_regex(const regex& r, std::vector<match>& ranges,
             ranges.back()._first = (*iter)[0].first;
             // Store end of match
             ranges.back()._second = (*iter)[0].second;
-            ranges.emplace_back(r._extend ? (*iter)[0].second : (*iter)[0].first,
-                r._extend ? (*iter)[0].second : (*iter)[0].first,
-                r._extend ? ranges.back()._eoi : (*iter)[0].second);
+            ranges.emplace_back((r._flags & config_flags::extend_search) ? (*iter)[0].second : (*iter)[0].first,
+                (r._flags & config_flags::extend_search) ? (*iter)[0].second : (*iter)[0].first,
+                (r._flags & config_flags::extend_search) ? ranges.back()._eoi : (*iter)[0].second);
         }
     }
-    else if (r._negate)
+    else if (r._flags & config_flags::negate)
     {
         if (ranges.back()._first != ranges.back()._eoi)
         {
@@ -1019,7 +1022,7 @@ bool process_regex(const regex& r, std::vector<match>& ranges,
     {
         captures.clear();
 
-        if (r._negate)
+        if (r._flags & config_flags::negate)
             captures.emplace_back(ranges.back()._first, ranges.back()._second);
         else
         {
@@ -1108,9 +1111,9 @@ bool process_text(const text& t, const char* data_first,
 
     if (success)
     {
-        if (t._negate)
+        if (t._flags & config_flags::negate)
         {
-            if (t._all)
+            if (t._flags & config_flags::negate_all)
                 success = false;
             else
             {
@@ -1134,12 +1137,12 @@ bool process_text(const text& t, const char* data_first,
             ranges.back()._first = first;
             // Store end of match
             ranges.back()._second = second;
-            ranges.emplace_back(t._extend ? second : first,
-                t._extend ? second : first,
-                t._extend ? ranges.back()._eoi : second);
+            ranges.emplace_back((t._flags & config_flags::extend_search) ? second : first,
+                (t._flags & config_flags::extend_search) ? second : first,
+                (t._flags & config_flags::extend_search) ? ranges.back()._eoi : second);
         }
     }
-    else if (t._negate)
+    else if (t._flags & config_flags::negate)
     {
         if (ranges.back()._first != ranges.back()._eoi)
         {
@@ -1285,7 +1288,7 @@ std::pair<bool, bool> search(std::vector<match>& ranges, const char* data_first,
 
             success = process_parser(p, data_first, ranges, matches,
                 replacements, captures);
-            negate = p._negate;
+            negate = (p._flags & config_flags::negate) != 0;
             break;
         }
         case match_type::lexer:
@@ -1293,7 +1296,7 @@ std::pair<bool, bool> search(std::vector<match>& ranges, const char* data_first,
             const auto& l = std::get<lexer>(v);
 
             success = process_lexer(l, ranges, captures);
-            negate = l._negate;
+            negate = (l._flags & config_flags::negate) != 0;
             break;
         }
         case match_type::regex:
@@ -1301,7 +1304,7 @@ std::pair<bool, bool> search(std::vector<match>& ranges, const char* data_first,
             const auto& r = std::get<regex>(v);
 
             success = process_regex(r, ranges, captures);
-            negate = r._negate;
+            negate = (r._flags & config_flags::negate) != 0;
             break;
         }
         case match_type::text:
@@ -1309,7 +1312,7 @@ std::pair<bool, bool> search(std::vector<match>& ranges, const char* data_first,
             const auto& t = std::get<text>(v);
 
             success = process_text(t, data_first, ranges, captures);
-            negate = t._negate;
+            negate = (t._flags & config_flags::negate) != 0;
             break;
         }
         default:
@@ -1978,18 +1981,31 @@ void build_config_parser(bool dumpGrammar=false, bool asEbnfRR=false)
     // Grammar rules
     grules.push("grules", "%empty "
         "| grules grule");
-    g_config_parser._actions[grules.push("grule",
-        "Name ':' production opt_script ';'")] =
+    grules.push("grule", "lhs ':' production ';'");
+    g_config_parser._actions[grules.push("lhs", "Name")] =
         [](config_state& state, const config_parser& parser)
     {
-        const auto& lhs = state._results.dollar(0, parser._gsm,
+        state._lhs = state._results.dollar(0, parser._gsm,
+            state._productions).str();
+    };
+    grules.push("production", "opt_prec_list "
+        "| production '|' opt_prec_list");
+    g_config_parser._actions[grules.push("opt_prec_list",
+        "opt_list opt_prec opt_script")] =
+        [](config_state& state, const config_parser& parser)
+    {
+        const auto& item1 = state._results.dollar(0, parser._gsm,
             state._productions);
-        const auto& prod = state._results.dollar(2, parser._gsm,
+        const auto& item2 = state._results.dollar(1, parser._gsm,
             state._productions);
-        const uint16_t prod_index = state._grules.push(lhs.str(), prod.str());
-        auto iter = g_curr_parser->_actions.find(prod_index);
+        const auto rhs = std::string(item1.first, item2.second);
+        const uint16_t prod_index = state._grules.push(state._lhs, rhs);
+        auto iter = g_force_unicode ?
+            g_curr_uparser->_actions.find(prod_index) :
+            g_curr_parser->_actions.find(prod_index);
 
-        if (iter != g_curr_parser->_actions.end())
+        if (iter != (g_force_unicode ? g_curr_uparser->_actions.end() :
+            g_curr_parser->_actions.end()))
         {
             for (const auto& cmd : iter->second)
             {
@@ -2022,9 +2038,6 @@ void build_config_parser(bool dumpGrammar=false, bool asEbnfRR=false)
             }
         }
     };
-    grules.push("production", "opt_prec_list "
-        "| production '|' opt_prec_list");
-    grules.push("opt_prec_list", "opt_list opt_prec");
     grules.push("opt_list", "%empty "
         "| \"%empty\" "
         "| rhs_list");
@@ -2670,6 +2683,7 @@ void show_help()
         "-shutdown\t\t<command to run when exiting>.\n"
         "-startup\t\t<command to run at startup>.\n"
         "-T <text>\t\tSearch for plain text with support for capture ($n) syntax.\n"
+        "-Tw <text>\t\tAs -T but with whole word matching.\n"
         "-utf8\t\t\tIn the absence of a BOM assume UTF-8\n"
         "-vE <regex>\t\tSearch using DFA regex (negated).\n"
         "-VE <regex>\t\tSearch using DFA regex (all negated).\n"
@@ -2678,7 +2692,9 @@ void show_help()
         "-vP <regex>\t\tSearch using std::regex (negated).\n"
         "-VP <regex>\t\tSearch using std::regex (all negated).\n"
         "-vT <text>\t\tSearch for plain text with support for capture ($n) syntax (negated).\n"
+        "-vTw <text>\t\tAs -vT but with whole word matching.\n"
         "-VT <text>\t\tSearch for plain text with support for capture ($n) syntax (all negated).\n"
+        "-VTw <text>\t\tAs -VT but with whole word matching.\n"
         "-writable\t\tOnly process files that are writable.\n"
         "<pathname>...\t\tFiles to search (wildcards supported).\n\n"
         "Config file format:\n\n"
@@ -2841,8 +2857,7 @@ void read_switches(const int argc, const char* const argv[],
             param = argv[i];
 
             if (i < argc)
-                configs.emplace_back(match_type::dfa_regex, param,
-                    false, false);
+                configs.emplace_back(match_type::dfa_regex, param, config_flags::none);
             else
                 throw std::runtime_error("Missing regex following -E.");
         }
@@ -2854,7 +2869,7 @@ void read_switches(const int argc, const char* const argv[],
 
             if (i < argc)
                 configs.emplace_back(match_type::dfa_regex, param,
-                    false, false, true);
+                    config_flags::extend_search);
             else
                 throw std::runtime_error("Missing regex following -Ee.");
         }
@@ -2895,7 +2910,7 @@ void read_switches(const int argc, const char* const argv[],
                 {
                     param = p.data();
                     configs.emplace_back(match_type::parser,
-                        std::string(param, param + p.size()), false, false);
+                        std::string(param, param + p.size()), config_flags::none);
                 }
             }
             else
@@ -2913,7 +2928,8 @@ void read_switches(const int argc, const char* const argv[],
                 {
                     param = p.data();
                     configs.emplace_back(match_type::parser,
-                        std::string(param, param + p.size()), false, false, true);
+                        std::string(param, param + p.size()),
+                        config_flags::extend_search);
                 }
             }
             else
@@ -2941,7 +2957,7 @@ void read_switches(const int argc, const char* const argv[],
             param = argv[i];
 
             if (i < argc)
-                configs.emplace_back(match_type::regex, param, false, false);
+                configs.emplace_back(match_type::regex, param, config_flags::none);
             else
                 throw std::runtime_error("Missing regex following -P.");
         }
@@ -2952,7 +2968,8 @@ void read_switches(const int argc, const char* const argv[],
             param = argv[i];
 
             if (i < argc)
-                configs.emplace_back(match_type::regex, param, false, false, true);
+                configs.emplace_back(match_type::regex, param,
+                        config_flags::extend_search);
             else
                 throw std::runtime_error("Missing regex following -Pe.");
         }
@@ -3021,7 +3038,19 @@ void read_switches(const int argc, const char* const argv[],
             param = argv[i];
 
             if (i < argc)
-                configs.emplace_back(match_type::text, param, false, false);
+                configs.emplace_back(match_type::text, param, config_flags::none);
+            else
+                throw std::runtime_error("Missing regex following -T.");
+        }
+        else if (strcmp("-Tw", param) == 0)
+        {
+            // Text
+            ++i;
+            param = argv[i];
+
+            if (i < argc)
+                configs.emplace_back(match_type::text, param,
+                        config_flags::whole_word);
             else
                 throw std::runtime_error("Missing regex following -T.");
         }
@@ -3032,7 +3061,8 @@ void read_switches(const int argc, const char* const argv[],
             param = argv[i];
 
             if (i < argc)
-                configs.emplace_back(match_type::dfa_regex, param, true, false);
+                configs.emplace_back(match_type::dfa_regex, param,
+                        config_flags::negate);
             else
                 throw std::runtime_error("Missing regex following -vE.");
         }
@@ -3043,7 +3073,8 @@ void read_switches(const int argc, const char* const argv[],
             param = argv[i];
 
             if (i < argc)
-                configs.emplace_back(match_type::dfa_regex, param, true, true);
+                configs.emplace_back(match_type::dfa_regex, param,
+                        config_flags::negate | config_flags::negate_all);
             else
                 throw std::runtime_error("Missing regex following -VE.");
         }
@@ -3059,7 +3090,8 @@ void read_switches(const int argc, const char* const argv[],
                 {
                     param = p.data();
                     configs.emplace_back(match_type::parser,
-                        std::string(param, param + p.size()), true, false);
+                        std::string(param, param + p.size()),
+                            config_flags::negate);
                 }
             }
             else
@@ -3077,7 +3109,8 @@ void read_switches(const int argc, const char* const argv[],
                 {
                     param = p.data();
                     configs.emplace_back(match_type::parser,
-                        std::string(param, param + p.size()), true, true);
+                        std::string(param, param + p.size()),
+                            config_flags::negate | config_flags::negate_all);
                 }
             }
             else
@@ -3090,7 +3123,8 @@ void read_switches(const int argc, const char* const argv[],
             param = argv[i];
 
             if (i < argc)
-                configs.emplace_back(match_type::regex, param, true, false);
+                configs.emplace_back(match_type::regex, param,
+                        config_flags::negate);
             else
                 throw std::runtime_error("Missing regex following -vP.");
         }
@@ -3101,7 +3135,8 @@ void read_switches(const int argc, const char* const argv[],
             param = argv[i];
 
             if (i < argc)
-                configs.emplace_back(match_type::regex, param, true, true);
+                configs.emplace_back(match_type::regex, param,
+                        config_flags::negate | config_flags::negate_all);
             else
                 throw std::runtime_error("Missing regex following -VP.");
         }
@@ -3112,7 +3147,19 @@ void read_switches(const int argc, const char* const argv[],
             param = argv[i];
 
             if (i < argc)
-                configs.emplace_back(match_type::text, param, true, false);
+                configs.emplace_back(match_type::text, param,
+                        config_flags::negate);
+            else
+                throw std::runtime_error("Missing regex following -vT.");
+        }
+        else if (strcmp("-vTw", param) == 0)
+        {
+            ++i;
+            param = argv[i];
+
+            if (i < argc)
+                configs.emplace_back(match_type::text, param,
+                    config_flags::whole_word | config_flags::negate);
             else
                 throw std::runtime_error("Missing regex following -vT.");
         }
@@ -3123,7 +3170,20 @@ void read_switches(const int argc, const char* const argv[],
             param = argv[i];
 
             if (i < argc)
-                configs.emplace_back(match_type::text, param, true, true);
+                configs.emplace_back(match_type::text, param,
+                        config_flags::negate | config_flags::negate_all);
+            else
+                throw std::runtime_error("Missing regex following -VT.");
+        }
+        else if (strcmp("-VTw", param) == 0)
+        {
+            ++i;
+            param = argv[i];
+
+            if (i < argc)
+                configs.emplace_back(match_type::text, param,
+                    config_flags::whole_word |
+                    config_flags::negate | config_flags::negate_all);
             else
                 throw std::runtime_error("Missing regex following -VT.");
         }
@@ -3149,9 +3209,7 @@ void fill_pipeline(const std::vector<config>& configs)
                 lexertl::rules rules;
                 lexer lexer;
 
-                lexer._negate = config._negate;
-                lexer._all = config._all;
-                lexer._extend = config._extend;
+                lexer._flags = config._flags;
 
                 if (g_icase)
                     rules.flags(*lexertl::regex_flags::icase |
@@ -3169,9 +3227,7 @@ void fill_pipeline(const std::vector<config>& configs)
         {
             regex regex;
 
-            regex._negate = config._negate;
-            regex._all = config._all;
-            regex._extend = config._extend;
+            regex._flags = config._flags;
             regex._rx.assign(config._param, g_icase ?
                 (std::regex_constants::ECMAScript |
                     std::regex_constants::icase) :
@@ -3185,9 +3241,7 @@ void fill_pipeline(const std::vector<config>& configs)
                 parser parser;
                 config_state state;
 
-                parser._negate = config._negate;
-                parser._all = config._all;
-                parser._extend = config._extend;
+                parser._flags = config._flags;
                 g_curr_parser = &parser;
 
                 if (g_config_parser._gsm.empty())
@@ -3200,7 +3254,7 @@ void fill_pipeline(const std::vector<config>& configs)
                 {
                     lexer lexer;
 
-                    lexer._negate = parser._negate;
+                    lexer._flags |= parser._flags & config_flags::negate;
                     lexer._sm.swap(parser._lsm);
                     g_pipeline.emplace_back(std::move(lexer));
                 }
@@ -3214,8 +3268,7 @@ void fill_pipeline(const std::vector<config>& configs)
         {
             text text;
 
-            text._negate = config._negate;
-            text._all = config._all;
+            text._flags = config._flags;
             text._text = config._param;
             g_pipeline.emplace_back(std::move(text));
         }
