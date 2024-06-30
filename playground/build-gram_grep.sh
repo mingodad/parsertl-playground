@@ -9,7 +9,7 @@ myflags="-O2"
 gcc-14-env g++  \
 	-std=c++20 $myflags -Wall -Wno-unused-function -pedantic \
 	-I.. \
-	 gram_grep.cpp debugmem.cpp \
+	 gram_grep.cpp \
 	-DPARSERTL_WITH_BITSET \
 	-DPARSERTL_WITH_BOOLSETx \
 	-DPARSERTL_WITH_BUILD_TABLE_INDEX \
