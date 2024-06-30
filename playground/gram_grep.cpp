@@ -1839,7 +1839,7 @@ std::string unescape(const std::string_view& vw)
 
 static std::string unescape_str(const char* first, const char* second)
 {
-    std::string ret = unescape(std::string_view(first, second));
+    std::string ret = unescape(std::string_view(first, second-first));
  
     for (std::size_t idx = ret.find('\''); idx != std::string::npos;
         idx = ret.find('\'', idx + 1))
