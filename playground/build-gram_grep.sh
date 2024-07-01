@@ -6,8 +6,8 @@ myflags="-O2"
 #myflags="-g4 -fsanitize=address -fsanitize=undefined"
 
 
-gcc-14-env g++  \
-	-std=c++20 $myflags -Wall -Wno-unused-function -pedantic \
+g++  \
+	-std=c++17 $myflags -Wall -Wno-unused-function -pedantic \
 	-I.. \
 	 gram_grep.cpp \
 	-DPARSERTL_WITH_BITSET \
