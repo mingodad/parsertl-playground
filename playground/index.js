@@ -85,6 +85,7 @@ const sampleList = [
 	["Capnproto parser", "capnproto-antlr4.g", "test.capnproto", "ace/mode/text"],
 	["Carbon parser (need review of '*')", "carbon-lang.g", "prelude.carbon", "ace/mode/typescript"],
 	["Cdecl parser", "cdecl.g", "test.cdecl", "ace/mode/c_cpp"],
+	["Cforall parser (partially working)", "cforall.g", "test.c", "ace/mode/c_cpp"],
 	["CG-CQL-author parser", "cg-cql-author.g", "test.cg-cql-author", "ace/mode/sql"],
 	["CG-CQL-old parser", "cql.g", "test.cql", "ace/mode/sql"],
 	["Chapel parser", "chapel.g", "test.chapel", "ace/mode/c_cpp"],
