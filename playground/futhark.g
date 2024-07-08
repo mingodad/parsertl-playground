@@ -959,8 +959,8 @@ doc   "-- |".*(\n{space}*"--".*)*
 
 "#["	"#["
 
-"%"{opchar}*	Mod
 "%%"{opchar}*	Rem
+"%"{opchar}*	Mod
 
 "+"{opchar}*	Plus
 
@@ -991,11 +991,6 @@ val	val
 while	while
 with	with
 
-{declit}	natlit
-{binlit}	intlit
-{hexlit}	intlit
-{romlit}	intlit
-
 {declit}i16	i16lit
 {declit}i32	i32lit
 {declit}i64	i64lit
@@ -1006,11 +1001,16 @@ with	with
 {declit}u64	u64lit
 {declit}u8	u8lit
 
+{declit}	natlit
+{binlit}	intlit
+{hexlit}	intlit
+{romlit}	intlit
+
 //nedd be after intlit
-{reallit}|{hexreallit}	floatlit
 ({reallit}|{hexreallit})f16	f16lit
 ({reallit}|{hexreallit})f32	f32lit
 ({reallit}|{hexreallit})f64	f64lit
+{reallit}|{hexreallit}	floatlit
 
 '(\\.|[^'\n\r\\])'	charlit
 \"(\\.|[^"\n\r\\])*\"	stringlit
