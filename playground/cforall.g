@@ -983,6 +983,7 @@ declaration :
 	c_declaration ';'
 	| cfa_declaration ';'
 	| static_assert
+	| ';'
 	;
 
 static_assert :
