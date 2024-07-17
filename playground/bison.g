@@ -319,7 +319,7 @@ SPACES	[ \t\r\n]+
 COMMENT	"//"[^\r\n]*
 C_STYLE_COMMENT [/][*](?s:.)*?[*][/]
 
-STRING	\"(\\.|[^\"\n\r\\])*\"|'(\\.|[^'\n\r\\])*'
+STRING	\"(\\.|[^\"\n\r\\])*\"
 ACTION_CODE [{](?s:.)*?[}]
 VERBATIN_CODE "%{"(?s:.)*?"%}"
 
