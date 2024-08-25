@@ -1,4 +1,4 @@
-//From: https://github.com/google/zetasql/blob/f6df6971a205790966e73eda0134f05a022d0e6a/zetasql/parser/bison_parser.y
+//From: https://github.com/google/zetasql/blob/194cd32b5d766d60e3ca442651d792c7fe54ea74/zetasql/parser/bison_parser.y
 //
 // Copyright 2019 Google LLC
 //
@@ -166,29 +166,346 @@
 //%expect 23
 
 /*Tokens*/
-
-%token KW_DEFINE_FOR_MACROS
-%token KW_EXCEPT_IN_SET_OP
-%token KW_FULL_IN_SET_OP
-%token KW_LEFT_IN_SET_OP
-%token KW_OPTIONS_IN_SELECT_WITH_OPTIONS
-%token KW_OPEN_HINT
-%token KW_OPEN_INTEGER_HINT
-%token KW_LEFT
-%token KW_DOUBLE_AT
-%token KW_QUALIFY_RESERVED
-%token KW_QUALIFY_NONRESERVED
-%token KW_WITH_STARTING_WITH_EXPRESSION
-%token KW_NAMED_ARGUMENT_ASSIGNMENT
-%token KW_WITH_STARTING_WITH_GROUP_ROWS
-%token KW_REPLACE_AFTER_INSERT
-%token KW_UPDATE_AFTER_INSERT
-
+//%token BACKSLASH
 %token BYTES_LITERAL
+//%token COMMENT
+//%token DECIMAL_INTEGER_LITERAL
+//%token DOLLAR_SIGN
+//%token EXP_IN_FLOAT_NO_SIGN
 %token FLOATING_POINT_LITERAL
+//%token HEX_INTEGER_LITERAL
 %token IDENTIFIER
 %token INTEGER_LITERAL
+//%token INVALID_LITERAL_PRECEDING_IDENTIFIER_NO_SPACE
+%token KW_ABORT
+%token KW_ACCESS
+%token KW_ACTION
+%token KW_ADD
+%token KW_ADD_ASSIGN
+%token KW_AGGREGATE
+%token KW_ALL
+%token KW_ALTER
+%token KW_ALWAYS
+%token KW_ANALYZE
+%token KW_AND
+%token KW_ANY
+%token KW_APPROX
+%token KW_ARE
+%token KW_ARRAY
+%token KW_AS
+%token KW_ASC
+%token KW_ASSERT
+%token KW_ASSERT_ROWS_MODIFIED
+%token KW_AT
+%token KW_BATCH
+%token KW_BEGIN
+%token KW_BETWEEN
+%token KW_BIGDECIMAL
+%token KW_BIGNUMERIC
+%token KW_BREAK
+%token KW_BY
+%token KW_CALL
+%token KW_CASCADE
+%token KW_CASE
+%token KW_CAST
+%token KW_CHECK
+%token KW_CLAMPED
+%token KW_CLONE
+%token KW_CLUSTER
+%token KW_COLLATE
+%token KW_COLUMN
+%token KW_COLUMNS
+%token KW_COMMIT
+%token KW_CONCAT_OP
+%token KW_CONNECTION
+%token KW_CONSTANT
+%token KW_CONSTRAINT
+//%token KW_CONTAINS
+%token KW_CONTINUE
+%token KW_COPY
+%token KW_CORRESPONDING
+%token KW_CREATE
+%token KW_CROSS
+%token KW_CUBE
+%token KW_CURRENT
+//%token KW_CURRENT_DATETIME_FUNCTION
+%token KW_CYCLE
+%token KW_DATA
+%token KW_DATABASE
+%token KW_DATE
+%token KW_DATETIME
+%token KW_DECIMAL
+%token KW_DECLARE
+%token KW_DEFAULT
+%token KW_DEFINE
+%token KW_DEFINE_FOR_MACROS
+%token KW_DEFINER
+%token KW_DELETE
+%token KW_DELETION
+%token KW_DEPTH
+%token KW_DESC
+%token KW_DESCRIBE
+%token KW_DESCRIPTOR
+%token KW_DETERMINISTIC
+%token KW_DISTINCT
+%token KW_DO
+%token KW_DOUBLE_AT
+%token KW_DROP
+%token KW_ELSE
+%token KW_ELSEIF
+%token KW_END
+%token KW_ENFORCED
+%token KW_ENUM
+%token KW_ERROR
+//%token KW_ESCAPE
+%token KW_EXCEPT
+%token KW_EXCEPT_IN_SET_OP
+%token KW_EXCEPTION
+%token KW_EXCLUDE
+%token KW_EXECUTE
+%token KW_EXISTS
+%token KW_EXPLAIN
+%token KW_EXPORT
+%token KW_EXTEND
+%token KW_EXTERNAL
+%token KW_EXTRACT
+%token KW_FALSE
+//%token KW_FETCH
+%token KW_FILES
+%token KW_FILL
+%token KW_FILTER
+%token KW_FIRST
+%token KW_FOLLOWING
+%token KW_FOR
+%token KW_FOREIGN
+%token KW_FORMAT
+%token KW_FROM
+%token KW_FULL
+%token KW_FULL_IN_SET_OP
+%token KW_FUNCTION
+%token KW_GENERATED
+%token KW_GRAPH
+%token KW_GRANT
+%token KW_GREATER_EQUALS
+%token KW_GROUP
+%token KW_GROUPING
+%token KW_GROUP_ROWS
+//%token KW_GROUPS
+%token KW_HASH
+%token KW_HAVING
+%token KW_HIDDEN
+%token KW_IDENTITY
+%token KW_IF
+%token KW_IGNORE
+%token KW_IMMEDIATE
+%token KW_IMMUTABLE
+%token KW_IMPORT
+%token KW_IN
+%token KW_INCLUDE
+%token KW_INCREMENT
+%token KW_INDEX
+%token KW_INNER
+%token KW_INOUT
+%token KW_INPUT
+%token KW_INSERT
+%token KW_INTERLEAVE
+%token KW_INTERSECT
+%token KW_INTERVAL
+%token KW_INTO
+%token KW_INVOKER
+%token KW_IS
+%token KW_ISOLATION
+%token KW_ITERATE
+%token KW_JOIN
+%token KW_JSON
+%token KW_KEY
+%token KW_LAMBDA_ARROW
+%token KW_LANGUAGE
+%token KW_LAST
+//%token KW_LATERAL
+%token KW_LEAVE
+%token KW_LEFT
+%token KW_LEFT_IN_SET_OP
+%token KW_LESS_EQUALS
+%token KW_LEVEL
+%token KW_LIKE
+%token KW_LIMIT
+%token KW_LOAD
+%token KW_LOOKUP
+%token KW_LOOP
+%token KW_MACRO
+%token KW_MAP
+%token KW_MATCH
+%token KW_MATCHED
+%token KW_MATCH_RECOGNIZE_NONRESERVED
+%token KW_MATCH_RECOGNIZE_RESERVED
+%token KW_MATERIALIZED
+%token KW_MAX
+%token KW_MAXVALUE
+%token KW_MEASURES
+%token KW_MERGE
+%token KW_MESSAGE
+%token KW_METADATA
+%token KW_MIN
+%token KW_MINVALUE
+%token KW_MODEL
+%token KW_MODULE
+%token KW_NAMED_ARGUMENT_ASSIGNMENT
+%token KW_NATURAL
+%token KW_NEW
+%token KW_NO
+%token KW_NOT
+%token KW_NOT_EQUALS_C_STYLE
+%token KW_NOT_EQUALS_SQL_STYLE
+%token KW_NOT_SPECIAL
+%token KW_NULL
+%token KW_NULL_FILTERED
+%token KW_NULLS
+%token KW_NUMERIC
+%token KW_OF
+%token KW_OFFSET
+%token KW_ON
+%token KW_ONLY
+%token KW_OPEN_HINT
+%token KW_OPEN_INTEGER_HINT
+%token KW_OPTIONS
+%token KW_OPTIONS_IN_SELECT_WITH_OPTIONS
+%token KW_OR
+%token KW_ORDER
+%token KW_OUT
+%token KW_OUTER
+%token KW_OUTPUT
+%token KW_OVER
+%token KW_OVERWRITE
+%token KW_PARENT
+%token KW_PARTITION
+%token KW_PARTITIONS
+%token KW_PATTERN
+%token KW_PERCENT
+%token KW_PIPE
+%token KW_PIVOT
+%token KW_POLICIES
+%token KW_POLICY
+%token KW_PRECEDING
+%token KW_PRIMARY
+%token KW_PRIVATE
+%token KW_PRIVILEGE
+%token KW_PRIVILEGES
+%token KW_PROCEDURE
+%token KW_PROJECT
+%token KW_PROTO
+%token KW_PUBLIC
+%token KW_QUALIFY_NONRESERVED
+%token KW_QUALIFY_RESERVED
+%token KW_RAISE
+%token KW_RANGE
+%token KW_READ
+%token KW_RECURSIVE
+%token KW_REFERENCES
+%token KW_REMOTE
+%token KW_REMOVE
+%token KW_RENAME
+%token KW_REPEAT
+%token KW_REPEATABLE
+%token KW_REPLACE
+%token KW_REPLACE_AFTER_INSERT
+%token KW_REPLACE_FIELDS
+%token KW_REPLICA
+%token KW_REPORT
+%token KW_RESPECT
+%token KW_RESTRICT
+%token KW_RESTRICTION
+%token KW_RETURN
+%token KW_RETURNS
+%token KW_REVOKE
+%token KW_RIGHT
+%token KW_ROLLBACK
+%token KW_ROLLUP
+%token KW_ROW
+%token KW_ROWS
+%token KW_RUN
+%token KW_SAFE_CAST
+%token KW_SCHEMA
+%token KW_SEARCH
+%token KW_SECURITY
+%token KW_SELECT
+%token KW_SEQUENCE
+%token KW_SET
+%token KW_SETS
+%token KW_SHIFT_LEFT
+%token KW_SHIFT_RIGHT
+%token KW_SHOW
+%token KW_SIMPLE
+%token KW_SNAPSHOT
+%token KW_SOME
+%token KW_SOURCE
+%token KW_SQL
+%token KW_STABLE
+%token KW_START
+%token KW_STATIC_DESCRIBE
+%token KW_STORED
+%token KW_STORING
+%token KW_STRICT
+%token KW_STRUCT
+%token KW_SUB_ASSIGN
+%token KW_SYSTEM
+%token KW_SYSTEM_TIME
+%token KW_TABLE
+%token KW_TABLES
+%token KW_TABLESAMPLE
+%token KW_TARGET
+%token KW_TEMP
+%token KW_TEMPORARY
+%token KW_THEN
+%token KW_TIME
+%token KW_TIMESTAMP
+%token KW_TO
+%token KW_TRANSACTION
+%token KW_TRANSFORM
+//%token KW_TREAT
+%token KW_TRUE
+%token KW_TRUNCATE
+%token KW_TYPE
+%token KW_UNBOUNDED
+%token KW_UNDROP
+%token KW_UNION
+%token KW_UNIQUE
+%token KW_UNKNOWN
+%token KW_UNNEST
+%token KW_UNPIVOT
+%token KW_UNTIL
+%token KW_UPDATE
+%token KW_UPDATE_AFTER_INSERT
+%token KW_USING
+%token KW_VALUE
+%token KW_VALUES
+%token KW_VECTOR
+%token KW_VIEW
+%token KW_VIEWS
+%token KW_VOLATILE
+%token KW_WEIGHT
+%token KW_WHEN
+%token KW_WHERE
+%token KW_WHILE
+%token KW_WINDOW
+%token KW_WITH
+//%token KW_WITHIN
+%token KW_WITH_STARTING_WITH_EXPRESSION
+%token KW_WITH_STARTING_WITH_GROUP_ROWS
+%token KW_WRITE
+%token KW_ZONE
+//%token LB_BEGIN_AT_STATEMENT_START
+//%token LB_CLOSE_TYPE_TEMPLATE
+//%token LB_DOT_IN_PATH_EXPRESSION
+//%token LB_END_OF_STATEMENT_LEVEL_HINT
+//%token LB_EXPLAIN_SQL_STATEMENT
+//%token LB_OPEN_NESTED_DML
+//%token LB_OPEN_STATEMENT_BLOCK
+//%token LB_OPEN_TYPE_TEMPLATE
+//%token LB_WITH_IN_SELECT_WITH_OPTIONS
+//%token MACRO_ARGUMENT_REFERENCE
 %token MACRO_BODY_TOKEN
+//%token MACRO_INVOCATION
 %token MODE_EXPRESSION
 %token MODE_NEXT_SCRIPT_STATEMENT
 %token MODE_NEXT_STATEMENT
@@ -198,18 +515,25 @@
 %token MODE_TYPE
 %token OPEN_INTEGER_PREFIX_HINT
 %token SCRIPT_LABEL
+//%token SENTINEL_LB_TOKEN_END
+//%token SENTINEL_LB_TOKEN_START
+//%token SENTINEL_NONRESERVED_KW_END
+//%token SENTINEL_NONRESERVED_KW_START
+//%token SENTINEL_RESERVED_KW_END
+//%token SENTINEL_RESERVED_KW_START
+//%token STANDALONE_EXPONENT_SIGN
 %token STRING_LITERAL
 
-%left /*1*/ "OR"
-%left /*2*/ "AND"
+%left /*1*/ KW_OR
+%left /*2*/ KW_AND
 %precedence /*3*/ UNARY_NOT_PRECEDENCE
-%nonassoc /*4*/ '=' "+=" "-=" "!=" "<>" '<' "<=" '>' ">=" "LIKE" "IN" "DISTINCT" "BETWEEN" "IS" "NOT_SPECIAL"
+%nonassoc /*4*/ '=' KW_ADD_ASSIGN KW_SUB_ASSIGN KW_NOT_EQUALS_C_STYLE KW_NOT_EQUALS_SQL_STYLE '<' KW_LESS_EQUALS '>' KW_GREATER_EQUALS KW_LIKE KW_IN KW_DISTINCT KW_BETWEEN KW_IS KW_NOT_SPECIAL
 %left /*5*/ '|'
 %left /*6*/ '^'
 %left /*7*/ '&'
-%left /*8*/ "<<" ">>"
+%left /*8*/ KW_SHIFT_LEFT KW_SHIFT_RIGHT
 %left /*9*/ '+' '-'
-%left /*10*/ "||"
+%left /*10*/ KW_CONCAT_OP
 %left /*11*/ '*' '/'
 %precedence /*12*/ UNARY_PRECEDENCE
 %precedence /*13*/ DOUBLE_AT_PRECEDENCE
@@ -220,7 +544,7 @@
 %%
 
 start_mode :
-    input //to parse multiple statements on the playground
+	input
 	| MODE_STATEMENT sql_statement
 	| MODE_SCRIPT script
 	| MODE_NEXT_STATEMENT next_statement
@@ -230,10 +554,11 @@ start_mode :
 	| MODE_TYPE type
 	;
 
+//to parse multiple statements on the playground
 input :
-    sql_statement
-    | input sql_statement
-    ;
+	unterminated_sql_statement ';'
+	| input unterminated_sql_statement ';'
+	;
 
 opt_semicolon :
 	';'
@@ -270,9 +595,9 @@ statement_level_hint :
 unterminated_sql_statement :
 	sql_statement_body
 	| statement_level_hint sql_statement_body
-	| "DEFINE" "MACRO"
-	| statement_level_hint "DEFINE" "MACRO"
-	| statement_level_hint KW_DEFINE_FOR_MACROS "MACRO"
+	| KW_DEFINE KW_MACRO
+	| statement_level_hint KW_DEFINE KW_MACRO
+	| statement_level_hint KW_DEFINE_FOR_MACROS KW_MACRO
 	;
 
 unterminated_unlabeled_script_statement :
@@ -312,6 +637,7 @@ sql_statement_body :
 	| run_batch_statement
 	| abort_batch_statement
 	| create_constant_statement
+	| create_connection_statement
 	| create_database_statement
 	| create_function_statement
 	| create_procedure_statement
@@ -350,7 +676,7 @@ sql_statement_body :
 	;
 
 define_macro_statement :
-	KW_DEFINE_FOR_MACROS "MACRO" MACRO_BODY_TOKEN macro_body
+	KW_DEFINE_FOR_MACROS KW_MACRO MACRO_BODY_TOKEN macro_body
 	;
 
 macro_body :
@@ -368,32 +694,32 @@ query_statement :
 	;
 
 alter_action :
-	"SET" "OPTIONS" options_list
-	| "SET" "AS" generic_entity_body
-	| "ADD" table_constraint_spec
-	| "ADD" primary_key_spec
-	| "ADD" "CONSTRAINT" opt_if_not_exists identifier primary_key_or_table_constraint_spec
-	| "DROP" "CONSTRAINT" opt_if_exists identifier
-	| "DROP" "PRIMARY" "KEY" opt_if_exists
-	| "ALTER" "CONSTRAINT" opt_if_exists identifier constraint_enforcement
-	| "ALTER" "CONSTRAINT" opt_if_exists identifier "SET" "OPTIONS" options_list
-	| "ADD" "COLUMN" opt_if_not_exists table_column_definition opt_column_position opt_fill_using_expression
-	| "DROP" "COLUMN" opt_if_exists identifier
-	| "RENAME" "COLUMN" opt_if_exists identifier "TO" identifier
-	| "ALTER" "COLUMN" opt_if_exists identifier "SET" "DATA" "TYPE" field_schema
-	| "ALTER" "COLUMN" opt_if_exists identifier "SET" "OPTIONS" options_list
-	| "ALTER" "COLUMN" opt_if_exists identifier "SET" "DEFAULT" expression
-	| "ALTER" "COLUMN" opt_if_exists identifier "DROP" "DEFAULT"
-	| "ALTER" "COLUMN" opt_if_exists identifier "DROP" "NOT" "NULL"
-	| "ALTER" "COLUMN" opt_if_exists identifier "DROP" "GENERATED"
-	| "RENAME" "TO" path_expression
-	| "SET" "DEFAULT" collate_clause
-	| "ADD" "ROW" "DELETION" "POLICY" opt_if_not_exists '(' /*14L*/ expression ')'
-	| "REPLACE" "ROW" "DELETION" "POLICY" opt_if_exists '(' /*14L*/ expression ')'
-	| "DROP" "ROW" "DELETION" "POLICY" opt_if_exists
-	| "ALTER" generic_sub_entity_type opt_if_exists identifier alter_action
-	| "ADD" generic_sub_entity_type opt_if_not_exists identifier opt_options_list
-	| "DROP" generic_sub_entity_type opt_if_exists identifier
+	KW_SET KW_OPTIONS options_list
+	| KW_SET KW_AS generic_entity_body
+	| KW_ADD table_constraint_spec
+	| KW_ADD primary_key_spec
+	| KW_ADD KW_CONSTRAINT opt_if_not_exists identifier primary_key_or_table_constraint_spec
+	| KW_DROP KW_CONSTRAINT opt_if_exists identifier
+	| KW_DROP KW_PRIMARY KW_KEY opt_if_exists
+	| KW_ALTER KW_CONSTRAINT opt_if_exists identifier constraint_enforcement
+	| KW_ALTER KW_CONSTRAINT opt_if_exists identifier KW_SET KW_OPTIONS options_list
+	| KW_ADD KW_COLUMN opt_if_not_exists table_column_definition opt_column_position opt_fill_using_expression
+	| KW_DROP KW_COLUMN opt_if_exists identifier
+	| KW_RENAME KW_COLUMN opt_if_exists identifier KW_TO identifier
+	| KW_ALTER KW_COLUMN opt_if_exists identifier KW_SET KW_DATA KW_TYPE field_schema
+	| KW_ALTER KW_COLUMN opt_if_exists identifier KW_SET KW_OPTIONS options_list
+	| KW_ALTER KW_COLUMN opt_if_exists identifier KW_SET KW_DEFAULT expression
+	| KW_ALTER KW_COLUMN opt_if_exists identifier KW_DROP KW_DEFAULT
+	| KW_ALTER KW_COLUMN opt_if_exists identifier KW_DROP KW_NOT KW_NULL
+	| KW_ALTER KW_COLUMN opt_if_exists identifier KW_DROP KW_GENERATED
+	| KW_RENAME KW_TO path_expression
+	| KW_SET KW_DEFAULT collate_clause
+	| KW_ADD KW_ROW KW_DELETION KW_POLICY opt_if_not_exists '(' /*14L*/ expression ')'
+	| KW_REPLACE KW_ROW KW_DELETION KW_POLICY opt_if_exists '(' /*14L*/ expression ')'
+	| KW_DROP KW_ROW KW_DELETION KW_POLICY opt_if_exists
+	| KW_ALTER generic_sub_entity_type opt_if_exists identifier alter_action
+	| KW_ADD generic_sub_entity_type opt_if_not_exists identifier opt_options_list
+	| KW_DROP generic_sub_entity_type opt_if_exists identifier
 	| spanner_alter_column_action
 	| spanner_set_on_delete_action
 	;
@@ -405,8 +731,8 @@ alter_action_list :
 
 privilege_restriction_alter_action :
 	restrict_to_clause
-	| "ADD" opt_if_not_exists possibly_empty_grantee_list
-	| "REMOVE" opt_if_exists possibly_empty_grantee_list
+	| KW_ADD opt_if_not_exists possibly_empty_grantee_list
+	| KW_REMOVE opt_if_exists possibly_empty_grantee_list
 	;
 
 privilege_restriction_alter_action_list :
@@ -416,10 +742,10 @@ privilege_restriction_alter_action_list :
 
 row_access_policy_alter_action :
 	grant_to_clause
-	| "FILTER" "USING" '(' /*14L*/ expression ')'
-	| "REVOKE" "FROM" '(' /*14L*/ grantee_list ')'
-	| "REVOKE" "FROM" "ALL"
-	| "RENAME" "TO" identifier
+	| KW_FILTER KW_USING '(' /*14L*/ expression ')'
+	| KW_REVOKE KW_FROM '(' /*14L*/ grantee_list ')'
+	| KW_REVOKE KW_FROM KW_ALL
+	| KW_RENAME KW_TO identifier
 	;
 
 row_access_policy_alter_action_list :
@@ -428,52 +754,53 @@ row_access_policy_alter_action_list :
 	;
 
 schema_object_kind :
-	"AGGREGATE" "FUNCTION"
-	| "APPROX" "VIEW"
-	| "CONSTANT"
-	| "DATABASE"
-	| "EXTERNAL" table_or_table_function
-	| "EXTERNAL" "SCHEMA"
-	| "FUNCTION"
-	| "INDEX"
-	| "MATERIALIZED" "VIEW"
-	| "MODEL"
-	| "PROCEDURE"
-	| "SCHEMA"
-	| "VIEW"
+	KW_AGGREGATE KW_FUNCTION
+	| KW_APPROX KW_VIEW
+	| KW_CONNECTION
+	| KW_CONSTANT
+	| KW_DATABASE
+	| KW_EXTERNAL table_or_table_function
+	| KW_EXTERNAL KW_SCHEMA
+	| KW_FUNCTION
+	| KW_INDEX
+	| KW_MATERIALIZED KW_VIEW
+	| KW_MODEL
+	| KW_PROCEDURE
+	| KW_SCHEMA
+	| KW_VIEW
 	;
 
 alter_statement :
-	"ALTER" table_or_table_function opt_if_exists maybe_dashed_path_expression alter_action_list
-	| "ALTER" schema_object_kind opt_if_exists path_expression alter_action_list
-	| "ALTER" generic_entity_type opt_if_exists path_expression alter_action_list
-	| "ALTER" generic_entity_type opt_if_exists alter_action_list
-	| "ALTER" "PRIVILEGE" "RESTRICTION" opt_if_exists "ON" privilege_list "ON" identifier path_expression privilege_restriction_alter_action_list
-	| "ALTER" "ROW" "ACCESS" "POLICY" opt_if_exists identifier "ON" path_expression row_access_policy_alter_action_list
-	| "ALTER" "ALL" "ROW" "ACCESS" "POLICIES" "ON" path_expression row_access_policy_alter_action
+	KW_ALTER table_or_table_function opt_if_exists maybe_dashed_path_expression alter_action_list
+	| KW_ALTER schema_object_kind opt_if_exists path_expression alter_action_list
+	| KW_ALTER generic_entity_type opt_if_exists path_expression alter_action_list
+	| KW_ALTER generic_entity_type opt_if_exists alter_action_list
+	| KW_ALTER KW_PRIVILEGE KW_RESTRICTION opt_if_exists KW_ON privilege_list KW_ON identifier path_expression privilege_restriction_alter_action_list
+	| KW_ALTER KW_ROW KW_ACCESS KW_POLICY opt_if_exists identifier KW_ON path_expression row_access_policy_alter_action_list
+	| KW_ALTER KW_ALL KW_ROW KW_ACCESS KW_POLICIES KW_ON path_expression row_access_policy_alter_action
 	;
 
 opt_input_output_clause :
-	"INPUT" table_element_list "OUTPUT" table_element_list
+	KW_INPUT table_element_list KW_OUTPUT table_element_list
 	| /*empty*/
 	;
 
 opt_transform_clause :
-	"TRANSFORM" '(' /*14L*/ select_list ')'
+	KW_TRANSFORM '(' /*14L*/ select_list ')'
 	| /*empty*/
 	;
 
 assert_statement :
-	"ASSERT" expression opt_description
+	KW_ASSERT expression opt_description
 	;
 
 opt_description :
-	"AS" string_literal
+	KW_AS string_literal
 	| /*empty*/
 	;
 
 analyze_statement :
-	"ANALYZE" opt_options_list opt_table_and_column_info_list
+	KW_ANALYZE opt_options_list opt_table_and_column_info_list
 	;
 
 opt_table_and_column_info_list :
@@ -491,10 +818,10 @@ table_and_column_info :
 	;
 
 transaction_mode :
-	"READ" "ONLY"
-	| "READ" "WRITE"
-	| "ISOLATION" "LEVEL" identifier
-	| "ISOLATION" "LEVEL" identifier identifier
+	KW_READ KW_ONLY
+	| KW_READ KW_WRITE
+	| KW_ISOLATION KW_LEVEL identifier
+	| KW_ISOLATION KW_LEVEL identifier identifier
 	;
 
 transaction_mode_list :
@@ -512,12 +839,12 @@ begin_statement :
 	;
 
 begin_transaction_keywords :
-	"START" transaction_keyword
-	| "BEGIN" opt_transaction_keyword
+	KW_START transaction_keyword
+	| KW_BEGIN opt_transaction_keyword
 	;
 
 transaction_keyword :
-	"TRANSACTION"
+	KW_TRANSACTION
 	;
 
 opt_transaction_keyword :
@@ -526,41 +853,41 @@ opt_transaction_keyword :
 	;
 
 set_statement :
-	"SET" "TRANSACTION" transaction_mode_list
-	| "SET" identifier '=' /*4N*/ expression
-	| "SET" named_parameter_expression '=' /*4N*/ expression
-	| "SET" system_variable_expression '=' /*4N*/ expression
-	| "SET" '(' /*14L*/ identifier_list ')' '=' /*4N*/ expression
-	| "SET" '(' /*14L*/ ')'
-	| "SET" identifier ',' identifier_list '=' /*4N*/
+	KW_SET KW_TRANSACTION transaction_mode_list
+	| KW_SET identifier '=' /*4N*/ expression
+	| KW_SET named_parameter_expression '=' /*4N*/ expression
+	| KW_SET system_variable_expression '=' /*4N*/ expression
+	| KW_SET '(' /*14L*/ identifier_list ')' '=' /*4N*/ expression
+	| KW_SET '(' /*14L*/ ')'
+	| KW_SET identifier ',' identifier_list '=' /*4N*/
 	;
 
 commit_statement :
-	"COMMIT" opt_transaction_keyword
+	KW_COMMIT opt_transaction_keyword
 	;
 
 rollback_statement :
-	"ROLLBACK" opt_transaction_keyword
+	KW_ROLLBACK opt_transaction_keyword
 	;
 
 start_batch_statement :
-	"START" "BATCH" opt_identifier
+	KW_START KW_BATCH opt_identifier
 	;
 
 run_batch_statement :
-	"RUN" "BATCH"
+	KW_RUN KW_BATCH
 	;
 
 abort_batch_statement :
-	"ABORT" "BATCH"
+	KW_ABORT KW_BATCH
 	;
 
 create_constant_statement :
-	"CREATE" opt_or_replace opt_create_scope "CONSTANT" opt_if_not_exists path_expression '=' /*4N*/ expression
+	KW_CREATE opt_or_replace opt_create_scope KW_CONSTANT opt_if_not_exists path_expression '=' /*4N*/ expression
 	;
 
 create_database_statement :
-	"CREATE" "DATABASE" path_expression opt_options_list
+	KW_CREATE KW_DATABASE path_expression opt_options_list
 	;
 
 unordered_options_body :
@@ -570,16 +897,16 @@ unordered_options_body :
 	;
 
 create_function_statement :
-	"CREATE" opt_or_replace opt_create_scope opt_aggregate "FUNCTION" opt_if_not_exists function_declaration opt_function_returns opt_sql_security_clause opt_determinism_level opt_language_or_remote_with_connection unordered_options_body
+	KW_CREATE opt_or_replace opt_create_scope opt_aggregate KW_FUNCTION opt_if_not_exists function_declaration opt_function_returns opt_sql_security_clause opt_determinism_level opt_language_or_remote_with_connection unordered_options_body
 	;
 
 opt_aggregate :
-	"AGGREGATE"
+	KW_AGGREGATE
 	| /*empty*/
 	;
 
 opt_not_aggregate :
-	"NOT" "AGGREGATE"
+	KW_NOT KW_AGGREGATE
 	| /*empty*/
 	;
 
@@ -604,21 +931,21 @@ function_parameters :
 
 begin_end_block_or_language_as_code :
 	begin_end_block
-	| "LANGUAGE" identifier opt_as_code
+	| KW_LANGUAGE identifier opt_as_code
 	;
 
 opt_external_security_clause :
-	"EXTERNAL" "SECURITY" external_security_clause_kind
+	KW_EXTERNAL KW_SECURITY external_security_clause_kind
 	| /*empty*/
 	;
 
 external_security_clause_kind :
-	"INVOKER"
-	| "DEFINER"
+	KW_INVOKER
+	| KW_DEFINER
 	;
 
 create_procedure_statement :
-	"CREATE" opt_or_replace opt_create_scope "PROCEDURE" opt_if_not_exists path_expression procedure_parameters opt_external_security_clause opt_with_connection_clause opt_options_list begin_end_block_or_language_as_code
+	KW_CREATE opt_or_replace opt_create_scope KW_PROCEDURE opt_if_not_exists path_expression procedure_parameters opt_external_security_clause opt_with_connection_clause opt_options_list begin_end_block_or_language_as_code
 	;
 
 procedure_parameters_prefix :
@@ -642,14 +969,14 @@ procedure_parameter :
 	;
 
 opt_procedure_parameter_mode :
-	"IN" /*4N*/
-	| "OUT"
-	| "INOUT"
+	KW_IN /*4N*/
+	| KW_OUT
+	| KW_INOUT
 	| /*empty*/
 	;
 
 opt_returns :
-	"RETURNS" type_or_tvf_schema
+	KW_RETURNS type_or_tvf_schema
 	| /*empty*/
 	;
 
@@ -658,16 +985,16 @@ opt_function_returns :
 	;
 
 opt_determinism_level :
-	"DETERMINISTIC"
-	| "NOT" "DETERMINISTIC"
-	| "IMMUTABLE"
-	| "STABLE"
-	| "VOLATILE"
+	KW_DETERMINISTIC
+	| KW_NOT KW_DETERMINISTIC
+	| KW_IMMUTABLE
+	| KW_STABLE
+	| KW_VOLATILE
 	| /*empty*/
 	;
 
 language :
-	"LANGUAGE" identifier
+	KW_LANGUAGE identifier
 	;
 
 opt_language :
@@ -676,7 +1003,7 @@ opt_language :
 	;
 
 remote_with_connection_clause :
-	"REMOTE" opt_with_connection_clause
+	KW_REMOTE opt_with_connection_clause
 	| with_connection_clause
 	;
 
@@ -686,24 +1013,24 @@ opt_remote_with_connection_clause :
 	;
 
 opt_language_or_remote_with_connection :
-	"LANGUAGE" identifier opt_remote_with_connection_clause
+	KW_LANGUAGE identifier opt_remote_with_connection_clause
 	| remote_with_connection_clause opt_language
 	| /*empty*/
 	;
 
 opt_sql_security_clause :
-	"SQL" "SECURITY" sql_security_clause_kind
+	KW_SQL KW_SECURITY sql_security_clause_kind
 	| /*empty*/
 	;
 
 sql_security_clause_kind :
-	"INVOKER"
-	| "DEFINER"
+	KW_INVOKER
+	| KW_DEFINER
 	;
 
 as_sql_function_body_or_string :
-	"AS" sql_function_body
-	| "AS" string_literal
+	KW_AS sql_function_body
+	| KW_AS string_literal
 	;
 
 opt_as_sql_function_body_or_string :
@@ -712,7 +1039,7 @@ opt_as_sql_function_body_or_string :
 	;
 
 opt_as_code :
-	"AS" string_literal
+	KW_AS string_literal
 	| /*empty*/
 	;
 
@@ -723,16 +1050,16 @@ path_expression_or_string :
 
 path_expression_or_default :
 	path_expression
-	| "DEFAULT"
+	| KW_DEFAULT
 	;
 
 sql_function_body :
 	'(' /*14L*/ expression ')'
-	| '(' /*14L*/ "SELECT"
+	| '(' /*14L*/ KW_SELECT
 	;
 
 restrict_to_clause :
-	"RESTRICT" "TO" possibly_empty_grantee_list
+	KW_RESTRICT KW_TO possibly_empty_grantee_list
 	;
 
 opt_restrict_to_clause :
@@ -741,12 +1068,12 @@ opt_restrict_to_clause :
 	;
 
 grant_to_clause :
-	"GRANT" "TO" '(' /*14L*/ grantee_list ')'
+	KW_GRANT KW_TO '(' /*14L*/ grantee_list ')'
 	;
 
 create_row_access_policy_grant_to_clause :
 	grant_to_clause
-	| "TO" grantee_list
+	| KW_TO grantee_list
 	;
 
 opt_create_row_access_policy_grant_to_clause :
@@ -755,28 +1082,28 @@ opt_create_row_access_policy_grant_to_clause :
 	;
 
 opt_filter :
-	"FILTER"
+	KW_FILTER
 	| /*empty*/
 	;
 
 filter_using_clause :
-	opt_filter "USING" '(' /*14L*/ expression ')'
+	opt_filter KW_USING '(' /*14L*/ expression ')'
 	;
 
 create_privilege_restriction_statement :
-	"CREATE" opt_or_replace "PRIVILEGE" "RESTRICTION" opt_if_not_exists "ON" privilege_list "ON" identifier path_expression opt_restrict_to_clause
+	KW_CREATE opt_or_replace KW_PRIVILEGE KW_RESTRICTION opt_if_not_exists KW_ON privilege_list KW_ON identifier path_expression opt_restrict_to_clause
 	;
 
 create_row_access_policy_statement :
-	"CREATE" opt_or_replace "ROW" opt_access "POLICY" opt_if_not_exists opt_identifier "ON" path_expression opt_create_row_access_policy_grant_to_clause filter_using_clause
+	KW_CREATE opt_or_replace KW_ROW opt_access KW_POLICY opt_if_not_exists opt_identifier KW_ON path_expression opt_create_row_access_policy_grant_to_clause filter_using_clause
 	;
 
 with_partition_columns_clause :
-	"WITH" "PARTITION" "COLUMNS" opt_table_element_list
+	KW_WITH KW_PARTITION KW_COLUMNS opt_table_element_list
 	;
 
 with_connection_clause :
-	"WITH" connection_clause
+	KW_WITH connection_clause
 	;
 
 opt_external_table_with_clauses :
@@ -787,32 +1114,43 @@ opt_external_table_with_clauses :
 	;
 
 create_external_table_statement :
-	"CREATE" opt_or_replace opt_create_scope "EXTERNAL" "TABLE" opt_if_not_exists maybe_dashed_path_expression opt_table_element_list opt_like_path_expression opt_default_collate_clause opt_external_table_with_clauses opt_options_list
+	KW_CREATE opt_or_replace opt_create_scope KW_EXTERNAL KW_TABLE opt_if_not_exists maybe_dashed_path_expression opt_table_element_list opt_like_path_expression opt_default_collate_clause opt_external_table_with_clauses opt_options_list
 	;
 
 create_external_table_function_statement :
-	"CREATE" opt_or_replace opt_create_scope "EXTERNAL" "TABLE" "FUNCTION"
+	KW_CREATE opt_or_replace opt_create_scope KW_EXTERNAL KW_TABLE KW_FUNCTION
+	;
+
+opt_create_index_statement_suffix :
+	partition_by_clause_prefix_no_hint opt_options_list
+	| opt_options_list spanner_index_interleave_clause
+	| options
+	| /*empty*/
 	;
 
 create_index_statement :
-	"CREATE" opt_or_replace opt_unique opt_spanner_null_filtered opt_index_type "INDEX" opt_if_not_exists path_expression "ON" path_expression opt_as_alias opt_index_unnest_expression_list index_order_by opt_index_storing_list opt_options_list opt_spanner_index_interleave_clause
+	KW_CREATE opt_or_replace opt_unique opt_spanner_null_filtered opt_index_type KW_INDEX opt_if_not_exists path_expression on_path_expression opt_as_alias opt_index_unnest_expression_list index_order_by_and_options opt_index_storing_list opt_create_index_statement_suffix
 	;
 
 create_schema_statement :
-	"CREATE" opt_or_replace "SCHEMA" opt_if_not_exists path_expression opt_default_collate_clause opt_options_list
+	KW_CREATE opt_or_replace KW_SCHEMA opt_if_not_exists path_expression opt_default_collate_clause opt_options_list
 	;
 
 create_external_schema_statement :
-	"CREATE" opt_or_replace opt_create_scope "EXTERNAL" "SCHEMA" opt_if_not_exists path_expression opt_with_connection_clause options
+	KW_CREATE opt_or_replace opt_create_scope KW_EXTERNAL KW_SCHEMA opt_if_not_exists path_expression opt_with_connection_clause options
+	;
+
+create_connection_statement :
+	KW_CREATE opt_or_replace KW_CONNECTION opt_if_not_exists path_expression opt_options_list
 	;
 
 undrop_statement :
-	"UNDROP" schema_object_kind opt_if_not_exists path_expression opt_at_system_time opt_options_list
+	KW_UNDROP schema_object_kind opt_if_not_exists path_expression opt_at_system_time opt_options_list
 	;
 
 create_snapshot_statement :
-	"CREATE" opt_or_replace "SNAPSHOT" "TABLE" opt_if_not_exists maybe_dashed_path_expression "CLONE" clone_data_source opt_options_list
-	| "CREATE" opt_or_replace "SNAPSHOT" schema_object_kind opt_if_not_exists maybe_dashed_path_expression "CLONE" clone_data_source opt_options_list
+	KW_CREATE opt_or_replace KW_SNAPSHOT KW_TABLE opt_if_not_exists maybe_dashed_path_expression KW_CLONE clone_data_source opt_options_list
+	| KW_CREATE opt_or_replace KW_SNAPSHOT schema_object_kind opt_if_not_exists maybe_dashed_path_expression KW_CLONE clone_data_source opt_options_list
 	;
 
 unordered_language_options :
@@ -822,29 +1160,29 @@ unordered_language_options :
 	;
 
 create_table_function_statement :
-	"CREATE" opt_or_replace opt_create_scope "TABLE" "FUNCTION" opt_if_not_exists path_expression opt_function_parameters opt_returns opt_sql_security_clause unordered_language_options opt_as_query_or_string
+	KW_CREATE opt_or_replace opt_create_scope KW_TABLE KW_FUNCTION opt_if_not_exists path_expression opt_function_parameters opt_returns opt_sql_security_clause unordered_language_options opt_as_query_or_string
 	;
 
 create_table_statement :
-	"CREATE" opt_or_replace opt_create_scope "TABLE" opt_if_not_exists maybe_dashed_path_expression opt_table_element_list opt_spanner_table_options opt_like_path_expression opt_clone_table opt_copy_table opt_default_collate_clause opt_partition_by_clause_no_hint opt_cluster_by_clause_no_hint opt_ttl_clause opt_with_connection_clause opt_options_list opt_as_query
+	KW_CREATE opt_or_replace opt_create_scope KW_TABLE opt_if_not_exists maybe_dashed_path_expression opt_table_element_list opt_spanner_table_options opt_like_path_expression opt_clone_table opt_copy_table opt_default_collate_clause opt_partition_by_clause_no_hint opt_cluster_by_clause_no_hint opt_ttl_clause opt_with_connection_clause opt_options_list opt_as_query
 	;
 
 append_or_overwrite :
-	"INTO"
-	| "OVERWRITE"
+	KW_INTO
+	| KW_OVERWRITE
 	;
 
 aux_load_data_from_files_options_list :
-	"FROM" "FILES" options_list
+	KW_FROM KW_FILES options_list
 	;
 
 opt_overwrite :
-	"OVERWRITE"
+	KW_OVERWRITE
 	| /*empty*/
 	;
 
 load_data_partitions_clause :
-	opt_overwrite "PARTITIONS" '(' /*14L*/ expression ')'
+	opt_overwrite KW_PARTITIONS '(' /*14L*/ expression ')'
 	;
 
 opt_load_data_partitions_clause :
@@ -853,18 +1191,18 @@ opt_load_data_partitions_clause :
 	;
 
 maybe_dashed_path_expression_with_scope :
-	"TEMP" "TABLE" maybe_dashed_path_expression
-	| "TEMPORARY" "TABLE" maybe_dashed_path_expression
+	KW_TEMP KW_TABLE maybe_dashed_path_expression
+	| KW_TEMPORARY KW_TABLE maybe_dashed_path_expression
 	| maybe_dashed_path_expression
 	;
 
 aux_load_data_statement :
-	"LOAD" "DATA" append_or_overwrite maybe_dashed_path_expression_with_scope opt_table_element_list opt_load_data_partitions_clause opt_collate_clause opt_partition_by_clause_no_hint opt_cluster_by_clause_no_hint opt_options_list aux_load_data_from_files_options_list opt_external_table_with_clauses
+	KW_LOAD KW_DATA append_or_overwrite maybe_dashed_path_expression_with_scope opt_table_element_list opt_load_data_partitions_clause opt_collate_clause opt_partition_by_clause_no_hint opt_cluster_by_clause_no_hint opt_options_list aux_load_data_from_files_options_list opt_external_table_with_clauses
 	;
 
 generic_entity_type_unchecked :
 	IDENTIFIER
-	| "PROJECT"
+	| KW_PROJECT
 	;
 
 generic_entity_type :
@@ -873,7 +1211,7 @@ generic_entity_type :
 
 sub_entity_type_identifier :
 	IDENTIFIER
-	| "REPLICA"
+	| KW_REPLICA
 	;
 
 generic_sub_entity_type :
@@ -886,16 +1224,16 @@ generic_entity_body :
 	;
 
 opt_generic_entity_body :
-	"AS" generic_entity_body
+	KW_AS generic_entity_body
 	| /*empty*/
 	;
 
 create_entity_statement :
-	"CREATE" opt_or_replace generic_entity_type opt_if_not_exists path_expression opt_options_list opt_generic_entity_body
+	KW_CREATE opt_or_replace generic_entity_type opt_if_not_exists path_expression opt_options_list opt_generic_entity_body
 	;
 
 create_model_statement :
-	"CREATE" opt_or_replace opt_create_scope "MODEL" opt_if_not_exists path_expression opt_input_output_clause opt_transform_clause opt_remote_with_connection_clause opt_options_list opt_as_query_or_aliased_query_list
+	KW_CREATE opt_or_replace opt_create_scope KW_MODEL opt_if_not_exists path_expression opt_input_output_clause opt_transform_clause opt_remote_with_connection_clause opt_options_list opt_as_query_or_aliased_query_list
 	;
 
 opt_table_element_list :
@@ -930,15 +1268,15 @@ table_column_schema :
 
 simple_column_schema_inner :
 	path_expression
-	| "INTERVAL"
+	| KW_INTERVAL
 	;
 
 array_column_schema_inner :
-	"ARRAY" template_type_open field_schema template_type_close
+	KW_ARRAY template_type_open field_schema template_type_close
 	;
 
 range_column_schema_inner :
-	"RANGE" template_type_open field_schema template_type_close
+	KW_RANGE template_type_open field_schema template_type_close
 	;
 
 struct_column_field :
@@ -947,12 +1285,12 @@ struct_column_field :
 	;
 
 struct_column_schema_prefix :
-	"STRUCT" template_type_open struct_column_field
+	KW_STRUCT template_type_open struct_column_field
 	| struct_column_schema_prefix ',' struct_column_field
 	;
 
 struct_column_schema_inner :
-	"STRUCT" template_type_open template_type_close
+	KW_STRUCT template_type_open template_type_close
 	| struct_column_schema_prefix template_type_close
 	;
 
@@ -968,15 +1306,15 @@ column_schema_inner :
 	;
 
 generated_mode :
-	"GENERATED" "AS"
-	| "GENERATED" "ALWAYS" "AS"
-	| "GENERATED" "BY" "DEFAULT" "AS"
-	| "AS"
+	KW_GENERATED KW_AS
+	| KW_GENERATED KW_ALWAYS KW_AS
+	| KW_GENERATED KW_BY KW_DEFAULT KW_AS
+	| KW_AS
 	;
 
 stored_mode :
-	"STORED" "VOLATILE"
-	| "STORED"
+	KW_STORED KW_VOLATILE
+	| KW_STORED
 	| /*empty*/
 	;
 
@@ -990,33 +1328,33 @@ signed_numerical_literal :
 	;
 
 opt_start_with :
-	"START" "WITH" signed_numerical_literal
+	KW_START KW_WITH signed_numerical_literal
 	| /*empty*/
 	;
 
 opt_increment_by :
-	"INCREMENT" "BY" signed_numerical_literal
+	KW_INCREMENT KW_BY signed_numerical_literal
 	| /*empty*/
 	;
 
 opt_maxvalue :
-	"MAXVALUE" signed_numerical_literal
+	KW_MAXVALUE signed_numerical_literal
 	| /*empty*/
 	;
 
 opt_minvalue :
-	"MINVALUE" signed_numerical_literal
+	KW_MINVALUE signed_numerical_literal
 	| /*empty*/
 	;
 
 opt_cycle :
-	"CYCLE"
-	| "NO" "CYCLE"
+	KW_CYCLE
+	| KW_NO KW_CYCLE
 	| /*empty*/
 	;
 
 identity_column_info :
-	"IDENTITY" '(' /*14L*/ opt_start_with opt_increment_by opt_maxvalue opt_minvalue opt_cycle ')'
+	KW_IDENTITY '(' /*14L*/ opt_start_with opt_increment_by opt_maxvalue opt_minvalue opt_cycle ')'
 	;
 
 generated_column_info :
@@ -1030,7 +1368,7 @@ invalid_generated_column :
 	;
 
 default_column_info :
-	"DEFAULT" expression
+	KW_DEFAULT expression
 	;
 
 invalid_default_column :
@@ -1049,7 +1387,7 @@ field_schema :
 	;
 
 primary_key_column_attribute :
-	"PRIMARY" "KEY"
+	KW_PRIMARY KW_KEY
 	;
 
 foreign_key_column_attribute :
@@ -1057,11 +1395,11 @@ foreign_key_column_attribute :
 	;
 
 hidden_column_attribute :
-	"HIDDEN"
+	KW_HIDDEN
 	;
 
 not_null_column_attribute :
-	"NOT" "NULL"
+	KW_NOT KW_NULL
 	;
 
 column_attribute :
@@ -1088,8 +1426,8 @@ opt_field_attributes :
 	;
 
 column_position :
-	"PRECEDING" identifier
-	| "FOLLOWING" identifier
+	KW_PRECEDING identifier
+	| KW_FOLLOWING identifier
 	;
 
 opt_column_position :
@@ -1098,7 +1436,7 @@ opt_column_position :
 	;
 
 fill_using_expression :
-	"FILL" "USING" expression
+	KW_FILL KW_USING expression
 	;
 
 opt_fill_using_expression :
@@ -1107,8 +1445,8 @@ opt_fill_using_expression :
 	;
 
 table_constraint_spec :
-	"CHECK" '(' /*14L*/ expression ')' opt_constraint_enforcement opt_options_list
-	| "FOREIGN" "KEY" column_list foreign_key_reference opt_constraint_enforcement opt_options_list
+	KW_CHECK '(' /*14L*/ expression ')' opt_constraint_enforcement opt_options_list
+	| KW_FOREIGN KW_KEY column_list foreign_key_reference opt_constraint_enforcement opt_options_list
 	;
 
 primary_key_element :
@@ -1126,7 +1464,7 @@ primary_key_element_list :
 	;
 
 primary_key_spec :
-	"PRIMARY" "KEY" primary_key_element_list opt_constraint_enforcement opt_options_list
+	KW_PRIMARY KW_KEY primary_key_element_list opt_constraint_enforcement opt_options_list
 	;
 
 primary_key_or_table_constraint_spec :
@@ -1141,18 +1479,18 @@ table_constraint_definition :
 	;
 
 foreign_key_reference :
-	"REFERENCES" path_expression column_list opt_foreign_key_match opt_foreign_key_actions
+	KW_REFERENCES path_expression column_list opt_foreign_key_match opt_foreign_key_actions
 	;
 
 opt_foreign_key_match :
-	"MATCH" foreign_key_match_mode
+	KW_MATCH foreign_key_match_mode
 	| /*empty*/
 	;
 
 foreign_key_match_mode :
-	"SIMPLE"
-	| "FULL"
-	| "NOT_SPECIAL" /*4N*/ "DISTINCT" /*4N*/
+	KW_SIMPLE
+	| KW_FULL
+	| KW_NOT_SPECIAL /*4N*/ KW_DISTINCT /*4N*/
 	;
 
 opt_foreign_key_actions :
@@ -1172,22 +1510,22 @@ opt_foreign_key_on_delete :
 	;
 
 foreign_key_on_update :
-	"ON" "UPDATE" foreign_key_action
+	KW_ON KW_UPDATE foreign_key_action
 	;
 
 foreign_key_on_delete :
-	"ON" "DELETE" foreign_key_action
+	KW_ON KW_DELETE foreign_key_action
 	;
 
 foreign_key_action :
-	"NO" "ACTION"
-	| "RESTRICT"
-	| "CASCADE"
-	| "SET" "NULL"
+	KW_NO KW_ACTION
+	| KW_RESTRICT
+	| KW_CASCADE
+	| KW_SET KW_NULL
 	;
 
 opt_constraint_identity :
-	"CONSTRAINT" identifier
+	KW_CONSTRAINT identifier
 	| /*empty*/
 	;
 
@@ -1197,13 +1535,13 @@ opt_constraint_enforcement :
 	;
 
 constraint_enforcement :
-	"ENFORCED"
-	| "NOT" "ENFORCED"
+	KW_ENFORCED
+	| KW_NOT KW_ENFORCED
 	;
 
 table_or_table_function :
-	"TABLE" "FUNCTION"
-	| "TABLE"
+	KW_TABLE KW_FUNCTION
+	| KW_TABLE
 	;
 
 tvf_schema_column :
@@ -1212,7 +1550,7 @@ tvf_schema_column :
 	;
 
 tvf_schema_prefix :
-	"TABLE" template_type_open tvf_schema_column
+	KW_TABLE template_type_open tvf_schema_column
 	| tvf_schema_prefix ',' tvf_schema_column
 	;
 
@@ -1221,23 +1559,23 @@ tvf_schema :
 	;
 
 opt_recursive :
-	"RECURSIVE"
+	KW_RECURSIVE
 	| /*empty*/
 	;
 
 create_view_statement :
-	"CREATE" opt_or_replace opt_create_scope opt_recursive "VIEW" opt_if_not_exists maybe_dashed_path_expression opt_column_with_options_list opt_sql_security_clause opt_options_list as_query
-	| "CREATE" opt_or_replace "MATERIALIZED" opt_recursive "VIEW" opt_if_not_exists maybe_dashed_path_expression opt_column_with_options_list opt_sql_security_clause opt_partition_by_clause_no_hint opt_cluster_by_clause_no_hint opt_options_list "AS" query_or_replica_source
-	| "CREATE" opt_or_replace "APPROX" opt_recursive "VIEW" opt_if_not_exists maybe_dashed_path_expression opt_column_with_options_list opt_sql_security_clause opt_options_list as_query
+	KW_CREATE opt_or_replace opt_create_scope opt_recursive KW_VIEW opt_if_not_exists maybe_dashed_path_expression opt_column_with_options_list opt_sql_security_clause opt_options_list as_query
+	| KW_CREATE opt_or_replace KW_MATERIALIZED opt_recursive KW_VIEW opt_if_not_exists maybe_dashed_path_expression opt_column_with_options_list opt_sql_security_clause opt_partition_by_clause_no_hint opt_cluster_by_clause_no_hint opt_options_list KW_AS query_or_replica_source
+	| KW_CREATE opt_or_replace KW_APPROX opt_recursive KW_VIEW opt_if_not_exists maybe_dashed_path_expression opt_column_with_options_list opt_sql_security_clause opt_options_list as_query
 	;
 
 query_or_replica_source :
 	query
-	| "REPLICA" "OF" maybe_dashed_path_expression
+	| KW_REPLICA KW_OF maybe_dashed_path_expression
 	;
 
 as_query :
-	"AS" query
+	KW_AS query
 	;
 
 opt_as_query :
@@ -1247,18 +1585,18 @@ opt_as_query :
 
 opt_as_query_or_string :
 	as_query
-	| "AS" string_literal
+	| KW_AS string_literal
 	| /*empty*/
 	;
 
 opt_as_query_or_aliased_query_list :
 	as_query
-	| "AS" '(' /*14L*/ aliased_query_list ')'
+	| KW_AS '(' /*14L*/ aliased_query_list ')'
 	| /*empty*/
 	;
 
 opt_if_not_exists :
-	"IF" "NOT" "EXISTS"
+	KW_IF KW_NOT KW_EXISTS
 	| /*empty*/
 	;
 
@@ -1272,45 +1610,45 @@ describe_info :
 	;
 
 opt_from_path_expression :
-	"FROM" maybe_slashed_or_dashed_path_expression
+	KW_FROM maybe_slashed_or_dashed_path_expression
 	| /*empty*/
 	;
 
 explain_statement :
-	"EXPLAIN" unterminated_sql_statement
+	KW_EXPLAIN unterminated_sql_statement
 	;
 
 export_data_statement :
-	"EXPORT" "DATA" opt_with_connection_clause opt_options_list "AS" query
+	KW_EXPORT KW_DATA opt_with_connection_clause opt_options_list KW_AS query
 	;
 
 export_model_statement :
-	"EXPORT" "MODEL" path_expression opt_with_connection_clause opt_options_list
+	KW_EXPORT KW_MODEL path_expression opt_with_connection_clause opt_options_list
 	;
 
 export_metadata_statement :
-	"EXPORT" table_or_table_function "METADATA" "FROM" maybe_dashed_path_expression opt_with_connection_clause opt_options_list
+	KW_EXPORT table_or_table_function KW_METADATA KW_FROM maybe_dashed_path_expression opt_with_connection_clause opt_options_list
 	;
 
 grant_statement :
-	"GRANT" privileges "ON" identifier path_expression "TO" grantee_list
-	| "GRANT" privileges "ON" identifier identifier path_expression "TO" grantee_list
-	| "GRANT" privileges "ON" path_expression "TO" grantee_list
+	KW_GRANT privileges KW_ON identifier path_expression KW_TO grantee_list
+	| KW_GRANT privileges KW_ON identifier identifier path_expression KW_TO grantee_list
+	| KW_GRANT privileges KW_ON path_expression KW_TO grantee_list
 	;
 
 revoke_statement :
-	"REVOKE" privileges "ON" identifier path_expression "FROM" grantee_list
-	| "REVOKE" privileges "ON" identifier identifier path_expression "FROM" grantee_list
-	| "REVOKE" privileges "ON" path_expression "FROM" grantee_list
+	KW_REVOKE privileges KW_ON identifier path_expression KW_FROM grantee_list
+	| KW_REVOKE privileges KW_ON identifier identifier path_expression KW_FROM grantee_list
+	| KW_REVOKE privileges KW_ON path_expression KW_FROM grantee_list
 	;
 
 privileges :
-	"ALL" opt_privileges_keyword
+	KW_ALL opt_privileges_keyword
 	| privilege_list
 	;
 
 opt_privileges_keyword :
-	"PRIVILEGES"
+	KW_PRIVILEGES
 	| /*empty*/
 	;
 
@@ -1325,32 +1663,45 @@ privilege :
 
 privilege_name :
 	identifier
-	| "SELECT"
+	| KW_SELECT
 	;
 
 rename_statement :
-	"RENAME" identifier path_expression "TO" path_expression
+	KW_RENAME identifier path_expression KW_TO path_expression
 	;
 
 import_statement :
-	"IMPORT" import_type path_expression_or_string opt_as_or_into_alias opt_options_list
+	KW_IMPORT import_type path_expression_or_string opt_as_or_into_alias opt_options_list
 	;
 
 module_statement :
-	"MODULE" path_expression opt_options_list
+	KW_MODULE path_expression opt_options_list
 	;
 
-index_order_by_prefix :
-	'(' /*14L*/ ordering_expression
-	| index_order_by_prefix ',' ordering_expression
+column_ordering_and_options_expr :
+	expression opt_collate_clause opt_asc_or_desc opt_null_order opt_options_list
+	;
+
+index_order_by_and_options_prefix :
+	'(' /*14L*/ column_ordering_and_options_expr
+	| index_order_by_and_options_prefix ',' column_ordering_and_options_expr
+	;
+
+all_column_column_options :
+	index_order_by_and_options_prefix ')'
+	;
+
+opt_with_column_options :
+	KW_WITH KW_COLUMN KW_OPTIONS all_column_column_options
+	| /*empty*/
 	;
 
 index_all_columns :
-	'(' /*14L*/ "ALL" "COLUMNS" ')'
+	'(' /*14L*/ KW_ALL KW_COLUMNS opt_with_column_options ')'
 	;
 
-index_order_by :
-	index_order_by_prefix ')'
+index_order_by_and_options :
+	index_order_by_and_options_prefix ')'
 	| index_all_columns
 	;
 
@@ -1374,7 +1725,7 @@ index_storing_expression_list :
 	;
 
 index_storing_list :
-	"STORING" index_storing_expression_list
+	KW_STORING index_storing_expression_list
 	;
 
 opt_index_storing_list :
@@ -1430,43 +1781,43 @@ possibly_empty_grantee_list :
 	;
 
 show_statement :
-	"SHOW" show_target opt_from_path_expression opt_like_string_literal
+	KW_SHOW show_target opt_from_path_expression opt_like_string_literal
 	;
 
 show_target :
-	"MATERIALIZED" "VIEWS"
+	KW_MATERIALIZED KW_VIEWS
 	| identifier
 	;
 
 opt_like_string_literal :
-	"LIKE" /*4N*/ string_literal
+	KW_LIKE /*4N*/ string_literal
 	| /*empty*/
 	;
 
 opt_like_path_expression :
-	"LIKE" /*4N*/ maybe_dashed_path_expression
+	KW_LIKE /*4N*/ maybe_dashed_path_expression
 	| /*empty*/
 	;
 
 opt_clone_table :
-	"CLONE" clone_data_source
+	KW_CLONE clone_data_source
 	| /*empty*/
 	;
 
 opt_copy_table :
-	"COPY" copy_data_source
+	KW_COPY copy_data_source
 	| /*empty*/
 	;
 
 all_or_distinct :
-	"ALL"
-	| "DISTINCT" /*4N*/
+	KW_ALL
+	| KW_DISTINCT /*4N*/
 	;
 
 query_set_operation_type :
-	"UNION"
+	KW_UNION
 	| KW_EXCEPT_IN_SET_OP
-	| "INTERSECT"
+	| KW_INTERSECT
 	;
 
 query_primary_or_set_operation :
@@ -1479,38 +1830,244 @@ parenthesized_query :
 	;
 
 select_or_from_keyword :
-	"SELECT"
-	| "FROM"
+	KW_SELECT
+	| KW_FROM
+	;
+
+bad_keyword_after_from_query :
+	KW_WHERE
+	| KW_SELECT
+	| KW_GROUP
+	;
+
+bad_keyword_after_from_query_allows_parens :
+	KW_ORDER
+	| KW_UNION
+	| KW_INTERSECT
+	| KW_EXCEPT_IN_SET_OP
+	| KW_LIMIT
+	;
+
+query_without_pipe_operators :
+	with_clause query_primary_or_set_operation opt_order_by_clause opt_limit_offset_clause
+	| with_clause_with_trailing_comma select_or_from_keyword
+	| with_clause KW_PIPE
+	| query_primary_or_set_operation opt_order_by_clause opt_limit_offset_clause
+	| opt_with_clause from_clause
+	| opt_with_clause from_clause bad_keyword_after_from_query
+	| opt_with_clause from_clause bad_keyword_after_from_query_allows_parens
 	;
 
 query :
-	with_clause query_primary_or_set_operation opt_order_by_clause opt_limit_offset_clause
-	| with_clause_with_trailing_comma select_or_from_keyword
-	| query_primary_or_set_operation opt_order_by_clause opt_limit_offset_clause
-	| opt_with_clause "FROM"
+	query_without_pipe_operators
+	| query KW_PIPE pipe_operator
+	;
+
+pipe_operator :
+	pipe_where_clause
+	| pipe_select_clause
+	| pipe_extend_clause
+	| pipe_rename
+	| pipe_aggregate_clause
+	| pipe_group_by
+	| pipe_limit_offset_clause
+	| pipe_set_operation_clause
+	| pipe_order_by_clause
+	| pipe_join
+	| pipe_call
+	| pipe_window_clause
+	| pipe_distinct
+	| pipe_tablesample
+	| pipe_as
+	| pipe_static_describe
+	| pipe_assert
+	| pipe_drop
+	| pipe_set
+	| pipe_pivot
+	| pipe_unpivot
+	;
+
+pipe_where_clause :
+	where_clause
+	;
+
+pipe_select_clause :
+	select_clause
+	;
+
+pipe_limit_offset_clause :
+	limit_offset_clause
+	;
+
+pipe_order_by_clause :
+	order_by_clause_with_opt_comma
+	;
+
+pipe_extend_clause :
+	KW_EXTEND pipe_selection_item_list
+	;
+
+pipe_selection_item :
+	select_column_expr
+	| select_column_dot_star
+	;
+
+pipe_selection_item_with_order :
+	select_column_expr opt_selection_item_order
+	| select_column_dot_star
+	;
+
+pipe_selection_item_list_no_comma :
+	pipe_selection_item
+	| pipe_selection_item_list_no_comma ',' pipe_selection_item
+	;
+
+pipe_selection_item_list_no_comma_with_order :
+	pipe_selection_item_with_order
+	| pipe_selection_item_list_no_comma_with_order ',' pipe_selection_item_with_order
+	;
+
+pipe_selection_item_list :
+	pipe_selection_item_list_no_comma opt_comma
+	;
+
+pipe_selection_item_list_with_order :
+	pipe_selection_item_list_no_comma_with_order opt_comma
+	;
+
+pipe_selection_item_list_with_order_or_empty :
+	pipe_selection_item_list_with_order
+	| /*empty*/
+	;
+
+pipe_rename_item :
+	identifier opt_as identifier
+	| identifier '.' /*14L*/
+	;
+
+pipe_rename_item_list :
+	pipe_rename_item
+	| pipe_rename_item_list ',' pipe_rename_item
+	;
+
+pipe_rename :
+	KW_RENAME pipe_rename_item_list opt_comma
+	;
+
+opt_comma :
+	','
+	| /*empty*/
+	;
+
+pipe_aggregate_clause :
+	KW_AGGREGATE pipe_selection_item_list_with_order_or_empty opt_group_by_clause_with_opt_comma
+	;
+
+pipe_group_by :
+	KW_GROUP
+	;
+
+pipe_set_operation_clause :
+	set_operation_metadata parenthesized_query
+	| pipe_set_operation_clause ',' parenthesized_query
+	;
+
+pipe_join :
+	opt_natural join_type join_hint KW_JOIN opt_hint table_primary opt_on_or_using_clause
+	;
+
+pipe_call :
+	KW_CALL tvf opt_as_alias
+	;
+
+pipe_window_clause :
+	KW_WINDOW pipe_selection_item_list
+	;
+
+pipe_distinct :
+	KW_DISTINCT /*4N*/
+	;
+
+pipe_tablesample :
+	sample_clause
+	;
+
+pipe_as :
+	KW_AS identifier
+	;
+
+pipe_static_describe :
+	KW_STATIC_DESCRIBE
+	;
+
+pipe_assert_base :
+	KW_ASSERT expression
+	| pipe_assert_base ',' expression
+	;
+
+pipe_assert :
+	pipe_assert_base opt_comma
+	;
+
+identifier_in_pipe_drop :
+	identifier
+	| identifier '.' /*14L*/
+	;
+
+identifier_list_in_pipe_drop :
+	identifier_in_pipe_drop
+	| identifier_list_in_pipe_drop ',' identifier_in_pipe_drop
+	;
+
+pipe_drop :
+	KW_DROP identifier_list_in_pipe_drop opt_comma
+	;
+
+pipe_set_item :
+	identifier '=' /*4N*/ expression
+	| identifier '.' /*14L*/
+	;
+
+pipe_set_item_list :
+	pipe_set_item
+	| pipe_set_item_list ',' pipe_set_item
+	;
+
+pipe_set :
+	KW_SET pipe_set_item_list opt_comma
+	;
+
+pipe_pivot :
+	pivot_clause opt_as_alias
+	;
+
+pipe_unpivot :
+	unpivot_clause opt_as_alias
 	;
 
 opt_corresponding_outer_mode :
 	KW_FULL_IN_SET_OP opt_outer
-	| "OUTER"
+	| KW_OUTER
 	| KW_LEFT_IN_SET_OP opt_outer
 	| /*empty*/
 	;
 
 opt_strict :
-	"STRICT"
+	KW_STRICT
 	| /*empty*/
 	;
 
 opt_column_match_suffix :
-	"CORRESPONDING"
-	| "CORRESPONDING" "BY" column_list
+	KW_CORRESPONDING
+	| KW_CORRESPONDING KW_BY column_list
 	| /*empty*/
 	;
 
 query_set_operation_prefix :
 	query_primary set_operation_metadata query_primary
 	| query_set_operation_prefix set_operation_metadata query_primary
+	| query_primary set_operation_metadata KW_FROM
+	| query_set_operation_prefix set_operation_metadata KW_FROM
 	;
 
 set_operation_metadata :
@@ -1527,8 +2084,8 @@ query_primary :
 	;
 
 select_clause :
-	"SELECT" opt_hint opt_select_with opt_all_or_distinct opt_select_as_clause select_list
-	| "SELECT" opt_hint opt_select_with opt_all_or_distinct opt_select_as_clause "FROM"
+	KW_SELECT opt_hint opt_select_with opt_all_or_distinct opt_select_as_clause select_list
+	| KW_SELECT opt_hint opt_select_with opt_all_or_distinct opt_select_as_clause KW_FROM
 	;
 
 select :
@@ -1540,21 +2097,21 @@ pre_select_with :
 	;
 
 opt_select_with :
-	pre_select_with "WITH" identifier
-	| pre_select_with "WITH" identifier KW_OPTIONS_IN_SELECT_WITH_OPTIONS options_list
+	pre_select_with KW_WITH identifier
+	| pre_select_with KW_WITH identifier KW_OPTIONS_IN_SELECT_WITH_OPTIONS options_list
 	| pre_select_with
 	;
 
 opt_select_as_clause :
-	"AS" "STRUCT"
-	| "AS" path_expression
+	KW_AS KW_STRUCT
+	| KW_AS path_expression
 	| /*empty*/
 	;
 
 extra_identifier_in_hints_name :
-	"HASH"
-	| "PROTO"
-	| "PARTITION"
+	KW_HASH
+	| KW_PROTO
+	| KW_PARTITION
 	;
 
 identifier_in_hints :
@@ -1583,8 +2140,8 @@ hint :
 	;
 
 opt_all_or_distinct :
-	"ALL"
-	| "DISTINCT" /*4N*/
+	KW_ALL
+	| KW_DISTINCT /*4N*/
 	| /*empty*/
 	;
 
@@ -1599,7 +2156,7 @@ select_list :
 	;
 
 star_except_list_prefix :
-	"EXCEPT" '(' /*14L*/ identifier
+	KW_EXCEPT '(' /*14L*/ identifier
 	| star_except_list_prefix ',' identifier
 	;
 
@@ -1608,12 +2165,12 @@ star_except_list :
 	;
 
 star_replace_item :
-	expression "AS" identifier
+	expression KW_AS identifier
 	;
 
 star_modifiers_with_replace_prefix :
-	star_except_list "REPLACE" '(' /*14L*/ star_replace_item
-	| "REPLACE" '(' /*14L*/ star_replace_item
+	star_except_list KW_REPLACE '(' /*14L*/ star_replace_item
+	| KW_REPLACE '(' /*14L*/ star_replace_item
 	| star_modifiers_with_replace_prefix ',' star_replace_item
 	;
 
@@ -1630,8 +2187,17 @@ select_column :
 
 select_column_expr :
 	expression
-	| expression "AS" identifier
+	| select_column_expr_with_as_alias
 	| expression identifier
+	;
+
+select_list_prefix_with_as_aliases :
+	select_column_expr_with_as_alias
+	| select_list_prefix_with_as_aliases ',' select_column_expr_with_as_alias
+	;
+
+select_column_expr_with_as_alias :
+	expression KW_AS identifier
 	;
 
 select_column_dot_star :
@@ -1650,30 +2216,35 @@ opt_as_alias :
 	;
 
 opt_as_alias_with_required_as :
-	"AS" identifier
+	KW_AS identifier
 	| /*empty*/
 	;
 
 opt_as_or_into_alias :
-	"AS" identifier
-	| "INTO" identifier
+	KW_AS identifier
+	| KW_INTO identifier
 	| /*empty*/
 	;
 
 opt_as :
-	"AS"
+	KW_AS
 	| /*empty*/
 	;
 
 opt_natural :
-	"NATURAL"
+	KW_NATURAL
 	| /*empty*/
 	;
 
 opt_outer :
-	"OUTER"
+	KW_OUTER
 	| /*empty*/
 	;
+
+//opt_int_literal_or_parameter :
+//	int_literal_or_parameter
+//	| /*empty*/
+//	;
 
 int_literal_or_parameter :
 	integer_literal
@@ -1682,7 +2253,7 @@ int_literal_or_parameter :
 	;
 
 cast_int_literal_or_parameter :
-	"CAST" '(' /*14L*/ int_literal_or_parameter "AS" type opt_format ')'
+	KW_CAST '(' /*14L*/ int_literal_or_parameter KW_AS type opt_format ')'
 	;
 
 possibly_cast_int_literal_or_parameter :
@@ -1691,7 +2262,7 @@ possibly_cast_int_literal_or_parameter :
 	;
 
 repeatable_clause :
-	"REPEATABLE" '(' /*14L*/ possibly_cast_int_literal_or_parameter ')'
+	KW_REPEATABLE '(' /*14L*/ possibly_cast_int_literal_or_parameter ')'
 	;
 
 sample_size_value :
@@ -1700,8 +2271,8 @@ sample_size_value :
 	;
 
 sample_size_unit :
-	"ROWS"
-	| "PERCENT"
+	KW_ROWS
+	| KW_PERCENT
 	;
 
 sample_size :
@@ -1715,19 +2286,14 @@ opt_repeatable_clause :
 
 opt_sample_clause_suffix :
 	repeatable_clause
-	| "WITH" "WEIGHT" opt_repeatable_clause
-	| "WITH" "WEIGHT" identifier opt_repeatable_clause
-	| "WITH" "WEIGHT" "AS" identifier opt_repeatable_clause
+	| KW_WITH KW_WEIGHT opt_repeatable_clause
+	| KW_WITH KW_WEIGHT identifier opt_repeatable_clause
+	| KW_WITH KW_WEIGHT KW_AS identifier opt_repeatable_clause
 	| /*empty*/
 	;
 
 sample_clause :
-	"TABLESAMPLE" identifier '(' /*14L*/ sample_size ')' opt_sample_clause_suffix
-	;
-
-opt_sample_clause :
-	sample_clause
-	| /*empty*/
+	KW_TABLESAMPLE identifier '(' /*14L*/ sample_size ')' opt_sample_clause_suffix
 	;
 
 pivot_expression :
@@ -1749,7 +2315,7 @@ pivot_value_list :
 	;
 
 pivot_clause :
-	"PIVOT" '(' /*14L*/ pivot_expression_list "FOR" expression_higher_prec_than_and "IN" /*4N*/ '(' /*14L*/ pivot_value_list ')' ')'
+	KW_PIVOT '(' /*14L*/ pivot_expression_list KW_FOR expression_higher_prec_than_and KW_IN /*4N*/ '(' /*14L*/ pivot_value_list ')' ')'
 	;
 
 opt_as_string_or_integer :
@@ -1796,21 +2362,21 @@ unpivot_in_item_list :
 	;
 
 opt_unpivot_nulls_filter :
-	"EXCLUDE" "NULLS"
-	| "INCLUDE" "NULLS"
+	KW_EXCLUDE KW_NULLS
+	| KW_INCLUDE KW_NULLS
 	| /*empty*/
 	;
 
 unpivot_clause :
-	"UNPIVOT" opt_unpivot_nulls_filter '(' /*14L*/ path_expression_list_with_opt_parens "FOR" path_expression "IN" /*4N*/ unpivot_in_item_list ')'
+	KW_UNPIVOT opt_unpivot_nulls_filter '(' /*14L*/ path_expression_list_with_opt_parens KW_FOR path_expression KW_IN /*4N*/ unpivot_in_item_list ')'
 	;
 
 opt_pivot_or_unpivot_clause_and_alias :
-	"AS" identifier
+	KW_AS identifier
 	| identifier
-	| "AS" identifier pivot_clause opt_as_alias
-	| "AS" identifier unpivot_clause opt_as_alias
-	| "AS" identifier qualify_clause_nonreserved
+	| KW_AS identifier pivot_clause opt_as_alias
+	| KW_AS identifier unpivot_clause opt_as_alias
+	| KW_AS identifier qualify_clause_nonreserved
 	| identifier pivot_clause opt_as_alias
 	| identifier unpivot_clause opt_as_alias
 	| identifier qualify_clause_nonreserved
@@ -1820,21 +2386,40 @@ opt_pivot_or_unpivot_clause_and_alias :
 	| /*empty*/
 	;
 
+match_recognize_clause :
+	KW_MATCH_RECOGNIZE_RESERVED '(' /*14L*/ opt_partition_by_clause order_by_clause KW_MEASURES select_list_prefix_with_as_aliases KW_PATTERN '(' /*14L*/ row_pattern_expr ')' KW_DEFINE with_expression_variable_prefix ')' opt_as_alias
+	;
+
+row_pattern_expr :
+	row_pattern_concatenation
+	| row_pattern_expr '|' /*5L*/ row_pattern_concatenation
+	;
+
+row_pattern_concatenation :
+	row_pattern_factor
+	| row_pattern_concatenation row_pattern_factor
+	;
+
+row_pattern_factor :
+	identifier
+	| '(' /*14L*/ row_pattern_expr ')'
+	;
+
 table_subquery :
-	parenthesized_query opt_pivot_or_unpivot_clause_and_alias opt_sample_clause
+	parenthesized_query opt_pivot_or_unpivot_clause_and_alias
 	;
 
 table_clause :
-	"TABLE" tvf_with_suffixes
-	| "TABLE" path_expression
+	KW_TABLE tvf_with_suffixes
+	| KW_TABLE path_expression
 	;
 
 model_clause :
-	"MODEL" path_expression
+	KW_MODEL path_expression
 	;
 
 connection_clause :
-	"CONNECTION" path_expression_or_default
+	KW_CONNECTION path_expression_or_default
 	;
 
 descriptor_column :
@@ -1847,7 +2432,7 @@ descriptor_column_list :
 	;
 
 descriptor_argument :
-	"DESCRIPTOR" '(' /*14L*/ descriptor_column_list ')'
+	KW_DESCRIPTOR '(' /*14L*/ descriptor_column_list ')'
 	;
 
 tvf_argument :
@@ -1861,13 +2446,13 @@ tvf_argument :
 	| '(' /*14L*/ model_clause ')'
 	| '(' /*14L*/ connection_clause ')'
 	| '(' /*14L*/ named_argument ')'
-	| "SELECT"
-	| "WITH"
+	| KW_SELECT
+	| KW_WITH
 	;
 
 tvf_prefix_no_args :
 	path_expression '(' /*14L*/
-	| "IF" '(' /*14L*/
+	| KW_IF '(' /*14L*/
 	;
 
 tvf_prefix :
@@ -1875,9 +2460,14 @@ tvf_prefix :
 	| tvf_prefix ',' tvf_argument
 	;
 
+tvf :
+	tvf_prefix_no_args ')' opt_hint
+	| tvf_prefix ')' opt_hint
+	;
+
 tvf_with_suffixes :
-	tvf_prefix_no_args ')' opt_hint opt_pivot_or_unpivot_clause_and_alias opt_sample_clause
-	| tvf_prefix ')' opt_hint opt_pivot_or_unpivot_clause_and_alias opt_sample_clause
+	tvf_prefix_no_args ')' opt_hint opt_pivot_or_unpivot_clause_and_alias
+	| tvf_prefix ')' opt_hint opt_pivot_or_unpivot_clause_and_alias
 	;
 
 table_path_expression_base :
@@ -1890,28 +2480,30 @@ table_path_expression_base :
 	;
 
 table_path_expression :
-	table_path_expression_base opt_hint opt_pivot_or_unpivot_clause_and_alias opt_with_offset_and_alias opt_at_system_time opt_sample_clause
+	table_path_expression_base opt_hint opt_pivot_or_unpivot_clause_and_alias opt_with_offset_and_alias opt_at_system_time
 	;
 
 table_primary :
 	tvf_with_suffixes
 	| table_path_expression
-	| '(' /*14L*/ join ')' opt_sample_clause
+	| '(' /*14L*/ join ')'
 	| table_subquery
+	| table_primary match_recognize_clause
+	| table_primary sample_clause
 	;
 
 opt_at_system_time :
-	"FOR" "SYSTEM" "TIME" "AS" "OF" expression
-	| "FOR" "SYSTEM_TIME" "AS" "OF" expression
+	KW_FOR KW_SYSTEM KW_TIME KW_AS KW_OF expression
+	| KW_FOR KW_SYSTEM_TIME KW_AS KW_OF expression
 	| /*empty*/
 	;
 
 on_clause :
-	"ON" expression
+	KW_ON expression
 	;
 
 using_clause_prefix :
-	"USING" '(' /*14L*/ identifier
+	KW_USING '(' /*14L*/ identifier
 	| using_clause_prefix ',' identifier
 	;
 
@@ -1934,18 +2526,23 @@ on_or_using_clause :
 	| using_clause
 	;
 
+opt_on_or_using_clause :
+	on_or_using_clause
+	| /*empty*/
+	;
+
 join_type :
-	"CROSS"
-	| "FULL" opt_outer
-	| "INNER"
+	KW_CROSS
+	| KW_FULL opt_outer
+	| KW_INNER
 	| KW_LEFT opt_outer
-	| "RIGHT" opt_outer
+	| KW_RIGHT opt_outer
 	| /*empty*/
 	;
 
 join_hint :
-	"HASH"
-	| "LOOKUP"
+	KW_HASH
+	| KW_LOOKUP
 	| /*empty*/
 	;
 
@@ -1955,13 +2552,13 @@ join_input :
 	;
 
 join :
-	join_input opt_natural join_type join_hint "JOIN" opt_hint table_primary opt_on_or_using_clause_list
+	join_input opt_natural join_type join_hint KW_JOIN opt_hint table_primary opt_on_or_using_clause_list
 	;
 
 from_clause_contents :
 	table_primary
 	| from_clause_contents ',' table_primary
-	| from_clause_contents opt_natural join_type join_hint "JOIN" opt_hint table_primary opt_on_or_using_clause_list
+	| from_clause_contents opt_natural join_type join_hint KW_JOIN opt_hint table_primary opt_on_or_using_clause_list
 	| '@'
 	| '?'
 	| KW_DOUBLE_AT
@@ -1973,7 +2570,7 @@ opt_from_clause :
 	;
 
 from_clause :
-	"FROM" from_clause_contents
+	KW_FROM from_clause_contents
 	;
 
 opt_clauses_following_from :
@@ -1992,7 +2589,7 @@ opt_clauses_following_group_by :
 	;
 
 where_clause :
-	"WHERE" expression
+	KW_WHERE expression
 	;
 
 opt_where_clause :
@@ -2001,12 +2598,12 @@ opt_where_clause :
 	;
 
 rollup_list :
-	"ROLLUP" '(' /*14L*/ expression
+	KW_ROLLUP '(' /*14L*/ expression
 	| rollup_list ',' expression
 	;
 
 cube_list :
-	"CUBE" '(' /*14L*/ expression
+	KW_CUBE '(' /*14L*/ expression
 	| cube_list ',' expression
 	;
 
@@ -2018,20 +2615,35 @@ grouping_set :
 	;
 
 grouping_set_list :
-	"GROUPING" "SETS" '(' /*14L*/ grouping_set
+	KW_GROUPING KW_SETS '(' /*14L*/ grouping_set
 	| grouping_set_list ',' grouping_set
+	;
+
+opt_selection_item_order :
+	asc_or_desc opt_null_order
+	| /*empty*/
+	;
+
+opt_grouping_item_order :
+	opt_selection_item_order
+	| null_order
 	;
 
 grouping_item :
 	'(' /*14L*/ ')'
-	| expression opt_as_alias_with_required_as
+	| expression opt_as_alias_with_required_as opt_grouping_item_order
 	| rollup_list ')'
 	| cube_list ')'
 	| grouping_set_list ')'
 	;
 
+opt_and_order :
+	KW_AND /*2L*/ KW_ORDER
+	| /*empty*/
+	;
+
 group_by_preamble :
-	"GROUP" opt_hint "BY"
+	KW_GROUP opt_hint opt_and_order KW_BY
 	;
 
 group_by_clause_prefix :
@@ -2040,7 +2652,7 @@ group_by_clause_prefix :
 	;
 
 group_by_all :
-	group_by_preamble "ALL"
+	group_by_preamble KW_ALL
 	;
 
 group_by_clause :
@@ -2053,8 +2665,13 @@ opt_group_by_clause :
 	| /*empty*/
 	;
 
+opt_group_by_clause_with_opt_comma :
+	group_by_clause_prefix opt_comma
+	| /*empty*/
+	;
+
 having_clause :
-	"HAVING" expression
+	KW_HAVING expression
 	;
 
 opt_having_clause :
@@ -2063,11 +2680,11 @@ opt_having_clause :
 	;
 
 window_definition :
-	identifier "AS" window_specification
+	identifier KW_AS window_specification
 	;
 
 window_clause_prefix :
-	"WINDOW" window_definition
+	KW_WINDOW window_definition
 	| window_clause_prefix ',' window_definition
 	;
 
@@ -2096,8 +2713,8 @@ qualify_clause_nonreserved :
 	;
 
 limit_offset_clause :
-	"LIMIT" expression "OFFSET" expression
-	| "LIMIT" expression
+	KW_LIMIT expression KW_OFFSET expression
+	| KW_LIMIT expression
 	;
 
 opt_limit_offset_clause :
@@ -2106,19 +2723,19 @@ opt_limit_offset_clause :
 	;
 
 opt_having_or_group_by_modifier :
-	"HAVING" "MAX" expression
-	| "HAVING" "MIN" expression
+	KW_HAVING KW_MAX expression
+	| KW_HAVING KW_MIN expression
 	| group_by_clause_prefix
 	| /*empty*/
 	;
 
 opt_clamped_between_modifier :
-	"CLAMPED" "BETWEEN" /*4N*/ expression_higher_prec_than_and "AND" /*2L*/ expression %prec "BETWEEN" /*4N*/
+	KW_CLAMPED KW_BETWEEN /*4N*/ expression_higher_prec_than_and KW_AND /*2L*/ expression %prec KW_BETWEEN /*4N*/
 	| /*empty*/
 	;
 
 opt_with_report_modifier :
-	"WITH" "REPORT" opt_with_report_format
+	KW_WITH KW_REPORT opt_with_report_format
 	| /*empty*/
 	;
 
@@ -2128,20 +2745,20 @@ opt_with_report_format :
 	;
 
 opt_null_handling_modifier :
-	"IGNORE" "NULLS"
-	| "RESPECT" "NULLS"
+	KW_IGNORE KW_NULLS
+	| KW_RESPECT KW_NULLS
 	| /*empty*/
 	;
 
 possibly_unbounded_int_literal_or_parameter :
 	int_literal_or_parameter
-	| "UNBOUNDED"
+	| KW_UNBOUNDED
 	;
 
 recursion_depth_modifier :
-	"WITH" "DEPTH" opt_as_alias_with_required_as
-	| "WITH" "DEPTH" opt_as_alias_with_required_as "BETWEEN" /*4N*/ possibly_unbounded_int_literal_or_parameter "AND" /*2L*/ possibly_unbounded_int_literal_or_parameter %prec "BETWEEN" /*4N*/
-	| "WITH" "DEPTH" opt_as_alias_with_required_as "MAX" possibly_unbounded_int_literal_or_parameter
+	KW_WITH KW_DEPTH opt_as_alias_with_required_as
+	| KW_WITH KW_DEPTH opt_as_alias_with_required_as KW_BETWEEN /*4N*/ possibly_unbounded_int_literal_or_parameter KW_AND /*2L*/ possibly_unbounded_int_literal_or_parameter %prec KW_BETWEEN /*4N*/
+	| KW_WITH KW_DEPTH opt_as_alias_with_required_as KW_MAX possibly_unbounded_int_literal_or_parameter
 	;
 
 aliased_query_modifiers :
@@ -2150,7 +2767,7 @@ aliased_query_modifiers :
 	;
 
 aliased_query :
-	identifier "AS" parenthesized_query aliased_query_modifiers
+	identifier KW_AS parenthesized_query aliased_query_modifiers
 	;
 
 aliased_query_list :
@@ -2159,8 +2776,8 @@ aliased_query_list :
 	;
 
 with_clause :
-	"WITH" aliased_query
-	| "WITH" "RECURSIVE" aliased_query
+	KW_WITH aliased_query
+	| KW_WITH KW_RECURSIVE aliased_query
 	| with_clause ',' aliased_query
 	;
 
@@ -2179,8 +2796,8 @@ with_clause_with_trailing_comma :
 	;
 
 asc_or_desc :
-	"ASC"
-	| "DESC"
+	KW_ASC
+	| KW_DESC
 	;
 
 opt_asc_or_desc :
@@ -2188,9 +2805,13 @@ opt_asc_or_desc :
 	| /*empty*/
 	;
 
+null_order :
+	KW_NULLS KW_FIRST
+	| KW_NULLS KW_LAST
+	;
+
 opt_null_order :
-	"NULLS" "FIRST"
-	| "NULLS" "LAST"
+	null_order
 	| /*empty*/
 	;
 
@@ -2201,7 +2822,7 @@ string_literal_or_parameter :
 	;
 
 collate_clause :
-	"COLLATE" string_literal_or_parameter
+	KW_COLLATE string_literal_or_parameter
 	;
 
 opt_collate_clause :
@@ -2210,7 +2831,7 @@ opt_collate_clause :
 	;
 
 opt_default_collate_clause :
-	"DEFAULT" collate_clause
+	KW_DEFAULT collate_clause
 	| /*empty*/
 	;
 
@@ -2219,12 +2840,16 @@ ordering_expression :
 	;
 
 order_by_clause_prefix :
-	"ORDER" opt_hint "BY" ordering_expression
+	KW_ORDER opt_hint KW_BY ordering_expression
 	| order_by_clause_prefix ',' ordering_expression
 	;
 
 order_by_clause :
 	order_by_clause_prefix
+	;
+
+order_by_clause_with_opt_comma :
+	order_by_clause_prefix opt_comma
 	;
 
 opt_order_by_clause :
@@ -2254,7 +2879,7 @@ expression_with_opt_alias :
 	;
 
 unnest_expression_prefix :
-	"UNNEST" '(' /*14L*/ expression_with_opt_alias
+	KW_UNNEST '(' /*14L*/ expression_with_opt_alias
 	| unnest_expression_prefix ',' expression_with_opt_alias
 	;
 
@@ -2265,7 +2890,7 @@ opt_array_zip_mode :
 
 unnest_expression :
 	unnest_expression_prefix opt_array_zip_mode ')'
-	| "UNNEST" '(' /*14L*/ "SELECT"
+	| KW_UNNEST '(' /*14L*/ KW_SELECT
 	;
 
 unnest_expression_with_opt_alias_and_offset :
@@ -2274,12 +2899,12 @@ unnest_expression_with_opt_alias_and_offset :
 
 comparative_operator :
 	'=' /*4N*/
-	| "!=" /*4N*/
-	| "<>" /*4N*/
+	| KW_NOT_EQUALS_C_STYLE /*4N*/
+	| KW_NOT_EQUALS_SQL_STYLE /*4N*/
 	| '<' /*4N*/
-	| "<=" /*4N*/
+	| KW_LESS_EQUALS /*4N*/
 	| '>' /*4N*/
-	| ">=" /*4N*/
+	| KW_GREATER_EQUALS /*4N*/
 	;
 
 additive_operator :
@@ -2293,44 +2918,44 @@ multiplicative_operator :
 	;
 
 shift_operator :
-	"<<" /*8L*/
-	| ">>" /*8L*/
+	KW_SHIFT_LEFT /*8L*/
+	| KW_SHIFT_RIGHT /*8L*/
 	;
 
 import_type :
-	"MODULE"
-	| "PROTO"
+	KW_MODULE
+	| KW_PROTO
 	;
 
 any_some_all :
-	"ANY"
-	| "SOME"
-	| "ALL"
+	KW_ANY
+	| KW_SOME
+	| KW_ALL
 	;
 
 like_operator :
-	"LIKE" /*4N*/ %prec "LIKE" /*4N*/
-	| "NOT_SPECIAL" /*4N*/ "LIKE" /*4N*/ %prec "LIKE" /*4N*/
+	KW_LIKE /*4N*/ %prec KW_LIKE /*4N*/
+	| KW_NOT_SPECIAL /*4N*/ KW_LIKE /*4N*/ %prec KW_LIKE /*4N*/
 	;
 
 between_operator :
-	"BETWEEN" /*4N*/ %prec "BETWEEN" /*4N*/
-	| "NOT_SPECIAL" /*4N*/ "BETWEEN" /*4N*/ %prec "BETWEEN" /*4N*/
+	KW_BETWEEN /*4N*/ %prec KW_BETWEEN /*4N*/
+	| KW_NOT_SPECIAL /*4N*/ KW_BETWEEN /*4N*/ %prec KW_BETWEEN /*4N*/
 	;
 
 distinct_operator :
-	"IS" /*4N*/ "DISTINCT" /*4N*/ "FROM" %prec "DISTINCT" /*4N*/
-	| "IS" /*4N*/ "NOT_SPECIAL" /*4N*/ "DISTINCT" /*4N*/ "FROM" %prec "DISTINCT" /*4N*/
+	KW_IS /*4N*/ KW_DISTINCT /*4N*/ KW_FROM %prec KW_DISTINCT /*4N*/
+	| KW_IS /*4N*/ KW_NOT_SPECIAL /*4N*/ KW_DISTINCT /*4N*/ KW_FROM %prec KW_DISTINCT /*4N*/
 	;
 
 in_operator :
-	"IN" /*4N*/ %prec "IN" /*4N*/
-	| "NOT_SPECIAL" /*4N*/ "IN" /*4N*/ %prec "IN" /*4N*/
+	KW_IN /*4N*/ %prec KW_IN /*4N*/
+	| KW_NOT_SPECIAL /*4N*/ KW_IN /*4N*/ %prec KW_IN /*4N*/
 	;
 
 is_operator :
-	"IS" /*4N*/ %prec "IS" /*4N*/
-	| "IS" /*4N*/ "NOT" %prec "IS" /*4N*/
+	KW_IS /*4N*/ %prec KW_IS /*4N*/
+	| KW_IS /*4N*/ KW_NOT %prec KW_IS /*4N*/
 	;
 
 unary_operator :
@@ -2340,7 +2965,7 @@ unary_operator :
 	;
 
 with_expression_variable :
-	identifier "AS" expression
+	identifier KW_AS expression
 	;
 
 with_expression_variable_prefix :
@@ -2354,17 +2979,17 @@ with_expression :
 
 expression :
 	expression_higher_prec_than_and
-	| and_expression %prec "AND" /*2L*/
-	| or_expression %prec "OR" /*1L*/
+	| and_expression %prec KW_AND /*2L*/
+	| or_expression %prec KW_OR /*1L*/
 	;
 
 or_expression :
-	expression "OR" /*1L*/ expression %prec "OR" /*1L*/
+	expression KW_OR /*1L*/ expression %prec KW_OR /*1L*/
 	;
 
 and_expression :
-	and_expression "AND" /*2L*/ expression_higher_prec_than_and %prec "AND" /*2L*/
-	| expression_higher_prec_than_and "AND" /*2L*/ expression_higher_prec_than_and %prec "AND" /*2L*/
+	and_expression KW_AND /*2L*/ expression_higher_prec_than_and %prec KW_AND /*2L*/
+	| expression_higher_prec_than_and KW_AND /*2L*/ expression_higher_prec_than_and %prec KW_AND /*2L*/
 	;
 
 expression_higher_prec_than_and :
@@ -2416,24 +3041,24 @@ unparenthesized_expression_higher_prec_than_and :
 	| expression_higher_prec_than_and '[' /*14L*/ expression ']' %prec PRIMARY_PRECEDENCE /*14L*/
 	| expression_higher_prec_than_and '.' /*14L*/ '(' /*14L*/ path_expression ')' %prec PRIMARY_PRECEDENCE /*14L*/
 	| expression_higher_prec_than_and '.' /*14L*/ identifier %prec PRIMARY_PRECEDENCE /*14L*/
-	| "NOT" expression_higher_prec_than_and %prec UNARY_NOT_PRECEDENCE /*3P*/
-	| expression_higher_prec_than_and like_operator any_some_all opt_hint unnest_expression %prec "LIKE" /*4N*/
-	| expression_higher_prec_than_and like_operator any_some_all opt_hint parenthesized_anysomeall_list_in_rhs %prec "LIKE" /*4N*/
-	| expression_higher_prec_than_and like_operator expression_higher_prec_than_and %prec "LIKE" /*4N*/
-	| expression_higher_prec_than_and distinct_operator expression_higher_prec_than_and %prec "DISTINCT" /*4N*/
-	| expression_higher_prec_than_and in_operator opt_hint unnest_expression %prec "IN" /*4N*/
-	| expression_higher_prec_than_and in_operator opt_hint parenthesized_in_rhs %prec "IN" /*4N*/
-	| expression_higher_prec_than_and between_operator expression_higher_prec_than_and "AND" /*2L*/ expression_higher_prec_than_and %prec "BETWEEN" /*4N*/
-	| expression_higher_prec_than_and between_operator expression_higher_prec_than_and "OR" /*1L*/ %prec "BETWEEN" /*4N*/
-	| expression_higher_prec_than_and is_operator "UNKNOWN" %prec "IS" /*4N*/
-	| expression_higher_prec_than_and is_operator null_literal %prec "IS" /*4N*/
-	| expression_higher_prec_than_and is_operator boolean_literal %prec "IS" /*4N*/
+	| KW_NOT expression_higher_prec_than_and %prec UNARY_NOT_PRECEDENCE /*3P*/
+	| expression_higher_prec_than_and like_operator any_some_all opt_hint unnest_expression %prec KW_LIKE /*4N*/
+	| expression_higher_prec_than_and like_operator any_some_all opt_hint parenthesized_anysomeall_list_in_rhs %prec KW_LIKE /*4N*/
+	| expression_higher_prec_than_and like_operator expression_higher_prec_than_and %prec KW_LIKE /*4N*/
+	| expression_higher_prec_than_and distinct_operator expression_higher_prec_than_and %prec KW_DISTINCT /*4N*/
+	| expression_higher_prec_than_and in_operator opt_hint unnest_expression %prec KW_IN /*4N*/
+	| expression_higher_prec_than_and in_operator opt_hint parenthesized_in_rhs %prec KW_IN /*4N*/
+	| expression_higher_prec_than_and between_operator expression_higher_prec_than_and KW_AND /*2L*/ expression_higher_prec_than_and %prec KW_BETWEEN /*4N*/
+	| expression_higher_prec_than_and between_operator expression_higher_prec_than_and KW_OR /*1L*/ %prec KW_BETWEEN /*4N*/
+	| expression_higher_prec_than_and is_operator KW_UNKNOWN %prec KW_IS /*4N*/
+	| expression_higher_prec_than_and is_operator null_literal %prec KW_IS /*4N*/
+	| expression_higher_prec_than_and is_operator boolean_literal %prec KW_IS /*4N*/
 	| expression_higher_prec_than_and comparative_operator expression_higher_prec_than_and %prec '=' /*4N*/
 	| expression_higher_prec_than_and '|' /*5L*/ expression_higher_prec_than_and
 	| expression_higher_prec_than_and '^' /*6L*/ expression_higher_prec_than_and
 	| expression_higher_prec_than_and '&' /*7L*/ expression_higher_prec_than_and
-	| expression_higher_prec_than_and "||" /*10L*/ expression_higher_prec_than_and
-	| expression_higher_prec_than_and shift_operator expression_higher_prec_than_and %prec "<<" /*8L*/
+	| expression_higher_prec_than_and KW_CONCAT_OP /*10L*/ expression_higher_prec_than_and
+	| expression_higher_prec_than_and shift_operator expression_higher_prec_than_and %prec KW_SHIFT_LEFT /*8L*/
 	| expression_higher_prec_than_and additive_operator expression_higher_prec_than_and %prec '+' /*9L*/
 	| expression_higher_prec_than_and multiplicative_operator expression_higher_prec_than_and %prec '*' /*11L*/
 	| unary_operator expression_higher_prec_than_and %prec UNARY_PRECEDENCE /*12P*/
@@ -2494,7 +3119,7 @@ slashed_path_expression :
 	;
 
 array_constructor_prefix_no_expressions :
-	"ARRAY" '[' /*14L*/
+	KW_ARRAY '[' /*14L*/
 	| '[' /*14L*/
 	| array_type '[' /*14L*/
 	;
@@ -2514,10 +3139,10 @@ range_literal :
 	;
 
 date_or_time_literal_kind :
-	"DATE"
-	| "DATETIME"
-	| "TIME"
-	| "TIMESTAMP"
+	KW_DATE
+	| KW_DATETIME
+	| KW_TIME
+	| KW_TIMESTAMP
 	;
 
 date_or_time_literal :
@@ -2525,8 +3150,8 @@ date_or_time_literal :
 	;
 
 interval_expression :
-	"INTERVAL" expression identifier
-	| "INTERVAL" expression identifier "TO" identifier
+	KW_INTERVAL expression identifier
+	| KW_INTERVAL expression identifier KW_TO identifier
 	;
 
 parameter_expression :
@@ -2540,7 +3165,7 @@ named_parameter_expression :
 
 type_name :
 	path_expression
-	| "INTERVAL"
+	| KW_INTERVAL
 	;
 
 template_type_open :
@@ -2552,7 +3177,7 @@ template_type_close :
 	;
 
 array_type :
-	"ARRAY" template_type_open type template_type_close
+	KW_ARRAY template_type_open type template_type_close
 	;
 
 struct_field :
@@ -2561,32 +3186,32 @@ struct_field :
 	;
 
 struct_type_prefix :
-	"STRUCT" template_type_open struct_field
+	KW_STRUCT template_type_open struct_field
 	| struct_type_prefix ',' struct_field
 	;
 
 struct_type :
-	"STRUCT" template_type_open template_type_close
+	KW_STRUCT template_type_open template_type_close
 	| struct_type_prefix template_type_close
 	;
 
 range_type :
-	"RANGE" template_type_open type template_type_close
+	KW_RANGE template_type_open type template_type_close
 	;
 
 function_type_prefix :
-	"FUNCTION" template_type_open '(' /*14L*/ type
+	KW_FUNCTION template_type_open '(' /*14L*/ type
 	| function_type_prefix ',' type
 	;
 
 function_type :
-	"FUNCTION" template_type_open '(' /*14L*/ ')' "->" type template_type_close
-	| "FUNCTION" template_type_open type "->" type template_type_close
-	| function_type_prefix ')' "->" type template_type_close
+	KW_FUNCTION template_type_open '(' /*14L*/ ')' KW_LAMBDA_ARROW type template_type_close
+	| KW_FUNCTION template_type_open type KW_LAMBDA_ARROW type template_type_close
+	| function_type_prefix ')' KW_LAMBDA_ARROW type template_type_close
 	;
 
 map_type :
-	"MAP" template_type_open type ',' type template_type_close
+	KW_MAP template_type_open type ',' type template_type_close
 	;
 
 raw_type :
@@ -2604,7 +3229,7 @@ type_parameter :
 	| string_literal
 	| bytes_literal
 	| floating_point_literal
-	| "MAX"
+	| KW_MAX
 	;
 
 type_parameters_prefix :
@@ -2623,15 +3248,15 @@ type :
 	;
 
 templated_parameter_kind :
-	"PROTO"
-	| "ENUM"
-	| "STRUCT"
-	| "ARRAY"
+	KW_PROTO
+	| KW_ENUM
+	| KW_STRUCT
+	| KW_ARRAY
 	| identifier
 	;
 
 templated_parameter_type :
-	"ANY" templated_parameter_kind
+	KW_ANY templated_parameter_kind
 	;
 
 type_or_tvf_schema :
@@ -2641,13 +3266,13 @@ type_or_tvf_schema :
 	;
 
 new_constructor_prefix_no_arg :
-	"NEW" type_name '(' /*14L*/
+	KW_NEW type_name '(' /*14L*/
 	;
 
 new_constructor_arg :
 	expression
-	| expression "AS" identifier
-	| expression "AS" '(' /*14L*/ path_expression ')'
+	| expression KW_AS identifier
+	| expression KW_AS '(' /*14L*/ path_expression ')'
 	;
 
 new_constructor_prefix :
@@ -2665,12 +3290,28 @@ braced_constructor_field_value :
 	| braced_constructor
 	;
 
+braced_constructor_extension_expression_start :
+	'(' /*14L*/ path_expression ')'
+	;
+
+braced_constructor_extension_expression :
+	braced_constructor_extension_expression_start
+	;
+
+braced_constructor_extension_lhs :
+	braced_constructor_extension_expression
+	;
+
 braced_constructor_extension :
-	'(' /*14L*/ path_expression ')' braced_constructor_field_value
+	braced_constructor_extension_lhs braced_constructor_field_value
+	;
+
+braced_constructor_lhs :
+	generalized_path_expression
 	;
 
 braced_constructor_field :
-	identifier braced_constructor_field_value
+	braced_constructor_lhs braced_constructor_field_value
 	;
 
 braced_constructor_start :
@@ -2692,22 +3333,22 @@ braced_constructor :
 	;
 
 braced_new_constructor :
-	"NEW" type_name braced_constructor
+	KW_NEW type_name braced_constructor
 	;
 
 struct_braced_constructor :
 	struct_type braced_constructor
-	| "STRUCT" braced_constructor
+	| KW_STRUCT braced_constructor
 	;
 
 case_no_value_expression_prefix :
-	"CASE" "WHEN" expression "THEN" expression
-	| case_no_value_expression_prefix "WHEN" expression "THEN" expression
+	KW_CASE KW_WHEN expression KW_THEN expression
+	| case_no_value_expression_prefix KW_WHEN expression KW_THEN expression
 	;
 
 case_value_expression_prefix :
-	"CASE" expression "WHEN" expression "THEN" expression
-	| case_value_expression_prefix "WHEN" expression "THEN" expression
+	KW_CASE expression KW_WHEN expression KW_THEN expression
+	| case_value_expression_prefix KW_WHEN expression KW_THEN expression
 	;
 
 case_expression_prefix :
@@ -2716,43 +3357,43 @@ case_expression_prefix :
 	;
 
 case_expression :
-	case_expression_prefix "END"
-	| case_expression_prefix "ELSE" expression "END"
+	case_expression_prefix KW_END
+	| case_expression_prefix KW_ELSE expression KW_END
 	;
 
 opt_at_time_zone :
-	"AT" "TIME" "ZONE" expression
+	KW_AT KW_TIME KW_ZONE expression
 	| /*empty*/
 	;
 
 opt_format :
-	"FORMAT" expression opt_at_time_zone
+	KW_FORMAT expression opt_at_time_zone
 	| /*empty*/
 	;
 
 cast_expression :
-	"CAST" '(' /*14L*/ expression "AS" type opt_format ')'
-	| "CAST" '(' /*14L*/ "SELECT"
-	| "SAFE_CAST" '(' /*14L*/ expression "AS" type opt_format ')'
-	| "SAFE_CAST" '(' /*14L*/ "SELECT"
+	KW_CAST '(' /*14L*/ expression KW_AS type opt_format ')'
+	| KW_CAST '(' /*14L*/ KW_SELECT
+	| KW_SAFE_CAST '(' /*14L*/ expression KW_AS type opt_format ')'
+	| KW_SAFE_CAST '(' /*14L*/ KW_SELECT
 	;
 
 extract_expression_base :
-	"EXTRACT" '(' /*14L*/ expression "FROM" expression
+	KW_EXTRACT '(' /*14L*/ expression KW_FROM expression
 	;
 
 extract_expression :
 	extract_expression_base ')'
-	| extract_expression_base "AT" "TIME" "ZONE" expression ')'
+	| extract_expression_base KW_AT KW_TIME KW_ZONE expression ')'
 	;
 
 replace_fields_arg :
-	expression "AS" generalized_path_expression
-	| expression "AS" generalized_extension_path
+	expression KW_AS generalized_path_expression
+	| expression KW_AS generalized_extension_path
 	;
 
 replace_fields_prefix :
-	"REPLACE_FIELDS" '(' /*14L*/ expression ',' replace_fields_arg
+	KW_REPLACE_FIELDS '(' /*14L*/ expression ',' replace_fields_arg
 	| replace_fields_prefix ',' replace_fields_arg
 	;
 
@@ -2761,16 +3402,16 @@ replace_fields_expression :
 	;
 
 function_name_from_keyword :
-	"IF"
-	| "GROUPING"
+	KW_IF
+	| KW_GROUPING
 	| KW_LEFT
-	| "RIGHT"
-	| "COLLATE"
-	| "RANGE"
+	| KW_RIGHT
+	| KW_COLLATE
+	| KW_RANGE
 	;
 
 function_call_expression_base :
-	expression_higher_prec_than_and '(' /*14L*/ "DISTINCT" /*4N*/ %prec PRIMARY_PRECEDENCE /*14L*/
+	expression_higher_prec_than_and '(' /*14L*/ KW_DISTINCT /*4N*/ %prec PRIMARY_PRECEDENCE /*14L*/
 	| expression_higher_prec_than_and '(' /*14L*/ %prec PRIMARY_PRECEDENCE /*14L*/
 	| function_name_from_keyword '(' /*14L*/ %prec PRIMARY_PRECEDENCE /*14L*/
 	;
@@ -2780,11 +3421,11 @@ function_call_argument :
 	| named_argument
 	| lambda_argument
 	| sequence_arg
-	| "SELECT"
+	| KW_SELECT
 	;
 
 sequence_arg :
-	"SEQUENCE" path_expression
+	KW_SEQUENCE path_expression
 	;
 
 named_argument :
@@ -2793,7 +3434,7 @@ named_argument :
 	;
 
 lambda_argument :
-	lambda_argument_list "->" expression
+	lambda_argument_list KW_LAMBDA_ARROW expression
 	;
 
 lambda_argument_list :
@@ -2818,7 +3459,7 @@ opt_identifier :
 	;
 
 partition_by_clause_prefix :
-	"PARTITION" opt_hint "BY" expression
+	KW_PARTITION opt_hint KW_BY expression
 	| partition_by_clause_prefix ',' expression
 	;
 
@@ -2828,7 +3469,7 @@ opt_partition_by_clause :
 	;
 
 partition_by_clause_prefix_no_hint :
-	"PARTITION" "BY" expression
+	KW_PARTITION KW_BY expression
 	| partition_by_clause_prefix_no_hint ',' expression
 	;
 
@@ -2838,7 +3479,7 @@ opt_partition_by_clause_no_hint :
 	;
 
 cluster_by_clause_prefix_no_hint :
-	"CLUSTER" "BY" expression
+	KW_CLUSTER KW_BY expression
 	| cluster_by_clause_prefix_no_hint ',' expression
 	;
 
@@ -2848,28 +3489,28 @@ opt_cluster_by_clause_no_hint :
 	;
 
 opt_ttl_clause :
-	"ROW" "DELETION" "POLICY" '(' /*14L*/ expression ')'
+	KW_ROW KW_DELETION KW_POLICY '(' /*14L*/ expression ')'
 	| /*empty*/
 	;
 
 preceding_or_following :
-	"PRECEDING"
-	| "FOLLOWING"
+	KW_PRECEDING
+	| KW_FOLLOWING
 	;
 
 window_frame_bound :
-	"UNBOUNDED" preceding_or_following
-	| "CURRENT" "ROW"
+	KW_UNBOUNDED preceding_or_following
+	| KW_CURRENT KW_ROW
 	| expression preceding_or_following
 	;
 
 frame_unit :
-	"ROWS"
-	| "RANGE"
+	KW_ROWS
+	| KW_RANGE
 	;
 
 opt_window_frame_clause :
-	frame_unit "BETWEEN" /*4N*/ window_frame_bound "AND" /*2L*/ window_frame_bound %prec "BETWEEN" /*4N*/
+	frame_unit KW_BETWEEN /*4N*/ window_frame_bound KW_AND /*2L*/ window_frame_bound %prec KW_BETWEEN /*4N*/
 	| frame_unit window_frame_bound
 	| /*empty*/
 	;
@@ -2884,18 +3525,18 @@ function_call_expression_with_clauses :
 	;
 
 opt_with_group_rows :
-	KW_WITH_STARTING_WITH_GROUP_ROWS "GROUP" "ROWS" parenthesized_query
+	KW_WITH_STARTING_WITH_GROUP_ROWS KW_GROUP KW_ROWS parenthesized_query
 	| /*empty*/
 	;
 
 opt_over_clause :
-	"OVER" window_specification
+	KW_OVER window_specification
 	| /*empty*/
 	;
 
 struct_constructor_prefix_with_keyword_no_arg :
 	struct_type '(' /*14L*/
-	| "STRUCT" '(' /*14L*/
+	| KW_STRUCT '(' /*14L*/
 	;
 
 struct_constructor_prefix_with_keyword :
@@ -2919,17 +3560,17 @@ struct_constructor :
 	;
 
 expression_subquery_with_keyword :
-	"ARRAY" parenthesized_query
-	| "EXISTS" opt_hint parenthesized_query
+	KW_ARRAY parenthesized_query
+	| KW_EXISTS opt_hint parenthesized_query
 	;
 
 null_literal :
-	"NULL"
+	KW_NULL
 	;
 
 boolean_literal :
-	"TRUE"
-	| "FALSE"
+	KW_TRUE
+	| KW_FALSE
 	;
 
 string_literal_component :
@@ -2957,8 +3598,8 @@ integer_literal :
 	;
 
 numeric_literal_prefix :
-	"NUMERIC"
-	| "DECIMAL"
+	KW_NUMERIC
+	| KW_DECIMAL
 	;
 
 numeric_literal :
@@ -2966,8 +3607,8 @@ numeric_literal :
 	;
 
 bignumeric_literal_prefix :
-	"BIGNUMERIC"
-	| "BIGDECIMAL"
+	KW_BIGNUMERIC
+	| KW_BIGDECIMAL
 	;
 
 bignumeric_literal :
@@ -2975,7 +3616,7 @@ bignumeric_literal :
 	;
 
 json_literal :
-	"JSON" string_literal
+	KW_JSON string_literal
 	;
 
 floating_point_literal :
@@ -3000,222 +3641,226 @@ system_variable_expression :
 	;
 
 common_keyword_as_identifier :
-	"ABORT"
-	| "ACCESS"
-	| "ACTION"
-	| "AGGREGATE"
-	| "ADD"
-	| "ALTER"
-	| "ALWAYS"
-	| "ANALYZE"
-	| "APPROX"
-	| "ARE"
-	| "ASSERT"
-	| "BATCH"
-	| "BEGIN"
-	| "BIGDECIMAL"
-	| "BIGNUMERIC"
-	| "BREAK"
-	| "CALL"
-	| "CASCADE"
-	| "CHECK"
-	| "CLAMPED"
-	| "CLONE"
-	| "COPY"
-	| "CLUSTER"
-	| "COLUMN"
-	| "COLUMNS"
-	| "COMMIT"
-	| "CONNECTION"
-	| "CONSTANT"
-	| "CONSTRAINT"
-	| "CONTINUE"
-	| "CORRESPONDING"
-	| "CYCLE"
-	| "DATA"
-	| "DATABASE"
-	| "DATE"
-	| "DATETIME"
-	| "DECIMAL"
-	| "DECLARE"
-	| "DEFINER"
-	| "DELETE"
-	| "DELETION"
-	| "DEPTH"
-	| "DESCRIBE"
-	| "DETERMINISTIC"
-	| "DO"
-	| "DROP"
-	| "ELSEIF"
-	| "ENFORCED"
-	| "ERROR"
-	| "EXCEPTION"
-	| "EXECUTE"
-	| "EXPLAIN"
-	| "EXPORT"
-	| "EXTEND"
-	| "EXTERNAL"
-	| "FILES"
-	| "FILTER"
-	| "FILL"
-	| "FIRST"
-	| "FOREIGN"
-	| "FORMAT"
-	| "FUNCTION"
-	| "GENERATED"
-	| "GRANT"
-	| "GROUP_ROWS"
-	| "HIDDEN"
-	| "IDENTITY"
-	| "IMMEDIATE"
-	| "IMMUTABLE"
-	| "IMPORT"
-	| "INCLUDE"
-	| "INCREMENT"
-	| "INDEX"
-	| "INOUT"
-	| "INPUT"
-	| "INSERT"
-	| "INVOKER"
-	| "ISOLATION"
-	| "ITERATE"
-	| "JSON"
-	| "KEY"
-	| "LANGUAGE"
-	| "LAST"
-	| "LEAVE"
-	| "LEVEL"
-	| "LOAD"
-	| "LOOP"
-	| "MACRO"
-	| "MAP"
-	| "MATCH"
-	| "MATCHED"
-	| "MATERIALIZED"
-	| "MAX"
-	| "MAXVALUE"
-	| "MESSAGE"
-	| "METADATA"
-	| "MIN"
-	| "MINVALUE"
-	| "MODEL"
-	| "MODULE"
-	| "NUMERIC"
-	| "OFFSET"
-	| "ONLY"
-	| "OPTIONS"
-	| "OUT"
-	| "OUTPUT"
-	| "OVERWRITE"
-	| "PARTITIONS"
-	| "PERCENT"
-	| "PIVOT"
-	| "POLICIES"
-	| "POLICY"
-	| "PRIMARY"
-	| "PRIVATE"
-	| "PRIVILEGE"
-	| "PRIVILEGES"
-	| "PROCEDURE"
-	| "PROJECT"
-	| "PUBLIC"
+	KW_ABORT
+	| KW_ACCESS
+	| KW_ACTION
+	| KW_AGGREGATE
+	| KW_ADD
+	| KW_ALTER
+	| KW_ALWAYS
+	| KW_ANALYZE
+	| KW_APPROX
+	| KW_ARE
+	| KW_ASSERT
+	| KW_BATCH
+	| KW_BEGIN
+	| KW_BIGDECIMAL
+	| KW_BIGNUMERIC
+	| KW_BREAK
+	| KW_CALL
+	| KW_CASCADE
+	| KW_CHECK
+	| KW_CLAMPED
+	| KW_CLONE
+	| KW_COPY
+	| KW_CLUSTER
+	| KW_COLUMN
+	| KW_COLUMNS
+	| KW_COMMIT
+	| KW_CONNECTION
+	| KW_CONSTANT
+	| KW_CONSTRAINT
+	| KW_CONTINUE
+	| KW_CORRESPONDING
+	| KW_CYCLE
+	| KW_DATA
+	| KW_DATABASE
+	| KW_DATE
+	| KW_DATETIME
+	| KW_DECIMAL
+	| KW_DECLARE
+	| KW_DEFINER
+	| KW_DELETE
+	| KW_DELETION
+	| KW_DEPTH
+	| KW_DESCRIBE
+	| KW_DETERMINISTIC
+	| KW_DO
+	| KW_DROP
+	| KW_ELSEIF
+	| KW_ENFORCED
+	| KW_ERROR
+	| KW_EXCEPTION
+	| KW_EXECUTE
+	| KW_EXPLAIN
+	| KW_EXPORT
+	| KW_EXTEND
+	| KW_EXTERNAL
+	| KW_FILES
+	| KW_FILTER
+	| KW_FILL
+	| KW_FIRST
+	| KW_FOREIGN
+	| KW_FORMAT
+	| KW_FUNCTION
+	| KW_GENERATED
+	| KW_GRANT
+	| KW_GROUP_ROWS
+	| KW_HIDDEN
+	| KW_IDENTITY
+	| KW_IMMEDIATE
+	| KW_IMMUTABLE
+	| KW_IMPORT
+	| KW_INCLUDE
+	| KW_INCREMENT
+	| KW_INDEX
+	| KW_INOUT
+	| KW_INPUT
+	| KW_INSERT
+	| KW_INVOKER
+	| KW_ISOLATION
+	| KW_ITERATE
+	| KW_JSON
+	| KW_KEY
+	| KW_LANGUAGE
+	| KW_LAST
+	| KW_LEAVE
+	| KW_LEVEL
+	| KW_LOAD
+	| KW_LOOP
+	| KW_MACRO
+	| KW_MAP
+	| KW_MATCH
+	| KW_MATCH_RECOGNIZE_NONRESERVED
+	| KW_MATCHED
+	| KW_MATERIALIZED
+	| KW_MAX
+	| KW_MAXVALUE
+	| KW_MEASURES
+	| KW_MESSAGE
+	| KW_METADATA
+	| KW_MIN
+	| KW_MINVALUE
+	| KW_MODEL
+	| KW_MODULE
+	| KW_NUMERIC
+	| KW_OFFSET
+	| KW_ONLY
+	| KW_OPTIONS
+	| KW_OUT
+	| KW_OUTPUT
+	| KW_OVERWRITE
+	| KW_PARTITIONS
+	| KW_PATTERN
+	| KW_PERCENT
+	| KW_PIVOT
+	| KW_POLICIES
+	| KW_POLICY
+	| KW_PRIMARY
+	| KW_PRIVATE
+	| KW_PRIVILEGE
+	| KW_PRIVILEGES
+	| KW_PROCEDURE
+	| KW_PROJECT
+	| KW_PUBLIC
 	| KW_QUALIFY_NONRESERVED
-	| "RAISE"
-	| "READ"
-	| "REFERENCES"
-	| "REMOTE"
-	| "REMOVE"
-	| "RENAME"
-	| "REPEAT"
-	| "REPEATABLE"
-	| "REPLACE"
-	| "REPLACE_FIELDS"
-	| "REPLICA"
-	| "REPORT"
-	| "RESTRICT"
-	| "RESTRICTION"
-	| "RETURNS"
-	| "RETURN"
-	| "REVOKE"
-	| "ROLLBACK"
-	| "ROW"
-	| "RUN"
-	| "SAFE_CAST"
-	| "SCHEMA"
-	| "SEARCH"
-	| "SECURITY"
-	| "SEQUENCE"
-	| "SETS"
-	| "SHOW"
-	| "SNAPSHOT"
-	| "SOURCE"
-	| "SQL"
-	| "STABLE"
-	| "START"
-	| "STORED"
-	| "STORING"
-	| "STRICT"
-	| "SYSTEM"
-	| "SYSTEM_TIME"
-	| "TABLE"
-	| "TABLES"
-	| "TARGET"
-	| "TEMP"
-	| "TEMPORARY"
-	| "TIME"
-	| "TIMESTAMP"
-	| "TRANSACTION"
-	| "TRANSFORM"
-	| "TRUNCATE"
-	| "TYPE"
-	| "UNDROP"
-	| "UNIQUE"
-	| "UNKNOWN"
-	| "UNPIVOT"
-	| "UNTIL"
-	| "UPDATE"
-	| "VALUE"
-	| "VALUES"
-	| "VECTOR"
-	| "VIEW"
-	| "VIEWS"
-	| "VOLATILE"
-	| "WEIGHT"
-	| "WHILE"
-	| "WRITE"
-	| "ZONE"
-	| "DESCRIPTOR"
-	| "INTERLEAVE"
-	| "NULL_FILTERED"
-	| "PARENT"
+	| KW_RAISE
+	| KW_READ
+	| KW_REFERENCES
+	| KW_REMOTE
+	| KW_REMOVE
+	| KW_RENAME
+	| KW_REPEAT
+	| KW_REPEATABLE
+	| KW_REPLACE
+	| KW_REPLACE_FIELDS
+	| KW_REPLICA
+	| KW_REPORT
+	| KW_RESTRICT
+	| KW_RESTRICTION
+	| KW_RETURNS
+	| KW_RETURN
+	| KW_REVOKE
+	| KW_ROLLBACK
+	| KW_ROW
+	| KW_RUN
+	| KW_SAFE_CAST
+	| KW_SCHEMA
+	| KW_SEARCH
+	| KW_SECURITY
+	| KW_SEQUENCE
+	| KW_SETS
+	| KW_SHOW
+	| KW_SNAPSHOT
+	| KW_SOURCE
+	| KW_SQL
+	| KW_STABLE
+	| KW_START
+	| KW_STATIC_DESCRIBE
+	| KW_STORED
+	| KW_STORING
+	| KW_STRICT
+	| KW_SYSTEM
+	| KW_SYSTEM_TIME
+	| KW_TABLE
+	| KW_TABLES
+	| KW_TARGET
+	| KW_TEMP
+	| KW_TEMPORARY
+	| KW_TIME
+	| KW_TIMESTAMP
+	| KW_TRANSACTION
+	| KW_TRANSFORM
+	| KW_TRUNCATE
+	| KW_TYPE
+	| KW_UNDROP
+	| KW_UNIQUE
+	| KW_UNKNOWN
+	| KW_UNPIVOT
+	| KW_UNTIL
+	| KW_UPDATE
+	| KW_VALUE
+	| KW_VALUES
+	| KW_VECTOR
+	| KW_VIEW
+	| KW_VIEWS
+	| KW_VOLATILE
+	| KW_WEIGHT
+	| KW_WHILE
+	| KW_WRITE
+	| KW_ZONE
+	| KW_DESCRIPTOR
+	| KW_INTERLEAVE
+	| KW_NULL_FILTERED
+	| KW_PARENT
 	;
 
 keyword_as_identifier :
 	common_keyword_as_identifier
-	| "SIMPLE"
+	| KW_SIMPLE
 	;
 
 opt_or_replace :
-	"OR" /*1L*/ "REPLACE"
+	KW_OR /*1L*/ KW_REPLACE
 	| /*empty*/
 	;
 
 opt_create_scope :
-	"TEMP"
-	| "TEMPORARY"
-	| "PUBLIC"
-	| "PRIVATE"
+	KW_TEMP
+	| KW_TEMPORARY
+	| KW_PUBLIC
+	| KW_PRIVATE
 	| /*empty*/
 	;
 
 opt_unique :
-	"UNIQUE"
+	KW_UNIQUE
 	| /*empty*/
 	;
 
 describe_keyword :
-	"DESCRIBE"
-	| "DESC"
+	KW_DESCRIBE
+	| KW_DESC
 	;
 
 opt_hint :
@@ -3229,12 +3874,12 @@ options_entry :
 
 options_assignment_operator :
 	'=' /*4N*/
-	| "+=" /*4N*/
-	| "-=" /*4N*/
+	| KW_ADD_ASSIGN /*4N*/
+	| KW_SUB_ASSIGN /*4N*/
 	;
 
 expression_or_proto :
-	"PROTO"
+	KW_PROTO
 	| expression
 	;
 
@@ -3249,7 +3894,7 @@ options_list :
 	;
 
 options :
-	"OPTIONS" options_list
+	KW_OPTIONS options_list
 	;
 
 opt_options_list :
@@ -3258,7 +3903,7 @@ opt_options_list :
 	;
 
 define_table_statement :
-	"DEFINE" "TABLE" path_expression options_list
+	KW_DEFINE KW_TABLE path_expression options_list
 	;
 
 dml_statement :
@@ -3268,39 +3913,39 @@ dml_statement :
 	;
 
 opt_from_keyword :
-	"FROM"
+	KW_FROM
 	| /*empty*/
 	;
 
 opt_where_expression :
-	"WHERE" expression
+	KW_WHERE expression
 	| /*empty*/
 	;
 
 opt_assert_rows_modified :
-	"ASSERT_ROWS_MODIFIED" possibly_cast_int_literal_or_parameter
+	KW_ASSERT_ROWS_MODIFIED possibly_cast_int_literal_or_parameter
 	| /*empty*/
 	;
 
 opt_returning_clause :
-	"THEN" "RETURN" select_list
-	| "THEN" "RETURN" "WITH" "ACTION" select_list
-	| "THEN" "RETURN" "WITH" "ACTION" "AS" identifier select_list
+	KW_THEN KW_RETURN select_list
+	| KW_THEN KW_RETURN KW_WITH KW_ACTION select_list
+	| KW_THEN KW_RETURN KW_WITH KW_ACTION KW_AS identifier select_list
 	| /*empty*/
 	;
 
 opt_or_ignore_replace_update :
-	"OR" /*1L*/ "IGNORE"
-	| "IGNORE"
-	| "OR" /*1L*/ "REPLACE"
+	KW_OR /*1L*/ KW_IGNORE
+	| KW_IGNORE
+	| KW_OR /*1L*/ KW_REPLACE
 	| KW_REPLACE_AFTER_INSERT
-	| "OR" /*1L*/ "UPDATE"
+	| KW_OR /*1L*/ KW_UPDATE
 	| KW_UPDATE_AFTER_INSERT
 	| /*empty*/
 	;
 
 insert_statement_prefix :
-	"INSERT" opt_or_ignore_replace_update opt_into maybe_dashed_generalized_path_expression opt_hint
+	KW_INSERT opt_or_ignore_replace_update opt_into maybe_dashed_generalized_path_expression opt_hint
 	;
 
 insert_statement :
@@ -3318,16 +3963,16 @@ clone_data_source :
 
 clone_data_source_list :
 	clone_data_source
-	| clone_data_source_list "UNION" "ALL" clone_data_source
+	| clone_data_source_list KW_UNION KW_ALL clone_data_source
 	;
 
 clone_data_statement :
-	"CLONE" "DATA" "INTO" maybe_dashed_path_expression "FROM" clone_data_source_list
+	KW_CLONE KW_DATA KW_INTO maybe_dashed_path_expression KW_FROM clone_data_source_list
 	;
 
 expression_or_default :
 	expression
-	| "DEFAULT"
+	| KW_DEFAULT
 	;
 
 insert_values_row_prefix :
@@ -3345,25 +3990,25 @@ insert_values_or_query :
 	;
 
 insert_values_list :
-	"VALUES" insert_values_row
+	KW_VALUES insert_values_row
 	| insert_values_list ',' insert_values_row
 	;
 
 delete_statement :
-	"DELETE" opt_from_keyword maybe_dashed_generalized_path_expression opt_hint opt_as_alias opt_with_offset_and_alias opt_where_expression opt_assert_rows_modified opt_returning_clause
+	KW_DELETE opt_from_keyword maybe_dashed_generalized_path_expression opt_hint opt_as_alias opt_with_offset_and_alias opt_where_expression opt_assert_rows_modified opt_returning_clause
 	;
 
 opt_with_offset_and_alias :
-	"WITH" "OFFSET" opt_as_alias
+	KW_WITH KW_OFFSET opt_as_alias
 	| /*empty*/
 	;
 
 update_statement :
-	"UPDATE" maybe_dashed_generalized_path_expression opt_hint opt_as_alias opt_with_offset_and_alias "SET" update_item_list opt_from_clause opt_where_expression opt_assert_rows_modified opt_returning_clause
+	KW_UPDATE maybe_dashed_generalized_path_expression opt_hint opt_as_alias opt_with_offset_and_alias KW_SET update_item_list opt_from_clause opt_where_expression opt_assert_rows_modified opt_returning_clause
 	;
 
 truncate_statement :
-	"TRUNCATE" "TABLE" maybe_dashed_path_expression opt_where_expression
+	KW_TRUNCATE KW_TABLE maybe_dashed_path_expression opt_where_expression
 	;
 
 nested_dml_statement :
@@ -3403,35 +4048,35 @@ update_item_list :
 	;
 
 opt_into :
-	"INTO"
+	KW_INTO
 	| /*empty*/
 	;
 
 opt_by_target :
-	"BY" "TARGET"
+	KW_BY KW_TARGET
 	| /*empty*/
 	;
 
 opt_and_expression :
-	"AND" /*2L*/ expression
+	KW_AND /*2L*/ expression
 	| /*empty*/
 	;
 
 merge_insert_value_list_or_source_row :
-	"VALUES" insert_values_row
-	| "ROW"
+	KW_VALUES insert_values_row
+	| KW_ROW
 	;
 
 merge_action :
-	"INSERT" opt_column_list merge_insert_value_list_or_source_row
-	| "UPDATE" "SET" update_item_list
-	| "DELETE"
+	KW_INSERT opt_column_list merge_insert_value_list_or_source_row
+	| KW_UPDATE KW_SET update_item_list
+	| KW_DELETE
 	;
 
 merge_when_clause :
-	"WHEN" "MATCHED" opt_and_expression "THEN" merge_action
-	| "WHEN" "NOT" "MATCHED" opt_by_target opt_and_expression "THEN" merge_action
-	| "WHEN" "NOT" "MATCHED" "BY" "SOURCE" opt_and_expression "THEN" merge_action
+	KW_WHEN KW_MATCHED opt_and_expression KW_THEN merge_action
+	| KW_WHEN KW_NOT KW_MATCHED opt_by_target opt_and_expression KW_THEN merge_action
+	| KW_WHEN KW_NOT KW_MATCHED KW_BY KW_SOURCE opt_and_expression KW_THEN merge_action
 	;
 
 merge_when_clause_list :
@@ -3445,7 +4090,7 @@ merge_source :
 	;
 
 merge_statement_prefix :
-	"MERGE" opt_into maybe_dashed_path_expression opt_as_alias "USING" merge_source "ON" expression
+	KW_MERGE opt_into maybe_dashed_path_expression opt_as_alias KW_USING merge_source KW_ON expression
 	;
 
 merge_statement :
@@ -3453,13 +4098,13 @@ merge_statement :
 	;
 
 call_statement_with_args_prefix :
-	"CALL" path_expression '(' /*14L*/ tvf_argument
+	KW_CALL path_expression '(' /*14L*/ tvf_argument
 	| call_statement_with_args_prefix ',' tvf_argument
 	;
 
 call_statement :
 	call_statement_with_args_prefix ')'
-	| "CALL" path_expression '(' /*14L*/ ')'
+	| KW_CALL path_expression '(' /*14L*/ ')'
 	;
 
 opt_function_parameters :
@@ -3468,47 +4113,47 @@ opt_function_parameters :
 	;
 
 opt_if_exists :
-	"IF" "EXISTS"
+	KW_IF KW_EXISTS
 	| /*empty*/
 	;
 
 opt_access :
-	"ACCESS"
+	KW_ACCESS
 	| /*empty*/
 	;
 
 drop_all_row_access_policies_statement :
-	"DROP" "ALL" "ROW" opt_access "POLICIES" "ON" path_expression
+	KW_DROP KW_ALL KW_ROW opt_access KW_POLICIES KW_ON path_expression
 	;
 
 on_path_expression :
-	"ON" path_expression
+	KW_ON path_expression
 	;
 
 opt_on_path_expression :
-	"ON" path_expression
+	KW_ON path_expression
 	| /*empty*/
 	;
 
 opt_drop_mode :
-	"RESTRICT"
-	| "CASCADE"
+	KW_RESTRICT
+	| KW_CASCADE
 	| /*empty*/
 	;
 
 drop_statement :
-	"DROP" "PRIVILEGE" "RESTRICTION" opt_if_exists "ON" privilege_list "ON" identifier path_expression
-	| "DROP" "ROW" "ACCESS" "POLICY" opt_if_exists identifier on_path_expression
-	| "DROP" index_type "INDEX" opt_if_exists path_expression opt_on_path_expression
-	| "DROP" table_or_table_function opt_if_exists maybe_dashed_path_expression opt_function_parameters
-	| "DROP" "SNAPSHOT" "TABLE" opt_if_exists maybe_dashed_path_expression
-	| "DROP" generic_entity_type opt_if_exists path_expression
-	| "DROP" schema_object_kind opt_if_exists path_expression opt_function_parameters opt_drop_mode
+	KW_DROP KW_PRIVILEGE KW_RESTRICTION opt_if_exists KW_ON privilege_list KW_ON identifier path_expression
+	| KW_DROP KW_ROW KW_ACCESS KW_POLICY opt_if_exists identifier on_path_expression
+	| KW_DROP index_type KW_INDEX opt_if_exists path_expression opt_on_path_expression
+	| KW_DROP table_or_table_function opt_if_exists maybe_dashed_path_expression opt_function_parameters
+	| KW_DROP KW_SNAPSHOT KW_TABLE opt_if_exists maybe_dashed_path_expression
+	| KW_DROP generic_entity_type opt_if_exists path_expression
+	| KW_DROP schema_object_kind opt_if_exists path_expression opt_function_parameters opt_drop_mode
 	;
 
 index_type :
-	"SEARCH"
-	| "VECTOR"
+	KW_SEARCH
+	| KW_VECTOR
 	;
 
 opt_index_type :
@@ -3527,12 +4172,12 @@ unterminated_non_empty_top_level_statement_list :
 	;
 
 opt_execute_into_clause :
-	"INTO" identifier_list
+	KW_INTO identifier_list
 	| /*empty*/
 	;
 
 execute_using_argument :
-	expression "AS" identifier
+	expression KW_AS identifier
 	| expression
 	;
 
@@ -3542,12 +4187,12 @@ execute_using_argument_list :
 	;
 
 opt_execute_using_clause :
-	"USING" execute_using_argument_list
+	KW_USING execute_using_argument_list
 	| /*empty*/
 	;
 
 execute_immediate :
-	"EXECUTE" "IMMEDIATE" expression opt_execute_into_clause opt_execute_using_clause
+	KW_EXECUTE KW_IMMEDIATE expression opt_execute_into_clause opt_execute_using_clause
 	;
 
 script :
@@ -3562,13 +4207,13 @@ statement_list :
 	;
 
 opt_else :
-	"ELSE" statement_list
+	KW_ELSE statement_list
 	| /*empty*/
 	;
 
 elseif_clauses :
-	"ELSEIF" expression "THEN" statement_list
-	| elseif_clauses "ELSEIF" expression "THEN" statement_list
+	KW_ELSEIF expression KW_THEN statement_list
+	| elseif_clauses KW_ELSEIF expression KW_THEN statement_list
 	;
 
 opt_elseif_clauses :
@@ -3577,17 +4222,16 @@ opt_elseif_clauses :
 	;
 
 if_statement_unclosed :
-	"IF" expression "THEN" statement_list opt_elseif_clauses opt_else
+	KW_IF expression KW_THEN statement_list opt_elseif_clauses opt_else
 	;
 
 if_statement :
-	if_statement_unclosed "END" "IF"
-	//| if_statement_unclosed error
+	if_statement_unclosed KW_END KW_IF
 	;
 
 when_then_clauses :
-	"WHEN" expression "THEN" statement_list
-	| when_then_clauses "WHEN" expression "THEN" statement_list
+	KW_WHEN expression KW_THEN statement_list
+	| when_then_clauses KW_WHEN expression KW_THEN statement_list
 	;
 
 opt_expression :
@@ -3596,20 +4240,20 @@ opt_expression :
 	;
 
 case_statement :
-	"CASE" opt_expression when_then_clauses opt_else "END" "CASE"
+	KW_CASE opt_expression when_then_clauses opt_else KW_END KW_CASE
 	;
 
 begin_end_block :
-	"BEGIN" statement_list opt_exception_handler "END"
+	KW_BEGIN statement_list opt_exception_handler KW_END
 	;
 
 opt_exception_handler :
-	"EXCEPTION" "WHEN" "ERROR" "THEN" statement_list
+	KW_EXCEPTION KW_WHEN KW_ERROR KW_THEN statement_list
 	| /*empty*/
 	;
 
 opt_default_expression :
-	"DEFAULT" expression
+	KW_DEFAULT expression
 	| /*empty*/
 	;
 
@@ -3619,47 +4263,47 @@ identifier_list :
 	;
 
 variable_declaration :
-	"DECLARE" identifier_list type opt_default_expression
-	| "DECLARE" identifier_list "DEFAULT" expression
+	KW_DECLARE identifier_list type opt_default_expression
+	| KW_DECLARE identifier_list KW_DEFAULT expression
 	;
 
 loop_statement :
-	"LOOP" statement_list "END" "LOOP"
+	KW_LOOP statement_list KW_END KW_LOOP
 	;
 
 while_statement :
-	"WHILE" expression "DO" statement_list "END" "WHILE"
+	KW_WHILE expression KW_DO statement_list KW_END KW_WHILE
 	;
 
 until_clause :
-	"UNTIL" expression
+	KW_UNTIL expression
 	;
 
 repeat_statement :
-	"REPEAT" statement_list until_clause "END" "REPEAT"
+	KW_REPEAT statement_list until_clause KW_END KW_REPEAT
 	;
 
 for_in_statement :
-	"FOR" identifier "IN" /*4N*/ parenthesized_query "DO" statement_list "END" "FOR"
+	KW_FOR identifier KW_IN /*4N*/ parenthesized_query KW_DO statement_list KW_END KW_FOR
 	;
 
 break_statement :
-	"BREAK" opt_identifier
-	| "LEAVE" opt_identifier
+	KW_BREAK opt_identifier
+	| KW_LEAVE opt_identifier
 	;
 
 continue_statement :
-	"CONTINUE" opt_identifier
-	| "ITERATE" opt_identifier
+	KW_CONTINUE opt_identifier
+	| KW_ITERATE opt_identifier
 	;
 
 return_statement :
-	"RETURN"
+	KW_RETURN
 	;
 
 raise_statement :
-	"RAISE"
-	| "RAISE" "USING" "MESSAGE" '=' /*4N*/ expression
+	KW_RAISE
+	| KW_RAISE KW_USING KW_MESSAGE '=' /*4N*/ expression
 	;
 
 next_statement_kind :
@@ -3669,17 +4313,17 @@ next_statement_kind :
 
 next_statement_kind_parenthesized_select :
 	'(' /*14L*/ next_statement_kind_parenthesized_select
-	| "SELECT"
-	| "WITH"
-	| "FROM"
+	| KW_SELECT
+	| KW_WITH
+	| KW_FROM
 	;
 
 next_statement_kind_table :
-	"TABLE"
+	KW_TABLE
 	;
 
 next_statement_kind_create_table_opt_as_or_semicolon :
-	"AS"
+	KW_AS
 	| ';'
 	| /*empty*/
 	;
@@ -3689,115 +4333,116 @@ next_statement_kind_create_modifiers :
 	;
 
 next_statement_kind_without_hint :
-	"EXPLAIN"
+	KW_EXPLAIN
 	| next_statement_kind_parenthesized_select
-	| "DEFINE" "TABLE"
-	| KW_DEFINE_FOR_MACROS "MACRO"
-	| "EXECUTE" "IMMEDIATE"
-	| "EXPORT" "DATA"
-	| "EXPORT" "MODEL"
-	| "EXPORT" table_or_table_function "METADATA"
-	| "INSERT"
-	| "UPDATE"
-	| "DELETE"
-	| "MERGE"
-	| "CLONE" "DATA"
-	| "LOAD" "DATA"
+	| KW_DEFINE KW_TABLE
+	| KW_DEFINE_FOR_MACROS KW_MACRO
+	| KW_EXECUTE KW_IMMEDIATE
+	| KW_EXPORT KW_DATA
+	| KW_EXPORT KW_MODEL
+	| KW_EXPORT table_or_table_function KW_METADATA
+	| KW_INSERT
+	| KW_UPDATE
+	| KW_DELETE
+	| KW_MERGE
+	| KW_CLONE KW_DATA
+	| KW_LOAD KW_DATA
 	| describe_keyword
-	| "SHOW"
-	| "DROP" "PRIVILEGE"
-	| "DROP" "ALL" "ROW" opt_access "POLICIES"
-	| "DROP" "ROW" "ACCESS" "POLICY"
-	| "DROP" "SEARCH" "INDEX"
-	| "DROP" "VECTOR" "INDEX"
-	| "DROP" table_or_table_function
-	| "DROP" "SNAPSHOT" "TABLE"
-	| "DROP" generic_entity_type
-	| "DROP" schema_object_kind
-	| "GRANT"
-	| "GRAPH"
-	| "REVOKE"
-	| "RENAME"
-	| "START"
-	| "BEGIN"
-	| "SET" "TRANSACTION" identifier
-	| "SET" identifier '=' /*4N*/
-	| "SET" named_parameter_expression '=' /*4N*/
-	| "SET" system_variable_expression '=' /*4N*/
-	| "SET" '(' /*14L*/
-	| "COMMIT"
-	| "ROLLBACK"
-	| "START" "BATCH"
-	| "RUN" "BATCH"
-	| "ABORT" "BATCH"
-	| "ALTER" "APPROX" "VIEW"
-	| "ALTER" "DATABASE"
-	| "ALTER" "SCHEMA"
-	| "ALTER" "EXTERNAL" "SCHEMA"
-	| "ALTER" "TABLE"
-	| "ALTER" "PRIVILEGE"
-	| "ALTER" "ROW"
-	| "ALTER" "ALL" "ROW" "ACCESS" "POLICIES"
-	| "ALTER" "VIEW"
-	| "ALTER" "MATERIALIZED" "VIEW"
-	| "ALTER" generic_entity_type
-	| "ALTER" "MODEL"
-	| "CREATE" "DATABASE"
-	| "CREATE" next_statement_kind_create_modifiers opt_aggregate "CONSTANT"
-	| "CREATE" next_statement_kind_create_modifiers opt_aggregate "FUNCTION"
-	| "CREATE" next_statement_kind_create_modifiers "PROCEDURE"
-	| "CREATE" opt_or_replace opt_unique opt_spanner_null_filtered opt_index_type "INDEX"
-	| "CREATE" opt_or_replace "SCHEMA"
-	| "CREATE" opt_or_replace generic_entity_type
-	| "CREATE" next_statement_kind_create_modifiers next_statement_kind_table opt_if_not_exists maybe_dashed_path_expression opt_table_element_list opt_like_path_expression opt_clone_table opt_copy_table opt_default_collate_clause opt_partition_by_clause_no_hint opt_cluster_by_clause_no_hint opt_with_connection_clause opt_options_list next_statement_kind_create_table_opt_as_or_semicolon
-	| "CREATE" next_statement_kind_create_modifiers "MODEL"
-	| "CREATE" next_statement_kind_create_modifiers "TABLE" "FUNCTION"
-	| "CREATE" next_statement_kind_create_modifiers "EXTERNAL" "TABLE"
-	| "CREATE" next_statement_kind_create_modifiers "EXTERNAL" "SCHEMA"
-	| "CREATE" opt_or_replace "PRIVILEGE"
-	| "CREATE" opt_or_replace "ROW" opt_access "POLICY"
-	| "CREATE" next_statement_kind_create_modifiers opt_recursive "VIEW"
-	| "CREATE" opt_or_replace "APPROX" opt_recursive "VIEW"
-	| "CREATE" opt_or_replace "MATERIALIZED" opt_recursive "VIEW"
-	| "CREATE" opt_or_replace "SNAPSHOT" "SCHEMA"
-	| "CREATE" opt_or_replace "SNAPSHOT" "TABLE"
-	| "CALL"
-	| "RETURN"
-	| "IMPORT"
-	| "MODULE"
-	| "ANALYZE"
-	| "ASSERT"
-	| "TRUNCATE"
-	| "IF"
-	| "WHILE"
-	| "LOOP"
-	| "DECLARE"
-	| "BREAK"
-	| "LEAVE"
-	| "CONTINUE"
-	| "ITERATE"
-	| "RAISE"
-	| "FOR"
-	| "REPEAT"
-	| label ':' "BEGIN"
-	| label ':' "LOOP"
-	| label ':' "WHILE"
-	| label ':' "FOR"
-	| label ':' "REPEAT"
-	| "UNDROP" schema_object_kind
+	| KW_SHOW
+	| KW_DROP KW_PRIVILEGE
+	| KW_DROP KW_ALL KW_ROW opt_access KW_POLICIES
+	| KW_DROP KW_ROW KW_ACCESS KW_POLICY
+	| KW_DROP KW_SEARCH KW_INDEX
+	| KW_DROP KW_VECTOR KW_INDEX
+	| KW_DROP table_or_table_function
+	| KW_DROP KW_SNAPSHOT KW_TABLE
+	| KW_DROP generic_entity_type
+	| KW_DROP schema_object_kind
+	| KW_GRANT
+	| KW_GRAPH
+	| KW_REVOKE
+	| KW_RENAME
+	| KW_START
+	| KW_BEGIN
+	| KW_SET KW_TRANSACTION identifier
+	| KW_SET identifier '=' /*4N*/
+	| KW_SET named_parameter_expression '=' /*4N*/
+	| KW_SET system_variable_expression '=' /*4N*/
+	| KW_SET '(' /*14L*/
+	| KW_COMMIT
+	| KW_ROLLBACK
+	| KW_START KW_BATCH
+	| KW_RUN KW_BATCH
+	| KW_ABORT KW_BATCH
+	| KW_ALTER KW_APPROX KW_VIEW
+	| KW_ALTER KW_CONNECTION
+	| KW_ALTER KW_DATABASE
+	| KW_ALTER KW_SCHEMA
+	| KW_ALTER KW_EXTERNAL KW_SCHEMA
+	| KW_ALTER KW_TABLE
+	| KW_ALTER KW_PRIVILEGE
+	| KW_ALTER KW_ROW
+	| KW_ALTER KW_ALL KW_ROW KW_ACCESS KW_POLICIES
+	| KW_ALTER KW_VIEW
+	| KW_ALTER KW_MATERIALIZED KW_VIEW
+	| KW_ALTER generic_entity_type
+	| KW_ALTER KW_MODEL
+	| KW_CREATE KW_DATABASE
+	| KW_CREATE next_statement_kind_create_modifiers KW_CONNECTION
+	| KW_CREATE next_statement_kind_create_modifiers opt_aggregate KW_CONSTANT
+	| KW_CREATE next_statement_kind_create_modifiers opt_aggregate KW_FUNCTION
+	| KW_CREATE next_statement_kind_create_modifiers KW_PROCEDURE
+	| KW_CREATE opt_or_replace opt_unique opt_spanner_null_filtered opt_index_type KW_INDEX
+	| KW_CREATE opt_or_replace KW_SCHEMA
+	| KW_CREATE opt_or_replace generic_entity_type
+	| KW_CREATE next_statement_kind_create_modifiers next_statement_kind_table opt_if_not_exists maybe_dashed_path_expression opt_table_element_list opt_like_path_expression opt_clone_table opt_copy_table opt_default_collate_clause opt_partition_by_clause_no_hint opt_cluster_by_clause_no_hint opt_with_connection_clause opt_options_list next_statement_kind_create_table_opt_as_or_semicolon
+	| KW_CREATE next_statement_kind_create_modifiers KW_MODEL
+	| KW_CREATE next_statement_kind_create_modifiers KW_TABLE KW_FUNCTION
+	| KW_CREATE next_statement_kind_create_modifiers KW_EXTERNAL KW_TABLE
+	| KW_CREATE next_statement_kind_create_modifiers KW_EXTERNAL KW_SCHEMA
+	| KW_CREATE opt_or_replace KW_PRIVILEGE
+	| KW_CREATE opt_or_replace KW_ROW opt_access KW_POLICY
+	| KW_CREATE next_statement_kind_create_modifiers opt_recursive KW_VIEW
+	| KW_CREATE opt_or_replace KW_APPROX opt_recursive KW_VIEW
+	| KW_CREATE opt_or_replace KW_MATERIALIZED opt_recursive KW_VIEW
+	| KW_CREATE opt_or_replace KW_SNAPSHOT KW_SCHEMA
+	| KW_CREATE opt_or_replace KW_SNAPSHOT KW_TABLE
+	| KW_CALL
+	| KW_RETURN
+	| KW_IMPORT
+	| KW_MODULE
+	| KW_ANALYZE
+	| KW_ASSERT
+	| KW_TRUNCATE
+	| KW_IF
+	| KW_WHILE
+	| KW_LOOP
+	| KW_DECLARE
+	| KW_BREAK
+	| KW_LEAVE
+	| KW_CONTINUE
+	| KW_ITERATE
+	| KW_RAISE
+	| KW_FOR
+	| KW_REPEAT
+	| label ':' KW_BEGIN
+	| label ':' KW_LOOP
+	| label ':' KW_WHILE
+	| label ':' KW_FOR
+	| label ':' KW_REPEAT
+	| KW_UNDROP schema_object_kind
 	;
 
 spanner_primary_key :
-	"PRIMARY" "KEY" primary_key_element_list
+	KW_PRIMARY KW_KEY primary_key_element_list
 	;
 
-opt_spanner_index_interleave_clause :
-	',' "INTERLEAVE" "IN" /*4N*/ maybe_dashed_path_expression
-	| /*empty*/
+spanner_index_interleave_clause :
+	',' KW_INTERLEAVE KW_IN /*4N*/ maybe_dashed_path_expression
 	;
 
 opt_spanner_interleave_in_parent_clause :
-	',' "INTERLEAVE" "IN" /*4N*/ "PARENT" maybe_dashed_path_expression opt_foreign_key_on_delete
+	',' KW_INTERLEAVE KW_IN /*4N*/ KW_PARENT maybe_dashed_path_expression opt_foreign_key_on_delete
 	| /*empty*/
 	;
 
@@ -3807,12 +4452,12 @@ opt_spanner_table_options :
 	;
 
 opt_spanner_null_filtered :
-	"NULL_FILTERED"
+	KW_NULL_FILTERED
 	| /*empty*/
 	;
 
 spanner_generated_or_default :
-	"AS" '(' /*14L*/ expression ')' "STORED"
+	KW_AS '(' /*14L*/ expression ')' KW_STORED
 	| default_column_info
 	;
 
@@ -3827,16 +4472,17 @@ opt_spanner_not_null_attribute :
 	;
 
 spanner_alter_column_action :
-	"ALTER" "COLUMN" opt_if_exists identifier column_schema_inner opt_spanner_not_null_attribute opt_spanner_generated_or_default opt_options_list
+	KW_ALTER KW_COLUMN opt_if_exists identifier column_schema_inner opt_spanner_not_null_attribute opt_spanner_generated_or_default opt_options_list
 	;
 
 spanner_set_on_delete_action :
-	"SET" "ON" "DELETE" foreign_key_action
+	KW_SET KW_ON KW_DELETE foreign_key_action
 	;
 
 %%
 
 %option caseless
+%x NOT_SPECIAL WITH_STARTING_WITH_GROUP_ROWS WITH_STARTING_WITH_EXPRESSION
 
 /* These are some basic regex definitions that are used in the lexer rules
    below.
@@ -4007,23 +4653,25 @@ whitespace_no_comments         {whitespace_character}+
 
 "^"	'^'
 "~"	'~'
-"<<"	"<<"
-"<="	"<="
-"<>"	"<>"
+"<<"	KW_SHIFT_LEFT
+"<="	KW_LESS_EQUALS
+"<>"	KW_NOT_EQUALS_SQL_STYLE
+"!="	KW_NOT_EQUALS_C_STYLE
 "<"	'<'
 "="	'='
-">="	">="
-">>"	">>"
+">="	KW_GREATER_EQUALS
+">>"	KW_SHIFT_RIGHT
 ">"	'>'
-"||"	"||"
+"||"	KW_CONCAT_OP
 "|"	'|'
-"-="	"-="
-"->"	"->"
+"|>"	KW_PIPE
+"-="	KW_SUB_ASSIGN
+"->"	KW_LAMBDA_ARROW
+"=>"	KW_NAMED_ARGUMENT_ASSIGNMENT
 "-"	'-'
 ","	','
 ";"	';'
 ":"	':'
-"!="	"!="
 "?"	'?'
 "/"	'/'
 "."	'.'
@@ -4034,307 +4682,324 @@ whitespace_no_comments         {whitespace_character}+
 "{"	'{'
 "}"	'}'
 "@"	'@'
+"@@"	KW_DOUBLE_AT
 "*"	'*'
 "&"	'&'
-"+="	"+="
+"+="	KW_ADD_ASSIGN
 "+"	'+'
-"ABORT"	"ABORT"
-"ACCESS"	"ACCESS"
-"ACTION"	"ACTION"
-"ADD"	"ADD"
-"AGGREGATE"	"AGGREGATE"
-"ALL"	"ALL"
-"ALTER"	"ALTER"
-"ALWAYS"	"ALWAYS"
-"ANALYZE"	"ANALYZE"
-"ANY"	"ANY"
-"APPROX"	"APPROX"
-"ARE"	"ARE"
-"ARRAY"	"ARRAY"
-"AS"	"AS"
-"ASC"	"ASC"
-"ASSERT"	"ASSERT"
-"ASSERT_ROWS_MODIFIED"	"ASSERT_ROWS_MODIFIED"
-"AT"	"AT"
-"BATCH"	"BATCH"
-"BEGIN"	"BEGIN"
-"BETWEEN"	"BETWEEN"
-"BIGDECIMAL"	"BIGDECIMAL"
-"BIGNUMERIC"	"BIGNUMERIC"
-"BREAK"	"BREAK"
-"BY"	"BY"
-"CALL"	"CALL"
-"CASCADE"	"CASCADE"
-"CASE"	"CASE"
-"CAST"	"CAST"
-"CHECK"	"CHECK"
-"CLAMPED"	"CLAMPED"
-"CLONE"	"CLONE"
-"CLUSTER"	"CLUSTER"
-"COLLATE"	"COLLATE"
-"COLUMN"	"COLUMN"
-"COLUMNS"	"COLUMNS"
-"COMMIT"	"COMMIT"
-"CONNECTION"	"CONNECTION"
-"CONSTANT"	"CONSTANT"
-"CONSTRAINT"	"CONSTRAINT"
-"CONTINUE"	"CONTINUE"
-"COPY"	"COPY"
-"CORRESPONDING"	"CORRESPONDING"
-"CREATE"	"CREATE"
-"CROSS"	"CROSS"
-"CUBE"	"CUBE"
-"CURRENT"	"CURRENT"
-"CYCLE"	"CYCLE"
-"DATABASE"	"DATABASE"
-"DATA"	"DATA"
-"DATE"	"DATE"
-"DATETIME"	"DATETIME"
-"DECIMAL"	"DECIMAL"
-"DECLARE"	"DECLARE"
-"DEFAULT"	"DEFAULT"
-"DEFINE"	"DEFINE"
+
 "DEFINE for macros"	KW_DEFINE_FOR_MACROS
-"DEFINER"	"DEFINER"
-"DELETE"	"DELETE"
-"DELETION"	"DELETION"
-"DEPTH"	"DEPTH"
-"DESC"	"DESC"
-"DESCRIBE"	"DESCRIBE"
-"DESCRIPTOR"	"DESCRIPTOR"
-"DETERMINISTIC"	"DETERMINISTIC"
-"DISTINCT"	"DISTINCT"
-"DO"	"DO"
-"DROP"	"DROP"
-"ELSE"	"ELSE"
-"ELSEIF"	"ELSEIF"
-"END"	"END"
-"ENFORCED"	"ENFORCED"
-"ENUM"	"ENUM"
-"ERROR"	"ERROR"
-"EXCEPT"	"EXCEPT"
-"EXCEPTION"	"EXCEPTION"
-"EXCLUDE"	"EXCLUDE"
-"EXECUTE"	"EXECUTE"
-"EXISTS"	"EXISTS"
-"EXPLAIN"	"EXPLAIN"
-"EXPORT"	"EXPORT"
-"EXTEND"	"EXTEND"
-"EXTERNAL"	"EXTERNAL"
-"EXTRACT"	"EXTRACT"
-"FALSE"	"FALSE"
-"FILES"	"FILES"
-"FILL"	"FILL"
-"FILTER"	"FILTER"
-"FIRST"	"FIRST"
-"FOLLOWING"	"FOLLOWING"
-"FOREIGN"	"FOREIGN"
-"FOR"	"FOR"
-"FORMAT"	"FORMAT"
-"FROM"	"FROM"
-"FUNCTION"	"FUNCTION"
-"GENERATED"	"GENERATED"
-"GRANT"	"GRANT"
-"GRAPH"	"GRAPH"
-"GROUP"	"GROUP"
-"GROUPING"	"GROUPING"
-"GROUP_ROWS"	"GROUP_ROWS"
-"HASH"	"HASH"
-"HAVING"	"HAVING"
-"HIDDEN"	"HIDDEN"
-"IDENTITY"	"IDENTITY"
-"IF"	"IF"
-"IGNORE"	"IGNORE"
-"IMMEDIATE"	"IMMEDIATE"
-"IMMUTABLE"	"IMMUTABLE"
-"IMPORT"	"IMPORT"
-"INCLUDE"	"INCLUDE"
-"INCREMENT"	"INCREMENT"
-"INDEX"	"INDEX"
-"IN"	"IN"
-"INNER"	"INNER"
-"INOUT"	"INOUT"
-"INPUT"	"INPUT"
-"INSERT"	"INSERT"
-"INTERLEAVE"	"INTERLEAVE"
-"INTERSECT"	"INTERSECT"
-"INTERVAL"	"INTERVAL"
-"INTO"	"INTO"
-"INVOKER"	"INVOKER"
-"IS"	"IS"
-"ISOLATION"	"ISOLATION"
-"ITERATE"	"ITERATE"
-"JOIN"	"JOIN"
-"JSON"	"JSON"
-"KEY"	"KEY"
-"AND"	"AND"
-"@@"	KW_DOUBLE_AT
-"EXCEPT in set operation"	KW_EXCEPT_IN_SET_OP
+KW_EXCEPT_IN_SET_OP	KW_EXCEPT_IN_SET_OP
 KW_FULL_IN_SET_OP	KW_FULL_IN_SET_OP
-"FULL"	"FULL"
 KW_LEFT_IN_SET_OP	KW_LEFT_IN_SET_OP
-"LEFT"	KW_LEFT
-"=>"	KW_NAMED_ARGUMENT_ASSIGNMENT
 KW_OPEN_HINT	KW_OPEN_HINT
 KW_OPEN_INTEGER_HINT	KW_OPEN_INTEGER_HINT
 KW_OPTIONS_IN_SELECT_WITH_OPTIONS	KW_OPTIONS_IN_SELECT_WITH_OPTIONS
-"OR"	"OR"
 KW_QUALIFY_NONRESERVED	KW_QUALIFY_NONRESERVED
 KW_QUALIFY_RESERVED	KW_QUALIFY_RESERVED
 KW_REPLACE_AFTER_INSERT	KW_REPLACE_AFTER_INSERT
 KW_UPDATE_AFTER_INSERT	KW_UPDATE_AFTER_INSERT
-KW_WITH_STARTING_WITH_EXPRESSION	KW_WITH_STARTING_WITH_EXPRESSION
-KW_WITH_STARTING_WITH_GROUP_ROWS	KW_WITH_STARTING_WITH_GROUP_ROWS
-"LANGUAGE"	"LANGUAGE"
-"LAST"	"LAST"
-"LEAVE"	"LEAVE"
-"LEVEL"	"LEVEL"
-"LIKE"	"LIKE"
-"LIMIT"	"LIMIT"
-"LOAD"	"LOAD"
-"LOOKUP"	"LOOKUP"
-"LOOP"	"LOOP"
-"MACRO"	"MACRO"
-"MAP"	"MAP"
-"MATCHED"	"MATCHED"
-"MATCH"	"MATCH"
-"MATERIALIZED"	"MATERIALIZED"
-"MAX"	"MAX"
-"MAXVALUE"	"MAXVALUE"
-"MERGE"	"MERGE"
-"MESSAGE"	"MESSAGE"
-"METADATA"	"METADATA"
-"MIN"	"MIN"
-"MINVALUE"	"MINVALUE"
-"MODEL"	"MODEL"
-"MODULE"	"MODULE"
-"NATURAL"	"NATURAL"
-"NEW"	"NEW"
-"NO"	"NO"
-"NOT"	"NOT"
-"NOT_SPECIAL"	"NOT_SPECIAL"
-"NULL_FILTERED"	"NULL_FILTERED"
-"NULL"	"NULL"
-"NULLS"	"NULLS"
-"NUMERIC"	"NUMERIC"
-"OFFSET"	"OFFSET"
-"OF"	"OF"
-"ONLY"	"ONLY"
-"ON"	"ON"
-"OPTIONS"	"OPTIONS"
-"ORDER"	"ORDER"
-"OUTER"	"OUTER"
-"OUT"	"OUT"
-"OUTPUT"	"OUTPUT"
-"OVER"	"OVER"
-"OVERWRITE"	"OVERWRITE"
-"PARENT"	"PARENT"
-"PARTITION"	"PARTITION"
-"PARTITIONS"	"PARTITIONS"
-"PERCENT"	"PERCENT"
-"PIVOT"	"PIVOT"
-"POLICIES"	"POLICIES"
-"POLICY"	"POLICY"
-"PRECEDING"	"PRECEDING"
-"PRIMARY"	"PRIMARY"
-"PRIVATE"	"PRIVATE"
-"PRIVILEGE"	"PRIVILEGE"
-"PRIVILEGES"	"PRIVILEGES"
-"PROCEDURE"	"PROCEDURE"
-"PROJECT"	"PROJECT"
-"PROTO"	"PROTO"
-"PUBLIC"	"PUBLIC"
-"RAISE"	"RAISE"
-"RANGE"	"RANGE"
-"READ"	"READ"
-"RECURSIVE"	"RECURSIVE"
-"REFERENCES"	"REFERENCES"
-"REMOTE"	"REMOTE"
-"REMOVE"	"REMOVE"
-"RENAME"	"RENAME"
-"REPEATABLE"	"REPEATABLE"
-"REPEAT"	"REPEAT"
-"REPLACE_FIELDS"	"REPLACE_FIELDS"
-"REPLACE"	"REPLACE"
-"REPLICA"	"REPLICA"
-"REPORT"	"REPORT"
-"RESPECT"	"RESPECT"
-"RESTRICTION"	"RESTRICTION"
-"RESTRICT"	"RESTRICT"
-"RETURN"	"RETURN"
-"RETURNS"	"RETURNS"
-"REVOKE"	"REVOKE"
-"RIGHT"	"RIGHT"
-"ROLLBACK"	"ROLLBACK"
-"ROLLUP"	"ROLLUP"
-"ROW"	"ROW"
-"ROWS"	"ROWS"
-"RUN"	"RUN"
-"SAFE_CAST"	"SAFE_CAST"
-"SCHEMA"	"SCHEMA"
-"SEARCH"	"SEARCH"
-"SECURITY"	"SECURITY"
-"SELECT"	"SELECT"
-"SEQUENCE"	"SEQUENCE"
-"SET"	"SET"
-"SETS"	"SETS"
-"SHOW"	"SHOW"
-"SIMPLE"	"SIMPLE"
-"SNAPSHOT"	"SNAPSHOT"
-"SOME"	"SOME"
-"SOURCE"	"SOURCE"
-"SQL"	"SQL"
-"STABLE"	"STABLE"
-"START"	"START"
-"STORED"	"STORED"
-"STORING"	"STORING"
-"STRICT"	"STRICT"
-"STRUCT"	"STRUCT"
-"SYSTEM"	"SYSTEM"
-"SYSTEM_TIME"	"SYSTEM_TIME"
-"TABLESAMPLE"	"TABLESAMPLE"
-"TABLES"	"TABLES"
-"TABLE"	"TABLE"
-"TARGET"	"TARGET"
-"TEMPORARY"	"TEMPORARY"
-"TEMP"	"TEMP"
-"THEN"	"THEN"
-"TIMESTAMP"	"TIMESTAMP"
-"TIME"	"TIME"
-"TO"	"TO"
-"TRANSACTION"	"TRANSACTION"
-"TRANSFORM"	"TRANSFORM"
-"TRUE"	"TRUE"
-"TRUNCATE"	"TRUNCATE"
-"TYPE"	"TYPE"
-"UNBOUNDED"	"UNBOUNDED"
-"UNDROP"	"UNDROP"
-"UNION"	"UNION"
-"UNIQUE"	"UNIQUE"
-"UNKNOWN"	"UNKNOWN"
-"UNNEST"	"UNNEST"
-"UNPIVOT"	"UNPIVOT"
-"UNTIL"	"UNTIL"
-"UPDATE"	"UPDATE"
-"USING"	"USING"
-"VALUES"	"VALUES"
-"VALUE"	"VALUE"
-"VECTOR"	"VECTOR"
-"VIEWS"	"VIEWS"
-"VIEW"	"VIEW"
-"VOLATILE"	"VOLATILE"
-"WEIGHT"	"WEIGHT"
-"WHEN"	"WHEN"
-"WHERE"	"WHERE"
-"WHILE"	"WHILE"
-"WINDOW"	"WINDOW"
-"WITH"	"WITH"
-"WRITE"	"WRITE"
-"ZONE"	"ZONE"
 
-{bytes_literal}	BYTES_LITERAL
-{floating_point_literal}	FLOATING_POINT_LITERAL
-{decimal_digits}|{hex_integer}	INTEGER_LITERAL
+"ABORT"	KW_ABORT
+"ACCESS"	KW_ACCESS
+"ACTION"	KW_ACTION
+"ADD"	KW_ADD
+"AGGREGATE"	KW_AGGREGATE
+"ALL"	KW_ALL
+"ALTER"	KW_ALTER
+"ALWAYS"	KW_ALWAYS
+"ANALYZE"	KW_ANALYZE
+"AND"	KW_AND
+"ANY"	KW_ANY
+"APPROX"	KW_APPROX
+"ARE"	KW_ARE
+"ARRAY"	KW_ARRAY
+"ASC"	KW_ASC
+"AS"	KW_AS
+"ASSERT"	KW_ASSERT
+"ASSERT_ROWS_MODIFIED"	KW_ASSERT_ROWS_MODIFIED
+"AT"	KW_AT
+"BATCH"	KW_BATCH
+"BEGIN"	KW_BEGIN
+"BETWEEN"	KW_BETWEEN
+"BIGDECIMAL"	KW_BIGDECIMAL
+"BIGNUMERIC"	KW_BIGNUMERIC
+"BREAK"	KW_BREAK
+"BY"	KW_BY
+"CALL"	KW_CALL
+"CASCADE"	KW_CASCADE
+"CASE"	KW_CASE
+"CAST"	KW_CAST
+"CHECK"	KW_CHECK
+"CLAMPED"	KW_CLAMPED
+"CLONE"	KW_CLONE
+"CLUSTER"	KW_CLUSTER
+"COLLATE"	KW_COLLATE
+"COLUMN"	KW_COLUMN
+"COLUMNS"	KW_COLUMNS
+"COMMIT"	KW_COMMIT
+"CONNECTION"	KW_CONNECTION
+"CONSTANT"	KW_CONSTANT
+"CONSTRAINT"	KW_CONSTRAINT
+"CONTINUE"	KW_CONTINUE
+"COPY"	KW_COPY
+"CORRESPONDING"	KW_CORRESPONDING
+"CREATE"	KW_CREATE
+"CROSS"	KW_CROSS
+"CUBE"	KW_CUBE
+"CURRENT"	KW_CURRENT
+"CYCLE"	KW_CYCLE
+"DATABASE"	KW_DATABASE
+"DATA"	KW_DATA
+"DATE"	KW_DATE
+"DATETIME"	KW_DATETIME
+"DECIMAL"	KW_DECIMAL
+"DECLARE"	KW_DECLARE
+"DEFAULT"	KW_DEFAULT
+"DEFINE"	KW_DEFINE
+"DEFINER"	KW_DEFINER
+"DELETE"	KW_DELETE
+"DELETION"	KW_DELETION
+"DEPTH"	KW_DEPTH
+"DESC"	KW_DESC
+"DESCRIBE"	KW_DESCRIBE
+"DESCRIPTOR"	KW_DESCRIPTOR
+"DETERMINISTIC"	KW_DETERMINISTIC
+"DISTINCT"	KW_DISTINCT
+"DO"	KW_DO
+"DROP"	KW_DROP
+"ELSEIF"	KW_ELSEIF
+"ELSE"	KW_ELSE
+"END"	KW_END
+"ENFORCED"	KW_ENFORCED
+"ENUM"	KW_ENUM
+"ERROR"	KW_ERROR
+"EXCEPTION"	KW_EXCEPTION
+"EXCEPT"	KW_EXCEPT
+"EXCLUDE"	KW_EXCLUDE
+"EXECUTE"	KW_EXECUTE
+"EXISTS"	KW_EXISTS
+"EXPLAIN"	KW_EXPLAIN
+"EXPORT"	KW_EXPORT
+"EXTEND"	KW_EXTEND
+"EXTERNAL"	KW_EXTERNAL
+"EXTRACT"	KW_EXTRACT
+"FALSE"	KW_FALSE
+"FILES"	KW_FILES
+"FILL"	KW_FILL
+"FILTER"	KW_FILTER
+"FIRST"	KW_FIRST
+"FOLLOWING"	KW_FOLLOWING
+"FOREIGN"	KW_FOREIGN
+"FOR"	KW_FOR
+"FORMAT"	KW_FORMAT
+"FROM"	KW_FROM
+"FUNCTION"	KW_FUNCTION
+"FULL"	KW_FULL
+"GENERATED"	KW_GENERATED
+"GRANT"	KW_GRANT
+"GRAPH"	KW_GRAPH
+"GROUPING"	KW_GROUPING
+"GROUP"	KW_GROUP
+"GROUP_ROWS"	KW_GROUP_ROWS
+"HASH"	KW_HASH
+"HAVING"	KW_HAVING
+"HIDDEN"	KW_HIDDEN
+"IDENTITY"	KW_IDENTITY
+"IF"	KW_IF
+"IGNORE"	KW_IGNORE
+"IMMEDIATE"	KW_IMMEDIATE
+"IMMUTABLE"	KW_IMMUTABLE
+"IMPORT"	KW_IMPORT
+"INCLUDE"	KW_INCLUDE
+"INCREMENT"	KW_INCREMENT
+"INDEX"	KW_INDEX
+"IN"	KW_IN
+"INNER"	KW_INNER
+"INOUT"	KW_INOUT
+"INPUT"	KW_INPUT
+"INSERT"	KW_INSERT
+"INTERLEAVE"	KW_INTERLEAVE
+"INTERSECT"	KW_INTERSECT
+"INTERVAL"	KW_INTERVAL
+"INTO"	KW_INTO
+"INVOKER"	KW_INVOKER
+"IS"	KW_IS
+"ISOLATION"	KW_ISOLATION
+"ITERATE"	KW_ITERATE
+"JOIN"	KW_JOIN
+"JSON"	KW_JSON
+"KEY"	KW_KEY
+"LANGUAGE"	KW_LANGUAGE
+"LAST"	KW_LAST
+"LEAVE"	KW_LEAVE
+"LEFT"	KW_LEFT
+"LEVEL"	KW_LEVEL
+"LIKE"	KW_LIKE
+"LIMIT"	KW_LIMIT
+"LOAD"	KW_LOAD
+"LOOKUP"	KW_LOOKUP
+"LOOP"	KW_LOOP
+"MACRO"	KW_MACRO
+"MAP"	KW_MAP
+"MATCHED"	KW_MATCHED
+"MATCH"	KW_MATCH
+KW_MATCH_RECOGNIZE_RESERVED	KW_MATCH_RECOGNIZE_RESERVED
+KW_MATCH_RECOGNIZE_NONRESERVED	KW_MATCH_RECOGNIZE_NONRESERVED
+"MATERIALIZED"	KW_MATERIALIZED
+"MAX"	KW_MAX
+"MAXVALUE"	KW_MAXVALUE
+"MEASURES"	KW_MEASURES
+"MERGE"	KW_MERGE
+"MESSAGE"	KW_MESSAGE
+"METADATA"	KW_METADATA
+"MIN"	KW_MIN
+"MINVALUE"	KW_MINVALUE
+"MODEL"	KW_MODEL
+"MODULE"	KW_MODULE
+"NATURAL"	KW_NATURAL
+"NEW"	KW_NEW
+"NO"	KW_NO
+"NOT"	KW_NOT
+
+"NOT"\s+("BETWEEN"|"IN"|"LIKE"|"DISTINCT")<NOT_SPECIAL> reject()
+<NOT_SPECIAL>{
+	"NOT"<INITIAL>	KW_NOT_SPECIAL
+}
+
+"NULL_FILTERED"	KW_NULL_FILTERED
+"NULL"	KW_NULL
+"NULLS"	KW_NULLS
+"NUMERIC"	KW_NUMERIC
+"OFFSET"	KW_OFFSET
+"OF"	KW_OF
+"ON"	KW_ON
+"ONLY"	KW_ONLY
+"OPTIONS"	KW_OPTIONS
+"ORDER"	KW_ORDER
+"OR"	KW_OR
+"OUTER"	KW_OUTER
+"OUT"	KW_OUT
+"OUTPUT"	KW_OUTPUT
+"OVER"	KW_OVER
+"OVERWRITE"	KW_OVERWRITE
+"PARENT"	KW_PARENT
+"PARTITION"	KW_PARTITION
+"PARTITIONS"	KW_PARTITIONS
+"PATTERN"	KW_PATTERN
+"PERCENT"	KW_PERCENT
+"PIVOT"	KW_PIVOT
+"POLICIES"	KW_POLICIES
+"POLICY"	KW_POLICY
+"PRECEDING"	KW_PRECEDING
+"PRIMARY"	KW_PRIMARY
+"PRIVATE"	KW_PRIVATE
+"PRIVILEGE"	KW_PRIVILEGE
+"PRIVILEGES"	KW_PRIVILEGES
+"PROCEDURE"	KW_PROCEDURE
+"PROJECT"	KW_PROJECT
+"PROTO"	KW_PROTO
+"PUBLIC"	KW_PUBLIC
+"RAISE"	KW_RAISE
+"RANGE"	KW_RANGE
+"READ"	KW_READ
+"RECURSIVE"	KW_RECURSIVE
+"REFERENCES"	KW_REFERENCES
+"REMOTE"	KW_REMOTE
+"REMOVE"	KW_REMOVE
+"RENAME"	KW_RENAME
+"REPEATABLE"	KW_REPEATABLE
+"REPEAT"	KW_REPEAT
+"REPLACE_FIELDS"	KW_REPLACE_FIELDS
+"REPLACE"	KW_REPLACE
+"REPLICA"	KW_REPLICA
+"REPORT"	KW_REPORT
+"RESPECT"	KW_RESPECT
+"RESTRICTION"	KW_RESTRICTION
+"RESTRICT"	KW_RESTRICT
+"RETURN"	KW_RETURN
+"RETURNS"	KW_RETURNS
+"REVOKE"	KW_REVOKE
+"RIGHT"	KW_RIGHT
+"ROLLBACK"	KW_ROLLBACK
+"ROLLUP"	KW_ROLLUP
+"ROW"	KW_ROW
+"ROWS"	KW_ROWS
+"RUN"	KW_RUN
+"SAFE_CAST"	KW_SAFE_CAST
+"SCHEMA"	KW_SCHEMA
+"SEARCH"	KW_SEARCH
+"SECURITY"	KW_SECURITY
+"SELECT"	KW_SELECT
+"SEQUENCE"	KW_SEQUENCE
+"SET"	KW_SET
+"SETS"	KW_SETS
+"SHOW"	KW_SHOW
+"SIMPLE"	KW_SIMPLE
+"SNAPSHOT"	KW_SNAPSHOT
+"SOME"	KW_SOME
+"SOURCE"	KW_SOURCE
+"SQL"	KW_SQL
+"STABLE"	KW_STABLE
+"START"	KW_START
+"STATIC_DESCRIBE"	KW_STATIC_DESCRIBE
+"STORED"	KW_STORED
+"STORING"	KW_STORING
+"STRICT"	KW_STRICT
+"STRUCT"	KW_STRUCT
+"SYSTEM"	KW_SYSTEM
+"SYSTEM_TIME"	KW_SYSTEM_TIME
+"TABLE"	KW_TABLE
+"TABLESAMPLE"	KW_TABLESAMPLE
+"TABLES"	KW_TABLES
+"TARGET"	KW_TARGET
+"TEMP"	KW_TEMP
+"TEMPORARY"	KW_TEMPORARY
+"THEN"	KW_THEN
+"TIME"	KW_TIME
+"TIMESTAMP"	KW_TIMESTAMP
+"TO"	KW_TO
+"TRANSACTION"	KW_TRANSACTION
+"TRANSFORM"	KW_TRANSFORM
+"TRUE"	KW_TRUE
+"TRUNCATE"	KW_TRUNCATE
+"TYPE"	KW_TYPE
+"UNBOUNDED"	KW_UNBOUNDED
+"UNDROP"	KW_UNDROP
+"UNION"	KW_UNION
+"UNIQUE"	KW_UNIQUE
+"UNKNOWN"	KW_UNKNOWN
+"UNNEST"	KW_UNNEST
+"UNPIVOT"	KW_UNPIVOT
+"UNTIL"	KW_UNTIL
+"UPDATE"	KW_UPDATE
+"USING"	KW_USING
+"VALUE"	KW_VALUE
+"VALUES"	KW_VALUES
+"VECTOR"	KW_VECTOR
+"VIEW"	KW_VIEW
+"VIEWS"	KW_VIEWS
+"VOLATILE"	KW_VOLATILE
+"WEIGHT"	KW_WEIGHT
+"WHEN"	KW_WHEN
+"WHERE"	KW_WHERE
+"WHILE"	KW_WHILE
+"WINDOW"	KW_WINDOW
+"WITH"	KW_WITH
+
+"WITH"\s+"GROUP"<WITH_STARTING_WITH_GROUP_ROWS> reject()
+<WITH_STARTING_WITH_GROUP_ROWS>{
+	"WITH"<INITIAL>	KW_WITH_STARTING_WITH_GROUP_ROWS
+}
+
+"WITH"\s*"("<WITH_STARTING_WITH_EXPRESSION> reject()
+<WITH_STARTING_WITH_EXPRESSION>{
+	"WITH"<INITIAL>	KW_WITH_STARTING_WITH_EXPRESSION
+}
+
+"WRITE"	KW_WRITE
+"ZONE"	KW_ZONE
+
 MACRO_BODY_TOKEN	MACRO_BODY_TOKEN
 MODE_EXPRESSION	MODE_EXPRESSION
 MODE_NEXT_SCRIPT_STATEMENT	MODE_NEXT_SCRIPT_STATEMENT
@@ -4344,7 +5009,16 @@ MODE_SCRIPT	MODE_SCRIPT
 MODE_STATEMENT	MODE_STATEMENT
 MODE_TYPE	MODE_TYPE
 OPEN_INTEGER_PREFIX_HINT	OPEN_INTEGER_PREFIX_HINT
+xxx_PRIMARY_PRECEDENCE	PRIMARY_PRECEDENCE
 SCRIPT_LABEL	SCRIPT_LABEL
+xxx_UNARY_NOT_PRECEDENCE	UNARY_NOT_PRECEDENCE
+xxx_UNARY_PRECEDENCE	UNARY_PRECEDENCE
+xxx_DOUBLE_AT_PRECEDENCE	DOUBLE_AT_PRECEDENCE
+
+{bytes_literal}	BYTES_LITERAL
+{floating_point_literal}	FLOATING_POINT_LITERAL
+{decimal_digits}|{hex_integer}	INTEGER_LITERAL
+
 {string_literal}	STRING_LITERAL
 
 {identifier}	IDENTIFIER

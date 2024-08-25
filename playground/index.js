@@ -270,7 +270,7 @@ const sampleList = [
 	["X64 ASM ATT parser", "x64asm-att.g", "test.x64asm-att", "ace/mode/assembly_x86"],
 	["XML parser", "xml.g", "test.xml.txt", "ace/mode/xml"],
 	["Z80 assembler parser", "z80-asm.g", "test.z80-asm", "ace/mode/assembly_x86"],
-	["ZetaSQL parser (be patient)(partially working)", "zetasql.g", "test.alasql", "ace/mode/sql"],
+	["ZetaSQL parser (be patient)(partially working)", "zetasql.g", "test.zetasql", "ace/mode/sql"],
 ];
 
 function loadLalr_sample(self) {
