@@ -159,7 +159,7 @@ const sampleList = [
 	["LALR parser", "lalr.g", "test.lalr", "ace/mode/yaml"],
 	["Lark parser", "lark.g", "test.lark", "ace/mode/yaml"],
 	["Left recursion demo", "tree-sitter-lr-dad.g", "test.lr-dad", "ace/mode/yaml"],
-	["Lezer parser (partially working)", "lezer.g", "test.lezer", "ace/mode/yaml"],
+	["Lezer parser", "lezer.g", "test.lezer", "ace/mode/yaml"],
 	["LFortran parser (partially working)", "lfortran.g", "test.fortran", "ace/mode/fortran"],
 	["Libfsm lx parser", "libfsm-lx.g", "test.libfsm-lx", "ace/mode/text"],
 	["Lightgrep parser (partially working)", "lightgrep-re.g", "test.lightgrep-re", "ace/mode/text"],

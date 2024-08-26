@@ -1,25 +1,32 @@
-%token ILLEGAL_CHARACTER
+//%token ILLEGAL_CHARACTER
 
 %token name AtName Literal CharSet InvertedCharSet AnyChar
 
 %token "as" "from" "extend" "prop" "propSource" "specialize" "tokens"
 %fallback name "as" "from" "extend" "prop" "propSource" "specialize" "tokens"
 
+/*
 %precedence scopedSkip
 %precedence repeat
 %precedence inline
 %precedence namespace
 %precedence call
+*/
 
 %start Grammar
 
 %%
 
-Grammar :
-	declaration*
+Grammar:
+	declaration_zom
 	;
 
-declaration :
+declaration_zom:
+	%empty
+	| declaration_zom declaration
+	;
+
+declaration:
 	RuleDeclaration
 	| topRuleDeclaration
 	| PrecedenceDeclaration
@@ -36,131 +43,309 @@ declaration :
 	| DetectDelimDeclaration
 	;
 
-PrecedenceDeclaration :
-	"@precedence" PrecedenceBody
+PrecedenceDeclaration:
+	"@precedence" '{' Precedence CommaOptPrecedence_zom '}'
 	;
 
-PrecedenceBody :
-	"{" "}"
-	| "{" Precedence (","? Precedence)* "}"
+CommaOptPrecedence_zom:
+	%empty
+	| CommaOptPrecedence_zom Comma_opt Precedence
 	;
 
-Precedence : PrecedenceName ("@left" | "@right" | "@cut")? ;
-
-TokensDeclaration :
-	"@tokens" TokensBody
+Comma_opt:
+	%empty
+	| ','
 	;
 
-TokensBody : "{" tokenDeclaration* "}" ;
-
-externalTokenSet :
-	"{" (Token ","?)* "}"
+Precedence:
+	PrecedenceName PrecedenceType_opt
 	;
 
-Token : RuleName Props? ;
+PrecedenceType_opt:
+	%empty
+	| PrecedenceType
+	;
 
-LocalTokensDeclaration :
+PrecedenceType:
+	"@left"
+	| "@right"
+	| "@cut"
+	;
+
+TokensDeclaration:
+	"@tokens" '{' tokenDeclaration_zom '}'
+	;
+
+TokensBody:
+	'{' tokenDeclarationOrElseToken_zom '}'
+	;
+
+tokenDeclaration_zom:
+	%empty
+	| tokenDeclaration_zom tokenDeclaration
+	;
+
+externalTokenSet:
+	'{' externalTokenSetElements '}'
+	;
+
+externalTokenSetElements:
+	%empty
+	| externalTokenSetElements Token Comma_opt
+	;
+
+Token:
+	RuleName Props_opt
+	;
+
+Props_opt:
+	%empty
+	| Props
+	;
+
+LocalTokensDeclaration:
 	"@local" "tokens" TokensBody
 	;
 
-TokensBody : "{" "}" | "{" (tokenDeclaration | ElseToken)+ "}" ;
+tokenDeclarationOrElseToken_zom:
+	%empty
+	| tokenDeclarationOrElseToken_zom tokenDeclarationOrElseToken
+	;
 
-ElseToken : "@else" RuleName Props? ;
+tokenDeclarationOrElseToken:
+	tokenDeclaration
+	| ElseToken
+	;
 
-ExternalTokensDeclaration :
+ElseToken:
+	"@else" RuleName Props_opt
+	;
+
+ExternalTokensDeclaration:
 	"@external" "tokens" Name "from" Literal externalTokenSet
 	;
 
-ExternalPropDeclaration :
-	"@external" "prop" Name ("as" Name)? "from" Literal
+ExternalPropDeclaration:
+	"@external" "prop" Name AsName_opt "from" Literal
 	;
 
-ExternalPropSourceDeclaration :
+AsName_opt:
+	%empty
+	| "as" Name
+	;
+
+ExternalPropSourceDeclaration:
 	"@external" "propSource" Name "from" Literal
 	;
 
-ExternalSpecializeDeclaration :
-	"@external" ("extend" | "specialize") Body Name "from" Literal externalTokenSet
+ExternalSpecializeDeclaration:
+	"@external" ExternalSpecializeType Body Name "from" Literal externalTokenSet
 	;
 
-ContextDeclaration :
+ExternalSpecializeType:
+	"extend"
+	| "specialize"
+	;
+
+ContextDeclaration:
 	"@context" Name "from" Literal
 	;
 
-DialectsDeclaration :
+DialectsDeclaration:
 	"@dialects" DialectBody
 	;
 
-DialectBody : "{" (Name ","?)* "}" ;
+DialectBody:
+	'{' DialectBodyElements '}'
+	;
 
-TopSkipDeclaration :
+DialectBodyElements:
+	%empty
+	| DialectBodyElements Name Comma_opt
+	;
+
+TopSkipDeclaration:
 	"@skip" Body
 	;
 
-SkipScope :
-	"@skip" Body /*%prec scopedSkip*/ SkipBody
+SkipScope:
+	"@skip" Body SkipBody
 	;
 
-SkipBody : "{" (RuleDeclaration | topRuleDeclaration)* "}" ;
+SkipBody:
+	'{' SkipBodyElements '}'
+	;
 
-DetectDelimDeclaration : "@detectDelim" ;
+SkipBodyElements:
+	%empty
+	| SkipBodyElements RuleDeclaration
+	| SkipBodyElements topRuleDeclaration
+	;
 
-tokenDeclaration :
+DetectDelimDeclaration:
+	"@detectDelim"
+	;
+
+tokenDeclaration:
 	TokenPrecedenceDeclaration
 	| TokenConflictDeclaration
 	| LiteralTokenDeclaration
 	| RuleDeclaration
 	;
 
-TokenPrecedenceDeclaration :
-	"@precedence" PrecedenceBody
+TokenPrecedenceDeclaration:
+	"@precedence" '{' LiteralOrNameExpressionCommaOpt_zom '}'
 	;
 
-PrecedenceBody : "{" ((Literal | nameExpression) ","?)* "}" ;
+LiteralOrNameExpressionCommaOpt_zom:
+	%empty
+	| LiteralOrNameExpressionCommaOpt_zom LiteralOrNameExpression Comma_opt
+	;
 
-TokenConflictDeclaration :
+LiteralOrNameExpression:
+	Literal
+	| nameExpression
+	;
+
+TokenConflictDeclaration:
 	"@conflict" ConflictBody
 	;
 
-ConflictBody : "{" (Literal | nameExpression) ","? (Literal | nameExpression) "}" ;
-
-LiteralTokenDeclaration :
-	Literal Props?
+ConflictBody:
+	'{' LiteralOrNameExpression Comma_opt LiteralOrNameExpression '}'
 	;
 
-RuleDeclaration : RuleName Props? ParamList? Body ;
+LiteralTokenDeclaration:
+	Literal Props_opt
+	;
 
-topRuleDeclaration : "@top" RuleName Props? ParamList? Body ;
+RuleDeclaration:
+	RuleName Props_opt ParamList_opt Body
+	;
 
-ParamList : "<" (ParamListElm ("," ParamListElm)*)? ">" ;
-ParamListElm : Name | AtName | Literal ;
+ParamList_opt:
+	%empty
+	| ParamList
+	;
 
-Body : "{" expression? "}" ;
+topRuleDeclaration:
+	"@top" RuleName Props_opt ParamList_opt Body
+	;
 
-Props : "[" ((Prop ",")* Prop)? "]" ;
+ParamList:
+	'<' ParamListArgs_opt '>'
+	;
 
-Prop : (AtName | Name) ("=" (Literal | Name | "." | PropEsc)*)? ;
+ParamListArgs_opt:
+	%empty
+	| ParamListElm CommaParamListElm_zom
+	;
 
-PropEsc : "{" RuleName "}" ;
+CommaParamListElm_zom:
+	%empty
+	| CommaParamListElm_zom ',' ParamListElm
+	;
 
-expression :
+ParamListElm:
+	Name
+	| AtName
+	| Literal
+	;
+
+Body:
+	'{' Expression_opt '}'
+	;
+
+Expression_opt:
+	%empty
+	| expression
+	;
+
+Props:
+	'[' PropList_opt ']'
+	;
+
+PropList_opt:
+	%empty
+	| PropComma_zom Prop
+	;
+
+PropComma_zom:
+	%empty
+	| PropComma_zom Prop ','
+	;
+
+Prop:
+	NameOrAtName
+	| NameOrAtName '=' Assignables_zom
+	;
+
+Assignables_zom:
+	%empty
+	| Assignables_zom Assignables
+	;
+
+Assignables:
+	Literal
+	| Name
+	| '.'
+	| '{' RuleName '}' #PropEsc
+	;
+
+NameOrAtName:
+	AtName
+	| Name
+	;
+
+expression:
 	seqExpression
 	| Choice
 	;
 
-Choice : seqExpression? ("|" seqExpression?)+ ;
+Choice:
+	seqExpression_opt altSeqExpression_oom
+	;
 
-seqExpression :
+altSeqExpression_oom:
+	altSeqExpression
+	| altSeqExpression_oom altSeqExpression
+	;
+
+altSeqExpression:
+	'|' seqExpression_opt
+	;
+
+seqExpression_opt:
+	%empty
+	| seqExpression
+	;
+
+seqExpression:
 	atomExpression
 	| Sequence
 	;
 
-Sequence :
-	marker (atomExpression | marker)*
-	| atomExpression (atomExpression | marker)+
+Sequence:
+	marker atomExpressionOrMarker_zom
+	| atomExpression atomExpressionOrMarker_oom
 	;
 
-atomExpression :
+atomExpressionOrMarker_oom:
+	atomExpressionOrMarker
+	| atomExpressionOrMarker_oom atomExpressionOrMarker
+	;
+
+atomExpressionOrMarker_zom:
+	%empty
+	| atomExpressionOrMarker_zom atomExpressionOrMarker
+	;
+
+atomExpressionOrMarker:
+	atomExpression
+	| marker
+	;
+
+atomExpression:
 	Literal
 	| CharSet
 	| AnyChar
@@ -175,54 +360,103 @@ atomExpression :
 	| Specialization
 	;
 
-CharClass :
-	"@asciiLetter" | "@asciiUpperCase" | "@asciiLowerCase" | "@digit" | "@whitespace" | "@eof"
+CharClass:
+	"@asciiLetter"
+	| "@asciiUpperCase"
+	| "@asciiLowerCase"
+	| "@digit"
+	| "@whitespace"
+	| "@eof"
 	;
-Optional : atomExpression /*%prec repeat*/ "?" ;
-Repeat : atomExpression /*%prec repeat*/ "*" ;
-Repeat1 : atomExpression /*%prec repeat*/ "+" ;
-InlineRule : (RuleName /*%prec inline*/ Props? | Props) Body ;
-ParenExpression : "(" expression? ")" ;
-Specialization : ("@specialize" | "@extend") Props? ArgList ;
 
-nameExpression :
-	RuleName ArgList?
+Optional:
+	atomExpression '?'
+	;
+
+Repeat:
+	atomExpression '*'
+	;
+
+Repeat1:
+	atomExpression '+'
+	;
+
+InlineRule:
+	RuleNameOrProps Body
+	;
+
+RuleNameOrProps:
+	RuleName Props_opt
+	| Props
+	;
+
+ParenExpression:
+	'(' Expression_opt ')'
+	;
+
+Specialization:
+	Specialization_type Props_opt ArgList
+	;
+
+Specialization_type:
+	"@specialize"
+	| "@extend"
+	;
+
+nameExpression:
+	RuleName
 	| ScopedName
 	| Call
 	;
 
-Call : (RuleName | ScopedName) /*%prec*/ call ArgList ;
+Call:
+	CallName ArgList
+	;
 
-marker :
+CallName:
+	RuleName
+	| ScopedName
+	;
+
+marker:
 	PrecedenceMarker
 	| AmbiguityMarker
 	;
 
-PrecedenceMarker : "!" PrecedenceName ;
-
-ScopedName : RuleName /*%prec namespace*/ "." RuleName ;
-AmbiguityMarker : "~" Name ;
-
-ArgList :
-	"<" (expression ("," expression)*)? ">"
+PrecedenceMarker:
+	'!' PrecedenceName
 	;
 
-RuleName : name ;
+ScopedName:
+	RuleName '.' RuleName
+	;
 
-PrecedenceName : name ArgList? | Literal ;
+AmbiguityMarker:
+	'~' Name
+	;
 
-Name : name ;
+ArgList:
+	'<' expression_oom '>'
+	;
 
-/*
-kw<value> { @specialize[@name={value}]<keyword, value> }
+expression_oom:
+	expression
+	| expression_oom ',' expression
+	;
 
-at<value> { @specialize[@name={value}]<AtName, value> }
-*/
+RuleName:
+	name
+	;
 
+PrecedenceName:
+	name
+	| name ArgList
+	| Literal
+	;
 
-//@external propSource lezerHighlighting from "./highlight"
-
-//@detectDelim
+Name:
+	name
+	;
 
 %%
 
@@ -250,23 +484,23 @@ InvertedCharSet "!["([^\\\]]|\\.)*"]"
 {LineComment}	skip()
 {BlockComment}	skip()
 
-"~"	"~"
-"<"	"<"
-"="	"="
-">"	">"
-"|"	"|"
-","	","
-"!"	"!"
-"?"	"?"
-"."	"."
-"("	"("
-")"	")"
-"["	"["
-"]"	"]"
-"{"	"{"
-"}"	"}"
-"*"	"*"
-"+"	"+"
+"~"	'~'
+"<"	'<'
+"="	'='
+">"	'>'
+"|"	'|'
+","	','
+"!"	'!'
+"?"	'?'
+"."	'.'
+"("	'('
+")"	')'
+"["	'['
+"]"	']'
+"{"	'{'
+"}"	'}'
+"*"	'*'
+"+"	'+'
 "as"	"as"
 "@asciiLetter"	"@asciiLetter"
 "@asciiLowerCase"	"@asciiLowerCase"
@@ -313,8 +547,8 @@ InvertedCharSet "!["([^\\\]]|\\.)*"]"
 
 /*@precedence { InvertedCharSet, "!" }*/
 
-{name}  name
+{name} name
 
-.	ILLEGAL_CHARACTER
+//.	ILLEGAL_CHARACTER
 
 %%
