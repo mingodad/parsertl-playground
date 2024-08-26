@@ -244,6 +244,7 @@ const sampleList = [
 	["SLK parser", "slk-parser.g", "test.slk-parser", "ace/mode/yaml"],
 	["SMLSharp parser", "smlsharp-iml.g", "test.smlsharp-iml", "ace/mode/ocaml"],
 	["Souffle parser", "souffle.g", "test.souffle", "ace/mode/prolog"],
+	["SQLite3 PIPES modified parser (partially working)", "sqlite3-pipe-dad.g", "test.sqlite3-pipe-dad", "ace/mode/sql"],
 	["SQLite3 modified parser (partially working)", "sqlite3-dad.g", "test.sqlite3", "ace/mode/sql"],
 	["SQLite3 parser (partially working)", "sqlite3.g", "test.sqlite3", "ace/mode/sql"],
 	["S/SL parser", "s-sl.g", "test.s-sl", "ace/mode/tex"],
