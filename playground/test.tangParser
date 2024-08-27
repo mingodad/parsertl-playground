@@ -1,0 +1,262 @@
+//TEST(ControlFlow, IF) {
+    // True condition with else branch.
+      if (true) {
+        print("true");
+      } else {
+        print("false");
+      }
+    // False condition with else branch.
+      if (false) {
+        print("true");
+      } else {
+        print("false");
+      }
+    // True condition without else branch.
+      if (true) {
+        print("true");
+      }
+    // False condition without else branch.
+      if (false) {
+        print("true");
+      }
+//TEST(ControlFlow, While) {
+    // True condition.
+      i = 0;
+      while (i < 3) {
+        print(i);
+        i = i + 1;
+      }
+    // False condition.
+      i = 3;
+      while (i < 3) {
+        print(i);
+        i = i + 1;
+      }
+//TEST(ControlFlow, DoWhile) {
+    // True condition.
+      i = 0;
+      do {
+        print(i);
+        i = i + 1;
+      } while (i < 3);
+    // False condition.
+      i = 3;
+      do {
+        print(i);
+        i = i + 1;
+      } while (i < 3);
+//TEST(ControlFlow, For) {
+    // True condition.
+      for (i = 0; i < 3; i = i + 1) {
+        print(i);
+      }
+    // False condition.
+      for (i = 3; i < 3; i = i + 1) {
+        print(i);
+      }
+//TEST(ControlFlow, RangedFor) {
+      for (i : [0, 1, 2]) {
+        print(i);
+      }
+    // Empty container.
+      for (i : []) {
+        print(i);
+      }
+//TEST(ControlFlow, Break) {
+    // Break in a while loop.
+      i = 0;
+      while (i < 4) {
+        i = i + 1;
+        if (i == 3) {
+          break;
+        }
+        print(i);
+      }
+    // Break in a do..while loop.
+      i = 0;
+      do {
+        i = i + 1;
+        if (i == 3) {
+          break;
+        }
+        print(i);
+      } while (i < 4);
+    // Break in a for loop.
+      for (i = 0; i < 4; i = i + 1) {
+        if (i == 2) {
+          break;
+        }
+        print(i);
+      }
+    // Break outside of a control flow structure.
+      break;
+//TEST(ControlFlow, Continue) {
+    // Continue in a while loop.
+      i = 0;
+      while (i < 3) {
+        i = i + 1;
+        if (i == 2) {
+          continue;
+        }
+        print(i);
+      }
+    // Continue in a do..while loop.
+      i = 0;
+      do {
+        i = i + 1;
+        if (i == 2) {
+          continue;
+        }
+        print(i);
+      } while (i < 3);
+    // Continue in a for loop.
+      for (i = 0; i < 3; i = i + 1) {
+        if (i == 1) {
+          continue;
+        }
+        print(i);
+      }
+    // Continue outside of a control flow structure.
+      continue;
+//TEST(Function, Simple) {
+      function foo() {
+        print("foo");
+      }
+      foo();
+    // Function with arguments.
+      function foo(a, b) {
+        print(a + b);
+      }
+      foo(1, 2);
+    // Function with return value.
+      function foo(a, b) {
+        return a + b;
+      }
+      print(foo(1, 2));
+
+//TEST(ControlFlowEdgeCases, Break) {
+    // Break in global context.
+      break;
+    // Break in function.
+      function foo() {
+        print("foo");
+        break;
+        print("bar");
+      }
+      foo();
+    // Multiple breaks.
+      i = 0;
+      while (i < 3) {
+        if (i == 2) {
+          break;
+        }
+        print(i);
+        i = i + 1;
+      }
+      i = 0;
+      while (i < 3) {
+        if (i == 2) {
+          break;
+        }
+        print("a");
+        i = i + 1;
+        break;
+      }
+//TEST(ControlFlowEdgeCases, Continue) {
+    // Continue in global context.
+      continue;
+    // Continue in function.
+      function foo() {
+        print("foo");
+        continue;
+        print("bar");
+      }
+      foo();
+    // Multiple continues.
+      i = 0;
+      while (i < 3) {
+        i = i + 1;
+        if (i == 2) {
+          continue;
+        }
+        print(i);
+      }
+      i = 0;
+      while (i < 3) {
+        i = i + 1;
+        if (i == 2) {
+          continue;
+        }
+        print("a");
+        continue;
+      }
+
+//TEST(VariableScope, Global) {
+    // Local variable in a function.
+      a = 1;
+      function foo() {
+        a = 2;
+        print(a);
+      }
+      print(a);
+      foo();
+      print(a);
+    // Global variable in a function, assignment separate.
+      a = 1;
+      function foo() {
+        global a;
+        print(a);
+        a = 2;
+        print(a);
+      }
+      print(a);
+      foo();
+      print(a);
+    // Global variable in a function, assignment combined.
+      a = 1;
+      function foo() {
+        global a = 2;
+        print(a);
+      }
+      print(a);
+      foo();
+      print(a);
+//TEST(NativeFunction, Library) {
+    // Simple function, no arguments
+      use a;
+      print(a());
+    // Simple function, with arguments
+      use a;
+      print(a(1, 2));
+    // Function with bound object
+      use a;
+      print(a());
+    // Function not found. Does not crash.
+      use a;
+      print(a());
+//TEST(Attributes, String) {
+    // Length (in graphemes).
+    // The long string of hex values is a UTF-8 encoding of the Scottish Flag.
+      print("$\xF0\x9F\x8F\xB4\xF3\xA0\x81\xA7\xF3\xA0\x81\xA2\xF3\xA0\x81\xB3\xF3\xA0\x81\xA3\xF3\xA0\x81\xB4\xF3\xA0\x81\xBF.".length);
+    // Length (in bytes).
+      print("$\xF0\x9F\x8F\xB4\xF3\xA0\x81\xA7\xF3\xA0\x81\xA2\xF3\xA0\x81\xB3\xF3\xA0\x81\xA3\xF3\xA0\x81\xB4\xF3\xA0\x81\xBF.".byte_length);
+//TEST(Attributes, Array) {
+    // size (empty array).
+      print([].size);
+    // size (non-empty array).
+      print([1, 2, 3].size);
+    // size (sliced array).
+      a = [1, 2, 3];
+      print(a[-2:].size);
+//TEST(Recursion, Fibonacci) {
+    // Fibonacci sequence.
+      function fib(n) {
+        if (n <= 0) {
+          return 0;
+        }
+        else if (n <= 2) {
+          return 1;
+        }
+        return fib(n - 1) + fib(n - 2);
+      }
+      print(fib(10));

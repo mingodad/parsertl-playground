@@ -250,6 +250,7 @@ const sampleList = [
 	["S/SL parser", "s-sl.g", "test.s-sl", "ace/mode/tex"],
 	["Stanc3 parser", "stanc3-parser.g", "test.stanc3", "ace/mode/text"],
 	["Tablegen-LLVM parser (partially working)", "tablegen-llvm.g", "test.tablegen-llvm", "ace/mode/yaml"],
+	["Tang parser (partially working)", "tangParser.g", "test.tangParser", "ace/mode/c_cpp"],
 	["Tameparse parser (not working)", "tameparser.g", "test.tameparser", "ace/mode/yaml"],
 	["Tarantol SQL parser (partially working)", "tarantol-sql.g", "test.tarantol-sql", "ace/mode/sql"],
 	["TDengine SQL parser", "tdengine-sql.g", "test.tdengine-sql", "ace/mode/sql"],
