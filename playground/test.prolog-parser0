@@ -1,0 +1,3 @@
+pW([1.5|R],X,Y):-p1(X,Z),p2(Y,Z),p3(R,Z).
+a(X,Y) :- b(X), c(Y), d(X,Y), e(X,Y,Z,A,B), f(A,B), g(G,A,G), h([X,Y|A],[Z,B|G]).
+pW([R],X):-p1(X),p2(R),p3(R,X).

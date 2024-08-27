@@ -1,0 +1,22 @@
+ <html xmlns="https://www.w3.org/1999/xhtml">
+ <head>
+ <title>ABC Products</title>
+ <meta http-equiv="Content-Type"
+    content="text/html; charset=iso-8859-1" />
+ </head>
+ <body>
+ <h1>ABC Products</h1>
+ <h2>Product One</h2>
+ <p>Product One is an exciting new widget that will simplify your
+  life.</p>
+ <p><b>Cost: $19.95</b></p>
+ <p><b>Shipping: $2.95</b></p>
+ <h2>Product Two</h2>
+ ...
+ <h3>Product Three</h3>
+ <p><i>Cost: $24.95</i></p>
+ <p>This is such a terrific widget that you will most certainly
+  want to buy one for your home and another one for your
+  office!</p>
+ </body>
+ </html>

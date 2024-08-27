@@ -1,0 +1,72 @@
+foo(bar, baz).
+foo(bar).
+foo(bar, Bar, baz).
+a(1, 2, 3) :- b(2).
+foo(bar) :- baz(foo), foo(baz).
+bar(foo).
+bar.
+bar(foo, baz) :- foo.
+
+foo(Bar) :-
+	Bar = [3, [4, 5], 5].
+
+baz :- \+ foo(foo); bar(foo).
+bob.
+
+mother_child(trude, sally).
+
+father_child(tom, sally).
+father_child(tom, erica).
+father_child(mike, tom).
+
+sibling(X, Y)      :- parent_child(Z, X), parent_child(Z, Y).
+
+parent_child(X, Y) :- father_child(X, Y).
+parent_child(X, Y) :- mother_child(X, Y).
+
+foo :-
+	4 * (3 + 2 + 4 * 3 / 2) is Bob,
+	5 = J,
+	Bob is 3.
+
+factorial(0, 1).
+
+factorial(N, Result) :-
+	N > 0,
+	Dec_N is N - 1,
+	factorial(Dec_N, Next_Factorial),
+	Result is N * Next_Factorial.
+
+find_e(0, Sum, Sum + 1).
+
+find_e(Accuracy, Sum, Result) :-
+	Accuracy > 0,
+	factorial(Accuracy, Next_Factorial),
+	Inverse_Factorial is 1 / Next_Factorial,
+	New_Sum is Sum + Inverse_Factorial,
+	Dec_Accuracy is Accuracy - 1,
+	find_e(Dec_Accuracy, New_Sum, Result).
+
+% find_e(10, 0, X).
+
+foo([1, 2, X | 5.3], Y) :-
+	Y is 5 + 2 * 3 / 4 ^ (9 / 3), !,
+	foo(Bar, Baz, Bob).
+
+% applying a function to its argument
+eval([calling(A), with(B)], Global_Env, _, Result) :-
+	eval(A, Global_Env, _,
+		closure(lambda(var(Bound_Term), Body),
+		capturing(Captured_Env))),
+	eval(B, Global_Env, _, EB),
+
+	% local env is ahead of global env, which enables variable shadowing
+	append(Captured_Env, Global_Env, Priority_Env),
+	eval(Body, [[Bound_Term | EB] | Priority_Env], _, Result).
+
+% fetching a term from an environment
+find_val([], Unbound_Name, [[], Unbound_Name]).
+find_val([[Name | Value] | _], Name, Value).
+find_val([[_ | _] | Env], Name, Value) :-
+	find_val(Env, Name, Value).
+
