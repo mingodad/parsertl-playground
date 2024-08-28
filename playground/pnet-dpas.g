@@ -20,8 +20,6 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-%token ILLEGAL_CHARACTER
-
 /*Tokens*/
 %token IDENTIFIER
 %token INTEGER_CONSTANT
@@ -82,24 +80,6 @@
 %token K_GE
 %token K_ASSIGN
 %token K_DOT_DOT
-%token '.'
-%token '('
-%token ')'
-%token ';'
-%token ','
-%token '='
-%token ':'
-%token '['
-%token ']'
-%token '<'
-%token '>'
-%token '+'
-%token '-'
-%token '*'
-%token '/'
-%token '&'
-%token '@'
-%token '^'
 
 %nonassoc /*1*/ IF_WITHOUT_ELSE
 %nonassoc /*2*/ K_ELSE
@@ -569,113 +549,112 @@ BasicConstant :
 
 %%
 
-DIGIT					[0-9]
-HEX						[0-9A-Fa-f]
-IDALPHA					[a-zA-Z_]
-EXPONENT				[Ee][+-]?{DIGIT}+
-WHITE					[ \t\v\r\f]
+%option caseless
+
+DIGIT			[0-9]
+HEX			[0-9A-Fa-f]
+IDALPHA			[a-zA-Z_]
+EXPONENT		[Ee][+-]?{DIGIT}+
+WHITE			[ \t\v\r\f]
 
 %%
 
-"<>"					K_NE
-"<="					K_LE
-">="					K_GE
-":="					K_ASSIGN
-".."					K_DOT_DOT
-"**"					K_POW
-
-"and"					K_AND
-"array"					K_ARRAY
-"begin"					K_BEGIN
-"case"					K_CASE
-"catch"					K_CATCH
-"const"					K_CONST
-"div"					K_DIV
-"do"					K_DO
-"downto"				K_DOWNTO
-"else"					K_ELSE
-"end"					K_END
-"exit"					K_EXIT
-"fastcall"				K_FASTCALL
-"finally"				K_FINALLY
-"for"					K_FOR
-"forward"				K_FORWARD
-"function"				K_FUNCTION
-"goto"					K_GOTO
-"if"					K_IF
-"in"					K_IN
-"label"					K_LABEL
-"import"				K_IMPORT
-"mod"					K_MOD
-"module"				K_MODULE
-"nil"					K_NIL
-"not"					K_NOT
-"of"					K_OF
-"or"					K_OR
-"packed"				K_PACKED
-"pow"					K_POW
-"procedure"				K_PROCEDURE
-"program"				K_PROGRAM
-"record"				K_RECORD
-"repeat"				K_REPEAT
-"set"					K_SET
-"shl"					K_SHL
-"shr"					K_SHR
-"sizeof"				K_SIZEOF
-"stdcall"				K_STDCALL
-"then"					K_THEN
-"throw"					K_THROW
-"to"					K_TO
-"try"					K_TRY
-"type"					K_TYPE
-"until"					K_UNTIL
-"var"					K_VAR
-"va_arg"				K_VA_ARG
-"with"					K_WITH
-"while"					K_WHILE
-"xor"					K_XOR
-
-"."	'.'
+"&"	'&'
 "("	'('
 ")"	')'
-";"	';'
+"*"	'*'
+"+"	'+'
 ","	','
-"="	'='
+"-"	'-'
+"."	'.'
+"/"	'/'
 ":"	':'
+";"	';'
+"<"	'<'
+"="	'='
+">"	'>'
+"@"	'@'
 "["	'['
 "]"	']'
-"<"	'<'
-">"	'>'
-"+"	'+'
-"-"	'-'
-"*"	'*'
-"/"	'/'
-"&"	'&'
-"@"	'@'
 "^"	'^'
+"<>"			K_NE
+"<="			K_LE
+">="			K_GE
+":="			K_ASSIGN
+".."			K_DOT_DOT
+"**"			K_POW
 
-'(''|[^'])*'			STRING_CONSTANT
+"and"			K_AND
+"array"			K_ARRAY
+"begin"			K_BEGIN
+"case"			K_CASE
+"catch"			K_CATCH
+"const"			K_CONST
+"div"			K_DIV
+"do"			K_DO
+"downto"		K_DOWNTO
+"else"			K_ELSE
+"end"			K_END
+"exit"			K_EXIT
+"fastcall"		K_FASTCALL
+"finally"		K_FINALLY
+"for"			K_FOR
+"forward"		K_FORWARD
+"function"		K_FUNCTION
+"goto"			K_GOTO
+"if"			K_IF
+"in"			K_IN
+"label"			K_LABEL
+"import"		K_IMPORT
+"mod"			K_MOD
+"module"		K_MODULE
+"nil"			K_NIL
+"not"			K_NOT
+"of"			K_OF
+"or"			K_OR
+"packed"		K_PACKED
+"pow"			K_POW
+"procedure"		K_PROCEDURE
+"program"		K_PROGRAM
+"record"		K_RECORD
+"repeat"		K_REPEAT
+"set"			K_SET
+"shl"			K_SHL
+"shr"			K_SHR
+"sizeof"		K_SIZEOF
+"stdcall"		K_STDCALL
+"then"			K_THEN
+"throw"			K_THROW
+"to"			K_TO
+"try"			K_TRY
+"type"			K_TYPE
+"until"			K_UNTIL
+"var"			K_VAR
+"va_arg"		K_VA_ARG
+"with"			K_WITH
+"while"			K_WHILE
+"xor"			K_XOR
 
-\"(\"\"|[^"])*\"		STRING_CONSTANT
+'(''|[^'])*'		STRING_CONSTANT
+
+\"(\"\"|[^"])*\"	STRING_CONSTANT
 
 {IDALPHA}({DIGIT}|{IDALPHA})*	IDENTIFIER
 
-{DIGIT}+{EXPONENT}				REAL_CONSTANT
+{DIGIT}+{EXPONENT}	REAL_CONSTANT
 {DIGIT}+"."{DIGIT}*{EXPONENT}	REAL_CONSTANT
-{DIGIT}+"."{DIGIT}+				REAL_CONSTANT
-{DIGIT}+"."[^.]					REAL_CONSTANT
+{DIGIT}+"."{DIGIT}+	REAL_CONSTANT
+{DIGIT}+"."[^.]		REAL_CONSTANT
 
-{DIGIT}{HEX}*[hH]				INTEGER_CONSTANT
+{DIGIT}{HEX}*[hH]	INTEGER_CONSTANT
 
-{DIGIT}+						INTEGER_CONSTANT
+{DIGIT}+		INTEGER_CONSTANT
 
-{WHITE}+						skip()
+{WHITE}+		skip()
 
-\n								skip()
+\n			skip()
 
-"{".*?"}"								skip()
-"(*"(?s:.)*?"*)"							skip()
-
-.								ILLEGAL_CHARACTER
+"{".*?"}"		skip()
+"(*"(?s:.)*?"*)"	skip()
 
 %%
