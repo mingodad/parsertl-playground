@@ -88,6 +88,7 @@ const sampleList = [
 	["Cforall parser (partially working)", "cforall.g", "test.c", "ace/mode/c_cpp"],
 	["CG-CQL-author parser", "cg-cql-author.g", "test.cg-cql-author", "ace/mode/sql"],
 	["CG-CQL-old parser", "cql.g", "test.cql", "ace/mode/sql"],
+	["Chaos parser", "chaos-parser.g", "test.chaos-parser", "ace/mode/c_cpp"],
 	["Chapel parser", "chapel.g", "test.chapel", "ace/mode/c_cpp"],
 	["CLanguage parser", "clanguage.g", "test.clanguage", "ace/mode/c_cpp"],
 	["CLaro-lang parser", "claro-lang.g", "test.claro-lang", "ace/mode/c_cpp"],
