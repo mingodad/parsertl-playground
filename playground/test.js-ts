@@ -1,0 +1,20 @@
+// The type, T, will be passed in
+interface Person<T> {
+  name: string;
+  age: number;
+  documents: T;
+}
+
+// We have to pass in the type of `documents` - an array of strings in this case
+const person1: Person<string[]> = {
+  name: 'John',
+  age: 48,
+  documents: ['passport', 'bank statement', 'visa'],
+};
+
+// Again, we implement the `Person` interface, and pass in the type for documents - in this case a string
+const person2: Person<string> = {
+  name: 'Delia',
+  age: 46,
+  documents: 'passport, P45',
+};
