@@ -1,3 +1,4 @@
+//From: https://github.com/semgrep/semgrep/blob/6f51b94d6bc2249f9ce2b6bb0eef72bf73ed6e9c/languages/javascript/menhir/parser_js.mly
 /* Yoann Padioleau
  *
  * Copyright (C) 2010-2014 Facebook
