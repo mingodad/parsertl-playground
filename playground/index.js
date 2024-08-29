@@ -151,6 +151,7 @@ const sampleList = [
 	["Java11 parser", "java11.g", "test.java", "ace/mode/java"],
 	["Javascript-database parser", "javascript-database-js.g", "test.js.txt", "ace/mode/javascript"],
 	["JavascriptCore parser", "javascript-core.g", "test.js.txt", "ace/mode/javascript"],
+	["Javascript-pff parser", "javascript-pff.g", "test.js.txt", "ace/mode/javascript"],
 	["Jq parser (partially working)", "jq-parser.g", "test.jq", "ace/mode/text"],
 	["Json5 parser", "json5.g", "test.json5.txt", "ace/mode/json"],
 	["Json lexer", "json-lexer.g", "test.json.txt", "ace/mode/json"],
