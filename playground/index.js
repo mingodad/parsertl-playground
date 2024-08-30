@@ -101,6 +101,7 @@ const sampleList = [
 	["C parser frama-c (partially working)", "cparser-frama-c.g", "test.frama-c", "ace/mode/c_cpp"],
 	["Cpp5-v2 parser (not working)", "cpp5-v2.g", "test.cpp", "ace/mode/c_cpp"],
 	["CSS parser from VLC", "CSSGrammar-vlc.g", "style.css", "ace/mode/css"],
+	["CSS parser from Webkit", "css-webkit.g", "style.css", "ace/mode/css"],
 	["Cup parser", "java-cup.g", "test.java-cup", "ace/mode/txt"],
 	["Cxx parser (not working)", "CxxParser.g", "test.cpp", "ace/mode/c_cpp"],
 	["Cyclone parser (partially working)", "cyclone.g", "test.cyclone", "ace/mode/c_cpp"],
