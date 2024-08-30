@@ -98,10 +98,9 @@
 %token WEBKIT_RULE_SYM
 %token WEBKIT_SELECTOR_SYM
 %token WEBKIT_VALUE_SYM
-%token WHITESPACE
+//%token WHITESPACE
 
-%nonassoc /*1*/ LOWEST_PREC
-%left /*2*/ UNIMPORTANT_TOK
+//%nonassoc /*1*/ LOWEST_PREC
 %right /*3*/ IDENT
 %nonassoc /*4*/ HEX
 %nonassoc /*5*/ IDSEL
@@ -116,48 +115,42 @@
 %%
 
 stylesheet :
-	maybe_space maybe_charset maybe_sgml rule_list
-	| webkit_rule maybe_space
-	| webkit_decls maybe_space
-	| webkit_value maybe_space
-	| webkit_mediaquery maybe_space
-	| webkit_selector maybe_space
-	| webkit_keyframe_rule maybe_space
+	 maybe_charset maybe_sgml rule_list
+	| webkit_rule
+	| webkit_decls
+	| webkit_value
+	| webkit_mediaquery
+	| webkit_selector
+	| webkit_keyframe_rule
 	;
 
 webkit_rule :
-	WEBKIT_RULE_SYM '{' maybe_space valid_rule maybe_space '}'
+	WEBKIT_RULE_SYM '{'  valid_rule  '}'
 	;
 
 webkit_keyframe_rule :
-	WEBKIT_KEYFRAME_RULE_SYM '{' maybe_space keyframe_rule maybe_space '}'
+	WEBKIT_KEYFRAME_RULE_SYM '{'  keyframe_rule  '}'
 	;
 
 webkit_decls :
-	WEBKIT_DECLS_SYM '{' maybe_space_before_declaration declaration_list '}'
+	WEBKIT_DECLS_SYM '{'  declaration_list '}'
 	;
 
 webkit_value :
-	WEBKIT_VALUE_SYM '{' maybe_space expr '}'
+	WEBKIT_VALUE_SYM '{'  expr '}'
 	;
 
 webkit_mediaquery :
-	WEBKIT_MEDIAQUERY_SYM WHITESPACE maybe_space media_query '}'
+	WEBKIT_MEDIAQUERY_SYM   media_query '}'
 	;
 
 webkit_selector :
-	WEBKIT_SELECTOR_SYM '{' maybe_space selector_list '}'
-	;
-
-maybe_space :
-	/*empty*/ %prec UNIMPORTANT_TOK /*2L*/
-	| maybe_space WHITESPACE
+	WEBKIT_SELECTOR_SYM '{'  selector_list '}'
 	;
 
 maybe_sgml :
 	/*empty*/
 	| maybe_sgml SGML_CD
-	| maybe_sgml WHITESPACE
 	;
 
 maybe_charset :
@@ -165,19 +158,14 @@ maybe_charset :
 	| charset
 	;
 
-closing_brace :
-	'}'
-	//| TOKEN_EOF %prec LOWEST_PREC /*1N*/
-	;
-
 charset :
-	CHARSET_SYM maybe_space STRING maybe_space ';'
+	CHARSET_SYM  STRING  ';'
 	//| CHARSET_SYM error /*10N*/ invalid_block
 	//| CHARSET_SYM error /*10N*/ ';'
 	;
 
 ignored_charset :
-	CHARSET_SYM maybe_space STRING maybe_space ';'
+	CHARSET_SYM  STRING  ';'
 	;
 
 rule_list :
@@ -186,7 +174,7 @@ rule_list :
 	;
 
 valid_rule :
-	before_ruleset ruleset
+	 ruleset
 	| media
 	| page
 	| font_face
@@ -224,22 +212,22 @@ block_rule :
 	;
 
 import :
-	IMPORT_SYM maybe_space string_or_uri maybe_space maybe_media_list ';'
-	//| IMPORT_SYM maybe_space string_or_uri maybe_space maybe_media_list invalid_block
+	IMPORT_SYM  string_or_uri  maybe_media_list ';'
+	//| IMPORT_SYM  string_or_uri  maybe_media_list invalid_block
 	//| IMPORT_SYM error /*10N*/ ';'
 	//| IMPORT_SYM error /*10N*/ invalid_block
 	;
 
 namespace :
-	NAMESPACE_SYM maybe_space maybe_ns_prefix string_or_uri maybe_space ';'
-	//| NAMESPACE_SYM maybe_space maybe_ns_prefix string_or_uri maybe_space invalid_block
+	NAMESPACE_SYM  maybe_ns_prefix string_or_uri  ';'
+	//| NAMESPACE_SYM  maybe_ns_prefix string_or_uri  invalid_block
 	//| NAMESPACE_SYM error /*10N*/ invalid_block
 	//| NAMESPACE_SYM error /*10N*/ ';'
 	;
 
 maybe_ns_prefix :
 	/*empty*/
-	| IDENT /*3R*/ maybe_space
+	| IDENT /*3R*/
 	;
 
 string_or_uri :
@@ -248,26 +236,26 @@ string_or_uri :
 	;
 
 media_feature :
-	IDENT /*3R*/ maybe_space
+	IDENT /*3R*/
 	;
 
 maybe_media_value :
 	/*empty*/
-	| ':' /*6N*/ maybe_space expr maybe_space
+	| ':' /*6N*/  expr
 	;
 
 media_query_exp :
-	'(' maybe_space media_feature maybe_space maybe_media_value ')' maybe_space
+	'('  media_feature  maybe_media_value ')'
 	;
 
 media_query_exp_list :
 	media_query_exp
-	| media_query_exp_list maybe_space MEDIA_AND maybe_space media_query_exp
+	| media_query_exp_list  MEDIA_AND  media_query_exp
 	;
 
 maybe_and_media_query_exp_list :
 	/*empty*/
-	| MEDIA_AND maybe_space media_query_exp_list
+	| MEDIA_AND  media_query_exp_list
 	;
 
 maybe_media_restrictor :
@@ -278,7 +266,7 @@ maybe_media_restrictor :
 
 media_query :
 	media_query_exp_list
-	| maybe_media_restrictor maybe_space medium maybe_and_media_query_exp_list
+	| maybe_media_restrictor  medium maybe_and_media_query_exp_list
 	;
 
 maybe_media_list :
@@ -288,21 +276,21 @@ maybe_media_list :
 
 media_list :
 	media_query
-	| media_list ',' maybe_space media_query
+	| media_list ','  media_query
 	//| media_list error /*10N*/
 	;
 
 media :
-	MEDIA_SYM maybe_space media_list '{' maybe_space block_rule_list save_block
-	| MEDIA_SYM maybe_space '{' maybe_space block_rule_list save_block
+	MEDIA_SYM  media_list '{'  block_rule_list '}'
+	| MEDIA_SYM  '{'  block_rule_list '}'
 	;
 
 medium :
-	IDENT /*3R*/ maybe_space
+	IDENT /*3R*/
 	;
 
 keyframes :
-	WEBKIT_KEYFRAMES_SYM maybe_space keyframe_name maybe_space '{' maybe_space keyframes_rule '}'
+	WEBKIT_KEYFRAMES_SYM  keyframe_name  '{'  keyframes_rule '}'
 	;
 
 keyframe_name :
@@ -312,16 +300,16 @@ keyframe_name :
 
 keyframes_rule :
 	/*empty*/
-	| keyframes_rule keyframe_rule maybe_space
+	| keyframes_rule keyframe_rule
 	;
 
 keyframe_rule :
-	key_list maybe_space '{' maybe_space declaration_list '}'
+	key_list  '{'  declaration_list '}'
 	;
 
 key_list :
 	key
-	| key_list maybe_space ',' maybe_space key
+	| key_list  ','  key
 	;
 
 key :
@@ -330,7 +318,7 @@ key :
 	;
 
 page :
-	PAGE_SYM maybe_space page_selector maybe_space '{' maybe_space declarations_and_margins closing_brace
+	PAGE_SYM  page_selector  '{'  declarations_and_margins '}'
 	//| PAGE_SYM error /*10N*/ invalid_block
 	//| PAGE_SYM error /*10N*/ ';'
 	;
@@ -344,11 +332,11 @@ page_selector :
 
 declarations_and_margins :
 	declaration_list
-	| declarations_and_margins margin_box maybe_space declaration_list
+	| declarations_and_margins margin_box  declaration_list
 	;
 
 margin_box :
-	margin_sym maybe_space '{' maybe_space declaration_list closing_brace
+	margin_sym  '{'  declaration_list '}'
 	;
 
 margin_sym :
@@ -371,15 +359,15 @@ margin_sym :
 	;
 
 font_face :
-	FONT_FACE_SYM maybe_space '{' maybe_space declaration_list '}' maybe_space
+	FONT_FACE_SYM  '{'  declaration_list '}'
 	//| FONT_FACE_SYM error /*10N*/ invalid_block
 	//| FONT_FACE_SYM error /*10N*/ ';'
 	;
 
 combinator :
-	'+' maybe_space
-	| '~' maybe_space
-	| '>' maybe_space
+	'+'
+	| '~'
+	| '>'
 	;
 
 maybe_unary_operator :
@@ -392,36 +380,19 @@ unary_operator :
 	| '+'
 	;
 
-maybe_space_before_declaration :
-	maybe_space
-	;
-
-before_ruleset :
-	/*empty*/
-	;
-
-before_rule_opening_brace :
-	/*empty*/
-	;
-
 ruleset :
-	selector_list before_rule_opening_brace '{' maybe_space_before_declaration declaration_list closing_brace
+	selector_list '{'  declaration_list '}'
 	;
 
 selector_list :
-	selector %prec UNIMPORTANT_TOK /*2L*/
-	| selector_list ',' maybe_space selector %prec UNIMPORTANT_TOK /*2L*/
+	selector
+	| selector_list ','  selector
 	//| selector_list error /*10N*/
-	;
-
-selector_with_trailing_whitespace :
-	selector WHITESPACE
 	;
 
 selector :
 	simple_selector
-	| selector_with_trailing_whitespace
-	| selector_with_trailing_whitespace simple_selector
+	| selector simple_selector
 	| selector combinator simple_selector
 	//| selector error /*10N*/
 	;
@@ -442,8 +413,8 @@ simple_selector :
 	;
 
 simple_selector_list :
-	simple_selector %prec UNIMPORTANT_TOK /*2L*/
-	| simple_selector_list maybe_space ',' maybe_space simple_selector %prec UNIMPORTANT_TOK /*2L*/
+	simple_selector
+	| simple_selector_list  ','  simple_selector
 	//| simple_selector_list error /*10N*/
 	;
 
@@ -471,14 +442,14 @@ class :
 	;
 
 attr_name :
-	IDENT /*3R*/ maybe_space
+	IDENT /*3R*/
 	;
 
 attrib :
-	'[' /*8N*/ maybe_space attr_name ']'
-	| '[' /*8N*/ maybe_space attr_name match maybe_space ident_or_string maybe_space ']'
-	| '[' /*8N*/ maybe_space namespace_selector attr_name ']'
-	| '[' /*8N*/ maybe_space namespace_selector attr_name match maybe_space ident_or_string maybe_space ']'
+	'[' /*8N*/  attr_name ']'
+	| '[' /*8N*/  attr_name match  ident_or_string  ']'
+	| '[' /*8N*/  namespace_selector attr_name ']'
+	| '[' /*8N*/  namespace_selector attr_name match  ident_or_string  ']'
 	;
 
 match :
@@ -501,12 +472,12 @@ pseudo_page :
 
 pseudo :
 	':' /*6N*/ IDENT /*3R*/
-	| ':' /*6N*/ ':' /*6N*/ IDENT /*3R*/
-	| ':' /*6N*/ ANYFUNCTION maybe_space simple_selector_list maybe_space ')'
-	| ':' /*6N*/ FUNCTION maybe_space NTH maybe_space ')'
-	| ':' /*6N*/ FUNCTION maybe_space maybe_unary_operator INTEGER maybe_space ')'
-	| ':' /*6N*/ FUNCTION maybe_space IDENT /*3R*/ maybe_space ')'
-	| ':' /*6N*/ NOTFUNCTION maybe_space simple_selector maybe_space ')'
+	| "::" IDENT /*3R*/
+	| ':' /*6N*/ ANYFUNCTION  simple_selector_list  ')'
+	| ':' /*6N*/ FUNCTION  NTH  ')'
+	| ':' /*6N*/ FUNCTION  maybe_unary_operator INTEGER  ')'
+	| ':' /*6N*/ FUNCTION  IDENT /*3R*/  ')'
+	| ':' /*6N*/ NOTFUNCTION  simple_selector  ')'
 	;
 
 declaration_list :
@@ -520,33 +491,33 @@ declaration_list :
 	;
 
 decl_list :
-	declaration ';' maybe_space
-	//| declaration invalid_block_list maybe_space
-	//| declaration invalid_block_list ';' maybe_space
-	//| error /*10N*/ ';' maybe_space
-	//| error /*10N*/ invalid_block_list error /*10N*/ ';' maybe_space
-	| decl_list declaration ';' maybe_space
-	//| decl_list error /*10N*/ ';' maybe_space
-	//| decl_list error /*10N*/ invalid_block_list error /*10N*/ ';' maybe_space
+	declaration ';'
+	//| declaration invalid_block_list
+	//| declaration invalid_block_list ';'
+	//| error /*10N*/ ';'
+	//| error /*10N*/ invalid_block_list error /*10N*/ ';'
+	| decl_list declaration ';'
+	//| decl_list error /*10N*/ ';'
+	//| decl_list error /*10N*/ invalid_block_list error /*10N*/ ';'
 	;
 
 declaration :
-	property ':' /*6N*/ maybe_space expr prio
+	property ':' /*6N*/  expr prio
 	//| property error /*10N*/
-	//| property ':' /*6N*/ maybe_space error /*10N*/ expr prio
-	//| property ':' /*6N*/ maybe_space expr prio error /*10N*/
-	| IMPORTANT_SYM maybe_space
-	| property ':' /*6N*/ maybe_space
-	//| property ':' /*6N*/ maybe_space error /*10N*/
+	//| property ':' /*6N*/  error /*10N*/ expr prio
+	//| property ':' /*6N*/  expr prio error /*10N*/
+	| IMPORTANT_SYM
+	| property ':' /*6N*/
+	//| property ':' /*6N*/  error /*10N*/
 	//| property invalid_block
 	;
 
 property :
-	IDENT /*3R*/ maybe_space
+	IDENT /*3R*/
 	;
 
 prio :
-	IMPORTANT_SYM maybe_space
+	IMPORTANT_SYM
 	| /*empty*/
 	;
 
@@ -559,55 +530,55 @@ expr :
 	;
 
 operator :
-	'/' maybe_space
-	| ',' maybe_space
+	'/'
+	| ','
 	| /*empty*/
 	;
 
 term :
 	unary_term
 	| unary_operator unary_term
-	| STRING maybe_space
-	| IDENT /*3R*/ maybe_space
-	| DIMEN maybe_space
-	| unary_operator DIMEN maybe_space
-	| URI maybe_space
-	| UNICODERANGE maybe_space
-	| HEX /*4N*/ maybe_space
-	| '#' maybe_space
+	| STRING
+	| IDENT /*3R*/
+	| DIMEN
+	| unary_operator DIMEN
+	| URI
+	| UNICODERANGE
+	| HEX /*4N*/
+	| '#'
 	| function
 	| calc_function
 	| min_or_max_function
-	| '%' maybe_space
+	| '%'
 	;
 
 unary_term :
-	INTEGER maybe_space
-	| FLOATTOKEN maybe_space
-	| PERCENTAGE maybe_space
-	| PXS maybe_space
-	| CMS maybe_space
-	| MMS maybe_space
-	| INS maybe_space
-	| PTS maybe_space
-	| PCS maybe_space
-	| DEGS maybe_space
-	| RADS maybe_space
-	| GRADS maybe_space
-	| TURNS maybe_space
-	| MSECS maybe_space
-	| SECS maybe_space
-	| HERTZ maybe_space
-	| KHERTZ maybe_space
-	| EMS maybe_space
-	| QEMS maybe_space
-	| EXS maybe_space
-	| REMS maybe_space
+	INTEGER
+	| FLOATTOKEN
+	| PERCENTAGE
+	| PXS
+	| CMS
+	| MMS
+	| INS
+	| PTS
+	| PCS
+	| DEGS
+	| RADS
+	| GRADS
+	| TURNS
+	| MSECS
+	| SECS
+	| HERTZ
+	| KHERTZ
+	| EMS
+	| QEMS
+	| EXS
+	| REMS
 	;
 
 function :
-	FUNCTION maybe_space expr ')' maybe_space
-	//| FUNCTION maybe_space error /*10N*/
+	FUNCTION  expr ')'
+	//| FUNCTION  error /*10N*/
 	;
 
 calc_func_term :
@@ -616,19 +587,19 @@ calc_func_term :
 	;
 
 calc_func_operator :
-	'+' WHITESPACE
-	| '-' WHITESPACE
-	| '*' /*9N*/ maybe_space
-	| '/' maybe_space
-	| IDENT /*3R*/ maybe_space
+	'+'
+	| '-'
+	| '*' /*9N*/
+	| '/'
+	| IDENT /*3R*/
 	;
 
 calc_func_paren_expr :
-	'(' maybe_space calc_func_expr maybe_space ')' maybe_space
+	'('  calc_func_expr  ')'
 	;
 
 calc_func_expr :
-	calc_func_term maybe_space
+	calc_func_term
 	| calc_func_expr calc_func_operator calc_func_term
 	| calc_func_expr calc_func_operator calc_func_paren_expr
 	| calc_func_paren_expr
@@ -637,12 +608,12 @@ calc_func_expr :
 
 calc_func_expr_list :
 	calc_func_expr
-	| calc_func_expr_list ',' maybe_space calc_func_expr
+	| calc_func_expr_list ','  calc_func_expr
 	;
 
 calc_function :
-	CALCFUNCTION maybe_space calc_func_expr ')' maybe_space
-	//| CALCFUNCTION maybe_space error /*10N*/
+	CALCFUNCTION  calc_func_expr ')'
+	//| CALCFUNCTION  error /*10N*/
 	;
 
 min_or_max :
@@ -651,13 +622,8 @@ min_or_max :
 	;
 
 min_or_max_function :
-	min_or_max maybe_space calc_func_expr_list ')' maybe_space
-	//| min_or_max maybe_space error /*10N*/
-	;
-
-save_block :
-	closing_brace
-	//| error /*10N*/ closing_brace
+	min_or_max  calc_func_expr_list ')'
+	//| min_or_max  error /*10N*/
 	;
 
 //invalid_at :
@@ -684,7 +650,7 @@ save_block :
 %x mediaquery
 //%x forkeyword
 
-w               [ \t\r\n\f]*
+w               [ \t\r\n\f]
 nl              \n|\r\n|\r|\f
 h               [0-9a-fA-F]
 nonascii        [\200-\377]
@@ -699,18 +665,19 @@ ident           -?{nmstart}{nmchar}*
 num             [0-9]+|[0-9]*"."[0-9]+
 intnum          [0-9]+
 string          {string1}|{string2}
-url             ([!#$%&*-~]|{nonascii}|{escape})*
+url             ([!#$%&*-~]|{nonascii}|{escape})
 range           \?{1,6}|{h}(\?{0,5}|{h}(\?{0,4}|{h}(\?{0,3}|{h}(\?{0,2}|{h}(\??|{h})))))
 nth             [\+-]?{intnum}*n([\t\r\n ]*[\+-][\t\r\n ]*{intnum})?
 
 %%
 
 <*> {
-\/\*[^*]*\*+([^/*][^*]*\*+)*\/	skip() /* ignore comments */
+"/*"(?s:.)*?"*/"	skip() /* ignore comments */
 
-[ \t\r\n\f]+            WHITESPACE
+[ \t\r\n\f]+            skip() //WHITESPACE
 
 ":"	':'
+"::"	"::"
 "."	'.'
 "["	'['
 "*"	'*'
@@ -773,7 +740,7 @@ nth             [\+-]?{intnum}*n([\t\r\n ]*[\+-][\t\r\n ]*{intnum})?
 
 //"@"{ident}              ATKEYWORD
 
-"!"{w}"important"       IMPORTANT_SYM
+"!"{w}*"important"       IMPORTANT_SYM
 
 {num}em                 EMS
 {num}rem                REMS
@@ -801,8 +768,8 @@ nth             [\+-]?{intnum}*n([\t\r\n ]*[\+-][\t\r\n ]*{intnum})?
 
 "-webkit-any("          ANYFUNCTION
 "not("                  NOTFUNCTION
-"url("{w}{string}{w}")" URI
-"url("{w}{url}{w}")"    URI
+"url("{w}*{string}{w}*")" URI
+"url("{w}*{url}+{w}*")"    URI
 "-webkit-calc("         CALCFUNCTION
 "-webkit-min("          MINFUNCTION
 "-webkit-max("          MAXFUNCTION
