@@ -381,7 +381,8 @@ unary_operator :
 	;
 
 ruleset :
-	selector_list '{'  declaration_list '}'
+	selector_list '{'  '}'
+	| selector_list '{'  declaration_list '}'
 	;
 
 selector_list :
@@ -532,6 +533,7 @@ expr :
 operator :
 	'/'
 	| ','
+	| '='
 	| /*empty*/
 	;
 
@@ -540,6 +542,7 @@ term :
 	| unary_operator unary_term
 	| STRING
 	| IDENT /*3R*/
+	| NTH
 	| DIMEN
 	| unary_operator DIMEN
 	| URI
@@ -661,13 +664,13 @@ nmchar          [_a-zA-Z0-9-]|{nonascii}|{escape}
 string1         \"([\t !#$%&(-~]|\\{nl}|\'|{nonascii}|{escape})*\"
 string2         \'([\t !#$%&(-~]|\\{nl}|\"|{nonascii}|{escape})*\'
 
-ident           -?{nmstart}{nmchar}*
-num             [0-9]+|[0-9]*"."[0-9]+
+ident           -*{nmstart}{nmchar}*
 intnum          [0-9]+
+num             {intnum}|[0-9]*"."{intnum}
 string          {string1}|{string2}
 url             ([!#$%&*-~]|{nonascii}|{escape})
 range           \?{1,6}|{h}(\?{0,5}|{h}(\?{0,4}|{h}(\?{0,3}|{h}(\?{0,2}|{h}(\??|{h})))))
-nth             [\+-]?{intnum}*n([\t\r\n ]*[\+-][\t\r\n ]*{intnum})?
+nth             [\+-]?{intnum}?n([\t\r\n ]*[\+-][\t\r\n ]*{intnum})?
 
 %%
 
@@ -726,7 +729,7 @@ nth             [\+-]?{intnum}*n([\t\r\n ]*[\+-][\t\r\n ]*{intnum})?
 "@right-top"            RIGHTTOP_SYM
 "@right-middle"         RIGHTMIDDLE_SYM
 "@right-bottom"         RIGHTBOTTOM_SYM
-"@media"<mediaquery>                MEDIA_SYM
+"@media"<mediaquery>    MEDIA_SYM
 "@font-face"            FONT_FACE_SYM
 "@charset"              CHARSET_SYM
 "@namespace"            NAMESPACE_SYM
@@ -735,7 +738,7 @@ nth             [\+-]?{intnum}*n([\t\r\n ]*[\+-][\t\r\n ]*{intnum})?
 "@-webkit-value"        WEBKIT_VALUE_SYM
 "@-webkit-mediaquery"<mediaquery>   WEBKIT_MEDIAQUERY_SYM
 "@-webkit-selector"     WEBKIT_SELECTOR_SYM
-"@-webkit-keyframes"    WEBKIT_KEYFRAMES_SYM
+"@-webkit-keyframes"|"@keyframes"    WEBKIT_KEYFRAMES_SYM
 "@-webkit-keyframe-rule" WEBKIT_KEYFRAME_RULE_SYM
 
 //"@"{ident}              ATKEYWORD
@@ -760,8 +763,6 @@ nth             [\+-]?{intnum}*n([\t\r\n ]*[\+-][\t\r\n ]*{intnum})?
 {num}s                  SECS
 {num}Hz                 HERTZ
 {num}kHz                KHERTZ
-{num}{ident}            DIMEN
-//{num}{ident}\+          INVALIDDIMEN
 {num}%+                 PERCENTAGE
 {intnum}                INTEGER
 {num}                   FLOATTOKEN
@@ -787,6 +788,8 @@ U\+{h}{1,6}-{h}{1,6}    UNICODERANGE
 {string}                STRING
 {ident}                 IDENT
 {nth}                   NTH
+//{num}{ident}\+          INVALIDDIMEN
+{num}{ident}            DIMEN
 }
 
 %%
