@@ -99,6 +99,7 @@ const sampleList = [
 	["Cowgol parser", "cowgol-cowfe.g", "test.cowgol-cowfe", "ace/mode/ada"],
 	["C lexer Puma", "clexer-puma.g", "test.frama-c", "ace/mode/c_cpp"],
 	["C parser frama-c (partially working)", "cparser-frama-c.g", "test.frama-c", "ace/mode/c_cpp"],
+	["C parser (c-to-json) (partially working)", "c-to-json.g", "test.frama-c", "ace/mode/c_cpp"],
 	["Cpp5-v2 parser (not working)", "cpp5-v2.g", "test.cpp", "ace/mode/c_cpp"],
 	["CSS parser from VLC", "CSSGrammar-vlc.g", "style.css", "ace/mode/css"],
 	["CSS parser from Webkit", "css-webkit.g", "style.css", "ace/mode/css"],
@@ -108,6 +109,7 @@ const sampleList = [
 	["Cyclone parser (partially working)", "cyclone.g", "test.cyclone", "ace/mode/c_cpp"],
 	["D parser (partially working)", "dlang-uaiso.g", "test.d", "ace/mode/c_cpp"],
 	["Datalog parser", "datalog.g", "test.datalog", "ace/mode/text"],
+	["DateTime parser (core)", "core-date-time-parser.g", "test.core-date-time-parser", "ace/mode/text"],
 	["Delphi parser (partially working)", "delphi.g", "test.delphi", "ace/mode/pascal"],
 	["Dino-lang parser", "dino-lang.g", "test.dino-lang", "ace/mode/c_cpp"],
 	["DMEngine parser", "dmengine-dm.g", "test.dmengine-dm", "ace/mode/sh"],
@@ -123,7 +125,6 @@ const sampleList = [
 	["Expr-lang parser", "expr-lang.g", "test.expr-lang", "ace/mode/txt"],
 	["Fault-lang parser (partially working)", "fault-lang-ext.g", "test.fault-lang", "ace/mode/txt"],
 	["Faust parser", "faustparser.g", "test.faustparser", "ace/mode/txt"],
-	["ZScript parser", "ffscript.g", "test.ffscript", "ace/mode/c_cpp"],
 	["Firebird DSQL parser", "firebird-dsql.g", "test.firebird-dsql", "ace/mode/sql"],
 	["Flatbuffers parser", "flatbuffers.g", "test.flatbuffers", "ace/mode/txt"],
 	["Fortune sheet formula parser", "fortune-sheet-formula.g", "test.fortune-sheet-formula", "ace/mode/txt"],
@@ -284,6 +285,7 @@ const sampleList = [
 	["XML parser", "xml.g", "test.xml.txt", "ace/mode/xml"],
 	["XML parser Eiffel", "xml_eiffel_parser.g", "test.xml_eiffel_parser", "ace/mode/xml"],
 	["Z80 assembler parser", "z80-asm.g", "test.z80-asm", "ace/mode/assembly_x86"],
+	["ZScript parser", "ffscript.g", "test.ffscript", "ace/mode/c_cpp"],
 	["ZetaSQL parser (be patient)(partially working)", "zetasql.g", "test.zetasql", "ace/mode/sql"],
 ];
 
