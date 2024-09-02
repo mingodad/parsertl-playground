@@ -46,9 +46,8 @@ BEGIN {  stack_index = 0 # stack[] holds the input files
    # test if INCLUDED is empty
    flag = 0 # on once the front is printed
    for( j in INCLUDED )
-      if ( ! flag )
-      { printf "%s : %s" , outfile, j ; flag = 1 }
-      else  printf " %s" , j
+      if ( ! flag ) {printf "%s : %s" , outfile, j ; flag = 1; }
+      #else  printf " %s" , j
 
    if ( flag )  print ""
 

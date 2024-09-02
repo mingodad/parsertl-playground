@@ -112,6 +112,7 @@ program :
 program_block :
 	 PA_block
 	| function_def
+	| NL
 	//| outside_error block
 	;
 PA_block :
@@ -443,7 +444,7 @@ ident		[a-zA-Z_][a-zA-Z_0-9]*
 
 %%
 
-#[^\n\r]*   skip()
+#.*   skip()
 [ \t]   skip()
 
 "BEGIN"  a_BEGIN
