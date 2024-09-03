@@ -281,6 +281,7 @@ const sampleList = [
 	["Vitess SQL parser (be patient)(partially working)", "sql-vitess.g", "test.sql-vitess", "ace/mode/sql"],
 	["Vitess SQL parser with fallback (partially working)", "sql-vitess-fallback.g", "test.sql-vitess", "ace/mode/sql"],
 	["Webassembly interpreter parser", "wasm-interpreter.g", "test.wast", "ace/mode/lisp"],
+	["WisiToken parser", "WisiToken.g", "test.WisiToken", "ace/mode/lisp"],
 	["X64 ASM ATT parser", "x64asm-att.g", "test.x64asm-att", "ace/mode/assembly_x86"],
 	["XML parser", "xml.g", "test.xml.txt", "ace/mode/xml"],
 	["XML parser Eiffel", "xml_eiffel_parser.g", "test.xml_eiffel_parser", "ace/mode/xml"],
