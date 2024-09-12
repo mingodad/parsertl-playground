@@ -1,4 +1,4 @@
-//From: https://github.com/inspirer/textmapper/blob/496b2847269e448d652abfff98ae5160736e82df/parsers/tm/tm.y
+//From: https://github.com/inspirer/textmapper/blob/b52f6146454080ec6d66ba695f89d260c685d3df/parsers/tm/tm.y
 //for fn in `find textmapper -name '*.tm'`; do echo $fn:1:1; ./parsertl-playground textmapper3.g $fn; done
 /*Tokens*/
 %token OR
@@ -37,11 +37,12 @@
 %token EXCL
 %token TILDE
 %token DOLLAR
-//%token ATSIGN
+//%token AT
 %token DIV
 %token LBRACE
 %token ERROR
 %token ID
+%token QUOTED_ID
 %token AS
 %token FALSE
 %token IMPORT
@@ -95,7 +96,6 @@
 %start YY_PARSE_file
 
 %%
-
 
 YY_PARSE_file :
 	file
@@ -154,6 +154,12 @@ identifier_Keywords :
 	| AS
 	| IMPORT
 	| SET
+	;
+
+identifier_Str :
+	identifier
+	| QUOTED_ID
+	| SCON
 	;
 
 integer_literal :
@@ -233,12 +239,12 @@ option :
 	;
 
 symref :
-	identifier
+	identifier_Str
 	;
 
 symref_Args :
-	identifier args
-	| identifier
+	identifier_Str args
+	| identifier_Str
 	;
 
 rawType :
@@ -284,26 +290,50 @@ stateref_list_Comma_separated :
 	;
 
 lexeme :
-	start_conditions identifier rawTypeopt COLON pattern integer_literal lexeme_attrs command
-	| start_conditions identifier rawTypeopt COLON pattern integer_literal lexeme_attrs
-	| start_conditions identifier rawTypeopt COLON pattern integer_literal command
-	| start_conditions identifier rawTypeopt COLON pattern integer_literal
-	| start_conditions identifier rawTypeopt COLON pattern lexeme_attrs command
-	| start_conditions identifier rawTypeopt COLON pattern lexeme_attrs
-	| start_conditions identifier rawTypeopt COLON pattern command
-	| start_conditions identifier rawTypeopt COLON pattern
-	| start_conditions identifier rawTypeopt COLON lexeme_attrs
-	| start_conditions identifier rawTypeopt COLON
-	| identifier rawTypeopt COLON pattern integer_literal lexeme_attrs command
-	| identifier rawTypeopt COLON pattern integer_literal lexeme_attrs
-	| identifier rawTypeopt COLON pattern integer_literal command
-	| identifier rawTypeopt COLON pattern integer_literal
-	| identifier rawTypeopt COLON pattern lexeme_attrs command
-	| identifier rawTypeopt COLON pattern lexeme_attrs
-	| identifier rawTypeopt COLON pattern command
-	| identifier rawTypeopt COLON pattern
-	| identifier rawTypeopt COLON lexeme_attrs
-	| identifier rawTypeopt COLON
+	start_conditions identifier_Str lexeme_id rawTypeopt COLON pattern integer_literal lexeme_attrs command
+	| start_conditions identifier_Str lexeme_id rawTypeopt COLON pattern integer_literal lexeme_attrs
+	| start_conditions identifier_Str lexeme_id rawTypeopt COLON pattern integer_literal command
+	| start_conditions identifier_Str lexeme_id rawTypeopt COLON pattern integer_literal
+	| start_conditions identifier_Str lexeme_id rawTypeopt COLON pattern lexeme_attrs command
+	| start_conditions identifier_Str lexeme_id rawTypeopt COLON pattern lexeme_attrs
+	| start_conditions identifier_Str lexeme_id rawTypeopt COLON pattern command
+	| start_conditions identifier_Str lexeme_id rawTypeopt COLON pattern
+	| start_conditions identifier_Str lexeme_id rawTypeopt COLON lexeme_attrs
+	| start_conditions identifier_Str lexeme_id rawTypeopt COLON
+	| start_conditions identifier_Str rawTypeopt COLON pattern integer_literal lexeme_attrs command
+	| start_conditions identifier_Str rawTypeopt COLON pattern integer_literal lexeme_attrs
+	| start_conditions identifier_Str rawTypeopt COLON pattern integer_literal command
+	| start_conditions identifier_Str rawTypeopt COLON pattern integer_literal
+	| start_conditions identifier_Str rawTypeopt COLON pattern lexeme_attrs command
+	| start_conditions identifier_Str rawTypeopt COLON pattern lexeme_attrs
+	| start_conditions identifier_Str rawTypeopt COLON pattern command
+	| start_conditions identifier_Str rawTypeopt COLON pattern
+	| start_conditions identifier_Str rawTypeopt COLON lexeme_attrs
+	| start_conditions identifier_Str rawTypeopt COLON
+	| identifier_Str lexeme_id rawTypeopt COLON pattern integer_literal lexeme_attrs command
+	| identifier_Str lexeme_id rawTypeopt COLON pattern integer_literal lexeme_attrs
+	| identifier_Str lexeme_id rawTypeopt COLON pattern integer_literal command
+	| identifier_Str lexeme_id rawTypeopt COLON pattern integer_literal
+	| identifier_Str lexeme_id rawTypeopt COLON pattern lexeme_attrs command
+	| identifier_Str lexeme_id rawTypeopt COLON pattern lexeme_attrs
+	| identifier_Str lexeme_id rawTypeopt COLON pattern command
+	| identifier_Str lexeme_id rawTypeopt COLON pattern
+	| identifier_Str lexeme_id rawTypeopt COLON lexeme_attrs
+	| identifier_Str lexeme_id rawTypeopt COLON
+	| identifier_Str rawTypeopt COLON pattern integer_literal lexeme_attrs command
+	| identifier_Str rawTypeopt COLON pattern integer_literal lexeme_attrs
+	| identifier_Str rawTypeopt COLON pattern integer_literal command
+	| identifier_Str rawTypeopt COLON pattern integer_literal
+	| identifier_Str rawTypeopt COLON pattern lexeme_attrs command
+	| identifier_Str rawTypeopt COLON pattern lexeme_attrs
+	| identifier_Str rawTypeopt COLON pattern command
+	| identifier_Str rawTypeopt COLON pattern
+	| identifier_Str rawTypeopt COLON lexeme_attrs
+	| identifier_Str rawTypeopt COLON
+	;
+
+lexeme_id :
+	LPAREN identifier_Keywords RPAREN
 	;
 
 lexeme_attrs :
@@ -353,20 +383,38 @@ grammar_part_OrSyntaxError :
 	;
 
 nonterm :
-	identifier nonterm_params rawType reportClause COLON rules SEMICOLON
+	identifier nonterm_params nonterm_alias rawType reportClause COLON rules SEMICOLON
+	| identifier nonterm_params nonterm_alias rawType COLON rules SEMICOLON
+	| identifier nonterm_params nonterm_alias reportClause COLON rules SEMICOLON
+	| identifier nonterm_params nonterm_alias COLON rules SEMICOLON
+	| identifier nonterm_params rawType reportClause COLON rules SEMICOLON
 	| identifier nonterm_params rawType COLON rules SEMICOLON
 	| identifier nonterm_params reportClause COLON rules SEMICOLON
 	| identifier nonterm_params COLON rules SEMICOLON
+	| identifier nonterm_alias rawType reportClause COLON rules SEMICOLON
+	| identifier nonterm_alias rawType COLON rules SEMICOLON
+	| identifier nonterm_alias reportClause COLON rules SEMICOLON
+	| identifier nonterm_alias COLON rules SEMICOLON
 	| identifier rawType reportClause COLON rules SEMICOLON
 	| identifier rawType COLON rules SEMICOLON
 	| identifier reportClause COLON rules SEMICOLON
 	| identifier COLON rules SEMICOLON
+	| EXTEND identifier nonterm_alias reportClause COLON rules SEMICOLON
+	| EXTEND identifier nonterm_alias COLON rules SEMICOLON
 	| EXTEND identifier reportClause COLON rules SEMICOLON
 	| EXTEND identifier COLON rules SEMICOLON
+	| INLINE identifier nonterm_params nonterm_alias reportClause COLON rules SEMICOLON
+	| INLINE identifier nonterm_params nonterm_alias COLON rules SEMICOLON
 	| INLINE identifier nonterm_params reportClause COLON rules SEMICOLON
 	| INLINE identifier nonterm_params COLON rules SEMICOLON
+	| INLINE identifier nonterm_alias reportClause COLON rules SEMICOLON
+	| INLINE identifier nonterm_alias COLON rules SEMICOLON
 	| INLINE identifier reportClause COLON rules SEMICOLON
 	| INLINE identifier COLON rules SEMICOLON
+	;
+
+nonterm_alias :
+	LBRACK identifier_Keywords RBRACK
 	;
 
 assoc :
@@ -424,20 +472,12 @@ rules :
 	;
 
 rule0 :
-	predicate rhsParts rhsSuffix reportClause
-	| predicate rhsParts rhsSuffix
-	| predicate rhsParts reportClause
+	predicate rhsParts reportClause
 	| predicate rhsParts
-	| predicate rhsSuffix reportClause
-	| predicate rhsSuffix
 	| predicate reportClause
 	| predicate
-	| rhsParts rhsSuffix reportClause
-	| rhsParts rhsSuffix
 	| rhsParts reportClause
 	| rhsParts
-	| rhsSuffix reportClause
-	| rhsSuffix
 	| reportClause
 	| %empty
 	| syntax_problem
@@ -445,11 +485,6 @@ rule0 :
 
 predicate :
 	LBRACK predicate_expression RBRACK
-	;
-
-rhsSuffix :
-	REM PREC symref
-	| REM SHIFT symref
 	;
 
 reportClause :
@@ -473,6 +508,8 @@ rhsPart :
 	| command
 	| rhsStateMarker
 	| rhsLookahead
+	| REM EMPTY
+	| REM PREC symref
 	;
 
 rhsPart_OrSyntaxError :
@@ -480,6 +517,8 @@ rhsPart_OrSyntaxError :
 	| command
 	| rhsStateMarker
 	| rhsLookahead
+	| REM EMPTY
+	| REM PREC symref
 	| syntax_problem
 	;
 
@@ -513,9 +552,13 @@ rhsOptional :
 	;
 
 rhsCast :
+	rhsAlias
+	| rhsAlias AS symref_Args
+	;
+
+rhsAlias :
 	rhsPrimary
-	| rhsPrimary AS symref_Args
-	| rhsPrimary AS literal
+	| rhsPrimary LBRACK identifier_Keywords RBRACK
 	;
 
 listSeparator :
@@ -615,7 +658,6 @@ predicate_expression :
 
 expression :
 	literal
-	| symref_Args
 	| LBRACK expression_list_Comma_separated COMMA RBRACK
 	| LBRACK expression_list_Comma_separated RBRACK
 	| LBRACK COMMA RBRACK
@@ -724,7 +766,7 @@ ID  [a-zA-Z_]([a-zA-Z_\-0-9]*[a-zA-Z_0-9])?|'(\\.|[^'\n\r\\])*'
 "+"	PLUS
 "$"	DOLLAR
 "~"	TILDE
-//"@="	ATSIGN
+//"@"	AT
 "=="	ASSIGNASSIGN
 "!="	EXCLASSIGN
 
@@ -740,7 +782,8 @@ ID  [a-zA-Z_]([a-zA-Z_\-0-9]*[a-zA-Z_0-9])?|'(\\.|[^'\n\r\\])*'
 /* Order matter if identifier comes before keywords they are classified as identifier */
 {ID}<afterID>	ID
 -?[0-9]+	ICON
-\"(\\.|[^\"\n\r\\])*\"	SCON
+\"(\\.|[^\"\n\r\\])+\"	SCON
+'(\\.|[^\'\n\r\\])+''	QUOTED_ID
 \/(\\.|[^/\n])+\/	REGEXP
 /*\{(?s:[^}])+\}	CODE*/
 <INITIAL,CODE_ST>"{"<>CODE_ST>
