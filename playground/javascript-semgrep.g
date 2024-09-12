@@ -1932,6 +1932,8 @@ elision :
 
 %%
 
+%x TRY_REGEX
+
 /*****************************************************************************/
 /* Regexp aliases */
 /*****************************************************************************/
@@ -1950,14 +1952,16 @@ InputCharacter  [^ \r\n]
 
 SPACES	[ \t\r\n]+
 COMMENT	"//"[^\r\n]*
-C_STYLE_COMMENT [/][*](?s:.)*?[*][/]
+C_STYLE_COMMENT "/*"(?s:.)*?"*/"
+SWS {SPACES}|{COMMENT}|{C_STYLE_COMMENT}
 
 %%
 /*Lexer*/
 
-{SPACES} skip()
-{COMMENT}	skip()
-{C_STYLE_COMMENT}	skip()
+//{SPACES} skip()
+//{COMMENT}	skip()
+//{C_STYLE_COMMENT}	skip()
+{SWS}   skip()
 
 /* ---------------------------------------------------------------------- */
 /* Keywords */
@@ -1976,7 +1980,7 @@ C_STYLE_COMMENT [/][*](?s:.)*?[*][/]
 "break"	T_BREAK
 "continue"	T_CONTINUE
 
-"return"	T_RETURN
+<INITIAL,TRY_REGEX>"return"	T_RETURN
 
 "throw"	T_THROW
 "try"	T_TRY
@@ -2062,15 +2066,15 @@ C_STYLE_COMMENT [/][*](?s:.)*?[*][/]
 //pop_mode ();
 "}" T_RCURLY
 
-"("  T_LPAREN
+<INITIAL,TRY_REGEX>"("  T_LPAREN
 ")"  T_RPAREN
 
-"["  T_LBRACKET
+<INITIAL,TRY_REGEX>"["  T_LBRACKET
 "]"  T_RBRACKET
 "."  T_PERIOD
 ";"  T_SEMICOLON
-","  T_COMMA
-":"  T_COLON
+<INITIAL,TRY_REGEX>","  T_COMMA
+<INITIAL,TRY_REGEX>":"  T_COLON
 "?"  T_PLING
 "?."  T_QUESTDOT
 "&&"  T_AND
@@ -2108,9 +2112,9 @@ C_STYLE_COMMENT [/][*](?s:.)*?[*][/]
 "|"  T_BIT_OR
 "&"  T_BIT_AND
 "^"  T_BIT_XOR
-"!"  T_NOT
+<INITIAL,TRY_REGEX>"!"  T_NOT
 "~"  T_BIT_NOT
-"="  T_ASSIGN
+<INITIAL,TRY_REGEX>"="  T_ASSIGN
 /* es7: */
 "**"  T_EXPONENT
 
@@ -2143,7 +2147,14 @@ T_XHP_SHORT_FRAGMENT	T_XHP_SHORT_FRAGMENT
 T_XHP_SLASH_GT	T_XHP_SLASH_GT
 T_XHP_TEXT	T_XHP_TEXT
 
-"/"(\\.|[^/\n\r\\])+"/"[gi]?	T_REGEX
+([=(!:,\[]|"return"){SPACES}*"/"<TRY_REGEX> reject()
+<TRY_REGEX>{
+    {SPACES}    skip()
+    {COMMENT}<INITIAL> skip()
+    {C_STYLE_COMMENT}<INITIAL> skip()
+	"/"(\\.|[^/\n\r\\])+"/"[gmi]*<INITIAL>	T_REGEX
+}
+
 0[xX][a-fA-F0-9]+|[0-9]+	T_INT
 [0-9]+([Ee][+-]?[0-9]+)?|[0-9]*\.[0-9]+([Ee][+-]?[0-9]+)?	T_FLOAT
 \"(\\.|[^\"\n\r\\])*\"|'(\\.|[^'\n\r\\])*'	T_STRING
