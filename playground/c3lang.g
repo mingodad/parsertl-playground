@@ -1,4 +1,4 @@
-//From: https://github.com/c3lang/c3c/blob/master/resources/grammar/grammar.y
+//From: https://github.com/c3lang/c3c/blob/f78466452a3379db02a91257496daed1fac07753/resources/grammar/grammar.y
 
 /*Tokens*/
 %token IDENT
