@@ -12,6 +12,10 @@
 %token CT_INCLUDE
 %token STRING_LITERAL
 %token INTEGER
+%token CT_AND_OP
+%token CT_OR_OP
+//%token CT_CONCAT_OP
+%token CT_EXEC
 %token INC_OP
 %token DEC_OP
 %token SHL_OP
@@ -152,32 +156,8 @@
 %token RBRAPIPE
 //%token HASH_CONST_IDENT
 %token CT_ASSIGNABLE
-%token CT_AND
+//%token CT_AND
 %token CT_IS_CONST
-%token '.'
-%token '('
-%token ')'
-%token ','
-%token '^'
-%token ':'
-%token '['
-%token ']'
-%token '!'
-%token '&'
-%token '*'
-%token '+'
-%token '-'
-%token '~'
-%token '/'
-%token '%'
-%token '|'
-%token '<'
-%token '>'
-%token '?'
-%token '='
-%token ';'
-%token '{'
-%token '}'
 
 
 %start translation_unit
@@ -229,13 +209,12 @@ ct_castable :
 
 ct_analyse :
 	CT_EVAL
-	| CT_DEFINED
 	| CT_SIZEOF
 	| CT_STRINGIFY
 	| CT_IS_CONST
 	;
 
-ct_arg :
+ct_vaarg :
 	CT_VACONST
 	| CT_VAARG
 	| CT_VAREF
@@ -291,11 +270,11 @@ base_expr_assignable :
 	| '(' expr ')'
 	| expr_block
 	| ct_call '(' flat_path ')'
-	| ct_arg '(' expr ')'
+	| ct_vaarg '[' expr ']'
 	| ct_analyse '(' expression_list ')'
+	| CT_DEFINED '(' arg_list ')'
 	| CT_VACOUNT
 	| CT_FEATURE '(' CONST_IDENT ')'
-	| CT_AND '(' expression_list ')'
 	| ct_castable '(' expr ',' type ')'
 	| lambda_decl compound_statement
 	;
@@ -465,7 +444,12 @@ relational_stmt_expr :
 	| relational_stmt_expr relational_op additive_expr
 	;
 
-rel_or_lambda_expr :
+try_catch_rhs_expr :
+	call_expr
+	| lambda_decl IMPLIES relational_expr
+	;
+
+try_chain_expr :
 	relational_expr
 	| lambda_decl IMPLIES relational_expr
 	;
@@ -473,21 +457,25 @@ rel_or_lambda_expr :
 and_expr :
 	relational_expr
 	| and_expr AND_OP relational_expr
+	| and_expr CT_AND_OP relational_expr
 	;
 
 and_stmt_expr :
 	relational_stmt_expr
 	| and_stmt_expr AND_OP relational_expr
+	| and_stmt_expr CT_AND_OP relational_expr
 	;
 
 or_expr :
 	and_expr
 	| or_expr OR_OP and_expr
+	| or_expr CT_OR_OP and_expr
 	;
 
 or_stmt_expr :
 	and_stmt_expr
 	| or_stmt_expr OR_OP and_expr
+	| or_stmt_expr CT_OR_OP and_expr
 	;
 
 suffix_expr :
@@ -579,13 +567,23 @@ param_path :
 	| param_path param_path_element
 	;
 
+arg_name :
+	IDENT
+	| CT_TYPE_IDENT
+	| HASH_IDENT
+	| CT_IDENT
+	;
+
 arg :
 	param_path '=' expr
-	| type
 	| param_path '=' type
+	| param_path
+	| arg_name ':' expr
+	| arg_name ':' type
+	| type
 	| expr
-	| CT_VASPLAT '(' range_expr ')'
-	| CT_VASPLAT '(' ')'
+	| CT_VASPLAT
+	| CT_VASPLAT '[' range_expr ']'
 	| ELLIPSIS expr
 	;
 
@@ -629,7 +627,7 @@ enum_list :
 
 enum_constant :
 	CONST_IDENT opt_attributes
-	| CONST_IDENT '(' arg_list ')' opt_attributes
+	| CONST_IDENT opt_attributes '=' constant_expr
 	;
 
 identifier_list :
@@ -638,9 +636,7 @@ identifier_list :
 	;
 
 enum_param_decl :
-	type
-	| type IDENT
-	| type IDENT '=' expr
+	type IDENT
 	;
 
 base_type :
@@ -673,7 +669,7 @@ base_type :
 	| CT_TYPE_IDENT
 	| CT_TYPEOF '(' expr ')'
 	| CT_TYPEFROM '(' constant_expr ')'
-	| CT_VATYPE '(' constant_expr ')'
+	| CT_VATYPE '[' constant_expr ']'
 	| CT_EVALTYPE '(' constant_expr ')'
 	;
 
@@ -784,15 +780,15 @@ catch_unwrap :
 	;
 
 try_unwrap :
-	TRY rel_or_lambda_expr
-	| TRY IDENT '=' rel_or_lambda_expr
-	| TRY type IDENT '=' rel_or_lambda_expr
+	TRY try_catch_rhs_expr
+	| TRY IDENT '=' try_chain_expr
+	| TRY type IDENT '=' try_chain_expr
 	;
 
 try_unwrap_chain :
 	try_unwrap
 	| try_unwrap_chain AND_OP try_unwrap
-	| try_unwrap_chain AND_OP rel_or_lambda_expr
+	| try_unwrap_chain AND_OP try_chain_expr
 	;
 
 default_stmt :
@@ -913,6 +909,7 @@ defer_stmt :
 	DEFER statement
 	| DEFER TRY statement
 	| DEFER CATCH statement
+	| DEFER '(' CATCH IDENT ')' statement
 	;
 
 ct_if_stmt :
@@ -1026,8 +1023,8 @@ opt_stmt_list :
 switch_stmt :
 	SWITCH optional_label '{' switch_body '}'
 	| SWITCH optional_label '{' '}'
-	| SWITCH optional_label paren_cond '{' switch_body '}'
-	| SWITCH optional_label paren_cond '{' '}'
+	| SWITCH optional_label paren_cond opt_attributes '{' switch_body '}'
+	| SWITCH optional_label paren_cond opt_attributes '{' '}'
 	;
 
 expression_list :
@@ -1161,12 +1158,6 @@ enum_params :
 	| enum_params ',' enum_param_decl
 	;
 
-enum_param_list :
-	'(' enum_params ')'
-	| '(' ')'
-	| empty
-	;
-
 struct_member_decl :
 	type identifier_list opt_attributes ';'
 	| struct_or_union IDENT opt_attributes struct_body
@@ -1178,12 +1169,14 @@ struct_member_decl :
 	;
 
 enum_spec :
-	':' type enum_param_list
-	| empty
+	':' base_type '(' enum_params ')'
+	| ':' base_type
+	| ':' '(' enum_params ')'
 	;
 
 enum_declaration :
 	ENUM TYPE_IDENT opt_interface_impl enum_spec opt_attributes '{' enum_list '}'
+	| ENUM TYPE_IDENT opt_interface_impl opt_attributes '{' enum_list '}'
 	;
 
 faults :
@@ -1298,22 +1291,6 @@ global_declaration :
 	| global_storage optional_type IDENT opt_attributes '=' expr ';'
 	;
 
-opt_tl_stmts :
-	top_level_statements
-	| empty
-	;
-
-tl_ct_case :
-	CT_CASE constant_expr ':' opt_tl_stmts
-	| CT_CASE type ':' opt_tl_stmts
-	| CT_DEFAULT ':' opt_tl_stmts
-	;
-
-tl_ct_switch_body :
-	tl_ct_case
-	| tl_ct_switch_body tl_ct_case
-	;
-
 define_attribute :
 	AT_TYPE_IDENT '(' parameters ')' opt_attributes '=' '{' opt_attributes '}'
 	| AT_TYPE_IDENT opt_attributes '=' '{' opt_attributes '}'
@@ -1354,19 +1331,6 @@ distinct_declaration :
 	DISTINCT TYPE_IDENT opt_interface_impl opt_attributes '=' opt_inline type ';'
 	;
 
-tl_ct_if :
-	CT_IF constant_expr ':' opt_tl_stmts tl_ct_if_tail
-	;
-
-tl_ct_if_tail :
-	CT_ENDIF
-	| CT_ELSE opt_tl_stmts CT_ENDIF
-	;
-
-tl_ct_switch :
-	ct_switch tl_ct_switch_body CT_ENDSWITCH
-	;
-
 module_param :
 	CONST_IDENT
 	| TYPE_IDENT
@@ -1384,7 +1348,7 @@ module :
 
 import_paths :
 	path_ident
-	| path_ident ',' path_ident
+	| import_paths ',' path_ident
 	;
 
 import_decl :
@@ -1406,17 +1370,22 @@ opt_extern :
 	| empty
 	;
 
+exec_decl :
+	CT_EXEC '(' expr ')' opt_attributes ';'
+	| CT_EXEC '(' expr ',' initializer_list ')' opt_attributes ';'
+	| CT_EXEC '(' expr ',' initializer_list ',' expr ')' opt_attributes ';'
+	;
+
 top_level :
 	module
 	| import_decl
+	| exec_decl
 	| opt_extern func_definition
 	| opt_extern const_declaration
 	| opt_extern global_declaration
 	| ct_assert_stmt
 	| ct_echo_stmt
 	| ct_include_stmt
-	| tl_ct_if
-	| tl_ct_switch
 	| struct_declaration
 	| fault_declaration
 	| enum_declaration
@@ -1462,7 +1431,7 @@ WS          [ \t\v\n\r\f]
 %%
 
 "$alignof"      CT_ALIGNOF
-"$and"          CT_AND
+//"$and"          CT_AND
 "$assert"       CT_ASSERT
 "$assignable"	CT_ASSIGNABLE
 "$case"         CT_CASE
@@ -1477,6 +1446,7 @@ WS          [ \t\v\n\r\f]
 "$error"        CT_ERROR
 "$eval"         CT_EVAL
 "$evaltype"     CT_EVALTYPE
+"$exec"         CT_EXEC
 "$extnameof"    CT_EXTNAMEOF
 "$feature"      CT_FEATURE
 "$for"          CT_FOR
@@ -1573,7 +1543,6 @@ WS          [ \t\v\n\r\f]
 
 "interface"	INTERFACE
 CT_ASSIGNABLE	CT_ASSIGNABLE
-CT_AND	CT_AND
 CT_IS_CONST	CT_IS_CONST
 
 //@{CONST}        AT_CONST_IDENT
@@ -1618,6 +1587,9 @@ b64\`{B64}+\` BYTES
 
 "..."		ELLIPSIS
 ".."		DOTDOT
+"&&&"       CT_AND_OP
+"|||"       CT_OR_OP
+//"+++"       CT_CONCAT_OP
 ">>="		SHR_ASSIGN
 "<<="		SHL_ASSIGN
 "+="		ADD_ASSIGN
