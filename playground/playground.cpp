@@ -825,18 +825,18 @@ struct BuildUserParser
 
         lexertl::generator::build(gs.user_parser.lrules, gs.user_parser.lsm);
 
-        if(gs.dumpAsEbnfRR == 3)
+        if(gs.dumpAsEbnfRR == 3 || gs.dumpAsEbnfRR == 4)
         {
 #ifdef WASM_PLAYGROUND
             switch_output("parse_ebnf_yacc");
 #endif
             parsertl::rules::string_vector terminals;
             gs.user_parser.grules.terminals(terminals);
-            lexertl::debug::dump(gs.user_parser.lrules, std::cout, terminals);
+            lexertl::debug::dump(gs.user_parser.lrules, std::cout, terminals, gs.dumpAsEbnfRR == 4);
             return false;
         }
 
-        if(gs.dumpAsEbnfRR == 5)
+        if(gs.dumpAsEbnfRR == 6)
         {
 #ifdef WASM_PLAYGROUND
             switch_output("parse_ebnf_yacc");
@@ -2300,11 +2300,12 @@ static void showHelp(const char* prog_name)
             "-dumpgptree          Dump grammar parser tree\n"
             "-dumpgptrace         Dump grammar parser trace\n"
             "-dumpglsm            Dump grammar lexer state machine\n"
-            "-dumpglrx            Dump grammar lexer regexes\n"            
+            "-dumpglrx            Dump grammar lexer regexes\n"
             "-dumpgsm             Dump grammar parser state machine\n"
             "-dumpAsEbnfRR        Dump grammar as EBNF for railroad diagram\n"
             "-dumpAsYacc          Dump grammar as Yacc\n"
             "-dumpAsLex           Dump grammar as Lex\n"
+            "-dumpAsLexME         Dump grammar as Lex with macros expanded\n"
             "-dumpAsSql           Dump grammar as SQL\n"
             "-dumpNaked           Dump naked grammar\n"
             "-dumpMaster          Dump master grammar\n"
@@ -2383,9 +2384,13 @@ int main(int argc, char *argv[])
         {
             gs.dumpAsEbnfRR = 3;
         }
+        else if (strcmp("-dumpAsLexME", param) == 0)
+        {
+            gs.dumpAsEbnfRR = 4;
+        }
         else if (strcmp("-dumpAsSql", param) == 0)
         {
-            gs.dumpAsEbnfRR = 5;
+            gs.dumpAsEbnfRR = 6;
         }
         else if (strcmp("-dumpMaster", param) == 0)
         {

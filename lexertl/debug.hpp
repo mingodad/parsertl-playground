@@ -28,7 +28,7 @@ namespace lexertl
         using rules = basic_rules<char_type, char_type, id_type>;
         using string = std::basic_string<char_type>;
 
-        static void dump(rules& rules_, ostream& stream_, const typename rules::string_vector& terminals)
+        static void dump(rules& rules_, ostream& stream_, const typename rules::string_vector& terminals, bool noMacros=false)
         {
             const auto& statemap = rules_.statemap();
             typename rules::string_vector states(statemap.size());
@@ -162,7 +162,15 @@ namespace lexertl
                         static_cast<char_type>(' ');
                     for (; regexes_iter_ != regexes_end_; ++regexes_iter_)
                     {
-                        dump_token(*regexes_iter_, stream_);
+                        const token& tk = *regexes_iter_;
+                        if (noMacros && tk._type == lexertl::detail::token_type::MACRO) {
+                            const auto& mp = macros_.at(tk._extra.substr(1, tk._extra.size()-2));
+                            for (const auto& token_ : mp)
+                            {
+                                dump_token(token_, stream_);
+                            }
+                        }
+                        else dump_token(*regexes_iter_, stream_);
                     }
                     if(next_dfas[regex_idx] != it->second || next_pushes[regex_idx] != rules_.npos())
                     {
