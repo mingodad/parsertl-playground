@@ -1,4 +1,4 @@
-//From: https://github.com/c3lang/c3c/blob/f78466452a3379db02a91257496daed1fac07753/resources/grammar/grammar.y
+//From: https://github.com/c3lang/c3c/blob/1bfe9c568ef987589d0fbd0536a3fd01f4e3fda6/resources/grammar/grammar.y#L1
 
 /*Tokens*/
 %token IDENT
@@ -14,7 +14,7 @@
 %token INTEGER
 %token CT_AND_OP
 %token CT_OR_OP
-//%token CT_CONCAT_OP
+%token CT_CONCAT_OP
 %token CT_EXEC
 %token INC_OP
 %token DEC_OP
@@ -413,6 +413,7 @@ bit_stmt_expr :
 additive_op :
 	'+'
 	| '-'
+	| CT_CONCAT_OP
 	;
 
 additive_expr :
@@ -1589,7 +1590,7 @@ b64\`{B64}+\` BYTES
 ".."		DOTDOT
 "&&&"       CT_AND_OP
 "|||"       CT_OR_OP
-//"+++"       CT_CONCAT_OP
+"+++"       CT_CONCAT_OP
 ">>="		SHR_ASSIGN
 "<<="		SHL_ASSIGN
 "+="		ADD_ASSIGN
