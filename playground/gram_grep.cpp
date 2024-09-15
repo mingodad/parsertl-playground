@@ -2772,18 +2772,28 @@ void add_pathname(std::string pn,
         wc_idx);
     const bool negate = pn[0] == '!';
     const std::string path = sep_idx == std::string::npos ? "." :
-        pn.substr(negate ? 1 : 0, sep_idx + 1);
+        pn.substr(negate ? 1 : 0, sep_idx + (negate ? 0 : 1));
     auto& [positive, negative] = map[path];
 
-    if (sep_idx == std::string::npos &&
+    if (sep_idx == std::string::npos)
+    {
+        if (!((!negate && wc_idx == 0) || (negate && wc_idx == 1)))
+        {
+            if (g_recursive)
+                pn.insert(negate ? 1 : 0, std::string(1, '*') +
+                    static_cast<char>(fs::path::preferred_separator));
+            else
+                pn.insert(negate ? 1 : 0, path +
+                    static_cast<char>(fs::path::preferred_separator));
+        }
+    }
+    else if (g_recursive &&
         !((!negate && wc_idx == 0) || (negate && wc_idx == 1)))
     {
-        if (g_recursive)
-            pn.insert(negate ? 1 : 0, std::string(1, '*') +
-                static_cast<char>(fs::path::preferred_separator));
-        else
-            pn.insert(negate ? 1 : 0, path +
-                static_cast<char>(fs::path::preferred_separator));
+        pn = std::string(1, '*') + pn.substr(sep_idx);
+
+        if (negate)
+            pn = '!' + pn;
     }
 
     if (negate)
