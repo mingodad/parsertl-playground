@@ -17,7 +17,7 @@
 %%
 
 nandlang :
-	funcdef nandlang
+	nandlang funcdef
 	| %empty
 	;
 
