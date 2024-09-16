@@ -204,6 +204,7 @@ const sampleList = [
 	["Mulang parser (not working)", "mulang.g", "test.mulang", "ace/mode/text"],
 	["Mysql parser (be patient)(partially working)", "mysql.g", "test.mysql", "ace/mode/sql"],
 	["N1QL parser", "n1ql.g", "test.n1ql", "ace/mode/sql"],
+	["Nandlang parser", "Nandlang.g", "test.Nandlang", "ace/mode/javascript"],
 	["NASL parser", "nasl-parser.g", "test.nasl", "ace/mode/shell"],
 	["Nearley parser", "nearley.g", "test.nearley", "ace/mode/yaml"],
 	["Nebula parser", "nebula-parser.g", "test.nebula-parser", "ace/mode/sql"],
