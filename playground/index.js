@@ -129,6 +129,7 @@ const sampleList = [
 	["Firebird DSQL parser", "firebird-dsql.g", "test.firebird-dsql", "ace/mode/sql"],
 	["Flatbuffers parser", "flatbuffers.g", "test.flatbuffers", "ace/mode/txt"],
 	["Fortune sheet formula parser", "fortune-sheet-formula.g", "test.fortune-sheet-formula", "ace/mode/txt"],
+	["FrontC parser", "frontc.g", "test.c", "ace/mode/c_cpp"],
 	["FsLex parser", "fslex.g", "test.fslex", "ace/mode/yaml"],
 	["FsYacc parser", "fsyacc.g", "test.fsyacc", "ace/mode/yaml"],
 	["Futhark parser (partially working)", "futhark.g", "test.futhark", "ace/mode/txt"],
