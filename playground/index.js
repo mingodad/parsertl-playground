@@ -265,6 +265,7 @@ const sampleList = [
 	["SQLite3 parser (partially working)", "sqlite3.g", "test.sqlite3", "ace/mode/sql"],
 	["S/SL parser", "s-sl.g", "test.s-sl", "ace/mode/tex"],
 	["Stanc3 parser", "stanc3-parser.g", "test.stanc3", "ace/mode/text"],
+	["SuperC C parser", "SuperC_cparser.g", "test.c", "ace/mode/c_cpp"],
 	["Tablegen-LLVM parser (partially working)", "tablegen-llvm.g", "test.tablegen-llvm", "ace/mode/yaml"],
 	["Tang parser (partially working)", "tangParser.g", "test.tangParser", "ace/mode/c_cpp"],
 	["Tameparse parser (not working)", "tameparser.g", "test.tameparser", "ace/mode/yaml"],
