@@ -119,6 +119,7 @@ const sampleList = [
 	["DuckDB SQL parser (be patient)", "duckdb-pgsql.g", "test.duckdb", "ace/mode/sql"],
 	["Dynare preprocessor parser (partially working)", "dynare-pp.g", "test.dynare-pp", "ace/mode/javascript"],
 	["Ebnf2bnf parser", "ebnf2bnf.g", "test.ebnf2bnf", "ace/mode/yaml"],
+	["EbnfToBison parser", "ebnftobison.g", "test.ebnftobison", "ace/mode/yaml"],
 	["Ecere parser (not working)", "ecere.g", "test.ecere", "ace/mode/c_cpp"],
 	["Eiffel parser (partially working)", "eiffel_parser.g", "test.eiffel_parser", "ace/mode/eiffel"],
 	["Estree parser", "estree.g", "test.estree", "ace/mode/txt"],
