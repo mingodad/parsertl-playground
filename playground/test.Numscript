@@ -1,0 +1,23 @@
+// the FALL24 coupon gets you 10% value off for a maximum of $20
+// pay $299.-
+send [USD/2 29900] (
+  source = {
+    10% from {
+      max [USD/2 2000] from @coupons:FALL24
+      @users:1234
+    }
+    remaining from @users:1234
+  }
+  destination = @payments:4567
+)
+// pay $90.-
+send [USD/2 9000] (
+  source = {
+    10% from {
+      max [USD/2 2000] from @coupons:FALL24
+      @users:1234
+    }
+    remaining from @users:1234
+  }
+  destination = @payments:5678
+)
