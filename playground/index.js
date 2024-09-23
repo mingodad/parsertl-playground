@@ -158,6 +158,7 @@ const sampleList = [
 	["Jacc parser", "jacc-grammar.g", "test.jacc-grammar", "ace/mode/yaml"],
 	["Jaime Gaza Syntax parser", "jaimegarza-syntax.g", "test.jaimegarza-syntax", "ace/mode/yaml"],
 	["Java11 parser", "java11.g", "test.java", "ace/mode/java"],
+	["Java-semgrep parser (partially working)", "java-semgrep.g", "test.java", "ace/mode/java"],
 	["Javascript-database parser", "javascript-database-js.g", "test.js.txt", "ace/mode/javascript"],
 	["JavascriptCore parser", "javascript-core.g", "test.js.txt", "ace/mode/javascript"],
 	["Javascript-pff parser", "javascript-pff.g", "test.js-ts", "ace/mode/typescript"],
