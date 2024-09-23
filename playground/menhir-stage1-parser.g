@@ -54,8 +54,8 @@ grammar:
 	;
 
 postlude:
-	/*EOF
-	|*/ PERCENTPERCENT /* followed by actual postlude */
+	%empty /*EOF*/
+	| PERCENTPERCENT /* followed by actual postlude */
 	;
 
 /* ------------------------------------------------------------------------- */
