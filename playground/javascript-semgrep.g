@@ -1731,6 +1731,7 @@ arrow_function :
 	| id T_ARROW arrow_body
 	/* can not factorize with TOPAR parameter_list TCPAR, see conflicts.txt */
 	/* es7: */
+	| T_LPAREN T_RPAREN option_annotation_ T_ARROW arrow_body
 	| T_ASYNC T_LPAREN_ARROW formal_parameter_list_opt T_RPAREN option_annotation_ T_ARROW arrow_body
 	| T_LPAREN_ARROW formal_parameter_list_opt T_RPAREN option_annotation_ T_ARROW arrow_body
 	;
@@ -2077,8 +2078,8 @@ SWS {SPACES}|{COMMENT}|{C_STYLE_COMMENT}
 <INITIAL,TRY_REGEX>":"  T_COLON
 "?"  T_PLING
 "?."  T_QUESTDOT
-"&&"  T_AND
-"||"  T_OR
+<INITIAL,TRY_REGEX>"&&"  T_AND
+<INITIAL,TRY_REGEX>"||"  T_OR
 "==="  T_STRICT_EQUAL
 "!=="  T_STRICT_NOT_EQUAL
 "<="  T_LESS_THAN_EQUAL
@@ -2147,7 +2148,7 @@ T_XHP_SHORT_FRAGMENT	T_XHP_SHORT_FRAGMENT
 T_XHP_SLASH_GT	T_XHP_SLASH_GT
 T_XHP_TEXT	T_XHP_TEXT
 
-([=(!:,\[]|"return"){SPACES}*"/"<TRY_REGEX> reject()
+([=(!:,\[]|"return"|"||"|"&&"){SPACES}*"/"<TRY_REGEX> reject()
 <TRY_REGEX>{
     {SPACES}    skip()
     {COMMENT}<INITIAL> skip()
@@ -2158,7 +2159,7 @@ T_XHP_TEXT	T_XHP_TEXT
 0[xX][a-fA-F0-9]+|[0-9]+	T_INT
 [0-9]+([Ee][+-]?[0-9]+)?|[0-9]*\.[0-9]+([Ee][+-]?[0-9]+)?	T_FLOAT
 \"(\\.|[^\"\n\r\\])*\"|'(\\.|[^'\n\r\\])*'	T_STRING
-"`"(\\.|[^`\n\r\\])*"`"	T_ENCAPSED_STRING
+"`"(\\.|[^`\\])*"`"	T_ENCAPSED_STRING
 
 /* Order matter if identifier comes before keywords they are classified as identifier */
 [a-zA-Z_$][a-zA-Z_0-9$]*	T_ID
