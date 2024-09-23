@@ -253,6 +253,7 @@ const sampleList = [
 	["Prolog1 parser", "prolog-parser1.g", "test.prolog-parser1", "ace/mode/text"],
 	["Prolog2 parser", "prolog-parser2.g", "test.prolog-parser2", "ace/mode/text"],
 	["Protobuf3 parser", "pb_parsing_parser.g", "test.proto3", "ace/mode/c_cpp"],
+	["Protocompile parser", "protocompile.g", "test.protocompile", "ace/mode/c_cpp"],
 	["Pyethon parser", "pyethon.g", "test.pyethon", "ace/mode/python"],
 	["ReasonML parser (partially working)", "reason_parser.g", "test.reason", "ace/mode/javascript"],
 	["R parser (partially working)", "r-parser.g", "test.r-parser", "ace/mode/r"],
