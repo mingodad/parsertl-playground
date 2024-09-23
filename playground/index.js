@@ -101,6 +101,7 @@ const sampleList = [
 	["C lexer Puma", "clexer-puma.g", "test.frama-c", "ace/mode/c_cpp"],
 	["C parser frama-c (partially working)", "cparser-frama-c.g", "test.frama-c", "ace/mode/c_cpp"],
 	["C parser (c-to-json) (partially working)", "c-to-json.g", "test.frama-c", "ace/mode/c_cpp"],
+	["Cpp-semgrep parser (partially working)", "cpp-semgrep.g", "test.c", "ace/mode/c_cpp"],
 	["Cpp5-v2 parser (not working)", "cpp5-v2.g", "test.cpp", "ace/mode/c_cpp"],
 	["CSS parser from VLC", "CSSGrammar-vlc.g", "style.css", "ace/mode/css"],
 	["CSS parser from Webkit", "css-webkit.g", "style.css", "ace/mode/css"],
