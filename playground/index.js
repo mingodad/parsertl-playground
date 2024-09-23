@@ -140,6 +140,7 @@ const sampleList = [
 	["Glcpp parser (partially working)", "glcpp-parse.g", "test.glcpp-parse", "ace/mode/c_cpp"],
 	["Glslang parser (partially working)", "glslang.g", "test.glslang", "ace/mode/c_cpp"],
 	["Gocc parser", "gocc.g", "test.gocc", "ace/mode/yaml"],
+	["Go-semgrep parser (partially working)", "go-semgrep.g", "test.go", "ace/mode/golang"],
 	["GramGrep parser", "gram_grep.g", "calculator.g", "ace/mode/yaml"],
 	["Graphql parser", "libgraphql.g", "test.libgraphql", "ace/mode/yaml"],
 	["Gringo-Clingo parser non grounding (partially working)", "gringo-ngp.g", "test.gringo-ngp", "ace/mode/text"],
