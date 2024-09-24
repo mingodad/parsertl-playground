@@ -78,7 +78,7 @@ const sampleList = [
 	["Blog-lang parser", "blog-lang.g", "test.blog-lang", "ace/mode/text"],
 	["BNFGen parser", "bnfgen.g", "test.bnfgen", "ace/mode/yaml"],
 	["Bolt parser", "bolt-parser.g", "test.bolt", "ace/mode/c_cpp"],
-	["Braille parser (not working)", "braille.g", "test.braille", "ace/mode/text"],
+	["Braille parser", "braille.g", "test.braille", "ace/mode/text"],
 	["Build your own prog. lang. CH13 parser", "build-your-own-programming-language-ch13.g", "test-ch13.java", "ace/mode/java"],
 	["C2c-err-transpiler  parser", "c2c-err-transpiler.g", "test.c", "ace/mode/c_cpp"],
 	["C3c  parser", "c3lang.g", "test.c3lang", "ace/mode/c_cpp"],

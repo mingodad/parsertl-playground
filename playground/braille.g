@@ -1,3 +1,4 @@
+//From: https://github.com/Genivia/RE-flex/blob/f737e1ea2c352b10841d549cbc7713535bef46ab/examples/braille.l
 /* Braille translator, inspired by the re2c example but expanded to be useful.
    To learn more:
    https://en.wikipedia.org/wiki/English_Braille
@@ -16,34 +17,34 @@ ther in a spirit of brotherhood.
 
 */
 
-%token ILLEGAL_CHARACTER
+//%token ILLEGAL_CHARACTER
 
-%token "a"
-%token "b"
-%token "c"
-%token "d"
-%token "e"
-%token "f"
-%token "g"
-%token "h"
-%token "i"
-%token "j"
-%token "k"
-%token "l"
-%token "m"
-%token "n"
-%token "o"
-%token "p"
-%token "q"
-%token "r"
-%token "s"
-%token "t"
-%token "u"
-%token "v"
-%token "w"
-%token "x"
-%token "y"
-%token "z"
+%token 'a'
+%token 'b'
+%token 'c'
+%token 'd'
+%token 'e'
+%token 'f'
+%token 'g'
+%token 'h'
+%token 'i'
+%token 'j'
+%token 'k'
+%token 'l'
+%token 'm'
+%token 'n'
+%token 'o'
+%token 'p'
+%token 'q'
+%token 'r'
+%token 's'
+%token 't'
+%token 'u'
+%token 'v'
+%token 'w'
+%token 'x'
+%token 'y'
+%token 'z'
 %token "and"
 %token "for"
 %token "of"
@@ -225,301 +226,659 @@ ther in a spirit of brotherhood.
 %token "ally"
 %token "ation"
 
-%token "0"
-%token "1"
-%token "2"
-%token "3"
-%token "4"
-%token "5"
-%token "6"
-%token "7"
-%token "8"
-%token "9"
+%token '0'
+%token '1'
+%token '2'
+%token '3'
+%token '4'
+%token '5'
+%token '6'
+%token '7'
+%token '8'
+%token '9'
 
-%token ","
-%token ";"
-%token ":"
-%token "."
-%token "-"
-%token "!"
-%token "?"
-%token "("
-%token "\""
-%token "'"
+%token ','
+%token ';'
+%token ':'
+%token '.'
+%token '-'
+%token '!'
+%token '?'
+%token '('
+%token '"'
+%token '\''
 
-%token " "
-%token "\t"
-%token "\n"
-%token "\r"
+%token ' '
+%token '\t'
+%token '\n'
+%token '\r'
 
 %%
 
-start :  ;
+start :  tk | start tk;
+
+tk :
+	 'a'
+	| 'b'
+	| 'c'
+	| 'd'
+	| 'e'
+	| 'f'
+	| 'g'
+	| 'h'
+	| 'i'
+	| 'j'
+	| 'k'
+	| 'l'
+	| 'm'
+	| 'n'
+	| 'o'
+	| 'p'
+	| 'q'
+	| 'r'
+	| 's'
+	| 't'
+	| 'u'
+	| 'v'
+	| 'w'
+	| 'x'
+	| 'y'
+	| 'z'
+	| "and"
+	| "for"
+	| "of"
+	| "the"
+	| "with"
+	| "ch"
+	| "gh"
+	| "sh"
+	| "th"
+	| "wh"
+	| "ed"
+	| "er"
+	| "ou"
+	| "ow"
+	| "en"
+	| "in"
+	| "st"
+	| "ar"
+	| "ing"
+	| "here"
+	| "there"
+	| "where"
+	| "ever"
+	| "ought"
+	| "father"
+	| "mother"
+	| "name"
+	| "character"
+	| "question"
+	| "know"
+	| "lord"
+	| "one"
+	| "day"
+	| "some"
+	| "part"
+	| "time"
+	| "right"
+	| "through"
+	| "under"
+	| "work"
+	| "young"
+	| "these"
+	| "those"
+	| "upon"
+	| "whose"
+	| "word"
+	| "cannot"
+	| "many"
+	| "had"
+	| "their"
+	| "spirit"
+	| "world"
+	| "but"
+	| "can"
+	| "do"
+	| "every"
+	| "from and -self"
+	| "go"
+	| "have"
+	| "just"
+	| "knowledge"
+	| "like"
+	| "more"
+	| "not"
+	| "people"
+	| "quite"
+	| "rather"
+	| "so"
+	| "that"
+	| "still"
+	| "us"
+	| "very"
+	| "it"
+	| "you"
+	| "as"
+	| "child"
+	| "shall"
+	| "this"
+	| "which"
+	| "out"
+	| "will"
+	| "be"
+	| "con"
+	| "dis"
+	| "enough"
+	| "to"
+	| "were"
+	| "his"
+	| "and was"
+	| "com"
+	| "about"
+	| "above"
+	| "according"
+	| "across"
+	| "after"
+	| "afternoon"
+	| "afterward"
+	| "again"
+	| "against"
+	| "also"
+	| "almost"
+	| "already"
+	| "altogether"
+	| "although"
+	| "always"
+	| "because"
+	| "before"
+	| "behind"
+	| "below"
+	| "beneath"
+	| "beside"
+	| "between"
+	| "beyond"
+	| "blind"
+	| "Braille"
+	| "could"
+	| "ceive"
+	| "ceiving"
+	| "children"
+	| "declare"
+	| "declaring"
+	| "either"
+	| "first"
+	| "friend"
+	| "good"
+	| "great"
+	| "herself"
+	| "him"
+	| "himself"
+	| "immediate"
+	| "little"
+	| "letter"
+	| "much"
+	| "must"
+	| "myself"
+	| "necessary"
+	| "neither"
+	| "o'clock"
+	| "ourselves"
+	| "paid"
+	| "perhaps"
+	| "quick"
+	| "rejoice"
+	| "rejoicing"
+	| "such"
+	| "said"
+	| "should"
+	| "today"
+	| "together"
+	| "tomorrow"
+	| "tonight"
+	| "themselves"
+	| "would"
+	| "its"
+	| "itself"
+	| "your"
+	| "yourself"
+	| "yourselves"
+	| "ea"
+	| "bb"
+	| "cc"
+	| "dd"
+	| "ound"
+	| "ount"
+	| "ance"
+	| "less"
+	| "sion"
+	| "ong"
+	| "ful"
+	| "ment"
+	| "ence"
+	| "ness"
+	| "tion"
+	| "ity"
+	| "ally"
+	| "ation"
+	| '0'
+	| '1'
+	| '2'
+	| '3'
+	| '4'
+	| '5'
+	| '6'
+	| '7'
+	| '8'
+	| '9'
+	| ','
+	| ';'
+	| ':'
+	| '.'
+	| '-'
+	| '!'
+	| '?'
+	| '('
+	| '"'
+	| '\''
+	| ' '
+	| '\t'
+	| '\n'
+	| '\r'
+	;
 
 %%
 
 // exclusive start conditions
-%x letters numbers
+%x letters numbers bt
 
 /* lookaheads for contractions to be valid, spacing and punctuation !?("'- */
-la [\u{2800} \t\n\r⠖⠦⠶⠴⠄⠤]
+//la [\u{2800} \t\n\r⠖⠦⠶⠴⠄⠤]
+la ("⠀"|[ \t\n\r]|"⠖"|"⠦"|"⠶"|"⠴"|"⠄"|"⠤")
 
 %%
 
-<*>⠰<INITIAL>
+//need to specify all desired states excluding <bt>
+<INITIAL,letters,numbers>⠰<INITIAL>
 
-<INITIAL,letters>⠁<letters>	"a"
-<INITIAL,letters>⠃<letters>	"b"
-<INITIAL,letters>⠉<letters>	"c"
-<INITIAL,letters>⠙<letters>	"d"
-<INITIAL,letters>⠑<letters>	"e"
-<INITIAL,letters>⠋<letters>	"f"
-<INITIAL,letters>⠛<letters>	"g"
-<INITIAL,letters>⠓<letters>	"h"
-<INITIAL,letters>⠊<letters>	"i"
-<INITIAL,letters>⠚<letters>	"j"
-<INITIAL,letters>⠅<letters>	"k"
-<INITIAL,letters>⠇<letters>	"l"
-<INITIAL,letters>⠍<letters>	"m"
-<INITIAL,letters>⠝<letters>	"n"
-<INITIAL,letters>⠕<letters>	"o"
-<INITIAL,letters>⠏<letters>	"p"
-<INITIAL,letters>⠟<letters>	"q"
-<INITIAL,letters>⠗<letters>	"r"
-<INITIAL,letters>⠎<letters>	"s"
-<INITIAL,letters>⠞<letters>	"t"
-<INITIAL,letters>⠥<letters>	"u"
-<INITIAL,letters>⠧<letters>	"v"
-<INITIAL,letters>⠺<letters>	"w"
-<INITIAL,letters>⠭<letters>	"x"
-<INITIAL,letters>⠽<letters>	"y"
-<INITIAL,letters>⠵<letters>	"z"
-<INITIAL,letters>⠯<letters>	"and"
-<INITIAL,letters>⠿<letters>	"for"
-<INITIAL,letters>⠷<letters>	"of"
-<INITIAL,letters>⠮<letters>	"the"
-<INITIAL,letters>⠾<letters>	"with"
-<INITIAL,letters>⠡<letters>	"ch"
-<INITIAL,letters>⠣<letters>	"gh"
-<INITIAL,letters>⠩<letters>	"sh"
-<INITIAL,letters>⠹<letters>	"th"
-<INITIAL,letters>⠱<letters>	"wh"
-<INITIAL,letters>⠫<letters>	"ed"
-<INITIAL,letters>⠻<letters>	"er"
-<INITIAL,letters>⠳<letters>	"ou"
-<INITIAL,letters>⠪<letters>	"ow"
-<INITIAL,letters>⠢<letters>	"en"
-<INITIAL,letters>⠔<letters>	"in"
-<INITIAL,letters>⠌<letters>	"st"
-<INITIAL,letters>⠜<letters>	"ar"
-<INITIAL,letters>⠬<letters>	"ing"
-/* INITIAL ABBREVIATIONS */
-<INITIAL,letters>⠐⠓<letters>	"here"
-<INITIAL,letters>⠐⠮<letters>	"there"
-<INITIAL,letters>⠐⠱<letters>	"where"
-<INITIAL,letters>⠐⠑<letters>	"ever"
-<INITIAL,letters>⠐⠳<letters>	"ought"
-<INITIAL,letters>⠐⠋<letters>	"father"
-<INITIAL,letters>⠐⠍<letters>	"mother"
-<INITIAL,letters>⠐⠝<letters>	"name"
-<INITIAL,letters>⠐⠡<letters>	"character"
-<INITIAL,letters>⠐⠟<letters>	"question"
-<INITIAL,letters>⠐⠅<letters>	"know"
-<INITIAL,letters>⠐⠇<letters>	"lord"
-<INITIAL,letters>⠐⠕<letters>	"one"
-<INITIAL,letters>⠐⠙<letters>	"day"
-<INITIAL,letters>⠐⠎<letters>	"some"
-<INITIAL,letters>⠐⠏<letters>	"part"
-<INITIAL,letters>⠐⠞<letters>	"time"
-<INITIAL,letters>⠐⠗<letters>	"right"
-<INITIAL,letters>⠐⠹<letters>	"through"
-<INITIAL,letters>⠐⠥<letters>	"under"
-<INITIAL,letters>⠐⠺<letters>	"work"
-<INITIAL,letters>⠐⠽<letters>	"young"
-<INITIAL,letters>⠘⠮<letters>	"these"
-<INITIAL,letters>⠘⠹<letters>	"those"
-<INITIAL,letters>⠘⠥<letters>	"upon"
-<INITIAL,letters>⠘⠱<letters>	"whose"
-<INITIAL,letters>⠘⠺<letters>	"word"
-<INITIAL,letters>⠸⠉<letters>	"cannot"
-<INITIAL,letters>⠸⠍<letters>	"many"
-<INITIAL,letters>⠸⠓<letters>	"had"
-<INITIAL,letters>⠸⠮<letters>	"their"
-<INITIAL,letters>⠸⠎<letters>	"spirit"
-<INITIAL,letters>⠸⠺<letters>	"world"
+<INITIAL,letters>{
+	⠁<letters>	'a'
+	⠃<letters>	'b'
+	⠉<letters>	'c'
+	⠙<letters>	'd'
+	⠑<letters>	'e'
+	⠋<letters>	'f'
+	⠛<letters>	'g'
+	⠓<letters>	'h'
+	⠊<letters>	'i'
+	⠚<letters>	'j'
+	⠅<letters>	'k'
+	⠇<letters>	'l'
+	⠍<letters>	'm'
+	⠝<letters>	'n'
+	⠕<letters>	'o'
+	⠏<letters>	'p'
+	⠟<letters>	'q'
+	⠗<letters>	'r'
+	⠎<letters>	's'
+	⠞<letters>	't'
+	⠥<letters>	'u'
+	⠧<letters>	'v'
+	⠺<letters>	'w'
+	⠭<letters>	'x'
+	⠽<letters>	'y'
+	⠵<letters>	'z'
+	⠯<letters>	"and"
+	⠿<letters>	"for"
+	⠷<letters>	"of"
+	⠮<letters>	"the"
+	⠾<letters>	"with"
+	⠡<letters>	"ch"
+	⠣<letters>	"gh"
+	⠩<letters>	"sh"
+	⠹<letters>	"th"
+	⠱<letters>	"wh"
+	⠫<letters>	"ed"
+	⠻<letters>	"er"
+	⠳<letters>	"ou"
+	⠪<letters>	"ow"
+	⠢<letters>	"en"
+	⠔<letters>	"in"
+	⠌<letters>	"st"
+	⠜<letters>	"ar"
+	⠬<letters>	"ing"
+	/* INITIAL ABBREVIATIONS */
+	⠐⠓<letters>	"here"
+	⠐⠮<letters>	"there"
+	⠐⠱<letters>	"where"
+	⠐⠑<letters>	"ever"
+	⠐⠳<letters>	"ought"
+	⠐⠋<letters>	"father"
+	⠐⠍<letters>	"mother"
+	⠐⠝<letters>	"name"
+	⠐⠡<letters>	"character"
+	⠐⠟<letters>	"question"
+	⠐⠅<letters>	"know"
+	⠐⠇<letters>	"lord"
+	⠐⠕<letters>	"one"
+	⠐⠙<letters>	"day"
+	⠐⠎<letters>	"some"
+	⠐⠏<letters>	"part"
+	⠐⠞<letters>	"time"
+	⠐⠗<letters>	"right"
+	⠐⠹<letters>	"through"
+	⠐⠥<letters>	"under"
+	⠐⠺<letters>	"work"
+	⠐⠽<letters>	"young"
+	⠘⠮<letters>	"these"
+	⠘⠹<letters>	"those"
+	⠘⠥<letters>	"upon"
+	⠘⠱<letters>	"whose"
+	⠘⠺<letters>	"word"
+	⠸⠉<letters>	"cannot"
+	⠸⠍<letters>	"many"
+	⠸⠓<letters>	"had"
+	⠸⠮<letters>	"their"
+	⠸⠎<letters>	"spirit"
+	⠸⠺<letters>	"world"
+}
 
 
 /*<INITIAL>{*/
 /* CONTRACTIONS */
-⠃/{la}	"but"
-⠉/{la}	"can"
-⠙/{la}	"do"
-⠑/{la}	"every"
-⠋/{la}	"from and -self"
-⠛/{la}	"go"
-⠓/{la}	"have"
-⠚/{la}	"just"
-⠅/{la}	"knowledge"
-⠇/{la}	"like"
-⠍/{la}	"more"
-⠝/{la}	"not"
-⠏/{la}	"people"
-⠟/{la}	"quite"
-⠗/{la}	"rather"
-⠎/{la}	"so"
-⠞/{la}	"that"
-⠌/{la}	"still"
-⠥/{la}	"us"
-⠧/{la}	"very"
-⠭/{la}	"it"
-⠽/{la}	"you"
-⠵/{la}	"as"
-⠡/{la}	"child"
-⠩/{la}	"shall"
-⠹/{la}	"this"
-⠱/{la}	"which"
-⠳/{la}	"out"
-⠺/{la}	"will"
+⠃{la}<bt> reject()
+⠉{la}<bt> reject()
+⠙{la}<bt> reject()
+⠑{la}<bt> reject()
+⠋{la}<bt> reject()
+⠛{la}<bt> reject()
+⠓{la}<bt> reject()
+⠚{la}<bt> reject()
+⠅{la}<bt> reject()
+⠇{la}<bt> reject()
+⠍{la}<bt> reject()
+⠝{la}<bt> reject()
+⠏{la}<bt> reject()
+⠟{la}<bt> reject()
+⠗{la}<bt> reject()
+⠎{la}<bt> reject()
+⠞{la}<bt> reject()
+⠌{la}<bt> reject()
+⠥{la}<bt> reject()
+⠧{la}<bt> reject()
+⠭{la}<bt> reject()
+⠽{la}<bt> reject()
+⠵{la}<bt> reject()
+⠡{la}<bt> reject()
+⠩{la}<bt> reject()
+⠹{la}<bt> reject()
+⠱{la}<bt> reject()
+⠳{la}<bt> reject()
+⠺{la}<bt> reject()
+<bt>{
+	⠃<INITIAL>	"but"
+	⠉<INITIAL>	"can"
+	⠙<INITIAL>	"do"
+	⠑<INITIAL>	"every"
+	⠋<INITIAL>	"from and -self"
+	⠛<INITIAL>	"go"
+	⠓<INITIAL>	"have"
+	⠚<INITIAL>	"just"
+	⠅<INITIAL>	"knowledge"
+	⠇<INITIAL>	"like"
+	⠍<INITIAL>	"more"
+	⠝<INITIAL>	"not"
+	⠏<INITIAL>	"people"
+	⠟<INITIAL>	"quite"
+	⠗<INITIAL>	"rather"
+	⠎<INITIAL>	"so"
+	⠞<INITIAL>	"that"
+	⠌<INITIAL>	"still"
+	⠥<INITIAL>	"us"
+	⠧<INITIAL>	"very"
+	⠭<INITIAL>	"it"
+	⠽<INITIAL>	"you"
+	⠵<INITIAL>	"as"
+	⠡<INITIAL>	"child"
+	⠩<INITIAL>	"shall"
+	⠹<INITIAL>	"this"
+	⠱<INITIAL>	"which"
+	⠳<INITIAL>	"out"
+	⠺<INITIAL>	"will"
+}
 ⠆     	"be"
 ⠒     	"con"
 ⠲     	"dis"
-⠢/{la}	"enough"
-⠖/{la}	"to"
-⠶/{la}	"were"
-⠦/{la}	"his"
-⠔/{la}	"in"
-⠴/{la}	"and was"
+⠢{la}<bt> reject()
+⠖{la}<bt> reject()
+⠶{la}<bt> reject()
+⠦{la}<bt> reject()
+⠔{la}<bt> reject()
+⠴{la}<bt> reject()
+<bt>{
+	⠢<INITIAL>	"enough"
+	⠖<INITIAL>	"to"
+	⠶<INITIAL>	"were"
+	⠦<INITIAL>	"his"
+	⠔<INITIAL>	"in"
+	⠴<INITIAL>	"and was"
+}
 ⠤     	"com"
 /* LONGER CONTRACTIONS */
-⠁⠃/{la}	"about"
-⠁⠃⠧/{la}	"above"
-⠁⠉/{la}	"according"
-⠁⠉⠗/{la}	"across"
-⠁⠋/{la}	"after"
-⠁⠋⠝/{la}	"afternoon"
-⠁⠋⠺/{la}	"afterward"
-⠁⠛/{la}	"again"
-⠁⠛⠌/{la}	"against"
-⠁⠇/{la}	"also"
-⠁⠇⠍/{la}	"almost"
-⠁⠇⠗/{la}	"already"
-⠁⠇⠞/{la}	"altogether"
-⠁⠇⠹/{la}	"although"
-⠁⠇⠺/{la}	"always"
-⠆⠉/{la}	"because"
-⠆⠋/{la}	"before"
-⠆⠓/{la}	"behind"
-⠆⠇/{la}	"below"
-⠆⠝/{la}	"beneath"
-⠆⠎/{la}	"beside"
-⠆⠞/{la}	"between"
-⠆⠽/{la}	"beyond"
-⠃⠇/{la}	"blind"
-⠃⠗⠇/{la}	"Braille"
-⠉⠙/{la}	"could"
-⠉⠧/{la}	"ceive"
-⠉⠧⠛/{la}	"ceiving"
-⠡⠝/{la}	"children"
-⠙⠉⠇/{la}	"declare"
-⠙⠉⠇⠛/{la}	"declaring"
-⠑⠊/{la}	"either"
-⠋⠌/{la}	"first"
-⠋⠗/{la}	"friend"
-⠛⠙/{la}	"good"
-⠛⠗⠞/{la}	"great"
-⠓⠻⠋/{la}	"herself"
-⠓⠍/{la}	"him"
-⠓⠍⠋/{la}	"himself"
-⠊⠍⠍/{la}	"immediate"
-⠇⠇/{la}	"little"
-⠇⠗/{la}	"letter"
-⠍⠡/{la}	"much"
-⠍⠌/{la}	"must"
-⠍⠽⠋/{la}	"myself"
-⠝⠑⠉/{la}	"necessary"
-⠝⠑⠊/{la}	"neither"
-⠕⠄⠉/{la}	"o'clock"
-⠳⠗⠧⠎/{la}	"ourselves"
-⠏⠙/{la}	"paid"
-⠏⠻⠓/{la}	"perhaps"
-⠟⠅/{la}	"quick"
-⠗⠚⠉/{la}	"rejoice"
-⠗⠚⠉⠛/{la}	"rejoicing"
-⠎⠡/{la}	"such"
-⠎⠙/{la}	"said"
-⠩⠙/{la}	"should"
-⠞⠙/{la}	"today"
-⠞⠛⠗/{la}	"together"
-⠞⠍/{la}	"tomorrow"
-⠞⠝/{la}	"tonight"
-⠮⠍⠧⠎/{la}	"themselves"
-⠺⠙/{la}	"would"
-⠭⠎/{la}	"its"
-⠭⠋/{la}	"itself"
-⠽⠗/{la}	"your"
-⠽⠗⠋/{la}	"yourself"
-⠽⠗⠧⠎/{la}	"yourselves"
+⠁⠃{la}<bt> reject()
+⠁⠃⠧{la}<bt> reject()
+⠁⠉{la}<bt> reject()
+⠁⠉⠗{la}<bt> reject()
+⠁⠋{la}<bt> reject()
+⠁⠋⠝{la}<bt> reject()
+⠁⠋⠺{la}<bt> reject()
+⠁⠛{la}<bt> reject()
+⠁⠛⠌{la}<bt> reject()
+⠁⠇{la}<bt> reject()
+⠁⠇⠍{la}<bt> reject()
+⠁⠇⠗{la}<bt> reject()
+⠁⠇⠞{la}<bt> reject()
+⠁⠇⠹{la}<bt> reject()
+⠁⠇⠺{la}<bt> reject()
+⠆⠉{la}<bt> reject()
+⠆⠋{la}<bt> reject()
+⠆⠓{la}<bt> reject()
+⠆⠇{la}<bt> reject()
+⠆⠝{la}<bt> reject()
+⠆⠎{la}<bt> reject()
+⠆⠞{la}<bt> reject()
+⠆⠽{la}<bt> reject()
+⠃⠇{la}<bt> reject()
+⠃⠗⠇{la}<bt> reject()
+⠉⠙{la}<bt> reject()
+⠉⠧{la}<bt> reject()
+⠉⠧⠛{la}<bt> reject()
+⠡⠝{la}<bt> reject()
+⠙⠉⠇{la}<bt> reject()
+⠙⠉⠇⠛{la}<bt> reject()
+⠑⠊{la}<bt> reject()
+⠋⠌{la}<bt> reject()
+⠋⠗{la}<bt> reject()
+⠛⠙{la}<bt> reject()
+⠛⠗⠞{la}<bt> reject()
+⠓⠻⠋{la}<bt> reject()
+⠓⠍{la}<bt> reject()
+⠓⠍⠋{la}<bt> reject()
+⠊⠍⠍{la}<bt> reject()
+⠇⠇{la}<bt> reject()
+⠇⠗{la}<bt> reject()
+⠍⠡{la}<bt> reject()
+⠍⠌{la}<bt> reject()
+⠍⠽⠋{la}<bt> reject()
+⠝⠑⠉{la}<bt> reject()
+⠝⠑⠊{la}<bt> reject()
+⠕⠄⠉{la}<bt> reject()
+⠳⠗⠧⠎{la}<bt> reject()
+⠏⠙{la}<bt> reject()
+⠏⠻⠓{la}<bt> reject()
+⠟⠅{la}<bt> reject()
+⠗⠚⠉{la}<bt> reject()
+⠗⠚⠉⠛{la}<bt> reject()
+⠎⠡{la}<bt> reject()
+⠎⠙{la}<bt> reject()
+⠩⠙{la}<bt> reject()
+⠞⠙{la}<bt> reject()
+⠞⠛⠗{la}<bt> reject()
+⠞⠍{la}<bt> reject()
+⠞⠝{la}<bt> reject()
+⠮⠍⠧⠎{la}<bt> reject()
+⠺⠙{la}<bt> reject()
+⠭⠎{la}<bt> reject()
+⠭⠋{la}<bt> reject()
+⠽⠗{la}<bt> reject()
+⠽⠗⠋{la}<bt> reject()
+⠽⠗⠧⠎{la}<bt> reject()
 /*}*/
+<bt>{
+	⠁⠃<INITIAL>	"about"
+	⠁⠃⠧<INITIAL>	"above"
+	⠁⠉<INITIAL>	"according"
+	⠁⠉⠗<INITIAL>	"across"
+	⠁⠋<INITIAL>	"after"
+	⠁⠋⠝<INITIAL>	"afternoon"
+	⠁⠋⠺<INITIAL>	"afterward"
+	⠁⠛<INITIAL>	"again"
+	⠁⠛⠌<INITIAL>	"against"
+	⠁⠇<INITIAL>	"also"
+	⠁⠇⠍<INITIAL>	"almost"
+	⠁⠇⠗<INITIAL>	"already"
+	⠁⠇⠞<INITIAL>	"altogether"
+	⠁⠇⠹<INITIAL>	"although"
+	⠁⠇⠺<INITIAL>	"always"
+	⠆⠉<INITIAL>	"because"
+	⠆⠋<INITIAL>	"before"
+	⠆⠓<INITIAL>	"behind"
+	⠆⠇<INITIAL>	"below"
+	⠆⠝<INITIAL>	"beneath"
+	⠆⠎<INITIAL>	"beside"
+	⠆⠞<INITIAL>	"between"
+	⠆⠽<INITIAL>	"beyond"
+	⠃⠇<INITIAL>	"blind"
+	⠃⠗⠇<INITIAL>	"Braille"
+	⠉⠙<INITIAL>	"could"
+	⠉⠧<INITIAL>	"ceive"
+	⠉⠧⠛<INITIAL>	"ceiving"
+	⠡⠝<INITIAL>	"children"
+	⠙⠉⠇<INITIAL>	"declare"
+	⠙⠉⠇⠛<INITIAL>	"declaring"
+	⠑⠊<INITIAL>	"either"
+	⠋⠌<INITIAL>	"first"
+	⠋⠗<INITIAL>	"friend"
+	⠛⠙<INITIAL>	"good"
+	⠛⠗⠞<INITIAL>	"great"
+	⠓⠻⠋<INITIAL>	"herself"
+	⠓⠍<INITIAL>	"him"
+	⠓⠍⠋<INITIAL>	"himself"
+	⠊⠍⠍<INITIAL>	"immediate"
+	⠇⠇<INITIAL>	"little"
+	⠇⠗<INITIAL>	"letter"
+	⠍⠡<INITIAL>	"much"
+	⠍⠌<INITIAL>	"must"
+	⠍⠽⠋<INITIAL>	"myself"
+	⠝⠑⠉<INITIAL>	"necessary"
+	⠝⠑⠊<INITIAL>	"neither"
+	⠕⠄⠉<INITIAL>	"o'clock"
+	⠳⠗⠧⠎<INITIAL>	"ourselves"
+	⠏⠙<INITIAL>	"paid"
+	⠏⠻⠓<INITIAL>	"perhaps"
+	⠟⠅<INITIAL>	"quick"
+	⠗⠚⠉<INITIAL>	"rejoice"
+	⠗⠚⠉⠛<INITIAL>	"rejoicing"
+	⠎⠡<INITIAL>	"such"
+	⠎⠙<INITIAL>	"said"
+	⠩⠙<INITIAL>	"should"
+	⠞⠙<INITIAL>	"today"
+	⠞⠛⠗<INITIAL>	"together"
+	⠞⠍<INITIAL>	"tomorrow"
+	⠞⠝<INITIAL>	"tonight"
+	⠮⠍⠧⠎<INITIAL>	"themselves"
+	⠺⠙<INITIAL>	"would"
+	⠭⠎<INITIAL>	"its"
+	⠭⠋<INITIAL>	"itself"
+	⠽⠗<INITIAL>	"your"
+	⠽⠗⠋<INITIAL>	"yourself"
+	⠽⠗⠧⠎<INITIAL>	"yourselves"
+}
 
 /* DIGRAPHS */
-<letters>⠂<.>	"ea"
-<letters>⠆<.>	"bb"
-<letters>⠒<.>	"cc"
-<letters>⠲<.>	"dd"
+<letters>{
+	⠂	"ea"
+	⠆	"bb"
+	⠒	"cc"
+	⠲	"dd"
 /* FINAL ABBREVIATIONS */
-<letters>⠨⠙<.>	"ound"
-<letters>⠨⠞<.>	"ount"
-<letters>⠨⠑<.>	"ance"
-<letters>⠨⠎<.>	"less"
-<letters>⠨⠝<.>	"sion"
-<letters>⠰⠛<.>	"ong"
-<letters>⠰⠇<.>	"ful"
-<letters>⠰⠞<.>	"ment"
-<letters>⠰⠑<.>	"ence"
-<letters>⠰⠎<.>	"ness"
-<letters>⠰⠝<.>	"tion"
-<letters>⠰⠽<.>	"ity"
-<letters>⠠⠽<.>	"ally"
-<letters>⠠⠝<.>	"ation"
+	⠨⠙	"ound"
+	⠨⠞	"ount"
+	⠨⠑	"ance"
+	⠨⠎	"less"
+	⠨⠝	"sion"
+	⠰⠛	"ong"
+	⠰⠇	"ful"
+	⠰⠞	"ment"
+	⠰⠑	"ence"
+	⠰⠎	"ness"
+	⠰⠝	"tion"
+	⠰⠽	"ity"
+	⠠⠽	"ally"
+	⠠⠝	"ation"
+}
 
-<*>⠼<numbers>
+<INITIAL,letters,numbers>⠼<numbers>
 
-<numbers>⠁<.>	"0"
-<numbers>⠃<.>	"1"
-<numbers>⠉<.>	"2"
-<numbers>⠙<.>	"3"
-<numbers>⠑<.>	"4"
-<numbers>⠋<.>	"5"
-<numbers>⠛<.>	"6"
-<numbers>⠓<.>	"7"
-<numbers>⠊<.>	"8"
-<numbers>⠚<.>	"9"
+<numbers>{
+	⠁	'0'
+	⠃	'1'
+	⠉	'2'
+	⠙	'3'
+	⠑	'4'
+	⠋	'5'
+	⠛	'6'
+	⠓	'7'
+	⠊	'8'
+	⠚	'9'
+}
 
 /* PUNCTUATION */
-<*>⠂/{la}<.>	","
-<*>⠆/{la}<.>	";"
-<*>⠒/{la}<.>	":"
-<*>⠲/{la}<.>	"."
-<*>⠤/{la}<.>	"-"
-<*>⠖<.>	"!"
-<*>⠦<.>	"?"
-<*>⠶<.>	"("
-<*>⠴<.>	"\""
-<*>⠄<.>	"'"
+<INITIAL,letters,numbers>{
+	⠂{la}<>bt> reject()
+	⠆{la}<>bt> reject()
+	⠒{la}<>bt> reject()
+	⠲{la}<>bt> reject()
+	⠤{la}<>bt> reject()
+}
+<bt>{
+	⠂<<>	','
+	⠆<<>	';'
+	⠒<<>	':'
+	⠲<<>	'.'
+	⠤<<>	'-'
+}
+<INITIAL,letters,numbers>{
+	⠖	'!'
+	⠦	'?'
+	⠶	'('
+	⠴	'"'
+	⠄	'\''
 /* MODES */
-<*>⠈<.>          skip()     /* accent */
-<*>⠨<.>          skip()     /* emph. */
-<*>⠠<.>          skip()     /* caps = true; */
-/* SPACING */
-<*>\u{2800}<INITIAL>	" "
-/*<*>[ \t\n\r]<INITIAL>       emit(text());*/
-<*>[ ]<INITIAL>	" "
-<*>[\t]<INITIAL>	"\t"
-<*>[\n]<INITIAL>	"\n"
-<*>[\r]<INITIAL>	"\r"
-/* OTHER BRAILLE LIGATURES */
-/*<*>\p{Braille}<.>     emit(text());*/
+	⠈          skip()     /* accent */
+	⠨          skip()     /* emph. */
+	⠠          skip()     /* caps = true; */
+	/* SPACING */
+	//\u{2800}<INITIAL>	' '
+	"⠀"<INITIAL>	' '
+	/*<*>[ \t\n\r]<INITIAL>       emit(text());*/
+	[ ]<INITIAL>	' '
+	[\t]<INITIAL>	'\t'
+	[\n]<INITIAL>	'\n'
+	[\r]<INITIAL>	'\r'
+	/* OTHER BRAILLE LIGATURES */
+	/*\p{Braille}     emit(text());*/
 
-<*>.<.>            ILLEGAL_CHARACTER
+	//.            ILLEGAL_CHARACTER
+}
 
 %%
