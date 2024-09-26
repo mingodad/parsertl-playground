@@ -1,3 +1,4 @@
+//From: https://github.com/Robert-van-Engelen/lua-to-lisp/blob/b04a56642e07f52bc963fd9e51302156445bcd17/lua.y
 // Lua 5.3 Bison parser and transpiler by Robert van Engelen
 // Eliminated reduce/reduce conflict by expanding the prefixexp nonterminal
 // Expanded the repetition nonterminal
@@ -112,11 +113,11 @@ stat :
 	| WHILE exp DO block END
 	| REPEAT block UNTIL exp
 	| FOR NAME '=' explist23 DO block END
-	| FOR namelist IN explist1 DO block END
+	| FOR namelist IN expr_comma_list DO block END
 	| FUNCTION funcname funcbody
 	| GOTO NAME
 	| label
-	| setlist '=' explist1
+	| setlist '=' expr_comma_list
 	| funccall
 	//| error DO
 	//| error IF
@@ -150,7 +151,7 @@ cond :
 laststat :
 	BREAK
 	| RETURN
-	| RETURN explist1
+	| RETURN expr_comma_list
 	;
 
 label :
@@ -159,7 +160,7 @@ label :
 
 binding :
 	LOCAL namelist
-	| LOCAL namelist '=' explist1
+	| LOCAL namelist '=' expr_comma_list
 	| LOCAL FUNCTION NAME funcbody
 	;
 
@@ -178,9 +179,9 @@ namelist :
 	| namelist ',' NAME
 	;
 
-explist1 :
+expr_comma_list :
 	exp
-	| explist1 ',' exp
+	| expr_comma_list ',' exp
 	;
 
 explist23 :
@@ -254,7 +255,7 @@ funccall :
 
 args :
 	'(' ')'
-	| '(' explist1 ')'
+	| '(' expr_comma_list ')'
 	| table
 	| STRING
 	;
