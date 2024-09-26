@@ -511,7 +511,7 @@ ArgExprNum :
 
 base_id [A-Za-z_][A-Za-z0-9_]*
 
-white_space [\n\r\t ]
+white_space [\n\r\t\x1A ]
 
 %%
 
@@ -572,7 +572,7 @@ white_space [\n\r\t ]
 "<"{base_id}">"	TK_lexical
 {base_id}	TK_alpha
 
-{base_id}({white_space})*(":"|"->")<head_sym>	reject()
+{base_id}({white_space})*(":"|"->"|"~>"|"/->"|"/~>")<head_sym>	reject()
 <head_sym> {
     ("Goal"|"Start")<INITIAL>	TK_GOALSYMBOL
     {base_id}<INITIAL>   TK_HEADSYMBOL

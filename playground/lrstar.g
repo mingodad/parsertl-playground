@@ -372,16 +372,16 @@ Tail_plus
 
 base_id [A-Za-z_][A-Za-z0-9_]*
 
-white_space [\n\r\t ]
+white_space [\n\r\t\x1A ]
 line_comment    "//".*
-blocl_comment   "/*"(?s:.)*?"*/"
+block_comment   "/*"(?s:.)*?"*/"
 
 %%
 
 <INITIAL,head_sym> {
     {white_space}+  skip()
     {line_comment}  skip()
-    {blocl_comment}    skip()
+    {block_comment}    skip()
 }
 
 ";"	';'
@@ -421,7 +421,7 @@ blocl_comment   "/*"(?s:.)*?"*/"
 "<"{base_id}">"	LEXICAL
 {base_id}	ALPHA
 
-{base_id}({white_space})*(":"|"->")<head_sym>	reject()
+{base_id}{white_space}*(":"|"->")<head_sym>	reject()
 <head_sym> {
     ("Goal"|"Start")<INITIAL>	GOALSYMBOL
     {base_id}<INITIAL>   HEADSYMBOL
