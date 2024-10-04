@@ -42,7 +42,7 @@ Grammar
 	;
 
 Declarations
-	:
+	: /*empty*/
 	| TerminalDecl_plus
 	;
 
@@ -66,7 +66,7 @@ Terminal
 	;
 
 OperPrec
-	:
+	: /*empty*/
 	| OperPrecLine_plus
 	;
 
@@ -154,7 +154,7 @@ ArrowRule
 	;
 
 TailList
-	:
+	: /*empty*/
 	| TailExpr_plus
 	;
 
@@ -256,7 +256,7 @@ TAName
 	;
 
 RuleAction
-	:
+	: /*empty*/
 	| "+>" NodeName PArgs Rev
 	| "*>" NodeNameWA PArgs Rev
 	;
@@ -274,18 +274,18 @@ NodeAction
 	;
 
 Rev
-	:
+	: /*empty*/
 	| '~'
 	;
 
 TArgs
-	:
+	: /*empty*/
 	| '(' ')'
 	| '(' ArgVar ')'
 	;
 
 PArgs
-	:
+	: /*empty*/
 	| '(' ')'
 	| '(' FirstArg ')'
 	;
@@ -322,7 +322,7 @@ Operator_plus
 	;
 
 NonterminalDef_zom
-	:
+	: /*empty*/
 	| NonterminalDef_zom NonterminalDef
 	;
 
@@ -374,15 +374,13 @@ base_id [A-Za-z_][A-Za-z0-9_]*
 
 white_space [\n\r\t\x1A ]
 line_comment    "//".*
-block_comment   "/*"(?s:.)*?"*/"
+//block_comment   "/*"(?s:.)*?"*/"
+block_comment   "/*"("*"[^/]|[^*])*"*/"
+WS  {white_space}|{line_comment}|{block_comment}
 
 %%
 
-<INITIAL,head_sym> {
-    {white_space}+  skip()
-    {line_comment}  skip()
-    {block_comment}    skip()
-}
+{WS}+  skip()
 
 ";"	';'
 "<eof>"	"<eof>"
@@ -421,7 +419,7 @@ block_comment   "/*"(?s:.)*?"*/"
 "<"{base_id}">"	LEXICAL
 {base_id}	ALPHA
 
-{base_id}{white_space}*(":"|"->")<head_sym>	reject()
+{base_id}{WS}*(":"|"->")<head_sym>	reject()
 <head_sym> {
     ("Goal"|"Start")<INITIAL>	GOALSYMBOL
     {base_id}<INITIAL>   HEADSYMBOL
