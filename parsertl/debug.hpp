@@ -18,6 +18,7 @@ namespace parsertl
     public:
         using rules = basic_rules<char_type>;
         using ostream = std::basic_ostream<char_type>;
+        static const size_t rule_idx_offset = 1; //to match bison numbers
 
         static void dump(const rules& rules_, ostream& stream_,
                 bool asEbnfRR = false, bool withIndex=false)
@@ -46,6 +47,8 @@ namespace parsertl
             else
             {
                 // Skip EOI token
+                const size_t max_line_size = 50;
+                size_t line_size = 0;
                 for (std::size_t idx_ = 1, size_ = tokens_info_.size();
                     idx_ < size_; ++idx_)
                 {
@@ -60,11 +63,18 @@ namespace parsertl
                     }
                     else
                     {
+                        if(map_iter_->first.second == rules::associativity::token_assoc) {
+                            if(line_size > max_line_size) {
+                                map_iter_->second += "\n%token";
+                                line_size = 0;
+                            }
+                            
+                            line_size += symbols_[idx_].size();
+                        }
                         map_iter_->second += static_cast<char_type>(' ');
                         map_iter_->second += symbols_[idx_];
                     }
                 }
-
                 for (const auto& pair_ : map_)
                 {
                     switch (pair_.first.second)
@@ -93,11 +103,15 @@ namespace parsertl
 
                 if (start_ != static_cast<std::size_t>(~0))
                 {
-                    stream_ << static_cast<char_type>('\n');
-                    start(stream_);
-                    stream_ << symbols_[terminals_ + start_] <<
-                        static_cast<char_type>('\n') <<
-                        static_cast<char_type>('\n');
+                    auto start_sym = symbols_[terminals_ + start_];
+                    if(start_sym[0] != '$')
+                    {
+                        stream_ << static_cast<char_type>('\n');
+                        start(stream_);
+                        stream_ << start_sym <<
+                            static_cast<char_type>('\n') <<
+                            static_cast<char_type>('\n');
+                    }
                 }
 
                 stream_ << static_cast<char_type>('%') <<
@@ -441,7 +455,7 @@ namespace parsertl
                     std::size_t j_ = 0;
 
                     stream_ << static_cast<char_type>('(') <<
-                        pair_._id <<
+                        pair_._id+rule_idx_offset <<
                         static_cast<char_type>(')') <<
                         static_cast<char_type>(' ') <<
                         static_cast<char_type>(' ') <<
@@ -512,7 +526,7 @@ namespace parsertl
                     prod_size_t index_ = lhs_iter_ - grammar_.begin();
 
                     const auto& lhs_name = symbols_[terminals_ + lhs_iter_->_lhs];
-                    //if(lhs_name[0] == '$') continue; //skip $accept
+                    if(lhs_name[0] == '$') continue; //skip $accept
                     stream_ << lhs_name;
                     if(asEbnfRR)
                     {
@@ -528,7 +542,7 @@ namespace parsertl
                     stream_ << static_cast<char_type>('\n');
                     if(withIndex) {
                         stream_ << static_cast<char_type>('(') <<
-                            index_ <<
+                            index_+rule_idx_offset <<
                             static_cast<char_type>(')');
                     }
                     stream_ << static_cast<char_type>('\t') <<
@@ -602,7 +616,7 @@ namespace parsertl
                 stream_ << static_cast<char_type>('\n');
                 if(withIndex) {
                     stream_ << static_cast<char_type>('(') <<
-                        index_ <<
+                        index_+rule_idx_offset <<
                         static_cast<char_type>(')');
                 }
 
