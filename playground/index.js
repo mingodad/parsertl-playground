@@ -412,6 +412,7 @@ function parse() {
   const generate_lex_me = $('#generate-action').val() == 'lex_me';
   const generate_sql = $('#generate-action').val() == 'sql';
   const generate_yacc_html = $('#generate-action').val() == 'yacc_html';
+  const generate_master = $('#generate-action').val() == 'master';
   const generate_cpp_parser = $('#generate-action').val() == 'cpp_parser';
 
   $grammarInfo.html('');
@@ -486,6 +487,7 @@ function parse() {
         dump_input_lexer,
         dump_input_parse_tree,
         dump_input_parse_trace,
+        generate_master,
         generate_cpp_parser,
         dump_ebnf_yacc);
 

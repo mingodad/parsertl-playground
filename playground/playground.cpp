@@ -870,13 +870,45 @@ struct BuildUserParser
             generate_cpp_symbols(gs.user_parser.grules, stream_);
             const auto productions = gs.user_parser.grules.grammar();
 
-            int idx = 0;
+            int idx = 0, alias_count = 0, last_idx = 0;
+            stream_ << "#define E_RULES_LIST() \\\n";
+            std::string last_lhs, this_lhs;
             for (const auto& prod : productions)
             {
-                if(!prod._alias.empty()) ++idx;
+                this_lhs = gs.user_parser.grules.name_from_nt_id(prod._lhs);
+                if(this_lhs == "$accept") {
+                    this_lhs = "24accept";
+                }
+                else if(!prod._alias.empty()) {
+                    ++alias_count;
+                    this_lhs = prod._alias.substr(1); //skip '#'
+                }
+                stream_ << "\tE_RULE(" << this_lhs;
+                if(last_lhs == this_lhs) {
+                    stream_ << ++last_idx;
+                }
+                else
+                {
+                    last_lhs = this_lhs;
+                    last_idx = 0;
+                }
+                stream_ << "),\\\n";
+                ++idx;
             }
+            stream_ <<
+                    "\n#define E_RULE(r) erule_##r\n"
+                    "enum erules_Idx{\n"
+                    "\tE_RULES_LIST()\n"
+                    "};\n"
+                    "#undef E_RULE\n\n";
+            stream_ <<
+                    "#define E_RULE(r) \"erule_\" #r\n"
+                    "static const char *erules_Idx_names[" << productions.size() << "] = {\n"
+                    "\tE_RULES_LIST()\n"
+                    "};\n"
+                    "#undef E_RULE\n\n";
             stream_ << "static const char *sm_rules_alias[" << productions.size() << "]";
-	    if(idx) // do not emit initialization code if there is no aliases
+	    if(alias_count) // do not emit initialization code if there is no aliases
 	    {
 		stream_ << " = {\n";
 		idx = 0;
@@ -1006,7 +1038,7 @@ struct BuildUserParser
 "        const SmRule *rule = sm_rules+i;\n"
 "        const char *lhs_name = esym_Symbols_names[rule->lhs];\n"
 "        if(lhs_name[0] == '$') continue;\n"
-"	fprintf(out, \"    case %zu: // %s :\", i, lhs_name);\n"
+"	fprintf(out, \"    case %s: // %s :\", erules_Idx_names[i], lhs_name);\n"
 "        if(rule->rhs_count == 0)\n"
 "        {\n"
 "            fprintf(out, \" /*empty*/\");\n"
@@ -1018,6 +1050,9 @@ struct BuildUserParser
 "                const char *rhs_name = esym_Symbols_names[rules_rhs_all[j]];\n"
 "                fprintf(out, \" %s\", rhs_name);\n"
 "            }\n"
+"        }\n"
+"        if(sm_rules_alias[i]) {\n"
+"                fprintf(out, \" %s\", sm_rules_alias[i]);\n"
 "        }\n"
 "        fprintf(out, \"\\n\");\n"
 "	fprintf(out, \"    break;\\n\");\n"
@@ -1360,6 +1395,7 @@ struct BuildUserParser
 "    //dumpGrammarSM(stdout);\n"
 "\n"
 "    //dumpGrammarEBNF(stdout);\n"
+"    //dumpGrammarReduceActions(stdout);\n"
 "    StrData data = readcontent(input_pathname);\n"
 "    if (!data.str)\n"
 "    {\n"
@@ -1963,8 +1999,11 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
 
     std::string warnings;
 
-    if(dumpGrammar || gs.dump_master_grammar)
+    if(dumpGrammar)
     {
+#ifdef WASM_PLAYGROUND
+        switch_output("parse_ebnf_yacc");
+#endif
         parsertl::debug::dump(grules, std::cout, asEbnfRR);
     }
     parsertl::generator::build(grules, gs.master_parser.gsm, &warnings);
@@ -2082,8 +2121,11 @@ void build_master_parser(GlobalState& gs, bool dumpGrammar=false, bool asEbnfRR=
     lrules.push("ID", "reject\\s*[(]\\s*[)]", gs.token_Reject, "RULE");
     lexertl::generator::build(lrules, gs.master_parser.lsm);
     //gs.master_parser.lsm.minimise ();
-    if(dumpGrammar || gs.dump_master_grammar)
+    if(dumpGrammar)
     {
+#ifdef WASM_PLAYGROUND
+        switch_output("parse_ebnf_yacc");
+#endif
         parsertl::rules::string_vector terminals;
         grules.terminals(terminals);
         lexertl::debug::dump(lrules, std::cout, terminals);
@@ -2106,8 +2148,9 @@ int main_base(int argc, char* argv[], GlobalState& gs)
 
     try
     {
-        build_master_parser(gs);
+        build_master_parser(gs, gs.dump_master_grammar);
         if(gs.verboseOutput) showDiffTime("build master parser");
+	if(gs.dump_master_grammar) return 0;
 
         play_iterator iter_lexg(gs.grammar_data,
                 gs.grammar_data + gs.grammar_data_size, gs.master_parser.lsm);
@@ -2260,6 +2303,7 @@ extern "C" int main_playground(
         ,int dump_input_lexer
         ,int dump_input_parse_tree
         ,int dump_input_parse_trace
+        ,int dump_master_grammar
         ,int generate_standalone_parser
         ,int dumpAsEbnfRR)
 {
@@ -2280,6 +2324,7 @@ extern "C" int main_playground(
     gs.dump_input_lexer = dump_input_lexer;
     gs.dump_input_parse_tree = dump_input_parse_tree;
     gs.dump_input_parse_trace = dump_input_parse_trace;
+    gs.dump_master_grammar = dump_master_grammar;
     gs.generate_standalone_parser = generate_standalone_parser;
     gs.dumpAsEbnfRR = dumpAsEbnfRR;
     gs.pruneParserTree = (dump_grammar_parse_tree == 1 || dump_input_parse_tree == 1);
