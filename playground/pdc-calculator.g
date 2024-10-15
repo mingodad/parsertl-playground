@@ -145,26 +145,25 @@ num_suffix	[KMGbB_]
 "+"	'+'
 "\n"	'\n'
 
-"&&"	AND
-"-"	DEC
-"/"	DIV
+"&="	AND
+"-="	DEC
+"/="	DIV
 "=="	EQ
 FUNCTION	FUNCTION
 ">="	GE
-"+"	INC
+"+="	INC
 "<="	LE
-"<"	LEFT
+"<<="	LEFT
 "<<"	LEFT_SHIFT
-"&"	LOGICAL_AND
-"|"	LOGICAL_OR
-"%"	MOD
-"*"	MUL
+"&&"	LOGICAL_AND
+"||"	LOGICAL_OR
+"%="	MOD
+"*="	MUL
 "!="	NE
-"!"	NEG
-"||"	OR
-">"	RIGHT
+"|="	OR
+">>="	RIGHT
 ">>"	RIGHT_SHIFT
-"^"	XOR
+"^="	XOR
 
 //Predefined variables
 "ans"	VARIABLE	//"the result of the previous calculation"

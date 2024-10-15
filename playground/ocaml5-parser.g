@@ -1795,8 +1795,8 @@ with	WITH
 [=<>|&$]{symbolchar}*	INFIXOP0
 [@^]{symbolchar}*	INFIXOP1
 [+-]{symbolchar}*	INFIXOP2
-[*/%]{symbolchar}*	INFIXOP3
 "**"{symbolchar}*	INFIXOP4
+[*/%]{symbolchar}*	INFIXOP3
 "#"({symbolchar}|"#")+	HASHOP
 
 "let"{kwdopchar}{dotsymbolchar}*	LETOP
