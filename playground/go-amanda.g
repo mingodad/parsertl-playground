@@ -658,12 +658,37 @@ oliteral :
 
 %%
 
+%x	INSERT_SEMI
+
 float				([0-9]*\.[0-9]+)|([0-9]+\.)
 exponent			[eE][-+]?[0-9]+
+
+id	[a-zA-Z_][a-zA-Z_0-9]*
+
+hex_int	"0"[xX][0-9a-fA-F]+
+octal_int	"0"[0-7]+
+dec_int	[0-9]+
+
+sstring	"'"(\\.|[^\\"])"'"
+dstring	"\""(\\.|[^\\"])*"\""
+
+lname	"bool"|"float64"|"int"|{id}
+
+lliteral	{hex_int}|{octal_int}|{dec_int}|{float}{exponent}?|[0-9]+{exponent}|{sstring}|{dstring}
 
 %%
 
 //case LNAME: case LLITERAL: case ')': case '}': case ']':
+({lname}|{lliteral}|")"|"}"|"]")\n<INSERT_SEMI>	reject()
+<INSERT_SEMI>{
+	{lname}	LNAME
+	{lliteral}	LLITERAL
+	")"	')'
+	"}"	'}'
+	"]"	']'
+	\n<INITIAL>	';'
+}
+
 "\n"					skip() //{ lineno++; if (isender(lasttoken)) return tok(';'); }
 [ \t\f\v\r]+				skip() /* Ignore whitespace. */
 
@@ -718,7 +743,6 @@ exponent			[eE][-+]?[0-9]+
 "<-"					LCOMM
 "@"					'@'
 
-"bool"					LNAME
 "break"					LBREAK
 "case"					LCASE
 "chan"					LCHAN
@@ -728,14 +752,12 @@ exponent			[eE][-+]?[0-9]+
 "defer"					LDEFER
 "else"					LELSE
 "fallthrough"				LFALL
-"float64"				LNAME
 "for"					LFOR
 "func"					LFUNC
 "go"					LGO
 "goto"					LGOTO
 "if"					LIF
 "import"				LIMPORT
-"int"					LNAME
 "interface"				LINTERFACE
 "map"					LMAP
 "package"				LPACKAGE
@@ -747,17 +769,7 @@ exponent			[eE][-+]?[0-9]+
 "type"					LTYPE
 "var"					LVAR
 
-[a-zA-Z_][a-zA-Z_0-9]*			LNAME
-
-"0"[xX][0-9a-fA-F]+			LLITERAL
-"0"[0-7]+				LLITERAL
-[0-9]+					LLITERAL
-
-{float}{exponent}?			LLITERAL
-[0-9]+{exponent}			LLITERAL
-
-"'"(\\.|[^\\"])"'"			LLITERAL
-
-"\""(\\.|[^\\"])*"\""			LLITERAL
+{lliteral}			LLITERAL
+{lname}					LNAME
 
 %%
