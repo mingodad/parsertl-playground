@@ -507,24 +507,21 @@ ArgExprNum :
 
 %%
 
-%x head_sym rule_action block_comment
+%x head_sym rule_action
 
 base_id [A-Za-z_][A-Za-z0-9_]*
 
 white_space [\n\r\t\x1A ]
 
+block_comment   "/*"([^*]|\*+[^*/])*\*+\/
+line_comment    "//".*
+
+WS  ({white_space}|{block_comment}|{line_comment})
+
 %%
 
 <INITIAL,head_sym> {
-    {white_space}+  skip()
-    "//".*  skip()
-    "/*"<>block_comment>
-}
-
-<block_comment>{
-	"/*"<>block_comment>
-	"*/"<<>	skip()
-	.|\n<.>
+    {WS}+  skip()
 }
 
 "("	'('
@@ -572,7 +569,7 @@ white_space [\n\r\t\x1A ]
 "<"{base_id}">"	TK_lexical
 {base_id}	TK_alpha
 
-{base_id}({white_space})*(":"|"->"|"~>"|"/->"|"/~>")<head_sym>	reject()
+{base_id}{WS}*(":"|"->"|"~>"|"/->"|"/~>")<head_sym>	reject()
 <head_sym> {
     ("Goal"|"Start")<INITIAL>	TK_GOALSYMBOL
     {base_id}<INITIAL>   TK_HEADSYMBOL
