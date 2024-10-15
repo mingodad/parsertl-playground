@@ -63,23 +63,9 @@ namespace lexertl
             {
                 auto iter_ = pair_.second.end();
 
-                if (pair_.second.size() > 3)
-                {
-                    pair_.second.front()._type = detail::token_type::OPENPAREN;
-                    pair_.second.front()._str.
-                        insert(string_token(static_cast<char_type>('('),
-                            static_cast <char_type>('(')));
-                    pair_.second.back()._type = detail::token_type::CLOSEPAREN;
-                    pair_.second.back()._str.
-                        insert(string_token(static_cast<char_type>(')'),
-                            static_cast <char_type>(')')));
-                }
-                else
-                {
-                    pair_.second.erase(--iter_);
-                    iter_ = pair_.second.begin();
-                    pair_.second.erase(iter_);
-                }
+                pair_.second.erase(--iter_);
+                iter_ = pair_.second.begin();
+                pair_.second.erase(iter_);
 
                 macro_sizes_.emplace(pair_.second.size(), pair_.first);
             }
