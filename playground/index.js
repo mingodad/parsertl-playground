@@ -181,6 +181,7 @@ const sampleList = [
 	["Libfsm lx parser", "libfsm-lx.g", "test.libfsm-lx", "ace/mode/text"],
 	["Lightgrep parser (partially working)", "lightgrep-re.g", "test.lightgrep-re", "ace/mode/text"],
 	["Linden Script parser", "lsl_ext.g", "test.lsl", "ace/mode/text"],
+	["Little-lang parser (partially working)", "little-lang.g", "test.little-lang", "ace/mode/c_cpp"],
 	["Lox parser", "lox-lalrpop.g", "test.lox", "ace/mode/javascript"],
 	["LPegrex parser (partially working)", "lpegrex.g", "test.lpegrex", "ace/mode/yaml"],
 	["LPython parser (not working)", "lpython.g", "test.python", "ace/mode/python"],
