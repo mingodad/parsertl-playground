@@ -723,7 +723,7 @@ tpoly :
 [0-9]+[Rr][0-9A-Fa-f]+ Lrconst
 [0-9]+[Ee][+-]?[0-9]+ Lrconst
 [0-9]+	Lconst
-'(\\.|[^"\r\n\\])'	Lconst
+'(\\.|[^'\r\n\\]|\\u[0-9]{4})'	Lconst
 
 \"(\\.|[^"\r\n\\])*\"	Lsconst
 "`"(\\.|[^`\r\n\\])*"`"	Lsconst
