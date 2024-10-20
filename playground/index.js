@@ -180,6 +180,7 @@ const sampleList = [
 	["LFortran parser (partially working)", "lfortran.g", "test.fortran", "ace/mode/fortran"],
 	["Libfsm lx parser", "libfsm-lx.g", "test.libfsm-lx", "ace/mode/text"],
 	["Lightgrep parser (partially working)", "lightgrep-re.g", "test.lightgrep-re", "ace/mode/text"],
+	["Limbo-Inferno parser", "limbo-inferno.g", "test.limbo-inferno", "ace/mode/sh"],
 	["Linden Script parser", "lsl_ext.g", "test.lsl", "ace/mode/text"],
 	["Little-lang parser (partially working)", "little-lang.g", "test.little-lang", "ace/mode/c_cpp"],
 	["Lox parser", "lox-lalrpop.g", "test.lox", "ace/mode/javascript"],
