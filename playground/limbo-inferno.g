@@ -73,6 +73,8 @@
 %token Lwhile
 %token Lxoreq
 
+//%fallback Lid Lraise
+
 %right /*1*/ '=' Landeq Loreq Lxoreq Llsheq Lrsheq Laddeq Lsubeq Lmuleq Ldiveq Lmodeq Lexpeq Ldeclas
 %left /*2*/ Lload
 %left /*3*/ Loror
@@ -613,6 +615,8 @@ tpoly :
 
 %%
 
+expn    [Ee][+-]?[0-9]+
+
 %%
 
 [ \t\r\n\v\f]+	skip()
@@ -719,11 +723,12 @@ tpoly :
 "type"		Ltype
 "while"	Lwhile
 
-[0-9]+"."[0-9]+	Lrconst
+[0-9]+"."[0-9]*{expn}?	Lrconst
+"."[0-9]*{expn}?	Lrconst
 [0-9]+[Rr][0-9A-Fa-f]+ Lrconst
-[0-9]+[Ee][+-]?[0-9]+ Lrconst
+[0-9]+{expn} Lrconst
 [0-9]+	Lconst
-'(\\.|[^'\r\n\\]|\\u[0-9]{4})'	Lconst
+"'''"|'(\\.|[^'\r\n\\]+|\\u[0-9A-Fa-f]{4})'	Lconst
 
 \"(\\.|[^"\r\n\\])*\"	Lsconst
 "`"(\\.|[^`\r\n\\])*"`"	Lsconst
