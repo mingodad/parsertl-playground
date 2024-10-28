@@ -1,0 +1,60 @@
+%%%	The Alternating Bit Protocol (correct version)
+
+medium(Get, Put) ::=
+	Get ? Data;
+	{   Put ! Data
+	#   action(drop)
+	};
+	medium(Get, Put).
+
+sender(AckIn, DataOut, Seq) ::=
+	%% Seq is the sequence number of the next frame to be sent
+	DataOut ! Seq;
+	{
+	    AckIn ? AckSeq;
+	    if AckSeq == Seq
+		%% successful ack, next message
+                then {
+		    NSeq is 1-Seq;
+		    sendnew(AckIn, DataOut, NSeq)
+		}
+	        %% unexpected ack, resend message
+                else sender(AckIn, DataOut, Seq)
+	#
+	    %% upon timeout, resend message
+	    sender(AckIn, DataOut, Seq)
+	}.
+
+sendnew(AckIn, DataOut, Seq) ::=
+	action(sendnew);
+	sender(AckIn, DataOut, Seq).
+
+receiver(DataIn, AckOut, Seq) ::=
+	%% Seq is the expected next sequence number
+	DataIn ? RecSeq;
+	if RecSeq == Seq
+	    then {
+		NSeq is 1-Seq;
+		action(recv);
+		AckOut ! RecSeq;
+		receiver(DataIn, AckOut, NSeq)
+	    }
+	    else {
+		%% unexpected seq, resend ack
+		AckOut ! RecSeq;
+		receiver(DataIn, AckOut, Seq)
+	    }.
+
+abp ::=
+      sendnew(R2S_out, S2R_in, 0)
+    | medium(S2R_in, S2R_out)		% sender -> receiver
+    | medium(R2S_in, R2S_out)		% receiver -> sender
+    | receiver(S2R_out, R2S_in, 0).
+
+
+%% A packet can be lost without being received
+drop_packet += <sendnew>lost \/ <->drop_packet.
+lost    += <sendnew>tt \/ <-recv>lost.
+
+%% The system can deadlock.
+deadlock += [-] ff \/ <-> deadlock.

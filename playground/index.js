@@ -303,6 +303,7 @@ const sampleList = [
 	["Webassembly interpreter parser", "wasm-interpreter.g", "test.wast", "ace/mode/lisp"],
 	["WisiToken parser", "WisiToken.g", "test.WisiToken", "ace/mode/lisp"],
 	["X64 ASM ATT parser", "x64asm-att.g", "test.x64asm-att", "ace/mode/assembly_x86"],
+	["XMC parser", "xmc-model-checker.g", "test.xmc-model-checker", "ace/mode/text"],
 	["XML parser", "xml.g", "test.xml.txt", "ace/mode/xml"],
 	["XML parser Eiffel", "xml_eiffel_parser.g", "test.xml_eiffel_parser", "ace/mode/xml"],
 	["Z80 assembler parser", "z80-asm.g", "test.z80-asm", "ace/mode/assembly_x86"],
