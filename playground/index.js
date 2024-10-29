@@ -61,6 +61,7 @@ const sampleList = [
 	["Ansi C11 parser (partially working)", "c11-ansi-c.g", "test.c", "ace/mode/c_cpp"],
 	["Ansi C18 parser (partially working)", "c18-ansi.g", "test.c", "ace/mode/c_cpp"],
 	["Ansi C parser", "cparser.g", "test.c", "ace/mode/c_cpp"],
+	["Ansi C c2go parser", "cc-c2go.g", "test.c", "ace/mode/c_cpp"],
 	["Antlr4.5 parser", "antlr-v4.5.g", "test.antlr", "ace/mode/yaml"],
 	["ArangoDB AQL parser", "arangodb-aql.g", "test.arangodb-aql", "ace/mode/text"],
 	["AS3 parser (partially working)", "as3-parser.g", "test.as3-parser", "ace/mode/c_cpp"],
