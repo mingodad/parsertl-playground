@@ -93,6 +93,8 @@ const sampleList = [
 	["CG-CQL-old parser", "cql.g", "test.cql", "ace/mode/sql"],
 	["Chaos parser", "chaos-parser.g", "test.chaos-parser", "ace/mode/c_cpp"],
 	["Chapel parser", "chapel.g", "test.chapel", "ace/mode/c_cpp"],
+	["CIL C parser", "cil-cparser.g", "test.c", "ace/mode/c_cpp"],
+	["CIL C parser old", "cil-cparser-origin.g", "test.c", "ace/mode/c_cpp"],
 	["CLanguage parser", "clanguage.g", "test.clanguage", "ace/mode/c_cpp"],
 	["CLaro-lang parser", "claro-lang.g", "test.claro-lang", "ace/mode/c_cpp"],
 	["CleverLang  parser", "clever-parser.g", "test.clever-parser", "ace/mode/c_cpp"],
