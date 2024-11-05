@@ -1,0 +1,13 @@
+http_requests_total;
+http_requests_total{job="apiserver", handler="/api/comments"};
+//http_requests_total{job="apiserver", handler="/api/comments"}[5m];
+http_requests_total{status!~"4.."};
+//rate(http_requests_total[5m])[30m:1m];
+//max_over_time(deriv(rate(distance_covered_total[5s])[30s:5s])[10m:]);
+(instance_memory_limit_bytes - instance_memory_usage_bytes) / 1024 / 1024;
+sum by (app, proc) (
+  instance_memory_limit_bytes - instance_memory_usage_bytes
+) / 1024 / 1024;
+count by (app) (instance_cpu_time_ns);
+limitk(10, app_foo_metric_bar);
+limit_ratio(0.1, app_foo_metric_bar);
