@@ -1,0 +1,111 @@
+package wisey.io;
+
+import wisey.lang.NString;
+
+/**
+ * Reads lines from a text stream
+ * <br/>
+ * Example:
+ * <pre>
+ * // Create text stream from standard input
+ * CTextStreamReader* stream = CTextStreamReader.openSystemIn();
+ *
+ * // read a line from stream
+ * NString* line = stream.readLineIntoNString(line)
+ *
+ * // close the stream
+ * stream.close();
+ * </pre>
+ */
+controller CTextStreamReader {
+
+  private constant int BUFFER_SIZE = 256;
+
+  /**
+   * Pointer to the native stream.
+   *
+   * You don't need to initialize this when instantiating using a static method.
+   */
+  receive ::llvm::struct::__sFILE::pointer mStream;
+
+  inject immediate char[BUFFER_SIZE]* mBuffer;
+
+  /**
+   * Create an instance of the CTextStreamReader to read the given file
+   */
+  public static CTextStreamReader* open(NString fileName) throws MFileCouldNotOpenException {
+    ::llvm::struct::__sFILE::pointer stream = ::llvm::function::fopen(fileName.getContent(), "r");
+    if (stream == null) {
+      throw build(MFileCouldNotOpenException).withFileName(fileName.toModel()).onHeap();
+    }
+    return inject(CTextStreamReader).withStream(stream).onHeap();
+  }
+
+  /**
+   * Create an instance of the CTextStreamReader to read standard input
+   */
+  public static CTextStreamReader* openSystemIn() {
+    return inject(CTextStreamReader).withStream(::llvm::global::wStdIn).onHeap();
+  }
+
+  /**
+   * Read one line up to the new line character or end of file
+   *
+   * New line character will not be part of the returned string
+   */
+  public NString* readLine() throws MStreamClosedException {
+    NString* line = NString.create();
+    return readLineIntoNString(line);
+  }
+
+  /**
+   * Reads one line from the text stream into a given NString object
+   *
+   * New line character will not be part of the returned string
+   */
+  public NString* readLineIntoNString(NString* line) throws MStreamClosedException {
+    if (mStream == null) {
+      throw build(MStreamClosedException).onHeap();
+    }
+
+    line.clear();
+    ::llvm::i8::pointer result = null;
+    long length = 0;
+    long bufferSize = mBuffer.getSize();
+    mBuffer[bufferSize - 1] = '\0';
+
+    do {
+      result = ::llvm::function::fgets(mBuffer, BUFFER_SIZE, mStream);
+      if (result == null) {
+        break;
+      }
+
+      length = ::llvm::function::strlen(mBuffer);
+      if (mBuffer[length - 1] == '\n') {
+        mBuffer[length - 1] = '\0';
+      }
+      line.appendCharArray(mBuffer);
+    } while (length > 0 && mBuffer[length - 1] != '\0');
+
+    if (!line.getLength()) {
+      return null;
+    }
+
+    return line;
+  }
+
+  /**
+   * Close the text reading stream
+   */
+  public void close() throws MStreamClosedException, MStreamCouldNotCloseException {
+    if (mStream == null) {
+      throw build(MStreamClosedException).onHeap();
+    }
+
+    int result = ::llvm::function::fclose(mStream);
+
+    if (result != 0) {
+      throw build(MStreamCouldNotCloseException).onHeap();
+    }
+  }
+}
