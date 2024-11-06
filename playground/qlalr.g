@@ -134,7 +134,7 @@ cblock_comment "/*"(?s:.)*?"*/"
 
 "%decl"	DECL_FILE
 "%expect"	EXPECT
-"%expect-lr"	EXPECT_RR
+"%expect-rr"	EXPECT_RR
 "%impl"	IMPL_FILE
 "%left"	LEFT
 "%merged_output"	MERGED_OUTPUT
@@ -168,7 +168,7 @@ cblock_comment "/*"(?s:.)*?"*/"
 "|"	OR
 ";"	SEMICOLON
 
-\"[^"\r\n]+\"	STRING_LITERAL
+\"(\\.|[^"\r\n\\])+\"	STRING_LITERAL
 [A-Z-a-z0-9_][A-Z-a-z0-9_.]* ID
 
 %%
