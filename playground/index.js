@@ -268,6 +268,7 @@ const sampleList = [
 	["Protobuf3 parser", "pb_parsing_parser.g", "test.proto3", "ace/mode/c_cpp"],
 	["Protocompile parser", "protocompile.g", "test.protocompile", "ace/mode/c_cpp"],
 	["Pyethon parser", "pyethon.g", "test.pyethon", "ace/mode/python"],
+	["Qlalr QT LALR parser", "qlalr.g", "test.qlalr", "ace/mode/text"],
 	["Quakeforge QC parser (partially working)", "quakeforge-qc-parse.g", "test.quakeforge-qc-parse", "ace/mode/c_cpp"],
 	["ReasonML parser (partially working)", "reason_parser.g", "test.reason", "ace/mode/javascript"],
 	["R parser (partially working)", "r-parser.g", "test.r-parser", "ace/mode/r"],
