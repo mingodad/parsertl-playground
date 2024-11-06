@@ -124,6 +124,8 @@ Empty : ;
 %x DECL IMPL
 
 cstr \"(\\.|[^"\r\n\\])*\"
+cline_comment "//".*
+cblock_comment "/*"(?s:.)*?"*/"
 
 %%
 
@@ -148,12 +150,16 @@ cstr \"(\\.|[^"\r\n\\])*\"
 <DECL>{
     "./"<INITIAL>	DECL
     {cstr}<.>
+    {cline_comment}<.>
+    {cblock_comment}<.>
     .|\n<.>
 }
 "/:"<IMPL>
 <IMPL>{
     ":/"<INITIAL>	IMPL
     {cstr}<.>
+    {cline_comment}<.>
+    {cblock_comment}<.>
     .|\n<.>
 }
 //ERROR	ERROR
@@ -163,6 +169,6 @@ cstr \"(\\.|[^"\r\n\\])*\"
 ";"	SEMICOLON
 
 \"[^"\r\n]+\"	STRING_LITERAL
-[A-Z-a-z_][A-Z-a-z0-9_.]* ID
+[A-Z-a-z0-9_][A-Z-a-z0-9_.]* ID
 
 %%
