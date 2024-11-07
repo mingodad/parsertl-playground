@@ -276,6 +276,7 @@ const sampleList = [
 	["Ruby parser (partially working)", "ruby-0bced53a.g", "test.ruby", "ace/mode/ruby"],
 	["Rune parser", "rune-deparse.g", "test.rune-deparse", "ace/mode/text"],
 	["Rust parser", "rust.g", "test.rs.txt", "ace/mode/rust"], /*github send ext '.rs' as application/rls-services+xml */
+	["SableCC parser", "sablecc3x.g", "test.sablecc3x", "ace/mode/text"],
 	["Scheme parser", "scheme.g", "test.scheme", "ace/mode/lisp"],
 	["SC-im spreadsheet parser", "sc-im.g", "test.sc-im", "ace/mode/text"],
 	["SDCC C parser (partially working)", "sdcc.g", "test.c", "ace/mode/c_cpp"],

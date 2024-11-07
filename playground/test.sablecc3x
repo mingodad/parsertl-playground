@@ -1,0 +1,497 @@
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * This file is part of SableCC.                             *
+ * See the file "LICENSE" for copyright information and the  *
+ * terms and conditions for copying, distribution and        *
+ * modification of SableCC.                                  *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+/* This grammar defines the SableCC 3.x input language. */
+
+Package org.sablecc.sablecc; // Root Java package for generated files.
+
+Helpers
+
+/* These are character sets and regular expressions used in the
+   definition of tokens. */
+
+    all = [0 .. 0xFFFF];
+    lowercase = ['a' .. 'z'];
+    uppercase = ['A' .. 'Z'];
+    digit = ['0' .. '9'];
+    hex_digit = [digit + [['a' .. 'f'] + ['A' .. 'F']]];
+
+    tab = 9;
+    cr = 13;
+    lf = 10;
+    eol = cr lf | cr | lf; // This takes care of different platforms
+
+    not_cr_lf = [all - [cr + lf]];
+    not_star = [all - '*'];
+    not_star_slash = [not_star - '/'];
+
+    blank = (' ' | tab | eol)+;
+
+    short_comment = '//' not_cr_lf* eol;
+    long_comment =
+        '/*' not_star* '*'+ (not_star_slash not_star* '*'+)* '/';
+    comment = short_comment | long_comment;
+
+    letter = lowercase | uppercase | '_' | '$';
+    id_part = lowercase (lowercase | digit)*;
+
+States
+    normal, /* The first state is the initial state. */
+    package;
+
+Tokens
+
+/* These are token definitions. It is allowed to use helper regular *
+ * expressions in the body of a token definition.                   *
+ * On a given input, the longest valid definition is chosen, In     *
+ * case of a match, the definition that appears first is chosen.    *
+ * Example: on input -> 's' <- "char" will have precedence on       *
+ * "string", because it appears first.                              */
+
+{package}
+    pkg_id = letter (letter | digit)*;
+
+{normal->package}
+    package = 'Package';
+
+    states = 'States';
+    helpers = 'Helpers';
+    tokens = 'Tokens';
+    ignored = 'Ignored';
+    productions = 'Productions';
+
+    abstract = 'Abstract';
+    syntax = 'Syntax';
+    tree = 'Tree';
+    new = 'New';
+    null = 'Null';
+
+    token_specifier = 'T';
+    production_specifier = 'P';
+
+    dot = '.';
+    d_dot = '..';
+
+{normal, package->normal}
+    semicolon = ';';
+
+    equal = '=';
+    l_bkt = '[';
+    r_bkt = ']';
+    l_par = '(';
+    r_par = ')';
+    l_brace =  '{';
+    r_brace =  '}';
+    plus = '+';
+    minus = '-';
+    q_mark = '?';
+    star = '*';
+    bar = '|';
+    comma = ',';
+    slash = '/';
+    arrow = '->';
+    colon = ':';
+
+    id = id_part ('_' id_part)*;
+
+    char = ''' not_cr_lf ''';
+    dec_char = digit+;
+    hex_char = '0' ('x' | 'X') hex_digit+;
+
+    string = ''' [not_cr_lf - ''']+ ''';
+
+    blank = blank;
+    comment = comment;
+
+Ignored Tokens
+
+/* These tokens are simply ignored by the parser. */
+
+    blank,
+    comment;
+
+Productions
+
+/* These are the productions of the grammar. The first production is *
+ * used by the implicit start production:                            *
+ *   start = (first production) EOF;                                 *
+ * ?, * and + have the same meaning as in a regular expression.      *
+ * In case a token and a production share the same name, the use of  *
+ * P. (for production) or T. (for token) is required.                *
+ * Each alternative can be explicitely named by preceding it with a  *
+ * name enclosed in braces.                                          *
+ * Each alternative element can be explicitely named by preceding it *
+ * with a name enclosed in brackets and followed by a colon.         */
+
+
+    grammar =
+        P.package? P.helpers? P.states? P.tokens? ign_tokens? P.productions? P.ast?
+	   {-> New grammar([P.package.list_pkg_id], P.helpers, P.states,
+	                   P.tokens, P.ign_tokens, P.productions, P.ast)
+	   };
+
+    package
+	   {-> [list_pkg_id]:pkg_id*} =
+        T.package pkg_name
+	   {-> [pkg_name.pkg_id] };
+
+    pkg_name
+	   {-> pkg_id*} =
+        pkg_id [pkg_ids]:pkg_name_tail* semicolon
+	   {-> [pkg_id, pkg_ids.pkg_id] };
+
+    pkg_name_tail
+	   {-> pkg_id } =
+        dot pkg_id
+	   {-> pkg_id };
+
+    helpers =
+        T.helpers [helper_defs]:helper_def+
+	   {-> New helpers([helper_defs]) };
+
+    helper_def =
+        id equal reg_exp semicolon
+	   {-> New helper_def(id, reg_exp) };
+
+    states =
+        T.states id_list semicolon
+	   {-> New states([id_list.id]) };
+
+    id_list
+	   {-> id*} =
+        id [ids]:id_list_tail*
+	   {-> [id, ids.id]};
+
+    id_list_tail
+	   {-> id } =
+        comma id
+	   {-> id};
+
+    tokens =
+        T.tokens [token_defs]:token_def+
+	   {-> New tokens([token_defs]) };
+
+    token_def =
+        state_list? id equal reg_exp look_ahead? semicolon
+	   {-> New token_def(state_list, id, reg_exp, look_ahead.slash, look_ahead.reg_exp) };
+
+    state_list =
+        l_brace id transition? [state_lists]:state_list_tail* r_brace
+	   {-> New state_list(id, transition, [state_lists])};
+
+    state_list_tail =
+        comma id transition?
+	   {-> New state_list_tail(id, transition) };
+
+    transition =
+        arrow id
+	   {-> New transition(id)};
+
+    ign_tokens =
+        ignored T.tokens id_list? semicolon
+	   {-> New ign_tokens([id_list.id]) };
+
+    look_ahead
+	   {-> slash reg_exp} =
+        slash reg_exp
+	   {-> slash reg_exp};
+
+    reg_exp =
+        concat [concats]:reg_exp_tail*
+	   {-> New reg_exp([concat, concats.concat])};
+
+
+    reg_exp_tail
+	   {-> concat } =
+        bar concat
+	   {-> concat};
+
+    concat =
+        [un_exps]:un_exp*
+	   {-> New concat([un_exps])};
+
+    un_exp =
+        basic un_op?;
+
+    basic =
+        {char}    P.char
+	   {-> New basic.char(P.char)}		|
+        {set}     set
+	   {-> New basic.set(set)}		|
+        {string}  string
+	   {-> New basic.string(string)}	|
+        {id}      id
+	   {-> New basic.id(id)}		|
+        {reg_exp} l_par reg_exp r_par
+	   {-> New basic.reg_exp(reg_exp)}	;
+
+    char =
+        {char} T.char |
+        {dec}  dec_char |
+        {hex}  hex_char;
+
+    set =
+        {operation} l_bkt [left]:basic  bin_op [right]:basic  r_bkt
+	   {-> New set.operation(left, bin_op, right) } |
+        {interval}  l_bkt [left]:P.char d_dot  [right]:P.char r_bkt
+	   {-> New set.interval(left, right) };
+
+    un_op =
+        {star}   star
+	   {-> New un_op.star(star)}   |
+        {q_mark} q_mark
+	   {-> New un_op.q_mark(q_mark)} |
+        {plus}   plus
+	   {-> New un_op.plus(plus)}   ;
+
+    bin_op =
+        {plus}  plus
+	   {-> New bin_op.plus()}  |
+        {minus} minus
+	   {-> New bin_op.minus()} ;
+
+    productions =
+        T.productions [prods]:prod+
+	   {-> New productions([prods]) };
+
+    prod =
+        id prod_transform? equal alts semicolon
+	   {-> New prod(id, prod_transform.arrow, [prod_transform.elem], [alts.list_alt])};
+
+    prod_transform
+	   {-> arrow elem*} =
+        l_brace arrow [elems]:elem* r_brace
+	   {-> arrow [elems]};
+
+    alts
+	   {-> [list_alt]:alt*} =
+        alt [alts]:alts_tail*
+	   {-> [alt, alts.alt]};
+
+    alts_tail
+	   {-> alt} =
+        bar alt
+	   {-> alt};
+
+    alt =
+        alt_name? [elems]:elem* alt_transform?
+	   {-> New alt(alt_name.id, [elems], alt_transform)};
+
+    alt_transform =
+        l_brace arrow [terms]: term* r_brace
+	   {-> New alt_transform(l_brace, [terms], r_brace)};
+
+    term =
+        {new} new prod_name l_par params? r_par
+	   {-> New term.new(prod_name, l_par, [params.list_term]) } 		|
+
+        {list} l_bkt list_of_list_term? r_bkt
+	   {-> New term.list(l_bkt, [list_of_list_term.list_terms])} 	|
+
+        {simple} specifier? id simple_term_tail?
+	   {-> New term.simple(specifier, id, simple_term_tail.id)} 	|
+
+        {null} null
+	   {-> New term.null()}						;
+
+    list_of_list_term
+	   {-> [list_terms]:list_term* } =
+		list_term [list_terms]:list_term_tail*
+	   {-> [list_term, list_terms.list_term] }    ;
+
+    list_term =
+        {new} new prod_name l_par params? r_par
+	   {-> New list_term.new(prod_name, l_par, [params.list_term])}		|
+       	{simple} specifier? id simple_term_tail?
+	   {-> New list_term.simple(specifier, id, simple_term_tail.id)};
+
+    list_term_tail
+	   {-> list_term} =
+	comma list_term
+	   {-> list_term} ;
+
+    simple_term_tail
+	   {-> id} =
+        dot id
+	   {-> id};
+
+    prod_name =
+        id prod_name_tail?
+	   {-> New prod_name(id, prod_name_tail.id)};
+
+    prod_name_tail
+	   {-> id} =
+        dot id
+	   {-> id};
+
+    params
+	   {-> [list_term]:term*} =
+       term [params]:params_tail*
+	   {-> [term, params.term]};
+
+    params_tail
+	   {-> term} =
+       comma term
+	   {-> term};
+
+    alt_name
+	   {-> id} =
+        l_brace id r_brace
+	   {-> id};
+
+    elem =
+        elem_name? specifier? id un_op?
+	   {-> New elem(elem_name.id, specifier, id, un_op) };
+
+    elem_name
+	   {-> id} =
+        l_bkt id r_bkt colon
+	   {-> id};
+
+    specifier =
+        {token}      token_specifier dot
+	   {-> New specifier.token()} 			|
+        {production} production_specifier dot
+	   {-> New specifier.production()}		;
+
+    ast =
+        abstract syntax tree [prods]:ast_prod+
+	   {-> New ast([prods]) };
+
+    ast_prod =
+        id equal [alts]:ast_alts semicolon
+	   {-> New ast_prod(id, [alts.list_ast_alt])};
+
+    ast_alts
+	   {-> [list_ast_alt]:ast_alt*} =
+        ast_alt [ast_alts]:ast_alts_tail*
+	   {-> [ast_alt, ast_alts.ast_alt]};
+
+    ast_alts_tail
+	   {-> ast_alt} =
+        bar ast_alt
+	   {-> ast_alt};
+
+    ast_alt =
+        alt_name? [elems]:elem*
+	   {-> New ast_alt(alt_name.id, [elems])};
+
+
+/*****************************************************************************************/
+/*											 */
+/*											 */
+/*											 */
+/*											 */
+/*											 */
+/*****************************************************************************************/
+Abstract Syntax Tree
+
+    grammar =
+        [package]:pkg_id* P.helpers? P.states? P.tokens? P.ign_tokens? P.productions? P.ast?;
+
+    helpers =
+        [helper_defs]:helper_def*;
+
+    helper_def =
+        id reg_exp;
+
+    states =
+	[list_id]:id*;
+
+    tokens =
+        [token_defs]:token_def*;
+
+    token_def =
+        state_list? id reg_exp slash? [look_ahead]:reg_exp?;
+
+    state_list =
+        id transition? [state_lists]:state_list_tail*;
+
+    state_list_tail =
+        id transition?;
+
+    transition =
+        id;
+
+    ign_tokens =
+        [list_id]:id*;
+
+    reg_exp =
+        [concats]:concat*;
+
+    concat =
+	[un_exps]: un_exp*;
+
+    un_exp =
+        basic un_op?;
+
+    basic =
+        {char}    P.char |
+        {set}     set |
+        {string}  string |
+        {id}      id |
+        {reg_exp} reg_exp;
+
+    char =
+        {char} T.char |
+        {dec}  dec_char |
+        {hex}  hex_char;
+
+    set =
+        {operation} [left]:basic bin_op [right]:basic |
+        {interval}  [left]:P.char [right]:P.char ;
+
+    un_op =
+        {star}   star 	|
+        {q_mark} q_mark |
+        {plus}   plus	;
+
+    bin_op =
+        {plus} |
+        {minus};
+
+    productions =
+        [prods]:prod*;
+
+    prod =
+        id arrow? [prod_transform]:elem* [alts]:alt*;
+
+    alt =
+        [alt_name]:id? [elems]:elem* alt_transform?;
+
+    alt_transform =
+	l_brace [terms]:term* r_brace;
+
+    term =
+        {new} prod_name l_par [params]:term* |
+        {list} l_bkt [list_terms]:list_term* |
+        {simple} specifier? id [simple_term_tail]:id? |
+        {null} ;
+
+    list_term =
+        {new} prod_name l_par [params]:term* |
+        {simple} specifier? id [simple_term_tail]:id? ;
+
+    prod_name =
+        id [prod_name_tail]:id? ;
+
+    elem =
+        [elem_name]:id? specifier? id un_op?;
+
+    specifier =
+        {token} 	|
+        {production} 	;
+
+    ast =
+        [prods]:ast_prod*;
+
+    ast_prod =
+        id [alts]:ast_alt*;
+
+    ast_alt =
+        [alt_name]:id? [elems]:elem*;
