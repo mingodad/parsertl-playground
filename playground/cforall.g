@@ -1,4 +1,4 @@
-//From: https://github.com/cforall/cforall/blob/ca1443045c528563ffa66d324b32e980f32ef020/src/Parser/parser.yy
+//From: https://github.com/cforall/cforall/blob/549e55ce53eccf83748bfce22af33134417ca8eb/src/Parser/parser.yy
 //
 // Cforall Version 1.0.0 Copyright (C) 2015 University of Waterloo
 //
@@ -78,6 +78,11 @@
 %token uFLOAT64
 %token uFLOAT64X
 %token uFLOAT128
+%token FLOAT32X4
+%token FLOAT64X2
+%token SVFLOAT32
+%token SVFLOAT64
+%token SVBOOL
 %token DECIMAL32
 %token DECIMAL64
 %token DECIMAL128
@@ -135,7 +140,7 @@
 %token TRY
 %token THROW
 %token THROWRESUME
-//%token AT
+%token AT
 %token ASM
 //%token ALIGNAS
 %token ALIGNOF
@@ -157,6 +162,7 @@
 %token CHARACTERconstant
 %token STRINGliteral
 %token DIRECTIVE
+%token C23_ATTRIBUTE
 %token FLOATING_DECIMALconstant
 %token FLOATING_FRACTIONconstant
 %token FLOATINGconstant
@@ -244,7 +250,7 @@ identifier :
 
 identifier_at :
 	identifier
-	| '@'
+	| AT
 	;
 
 identifier_or_type_name :
@@ -313,23 +319,8 @@ postfix_expression :
 	| postfix_expression ICR
 	| postfix_expression DECR
 	| '(' /*15P*/ type_no_function ')' '{' initializer_list_opt comma_opt '}' /*14P*/
-	| '(' /*15P*/ type_no_function ')' '@' '{' initializer_list_opt comma_opt '}' /*14P*/
+	| '(' /*15P*/ type_no_function ')' AT '{' initializer_list_opt comma_opt '}' /*14P*/
 	| '^' primary_expression '{' argument_expression_list_opt '}' /*14P*/
-	;
-
-argument_expression_list_opt :
-	/*empty*/
-	| argument_expression_list
-	;
-
-argument_expression_list :
-	argument_expression
-	| argument_expression_list_opt ',' argument_expression
-	;
-
-argument_expression :
-	'@'
-	| assignment_expression
 	;
 
 field_name_list :
@@ -375,8 +366,8 @@ unary_expression :
 	| ALIGNOF '(' /*15P*/ cfa_abstract_function ')'
 	| OFFSETOF '(' /*15P*/ type_no_function ',' identifier ')'
 	| TYPEID '(' /*15P*/ type ')'
-	| COUNTOF '(' /*15P*/ type_no_function ')'
 	| COUNTOF unary_expression
+	| COUNTOF '(' /*15P*/ type_no_function ')'
 	;
 
 ptrref_operator :
@@ -489,6 +480,22 @@ constant_expression :
 	conditional_expression
 	;
 
+argument_expression_list_opt :
+	/*empty*/
+	| argument_expression_list
+	;
+
+argument_expression_list :
+	argument_expression
+	| argument_expression_list ',' argument_expression
+	;
+
+argument_expression :
+	'?'
+	| '?' identifier '=' assignment_expression
+	| assignment_expression
+	;
+
 assignment_expression :
 	conditional_expression
 	| unary_expression assignment_operator assignment_expression
@@ -525,15 +532,18 @@ compound_assignment_operator :
 	;
 
 tuple :
-	'[' ',' tuple_expression_list ']'
-	| '[' push assignment_expression pop ',' tuple_expression_list ']'
+	'[' ',' ']'
+	| '[' assignment_expression ',' ']'
+	| '[' AT comma_opt ']'
+	| '[' assignment_expression ',' tuple_expression_list comma_opt ']'
+	| '[' AT ',' tuple_expression_list comma_opt ']'
 	;
 
 tuple_expression_list :
 	assignment_expression
-	| '@'
+	| AT
 	| tuple_expression_list ',' assignment_expression
-	| tuple_expression_list ',' '@'
+	| tuple_expression_list ',' AT
 	;
 
 comma_expression :
@@ -678,46 +688,46 @@ for_control_expression :
 	';' comma_expression_opt ';' comma_expression_opt
 	| comma_expression ';' comma_expression_opt ';' comma_expression_opt
 	| declaration comma_expression_opt ';' comma_expression_opt
-	| '@' ';' comma_expression
-	| '@' ';' comma_expression ';' comma_expression
+	| AT ';' comma_expression
+	| AT ';' comma_expression ';' comma_expression
 	| comma_expression
 	| downupdowneq comma_expression
 	| comma_expression updowneq comma_expression
-	| '@' updowneq comma_expression
-	| comma_expression updowneq '@'
+	| AT updowneq comma_expression
+	| comma_expression updowneq AT
 	| comma_expression updowneq comma_expression '~' comma_expression
-	| '@' updowneq comma_expression '~' comma_expression
-	| comma_expression updowneq '@' '~' comma_expression
-	| comma_expression updowneq comma_expression '~' '@'
-	| '@' updowneq '@'
-	| '@' updowneq comma_expression '~' '@'
-	| comma_expression updowneq '@' '~' '@'
-	| '@' updowneq '@' '~' '@'
+	| AT updowneq comma_expression '~' comma_expression
+	| comma_expression updowneq AT '~' comma_expression
+	| comma_expression updowneq comma_expression '~' AT
+	| AT updowneq AT
+	| AT updowneq comma_expression '~' AT
+	| comma_expression updowneq AT '~' AT
+	| AT updowneq AT '~' AT
 	| comma_expression ';' comma_expression
 	| comma_expression ';' downupdowneq comma_expression
 	| comma_expression ';' comma_expression updowneq comma_expression
-	| comma_expression ';' '@' updowneq comma_expression
-	| comma_expression ';' comma_expression updowneq '@'
-	| comma_expression ';' '@' updowneq '@'
+	| comma_expression ';' AT updowneq comma_expression
+	| comma_expression ';' comma_expression updowneq AT
+	| comma_expression ';' AT updowneq AT
 	| comma_expression ';' comma_expression updowneq comma_expression '~' comma_expression
-	| comma_expression ';' '@' updowneq comma_expression '~' comma_expression
-	| comma_expression ';' comma_expression updowneq '@' '~' comma_expression
-	| comma_expression ';' comma_expression updowneq comma_expression '~' '@'
-	| comma_expression ';' '@' updowneq comma_expression '~' '@'
-	| comma_expression ';' comma_expression updowneq '@' '~' '@'
-	| comma_expression ';' '@' updowneq '@' '~' '@'
+	| comma_expression ';' AT updowneq comma_expression '~' comma_expression
+	| comma_expression ';' comma_expression updowneq AT '~' comma_expression
+	| comma_expression ';' comma_expression updowneq comma_expression '~' AT
+	| comma_expression ';' AT updowneq comma_expression '~' AT
+	| comma_expression ';' comma_expression updowneq AT '~' AT
+	| comma_expression ';' AT updowneq AT '~' AT
 	| declaration comma_expression
 	| declaration downupdowneq comma_expression
 	| declaration comma_expression updowneq comma_expression
-	| declaration '@' updowneq comma_expression
-	| declaration comma_expression updowneq '@'
+	| declaration AT updowneq comma_expression
+	| declaration comma_expression updowneq AT
 	| declaration comma_expression updowneq comma_expression '~' comma_expression
-	| declaration '@' updowneq comma_expression '~' comma_expression
-	| declaration comma_expression updowneq '@' '~' comma_expression
-	| declaration comma_expression updowneq comma_expression '~' '@'
-	| declaration '@' updowneq comma_expression '~' '@'
-	| declaration comma_expression updowneq '@' '~' '@'
-	| declaration '@' updowneq '@' '~' '@'
+	| declaration AT updowneq comma_expression '~' comma_expression
+	| declaration comma_expression updowneq AT '~' comma_expression
+	| declaration comma_expression updowneq comma_expression '~' AT
+	| declaration AT updowneq comma_expression '~' AT
+	| declaration comma_expression updowneq AT '~' AT
+	| declaration AT updowneq AT '~' AT
 	| comma_expression ';' type_type_specifier
 	| comma_expression ';' downupdowneq enum_key
 	;
@@ -767,7 +777,7 @@ jump_statement :
 	| SUSPEND GENERATOR compound_statement
 	| THROW assignment_expression_opt ';'
 	| THROWRESUME assignment_expression_opt ';'
-	| THROWRESUME assignment_expression_opt '@' assignment_expression ';'
+	| THROWRESUME assignment_expression_opt AT assignment_expression ';'
 	;
 
 fall_through_name :
@@ -868,8 +878,8 @@ exception_statement :
 	;
 
 handler_clause :
-	handler_key '(' /*15P*/ push exception_declaration pop handler_predicate_opt ')' compound_statement
-	| handler_clause handler_key '(' /*15P*/ push exception_declaration pop handler_predicate_opt ')' compound_statement
+	handler_key '(' /*15P*/ exception_declaration handler_predicate_opt ')' compound_statement
+	| handler_clause handler_key '(' /*15P*/ exception_declaration handler_predicate_opt ')' compound_statement
 	;
 
 handler_predicate_opt :
@@ -982,13 +992,12 @@ local_label_list :
 declaration :
 	c_declaration ';'
 	| cfa_declaration ';'
-	| static_assert
-	| ';'
+	| static_assert ';'
 	;
 
 static_assert :
-	STATICASSERT '(' /*15P*/ constant_expression ',' string_literal ')' ';'
-	| STATICASSERT '(' /*15P*/ constant_expression ')' ';'
+	STATICASSERT '(' /*15P*/ constant_expression ',' string_literal ')'
+	| STATICASSERT '(' /*15P*/ constant_expression ')'
 	;
 
 cfa_declaration :
@@ -1029,8 +1038,8 @@ cfa_function_specifier :
 	;
 
 cfa_function_return :
-	'[' push cfa_parameter_list pop ']'
-	| '[' push cfa_parameter_list ',' cfa_abstract_parameter_list pop ']'
+	'[' cfa_parameter_list ']'
+	| '[' cfa_parameter_list ',' cfa_abstract_parameter_list ']'
 	;
 
 cfa_typedef_declaration :
@@ -1174,6 +1183,11 @@ basic_type_name_type :
 	| uFLOAT64
 	| uFLOAT64X
 	| uFLOAT128
+	| FLOAT32X4
+	| FLOAT64X2
+	| SVFLOAT32
+	| SVFLOAT64
+	| SVBOOL
 	| DECIMAL32
 	| DECIMAL64
 	| DECIMAL128
@@ -1352,7 +1366,7 @@ field_declaration :
 	| EXTENSION cfa_field_declaring_list ';'
 	| INLINE cfa_field_abstract_list ';'
 	| cfa_typedef_declaration ';'
-	| static_assert
+	| static_assert ';'
 	;
 
 field_declaring_list_opt :
@@ -1423,7 +1437,8 @@ enum_type_nobody :
 	;
 
 enumerator_list :
-	visible_hide_opt identifier_or_type_name enumerator_value_opt
+	/*empty*/
+	| visible_hide_opt identifier_or_type_name enumerator_value_opt
 	| INLINE type_name
 	| enumerator_list ',' visible_hide_opt identifier_or_type_name enumerator_value_opt
 	| enumerator_list ',' INLINE type_name
@@ -1539,7 +1554,7 @@ initializer_list_opt :
 	;
 
 designation :
-	designator_list ':'
+	designator_list '='
 	| identifier_at ':'
 	;
 
@@ -1550,10 +1565,10 @@ designator_list :
 
 designator :
 	'.' identifier_at
-	| '[' push assignment_expression pop ']'
-	| '[' push subrange pop ']'
-	| '[' push constant_expression ELLIPSIS constant_expression pop ']'
-	| '.' '[' push field_name_list pop ']'
+	| '[' constant_expression ']'
+	| '[' subrange ']'
+	| '[' constant_expression ELLIPSIS constant_expression ']'
+	| '.' '[' field_name_list ']'
 	;
 
 type_parameter_list :
@@ -1600,7 +1615,7 @@ assertion_list :
 
 assertion :
 	'|' identifier_or_type_name '(' /*15P*/ type_list ')'
-	| '|' '{' push trait_declaration_list pop '}' /*14P*/
+	| '|' '{' trait_declaration_list '}' /*14P*/
 	;
 
 type_list :
@@ -1629,13 +1644,13 @@ type_declarator_name :
 trait_specifier :
 	TRAIT identifier_or_type_name '(' /*15P*/ type_parameter_list ')' '{' '}' /*14P*/
 	| forall TRAIT identifier_or_type_name '{' '}' /*14P*/
-	| TRAIT identifier_or_type_name '(' /*15P*/ type_parameter_list ')' '{' push trait_declaration_list pop '}' /*14P*/
-	| forall TRAIT identifier_or_type_name '{' push trait_declaration_list pop '}' /*14P*/
+	| TRAIT identifier_or_type_name '(' /*15P*/ type_parameter_list ')' '{' trait_declaration_list '}' /*14P*/
+	| forall TRAIT identifier_or_type_name '{' trait_declaration_list '}' /*14P*/
 	;
 
 trait_declaration_list :
 	trait_declaration
-	| trait_declaration_list pop push trait_declaration
+	| trait_declaration_list trait_declaration
 	;
 
 trait_declaration :
@@ -1646,12 +1661,13 @@ trait_declaration :
 cfa_trait_declaring_list :
 	cfa_variable_specifier
 	| cfa_function_specifier
-	| cfa_trait_declaring_list pop ',' push identifier_or_type_name
+	| cfa_trait_declaring_list ',' identifier_or_type_name
 	;
 
 trait_declaring_list :
-	type_specifier declarator
-	| trait_declaring_list pop ',' push declarator
+	type_specifier_nobody declarator
+	| trait_declaring_list ',' declarator
+	//| error
 	;
 
 translation_unit :
@@ -1694,6 +1710,7 @@ external_definition :
 	| type_qualifier_list '{' up external_definition_list_opt down '}' /*14P*/
 	| declaration_qualifier_list '{' up external_definition_list_opt down '}' /*14P*/
 	| declaration_qualifier_list type_qualifier_list '{' up external_definition_list_opt down '}' /*14P*/
+	| ';'
 	;
 
 external_function_definition :
@@ -1750,6 +1767,7 @@ attribute :
 	ATTRIBUTE '(' /*15P*/ '(' /*15P*/ attribute_name_list ')' ')'
 	| ATTRIBUTE '(' /*15P*/ attribute_name_list ')'
 	| ATTR '(' /*15P*/ attribute_name_list ')'
+	| C23_ATTRIBUTE
 	;
 
 attribute_name_list :
@@ -1771,6 +1789,7 @@ attr_name :
 
 paren_identifier :
 	identifier_at
+	| '?' identifier
 	| '(' /*15P*/ paren_identifier ')'
 	;
 
@@ -2017,8 +2036,8 @@ abstract_function :
 array_dimension :
 	'[' ']'
 	| '[' ']' multi_array_dimension
-	| '[' push assignment_expression pop ',' comma_expression ']'
-	| '[' push array_type_list pop ']'
+	| '[' assignment_expression ',' comma_expression ']'
+	| '[' array_type_list ']'
 	| multi_array_dimension
 	;
 
@@ -2037,10 +2056,10 @@ upupeq :
 	;
 
 multi_array_dimension :
-	'[' push assignment_expression pop ']'
-	| '[' push '*' pop ']'
-	| multi_array_dimension '[' push assignment_expression pop ']'
-	| multi_array_dimension '[' push '*' pop ']'
+	'[' assignment_expression ']'
+	| '[' '*' ']'
+	| multi_array_dimension '[' assignment_expression ']'
+	| multi_array_dimension '[' '*' ']'
 	;
 
 abstract_parameter_declarator_opt :
@@ -2151,10 +2170,10 @@ cfa_identifier_parameter_array :
 	;
 
 cfa_array_parameter_1st_dimension :
-	'[' push type_qualifier_list '*' pop ']'
-	| '[' push type_qualifier_list assignment_expression pop ']'
-	| '[' push declaration_qualifier_list assignment_expression pop ']'
-	| '[' push declaration_qualifier_list type_qualifier_list assignment_expression pop ']'
+	'[' type_qualifier_list '*' ']'
+	| '[' type_qualifier_list assignment_expression ']'
+	| '[' declaration_qualifier_list assignment_expression ']'
+	| '[' declaration_qualifier_list type_qualifier_list assignment_expression ']'
 	;
 
 cfa_abstract_declarator_tuple :
@@ -2187,9 +2206,9 @@ cfa_abstract_array :
 	;
 
 cfa_abstract_tuple :
-	'[' push cfa_abstract_parameter_list pop ']'
-	| '[' push type_specifier_nobody ELLIPSIS pop ']'
-	| '[' push type_specifier_nobody ELLIPSIS constant_expression pop ']'
+	'[' cfa_abstract_parameter_list ']'
+	| '[' type_specifier_nobody ELLIPSIS ']'
+	| '[' type_specifier_nobody ELLIPSIS constant_expression ']'
 	;
 
 cfa_abstract_function :
@@ -2279,11 +2298,14 @@ cwide_prefix "L"|"U"|"u"
 swide_prefix {cwide_prefix}|"u8"
 
 // display/white-space characters
-h_tab [\011]
-form_feed [\014]
-v_tab [\013]
-c_return [\015]
-h_white [ ]|{h_tab}
+h_tab "\t"
+form_feed "\f"
+v_tab "\v"
+new_line "\n"
+c_return "\r"
+h_white " "|{h_tab}
+v_white {v_tab}|{c_return}|{form_feed}
+hv_white {h_white}|{v_tab}|{new_line}|{c_return}|{form_feed}
 
 // overloadable operators
 op_unary_only "~"|"!"
@@ -2296,6 +2318,11 @@ op_binary_over {op_unary_binary}|{op_binary_only}
 // op_binary_not_over "?"|"->"|"."|"&&"|"||"|"@="
 // operator {op_unary_pre_post}|{op_binary_over}|{op_binary_not_over}
 
+// C23 attributes, CPP also handles missing quote delimiter
+attr_string "\""([^\"\\\n]|{escape_seq})*["\n]
+attr_arg_opt ({hv_white}*"("({hv_white}*{attr_string}{hv_white}*)+")")?
+attributes "deprecated"{attr_arg_opt}|"fallthrough"|"nodiscard"{attr_arg_opt}|"maybe_unused"|"noreturn"|"_Noreturn"|"unsequenced"|"unused"|"reproducible"|{identifier}{hv_white}*"::"{hv_white}*{identifier}
+
 %%
 
 [ \t\r\n]+	skip()
@@ -2306,7 +2333,7 @@ op_binary_over {op_unary_binary}|{op_binary_only}
 ^{h_white}*"#"[^\n]*"\n" DIRECTIVE
 
 				/* punctuation */
-"@"			'@'
+"@"			AT
 "`"			'`'
 "["			'['
 "]"			']'
@@ -2392,6 +2419,7 @@ auto			AUTO
 __auto_type		AUTO_TYPE
 basetypeof		BASETYPEOF			// CFA
 _Bool			BOOL				// C99
+__SVBool_t      SVBOOL              // gcc (ARM)
 break			BREAK
 case			CASE
 catch			CATCH				// CFA
@@ -2439,6 +2467,10 @@ _Float64		uFLOAT64					// GCC
 _Float64x		uFLOAT64X					// GCC
 _Float128		uFLOAT128					// GCC
 _Float128x		uFLOAT128					// GCC
+__Float32x4_t	FLOAT32X4					// GCC (ARM)
+__Float64x2_t	FLOAT64X2					// GCC (ARM)
+__SVFloat32_t	SVFLOAT32					// GCC (ARM)
+__SVFloat64_t	SVFLOAT64					// GCC (ARM)
 for				FOR
 forall			FORALL				// CFA
 fortran			FORTRAN
@@ -2519,6 +2551,8 @@ while			WHILE
 with			WITH				// CFA
 zero_t			ZERO_T				// CFA
 
+"[["{hv_white}*{attributes}({hv_white}*","{hv_white}*{attributes})*{hv_white}*"]]" C23_ATTRIBUTE
+
 				/* numeric constants */
 {binary_constant} INTEGERconstant
 {octal_constant} INTEGERconstant
@@ -2591,7 +2625,9 @@ zero_t			ZERO_T				// CFA
 //	} // if
 //}
 
-
+TYPEDIMname TYPEDIMname
+TYPEDEFname TYPEDEFname
+TYPEGENname TYPEGENname
 {identifier}	IDENTIFIER
 "``"{identifier}	IDENTIFIER
 
