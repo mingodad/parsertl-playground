@@ -704,8 +704,8 @@ T_START_BACKTICK	T_START_BACKTICK
 {ID}|"$"[0-9]+	T_ID
 
 {ws}+	skip()
-^"#!".*  skip()
 "//".*	skip()
+"#".*	skip()
 "/*"(?s:.)*?"*/"	skip()
 
 %%
