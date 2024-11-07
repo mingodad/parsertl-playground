@@ -176,6 +176,7 @@ const sampleList = [
 	["JsonLint parser", "jsonlint.g", "test.json.txt", "ace/mode/json"],
 	["JsSql parser", "js-sql-parser.g", "test.js-sql-parser", "ace/mode/sql"],
 	["Kinx parser (partially working)", "kinx.g", "test.kinx", "ace/mode/c_cpp"],
+	["Kitlang parser (partially working)", "kitlang-ghc.g", "test.kitlang-ghc", "ace/mode/c_cpp"],
 	["Koka-lang parser (partially working)", "koka-lang.g", "test.koka-lang", "ace/mode/text"],
 	["LALR parser", "lalr.g", "test.lalr", "ace/mode/yaml"],
 	["Lark parser", "lark.g", "test.lark", "ace/mode/yaml"],

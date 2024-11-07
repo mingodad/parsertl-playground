@@ -1,0 +1,102 @@
+#[builtin] abstract Bool: Void;
+
+#[builtin] abstract CArray[T, $N = 0]: Ptr[T] {
+    rules {
+        ($this.length) => N;
+        (for $ident in $this {$e}) => {
+            for __i in 0 ... N {
+                var $ident: T = $this[__i];
+                {$e}
+            }
+        }
+    }
+
+    public function all(fn: function (&T) -> Bool): Bool {
+        for item in this {
+            if !fn(item) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function any(fn: function (&T) -> Bool): Bool {
+        for item in this {
+            if fn(item) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+#[builtin] abstract Box[T];
+
+#[builtin] #[promote] abstract Const[T]: T;
+
+#[promote] abstract ReadOnly[T]: T {
+    rules {
+        ($this.$field = $e) => {1 / 0;}
+    }
+}
+
+#[promote] #[demote] abstract CString: Ptr[Char] {
+    rules {
+        ($this.length) => strlen($this);
+        ($this == ${other: CString}) => $this.eq($other);
+        ($this != ${other: CString}) => !$this.eq($other);
+        (for $ident in $this {$e}) => {
+            var __i: Ptr[Char] = $this;
+            while __i != null && (*__i) != 0 {
+                var $ident: Char = *(__i++);
+                {$e}
+            }
+        }
+    }
+
+    public static function alloc(allocator: Box[Allocator], chars: Size): CString {
+        return allocator.calloc(chars + 1);
+    }
+
+    public function copy(allocator: Box[Allocator]): CString {
+        var new = allocator.alloc(this.length + 1);
+        strcpy(new, this);
+        return new;
+    }
+
+    public function startsWith(other: CString): Bool {
+        var len1 = this.length;
+        var len2 = other.length;
+        return len1 >= len2 && strncmp(this, other, len2) == 0;
+    }
+
+    public function endsWith(other: CString): Bool {
+        var len1 = this.length;
+        var len2 = other.length;
+        return len1 >= len2 && strcmp(&this[len1 - len2], other) == 0;
+    }
+
+    public function eq(other: CString): Bool {
+        if (this as Ptr[Void]) == null && (other as Ptr[Void]) == null {
+            return true;
+        } else if (this as Ptr[Void]) == null || (other as Ptr[Void]) == null {
+            return false;
+        } else {
+            return strcmp(this, other) == 0;
+        }
+    }
+}
+
+trait Enum {
+    public static function name(): CString;
+    public static function members(): Slice[CString];
+}
+
+trait Struct {
+    public static function name(): CString;
+    public static function fields(): Slice[CString];
+}
+
+trait Union {
+    public static function name(): CString;
+    public static function fields(): Slice[CString];
+}
