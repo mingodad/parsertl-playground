@@ -14,7 +14,7 @@
 
 //Grammar . Grammar ::= [Def] ;
 Grammar :
-	Def_list
+	ListDef
 	;
 
 // separator Def ";" ;  // Note: this still permits a final semicolon.
@@ -23,15 +23,15 @@ Grammar :
 //(:).      [Def] ::= Def ";" [Def] ;
 //// extra semicolons allowed
 //_.        [Def] ::= ";" [Def] ;
-Def_list :
+ListDef :
 	%empty
-	| Def_list Def ';'
+	| ListDef Def ';'
 	;
 
 // The rules of the grammar
 //Rule .    Def ::= Label "." Cat "::=" [Item] ;
 Def :
-	Label '.' Cat "::=" Item_list
+	Label '.' Cat "::=" ListItem
 	;
 
 // Items
@@ -42,9 +42,9 @@ Item :
 	| Cat #NTerminal
 	;
 
-Item_list :
+ListItem :
 	%empty
-	| Item_list Item
+	| ListItem Item
 	;
 
 //terminator Item "" ;
@@ -57,9 +57,9 @@ Cat :
 	| Identifier #IdCat
 	;
 
-Cat_list :
+ListCat :
 	Cat
-	| Cat_list ',' Cat
+	| ListCat ',' Cat
 	;
 
 //separator Cat "," ; // for "entrypoints"
@@ -94,16 +94,16 @@ Label :
 Def :
 	"comment"  String #Comment
 	| "comment"  String String #Comments
-	| "internal" Label '.' Cat "::=" Item_list #Internal
+	| "internal" Label '.' Cat "::=" ListItem #Internal
 	| "token" Identifier Reg #Token
 	| "position" "token" Identifier Reg #PosToken
-	| "entrypoints" Cat_list #Entryp
+	| "entrypoints" ListCat #Entryp
 	| "separator"   MinimumSize Cat String #Separator
 	| "terminator"  MinimumSize Cat String #Terminator
 	| "delimiters"  Cat String String Separation MinimumSize #Delimiters
 	| "coercions"   Identifier Integer #Coercions
-	| "rules"       Identifier "::=" RHS_list #Rules
-	| "define"      Identifier Arg_list '=' Exp #Function
+	| "rules"       Identifier "::=" ListRHS #Rules
+	| "define"      Identifier ListArg '=' Exp #Function
 	;
 
 //Arg.        Arg ::= Identifier ;
@@ -112,9 +112,9 @@ Arg :
 	Identifier
 	;
 
-Arg_list :
+ListArg :
 	Arg
-	| Arg_list Arg
+	| ListArg Arg
 	;
 
 // Lists
@@ -132,14 +132,14 @@ Separation :
 //LayoutStop. Def ::= "layout" "stop" [String] ; // Layout stop keywords
 //LayoutTop.  Def ::= "layout" "toplevel"      ; // Should the toplevel be a block?
 Def :
-	"layout" String_list #Layout
-	| "layout" "stop" String_list #LayoutStop
+	"layout" ListString #Layout
+	| "layout" "stop" ListString #LayoutStop
 	| "layout" "toplevel" #LayoutTop
 	;
 
-String_list :
+ListString :
 	String
-	| String_list ',' String
+	| ListString ',' String
 	;
 
 //separator nonempty String "," ;
@@ -153,7 +153,7 @@ Exp :
 //App.        Exp1 ::= Identifier [Exp2] ;
 Exp1 :
     Exp2
-	| Identifier Exp2_list #App
+	| Identifier ListExpr2 #App
 	;
 //Var.        Exp2 ::= Identifier ;
 //LitInt.     Exp2 ::= Integer ;
@@ -167,19 +167,19 @@ Exp2 :
 	| Char #LitChar
 	| String #LitString
 	| Double #LitDouble
-	| '[' Exp_list ']'
+	| '[' ListExpr ']'
 	| '(' Exp ')'
 	;
 
-Exp2_list :
+ListExpr2 :
 	Exp2
-	| Exp2_list Exp2
+	| ListExpr2 Exp2
 	;
 
-Exp_list :
+ListExpr :
     %empty
 	| Exp
-	| Exp_list ',' Exp
+	| ListExpr ',' Exp
 	;
 
 //coercions   Exp 2;
@@ -189,9 +189,9 @@ Exp_list :
 
 //RHS.      RHS ::= [Item] ;
 //separator nonempty RHS "|" ;
-RHS_list :
-	Item_list
-	| RHS_list '|' Item_list
+ListRHS :
+	ListItem
+	| ListRHS '|' ListItem
 	;
 
 // List size condition
