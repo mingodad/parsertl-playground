@@ -1,0 +1,124 @@
+{-
+    BNF Converter: Language definition
+    Copyright (C) 2004  Author: Markus Forsberg, Michael Pellauer, Aarne Ranta
+
+
+-}
+
+-- A Grammar is a sequence of definitions
+
+Grammar . Grammar ::= [Def] ;
+
+-- separator Def ";" ;  -- Note: this still permits a final semicolon.
+[].       [Def] ::= ;
+(:[]).    [Def] ::= Def ;
+(:).      [Def] ::= Def ";" [Def] ;
+-- extra semicolons allowed
+_.        [Def] ::= ";" [Def] ;
+
+-- The rules of the grammar
+Rule .    Def ::= Label "." Cat "::=" [Item] ;
+
+-- Items
+Terminal  . Item ::= String ;
+NTerminal . Item ::= Cat ;
+
+terminator Item "" ;
+
+-- Categories (non-terminals)
+ListCat  . Cat ::= "[" Cat "]" ;
+IdCat    . Cat ::= Identifier ;
+
+separator Cat "," ; -- for "entrypoints"
+
+-- Labels
+Id       . Label ::= Identifier          ;  -- AST constructor
+Wild     . Label ::= "_"                 ;  -- No AST constructor (embedding)
+ListE    . Label ::= "[" "]"             ;  -- Empty list
+ListCons . Label ::= "(" ":" ")"         ;  -- Cons
+ListOne  . Label ::= "(" ":" "[" "]" ")" ;  -- Singleton list
+
+-- Pragmas
+Comment  .  Def ::= "comment"  String                     ; -- Line comment
+Comments .  Def ::= "comment"  String String              ; -- Block comment
+Internal .  Def ::= "internal" Label "." Cat "::=" [Item] ; -- No parsing, AST and printing only
+Token.      Def ::=            "token" Identifier Reg     ; -- Lexer token
+PosToken.   Def ::= "position" "token" Identifier Reg     ; -- Lexer token with position info
+Entryp.     Def ::= "entrypoints" [Cat]                   ; -- Names of parsers
+Separator.  Def ::= "separator"   MinimumSize Cat String  ; -- List
+Terminator. Def ::= "terminator"  MinimumSize Cat String  ; -- List
+Delimiters. Def ::= "delimiters"  Cat String String Separation MinimumSize;
+Coercions.  Def ::= "coercions"   Identifier Integer      ; -- Embeddings and parenthesized exprs.
+Rules.      Def ::= "rules"       Identifier "::=" [RHS]  ; -- Automatically generated lables (e.g. enums)
+Function.   Def ::= "define"      Identifier [Arg] "=" Exp;
+
+Arg.        Arg ::= Identifier ;
+separator   Arg "" ;
+
+-- Lists
+SepNone.    Separation ::= ;
+SepTerm.    Separation ::= "terminator" String;
+SepSepar.   Separation ::= "separator"  String;
+
+-- Layout
+Layout.     Def ::= "layout" [String]        ; -- Layout start keywords
+LayoutStop. Def ::= "layout" "stop" [String] ; -- Layout stop keywords
+LayoutTop.  Def ::= "layout" "toplevel"      ; -- Should the toplevel be a block?
+
+separator nonempty String "," ;
+
+-- Expressions for "define" pragma
+Cons.       Exp  ::= Exp1 ":" Exp ;
+App.        Exp1 ::= Identifier [Exp2] ;
+Var.        Exp2 ::= Identifier ;
+LitInt.     Exp2 ::= Integer ;
+LitChar.    Exp2 ::= Char ;
+LitString.  Exp2 ::= String ;
+LitDouble.  Exp2 ::= Double ;
+List.       Exp2 ::= "[" [Exp] "]" ;
+
+coercions   Exp 2;
+
+separator   Exp ","        ; -- list list
+separator nonempty Exp2 "" ; -- argument list
+
+RHS.      RHS ::= [Item] ;
+separator nonempty RHS "|" ;
+
+-- List size condition
+MNonempty.  MinimumSize ::= "nonempty" ;
+MEmpty.     MinimumSize ::=  ;
+
+-- Regular expressions
+
+RAlt.     Reg  ::= Reg  "|" Reg1  ;  -- left-associative
+
+RMinus.   Reg1 ::= Reg1 "-" Reg2  ;  -- left-associative
+
+RSeq.     Reg2 ::= Reg2 Reg3      ;  -- left-associative
+
+RStar.    Reg3 ::= Reg3 "*"       ;
+RPlus.    Reg3 ::= Reg3 "+"       ;
+ROpt.     Reg3 ::= Reg3 "?"       ;
+
+REps.     Reg3 ::= "eps"          ;  -- empty string, same as {""}
+
+RChar.    Reg3 ::= Char           ;  -- single character
+RAlts.    Reg3 ::= "[" String "]" ;  -- list of alternative characters
+RSeqs.    Reg3 ::= "{" String "}" ;  -- character sequence
+
+RDigit.   Reg3 ::= "digit"        ;
+RLetter.  Reg3 ::= "letter"       ;
+RUpper.   Reg3 ::= "upper"        ;
+RLower.   Reg3 ::= "lower"        ;
+RAny.     Reg3 ::= "char"         ;
+
+coercions Reg 3;
+
+-- LBNF identifiers
+
+position token Identifier letter (letter | digit | '_')* ;
+
+-- Comments in BNF source
+comment "--"      ;
+comment "{-" "-}" ;

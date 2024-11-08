@@ -78,6 +78,7 @@ const sampleList = [
 	["Blawn parser", "blawn-parser.g", "test.blawn", "ace/mode/python"],
 	["Blech parser (partially working)", "blech-parser.g", "test.blech-parser", "ace/mode/text"],
 	["Blog-lang parser", "blog-lang.g", "test.blog-lang", "ace/mode/text"],
+	["BNFC parser", "bnfc.g", "test.bnfc", "ace/mode/yaml"],
 	["BNFGen parser", "bnfgen.g", "test.bnfgen", "ace/mode/yaml"],
 	["Bolt parser", "bolt-parser.g", "test.bolt", "ace/mode/c_cpp"],
 	["Braille parser", "braille.g", "test.braille", "ace/mode/text"],
