@@ -114,6 +114,7 @@ const sampleList = [
 	["Cup parser", "java-cup.g", "test.java-cup", "ace/mode/txt"],
 	["Cxx parser (not working)", "CxxParser.g", "test.cpp", "ace/mode/c_cpp"],
 	["Cyclone parser (partially working)", "cyclone.g", "test.cyclone", "ace/mode/c_cpp"],
+	["Cycipt parser (be patient) (partially working)", "cycriptC.g", "test.cycriptC", "ace/mode/javascript"],
 	["D parser (partially working)", "dlang-uaiso.g", "test.d", "ace/mode/c_cpp"],
 	["Datalog parser", "datalog.g", "test.datalog", "ace/mode/text"],
 	["DateTime parser (core)", "core-date-time-parser.g", "test.core-date-time-parser", "ace/mode/text"],

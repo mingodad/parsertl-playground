@@ -1,0 +1,65 @@
+/* Cycript - The Truly Universal Scripting Language
+ * Copyright (C) 2009-2016  Jay Freeman (saurik)
+*/
+
+/* GNU Affero General Public License, Version 3 {{{ */
+/*
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+**/
+/* }}} */
+
+(function() {
+
+Number.prototype.__defineGetter__('$cyt', function() {
+    if (this.$cyt_)
+        return this.$cyt_;
+    if ((this|0) == this)
+        return int;
+});
+
+this.typeid = function(object) {
+    return object.$cyt;
+};
+
+
+$cy_set(Boolean.prototype, {
+    toCYON: function() {
+        return `new Boolean(${this.toString()})`;
+    },
+});
+
+$cy_set(Date.prototype, {
+    toCYON: function() {
+        return `new ${this.constructor.name}(${this.toUTCString().toCYON()})`;
+    },
+});
+
+
+$cy_set(Number.prototype, {
+    toCYON: function() {
+        if ("$cyt" in this)
+            //return `${this.$cyt.toCYON()}(${this.toString()})`;
+            return this.toString();
+        return `new Number(${this.toString()})`;
+    },
+});
+
+$cy_set(RegExp.prototype, {
+    toCYON: function() {
+        return this.toString();
+    },
+});
+
+
+})();
