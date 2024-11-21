@@ -499,7 +499,7 @@ AssignmentOperator :
 
 ConditionalExpression :
 	ArithmeticalExpression
-	| ArithmeticalExpression QUESTION Expression COLON ConditionalExpression
+	| ArithmeticalExpression QUESTION ExpressionOpt COLON ConditionalExpression
 	;
 
 ArithmeticalExpression :
@@ -617,7 +617,7 @@ LBRACE    "??<"|"{"
 VERTICAL  "??!"|"|"
 RBRACE    "??>"|"}"
 TILDE     "??-"|"~"
-PR_INS    [ \t]+[^\n\r]+
+PR_INS    [ \t]+[^\n\r]+(\\\n.*)*
 NLE       {BS}(\n|\r|\r\n)
 UCN       {BS}(u{H}{4}|U{H}{8})
 ID        {ND}({ND}|{D}|{UCN})*
@@ -634,8 +634,8 @@ WS        [ \f\n\r\t\v]
 <PREP>"ifdef"{PR_INS}<INITIAL> skip()
 <PREP>"ifndef"{PR_INS}<INITIAL> skip()
 <PREP>"elif"{PR_INS}<INITIAL> skip()
-<PREP>"else"[^\n\r]*$<INITIAL> skip()
-<PREP>"endif"[^\n\r]*$<INITIAL> skip()
+<PREP>"else".*<INITIAL> skip()
+<PREP>"endif".*<INITIAL> skip()
 
 <PREP>"include"[ \t]*\"<INCL_FL>
 <PREP>"include"[ \t]*"<"<INCL_ST>
