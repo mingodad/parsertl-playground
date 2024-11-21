@@ -1,0 +1,218 @@
+// type U = U
+type U
+
+// type Tuple = Tuple i64 i64
+type Tuple(i64, i64)
+
+type Option = Some i64 | None
+
+type List = Node i64 List | Empty
+
+type BinTree = BNode i64 BinTree BinTree | BEmpty
+
+
+fn main() {
+    list_demo();
+    //bintree_demo();
+    benchmark();
+    x := case Tuple(10, 20) {
+        Tuple (y, _) => y,
+    _ => 0,
+    };
+    printf("x = %lli\n", x);
+}
+
+fn benchmark() {
+    tree := BEmpty;
+    i := 1000;
+    while i > 0 {
+        tree = insert(i, tree);
+    tree = insert(-i, tree);
+        i = i - 1;
+    }
+    tree = insert(5, tree);
+    tree = insert(3, tree);
+    tree = insert(7, tree);
+    tree = insert(4, tree);
+    tree = insert(6, tree);
+    tree = insert(2, tree);
+    printf("min = %lli\n", get_min(tree));
+
+}
+
+
+
+fn list_demo() {
+    list := Node (2, Node (3, Empty));
+
+    x := head(list);
+    printf("x = %lli\n", unwrap_or_default(x));
+    y := tail(list);
+    z := head(y);
+    printf("z = %lli\n", unwrap_or_default(z));
+
+    list = Node(1, list);
+    printf("head(list) = %lli\n", unwrap_or_default(head(list)));
+
+    list = push(4, list);
+
+    printf("list[4] = %lli\n", unwrap_or_default(get(4, list)));
+}
+
+fn get(i: i64, l: List) -> Option {
+    return case l {
+        Node (x, xs) => case i { 0 => Some(x), _ => get(i - 1, xs) },
+        _ => None,
+    };
+}
+
+fn prepend(x: i64, xs: List) -> List {
+    return Node (x, xs);
+}
+
+fn pop(xs: List) -> List {
+    return case xs {
+        Node (_, ys) => ys,
+        _ => Empty,
+    };
+}
+
+fn push(x: i64, xs: List) -> List {
+    return case xs {
+        Node (y, ys) => Node (y, push(x, ys)),
+        _ => Node (x, Empty),
+    };
+}
+
+fn is_empty(l: List) -> i64 {
+    return case l {
+        Empty => -1,
+        _ => 0,
+    };
+}
+
+fn head(l: List) -> Option {
+    return case l {
+        Node (x, _) => Some(x),
+        _ => None,
+    };
+}
+
+
+fn tail(l: List) -> List {
+    return case l {
+        Node (_, xs) => xs,
+        _ => Empty,
+    };
+}
+
+
+fn unwrap_or_default(x: Option) -> i64 {
+    return case x {
+        Some(i) => i,
+        _ => 0,
+    };
+}
+
+
+fn bintree_demo() -> i64 {
+    tree := BEmpty;
+    tree = insert(5, tree);
+    tree = insert(3, tree);
+    tree = insert(7, tree);
+    tree = insert(4, tree);
+    tree = insert(6, tree);
+    tree = insert(2, tree);
+    printf("min = %lli\n", get_min(tree));
+    free_tree(tree);
+    return 0;
+}
+
+fn free_tree(root: BinTree) -> i64 {
+    //printf("freeing tree %lli (%lli, %lli)\n", get_value(root), get_value(left(root)), get_value(right(root)));
+    return case root {
+        BNode (_, left, right) => free_tree(left) + free_tree(right) + helper_free(root),
+        _ => helper_free(root),
+    };
+}
+
+fn left(root: BinTree) -> BinTree {
+    return case root {
+        BNode (_, left, _) => left,
+        _ => BEmpty,
+    };
+}
+
+fn right(root: BinTree) -> BinTree {
+    return case root {
+        BNode (_, _, right) => right,
+        _ => BEmpty,
+    };
+}
+
+fn get_value(root: BinTree) -> i64 {
+    return case root {
+        BNode (x, _, _) => x,
+        _ => 0,
+    };
+}
+
+fn helper_free(root: BinTree) -> i64 {
+    free(root);
+    return 0;
+}
+
+fn has_left(root: BinTree) -> i64 {
+    return case root {
+        BNode (_, BEmpty, _) => 0,
+        _ => -1,
+    };
+}
+
+fn has_right(root: BinTree) -> i64 {
+    return case root {
+        BNode (_, _, BEmpty) => 0,
+        _ => -1,
+    };
+}
+
+fn is_leaf(root: BinTree) -> i64 {
+    return case root {
+        BNode (_, BEmpty, BEmpty) => -1,
+        _ => 0,
+    };
+}
+
+fn insert(x: i64, root: BinTree) -> BinTree {
+    return case root {
+        BNode (y, left, right) => case x < y {
+            0 => BNode (y, left, insert(x, right)),
+            _ => BNode (y, insert(x, left), right),
+        },
+        _ => BNode (x, BEmpty, BEmpty),
+    };
+}
+
+fn get_min(root: BinTree) -> i64 {
+    return case root {
+        BNode (x, BEmpty, _) => x,
+        BNode (_, left, _) => get_min(left),
+        _ => 0,
+    };
+}
+
+fn insert_mut(x: i64, root: BinTree) -> i64 {
+    case root {
+        BNode (y, left, right) => case x < y {
+            0 => insert_mut(x, right),
+            _ => insert_mut(x, left),
+        },
+        _ => helper_assign(root, BNode (x, BEmpty, BEmpty)),
+    };
+    return 0;
+}
+
+fn helper_assign(root: BinTree, new_root: BinTree) -> i64 {
+    root = new_root;
+    return 0;
+}
