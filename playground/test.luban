@@ -1,0 +1,120 @@
+
+// to demo the dynamic type system of Edifice
+
+namespace luban::demo;
+
+typedef enum < "john","paul","george","ringo" > beatles;
+typedef range < 1,10 > babycounts;
+typedef range < 11,20 > mycounts;
+typedef < vector, int > QueryResult;
+
+struct AllTypes
+(
+    input:
+	inputofanytype;
+
+	// basic types
+	double idouble;
+	int	  iint;
+	string istring;
+	bool   ibool;
+	char   ichar;
+
+	// enum and range
+	input ::beatles oneoffour;
+	enum < 1,2,3,5,7 > onesmallprime;
+
+	// mutlti type properties
+	< ::babycounts, ::mycounts >  icount; // a property named icount can be one of the babycounts and mycounts
+
+
+	// container types
+	input vector ivec; // vector of object
+
+	input ::QueryResult iqueryresult;
+
+   output      bool  itworks;
+
+)
+as process
+{
+	::println(obj=input.inputofanytype);
+	::println(obj=input.idouble);
+	::println(obj=input.iint);
+	::println(obj=input.istring);
+	::println(obj=input.ichar);
+	::println(obj=input.ibool);
+	::println(obj=input.oneoffour);
+	::println(obj=input.onesmallprime);
+	::println(obj=input.icount);
+	::println(obj=input.ivec);
+	::println(obj=input.iqueryresult);
+
+	::println(obj= input.inputofanytype != null );
+	::println(obj= input.inputofanytype isa string );
+	::println(obj= input.inputofanytype );
+
+	if ( ! input.inputofanytype == null && input.inputofanytype isa string )
+		::println(obj="The first input is a string\n");
+	else
+		if ( ! input.inputofanytype == null )
+		::println ( obj="The first input is a "+string(typeof(input.inputofanytype))+"\n");
+		else
+		::println ( obj="The first input is null\n");
+
+
+	x = "1234.5";
+	y = double(x) + 100;
+	::println(obj = "\"1234.5\"+100 = " +string(y));
+
+	if ( input.oneoffour != null and input.oneoffour == "john" )
+		::println(obj="John is my favourite, though I don't know who he is\n");
+
+
+	::println(obj=input.onesmallprime);
+	if ( input.icount != null and ! ( input.icount isa ::mycounts ) && ! ( input.icount isa ::babycounts ) )
+		::println(obj= "I am totally supurised. Your interpreter is not working\n" );
+	::println(obj="input.icount="+string(input.icount));
+
+	// check vector operation
+	::println(obj="input.ivec="+string(input.ivec)); // get local copy, the inputs are read only from struct inside
+
+	// muti type
+     if ( input.iqueryresult != null and ( input.iqueryresult isa int or input.iqueryresult isa vector ) )
+		::println(obj="Query returns single row result: "+string(input.iqueryresult));
+	else
+		if ( input.iqueryresult != null and input.iqueryresult isa vector )
+			::println(obj="Query returns a bunch of rows: "+string(input.iqueryresult));
+		else
+			if ( input.iqueryresult != null )
+			::println(obj="Luban interpreter messed up!");
+
+
+	x = 100;
+	xtype = typeof(x);
+	::println(obj="x="+string(x));
+	::println(obj="xtype="+string(xtype));
+	if ( x isa xtype )
+		::println(obj="OK, dynamic type checking is working");
+	else
+		::println(obj="Wait! The Luban interpreter is NOT working!");
+
+
+	if ( xtype isa typeinfo )
+		::println(obj="OK, dynamic type checking is working");
+	else
+		::println(obj="Wait! The Luban interpreter is NOT working!");
+
+
+      output.itworks = true;
+
+	// set the typed variable to wrong type will stop the struct evaluation
+	char charchar='\n';
+	bool blit = true;
+	error err=error("this is an error");
+	charchar = 12345; blit = 10; err = 5;
+	::println(obj="You should never see me\n");
+
+
+
+}
