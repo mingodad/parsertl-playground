@@ -231,6 +231,7 @@ const sampleList = [
 	["Nearley parser", "nearley.g", "test.nearley", "ace/mode/yaml"],
 	["Nebula parser", "nebula-parser.g", "test.nebula-parser", "ace/mode/sql"],
 	["Network simulator demikernel parser", "network_simulator-demikernel.g", "test.network_simulator-demikernel", "ace/mode/text"],
+	["Never language parser", "never-parser.g", "test.never-parser", "ace/mode/text"],
 	["Numscript parser", "Numscript.g", "test.Numscript", "ace/mode/text"],
 	["Oberon parser", "oberon.g", "test.oberon", "ace/mode/pascal"],
 	["Ocaml5 parser (partially working)", "ocaml5-parser.g", "test.ocaml", "ace/mode/ocaml"],
