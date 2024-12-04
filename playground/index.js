@@ -223,6 +223,7 @@ const sampleList = [
 	["MSTA parser", "msta.g", "test.msta", "ace/mode/yaml"],
 	["mtail parser", "mtail.g", "test.mtail", "ace/mode/yaml"],
 	["Mulang parser (not working)", "mulang.g", "test.mulang", "ace/mode/text"],
+	["Myrddin parser", "myrddin.g", "test.myrddin", "ace/mode/text"],
 	["Mysql parser (be patient)(partially working)", "mysql.g", "test.mysql", "ace/mode/sql"],
 	["N1QL parser", "n1ql.g", "test.n1ql", "ace/mode/sql"],
 	["Nandlang parser", "Nandlang.g", "test.Nandlang", "ace/mode/javascript"],
