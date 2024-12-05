@@ -253,6 +253,7 @@ const sampleList = [
 	["PDC calculator parser", "pdc-calculator.g", "test.pdc-calculator", "ace/mode/text"],
 	["Peg parser (partially working)", "peg.g", "test.peg", "ace/mode/yaml"],
 	["Peg2 parser (partially working)", "peg2.g", "test.peg", "ace/mode/yaml"],
+	["Pest peg parser", "pest-peg.g", "test.pest-peg", "ace/mode/yaml"],
 	["PHP-8.2 parser (partially working)", "php-8.2.g", "test.php", "ace/mode/php"],
 	["Pikchr parser", "pikchr.g", "test.pikchr", "ace/mode/text"],
 	["Pike-lang parser", "pike-lang.g", "test.pike", "ace/mode/c_cpp"],
