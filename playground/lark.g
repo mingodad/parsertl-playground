@@ -4,48 +4,165 @@
 
 %%
 
-start: (_item? _NL)* _item? ;
+start:
+	  _item_opt_NL_zom _item_opt
+	;
 
-_item: rule
-     | token
-     | statement ;
+_item_opt_NL_zom:
+	  %empty
+	| _item_opt_NL_zom _item_opt _NL
+	;
 
-rule: RULE rule_params priority? ':' expansions ;
-token: TOKEN token_params priority? ':' expansions ;
+_item_opt:
+	  %empty
+	| _item
+	;
 
-rule_params: ('{' RULE (',' RULE)* '}')? ;
-token_params: ('{' TOKEN (',' TOKEN)* '}')? ;
+_item:
+	  rule
+	| token
+	| statement
+	;
 
-priority: '.' NUMBER ;
+rule:
+	  RULE rule_params priority_opt ':' expansions
+	;
 
-statement: "%ignore" expansions                    // ignore
-         | "%import" import_path ["->" name]       // import
-         | "%import" import_path name_list         // multi_import
-         | "%override" rule                        // override_rule
-         | "%declare" name+  ;                        // declare
+priority_opt:
+	  %empty
+	| priority
+	;
 
-import_path: '.'? name ('.' name)* ;
-name_list: '(' name (',' name)* ')' ;
+token:
+	  TOKEN token_params priority_opt ':' expansions
+	;
 
-expansions: alias (_VBAR alias)* ;
+rule_params:
+	  %empty
+	| '{' RULE_comma_oom '}'
+	;
 
-alias: expansion ("->" RULE)? ;
+RULE_comma_oom:
+	  RULE
+	| RULE_comma_oom ',' RULE
+	;
 
-expansion: expr* ;
+token_params:
+	  %empty
+	| '{' TOKEN_comma_oom '}'
+	;
 
-expr: atom (OP | '~' NUMBER (".." NUMBER)?)? ;
+TOKEN_comma_oom:
+	  TOKEN
+	| TOKEN_comma_oom ',' TOKEN
+	;
 
-atom: '(' expansions ')'
-     | '[' expansions ']' // maybe
-     | value ;
+priority:
+	  '.' NUMBER
+	;
 
-value: STRING ".." STRING  // literal_range
-      | name
-      | (REGEXP | STRING) // literal
-      | name '{' value (',' value)* '}' ; // template_usage
+statement:
+	  "%ignore" expansions
+	| "%import" import_path arrow_name_opt
+	| "%import" import_path name_list
+	| "%override" rule
+	| "%declare" name_oom
+	;
 
-name: RULE
-    | TOKEN ;
+name_oom:
+	  name
+	| name_oom name
+	;
+
+arrow_name_opt:
+	  %empty
+	| "->" name
+	;
+
+import_path:
+	  dot_opt name dot_name_zom
+	;
+
+dot_name_zom:
+	  %empty
+	| dot_name_zom '.' name
+	;
+
+dot_opt:
+	  %empty
+	| '.'
+	;
+
+name_list:
+	  '(' name_comma_oom ')'
+	;
+
+name_comma_oom:
+	  name
+	| name_comma_oom ',' name
+	;
+
+expansions:
+	  alias _VBAR_alias_zom
+	;
+
+_VBAR_alias_zom:
+	  %empty
+	| _VBAR_alias_zom _VBAR alias
+	;
+
+alias:
+	  expansion arrow_RULE_opt
+	;
+
+arrow_RULE_opt:
+	  %empty
+	| "->" RULE
+	;
+
+expansion:
+	  %empty
+	| expansion expr
+	;
+
+expr:
+	  atom repetition__opt
+	;
+
+repetition__opt:
+	  %empty
+	| OP
+	| '~' NUMBER
+	| '~' NUMBER ".." NUMBER
+	;
+
+atom:
+	  '(' expansions ')'
+	| '[' expansions ']'
+	| value
+	;
+
+value:
+	  STRING ".." STRING
+	| name
+	| regex_or_string
+	| name '{' value_oom '}'
+	;
+
+value_oom:
+	  value
+	| value_oom ',' value
+	;
+
+regex_or_string:
+	  REGEXP
+	| STRING
+	;
+
+name:
+	  RULE
+	| TOKEN
+	;
 
 %%
 

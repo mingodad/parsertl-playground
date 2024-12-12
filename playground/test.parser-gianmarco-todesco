@@ -1,0 +1,67 @@
+StmLst ->
+StmLst -> StmLst Stm
+
+Stm -> '#' 'include' qstring : Include(3)
+Stm -> '#' 'include' '<' Filename '>' : Include(4)
+
+Stm -> '#' 'define' DefineName DefineBody eol: Define(3,4)
+
+DefineName -> ident : DefineName(1)
+DefineName -> ident '(' ')': DefineName(1)
+DefineName -> ident '(' DefineArgLst ')': DefineName(1)
+DefineArgLst -> ident : DefineArg(1)
+DefineArgLst -> DefineArgLst ',' ident : DefineArg(1,3)
+
+DefineBody -> : DefineBody
+DefineBody -> DefineBody '\\' eol : pass(1)
+DefineBody -> DefineBody any: DefineBody(1,2)
+
+
+Filename -> ident '.' ident
+Filename -> ident '/' Filename
+Block -> '{' BlockContent '}' : null
+BlockContent -> : null
+BlockContent -> BlockContent Block : null
+BlockContent -> BlockContent any : null
+Stm -> 'typedef' SingleVarDecl ';': Typedef(2)
+Stm -> 'typedef' 'struct' ident ident ';': TypedefStruct(3,4)
+SingleVarDecl -> Type DecoratedVar : Decl(1,2)
+Type -> ident : pass
+DecoratedVar -> VarName : VarName(1)
+DecoratedVar -> '*' DecoratedVar : Pointer(2)
+DecoratedVar -> DecoratedVar '[' ArraySize ']' : Array(1,3)
+DecoratedVar -> DecoratedVar '(' ArgList ')': Function(1,3)
+DecoratedVar -> '(' DecoratedVar ')': pass(2)
+DecoratedVar2 -> DecoratedVar : pass
+DecoratedVar2 -> DecoratedVar '=' ConstExpr: pass(1)
+VarName -> ident : pass
+ArraySize -> int : pass
+ArraySize -> ident : pass
+ArraySize -> : pass
+Stm -> VarDeclStm : pass
+Stm -> 'static' VarDeclStm : StaticDecl(2)
+VarDeclStm -> Type DecoratedVarLst ';': VarDecl(1,2)
+DecoratedVarLst -> DecoratedVar2 : VarList(1)
+DecoratedVarLst -> DecoratedVarLst ',' DecoratedVar2 :  VarList(1,3)
+Type -> 'enum' '{' EnumList '}' : Enum(3)
+EnumList -> EnumListItem : EnumList(1)
+EnumList -> EnumList ',' EnumListItem : EnumList(1,3)
+EnumListItem ->ident : pass
+EnumListItem-> ident '=' int : pass(1)
+StructFieldList -> VarDeclStm: StructFieldList(1)
+StructFieldList -> StructFieldList VarDeclStm: StructFieldList(1,2)
+Stm -> 'struct' ident '{' StructFieldList '}' ';': Struct(2,4)
+ConstExpr -> ident : pass
+ConstExpr -> int : pass
+Stm -> Type ident '(' ArgList ')' Block : Function(1,2,4)
+Stm -> Type '*' ident '(' ArgList ')' Block : Function(1,2,3,5)
+Stm -> 'static' Type ident '(' ArgList ')' Block : StaticFunction(2,3,5)
+Stm -> 'static' Type '*' ident '(' ArgList ')' Block : StaticFunction(2,3,4,6)
+Type2 -> Type : pass
+Type2 -> Type '*' : PointerTo(1)
+ArgList -> : ArgList
+ArgList -> ArgList1 : pass
+ArgList1 -> Arg : ArgList(1)
+ArgList1 -> ArgList1 ',' Arg : ArgList(1,3)
+Arg -> Type DecoratedVar2 : Arg(1,2)
+Arg -> Type : Arg(1)
