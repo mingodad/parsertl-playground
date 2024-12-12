@@ -1,0 +1,485 @@
+//From: https://github.com/pwil3058/dunnart/blob/ad088772b1719ea1ce17356d5e5b279dd33d9838/dunnart.ddgs
+// dunnart.ddgs
+//
+// Copyright Peter Williams 2013 <pwil3058@bigpond.net.au>.
+//
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE_1_0.txt or copy at
+//          http://www.boost.org/LICENSE_1_0.txt)
+
+// dunnart specification for dunnart grammar specification language
+
+%{
+// dunnart.d
+//
+// Copyright Peter Williams 2013 <pwil3058@bigpond.net.au>.
+//
+// Distributed under the Boost Software License, Version 1.0.
+//    (See accompanying file LICENSE_1_0.txt or copy at
+//          http://www.boost.org/LICENSE_1_0.txt)
+%}
+
+%{
+import std.stdio;
+import std.file;
+
+import ddlib.lexan;
+import symbols;
+import grammar;
+
+struct ProductionTail {
+    Symbol[] right_hand_side;
+    AssociativePrecedence associative_precedence;
+    Predicate predicate;
+    SemanticAction action;
+}
+
+// Aliases for use in field definitions
+alias ProductionTail[] ProductionTailList;
+alias Symbol[] SymbolList;
+alias string[] StringList;
+
+uint error_count;
+uint warning_count;
+
+void message(T...)(const CharLocation locn, const string tag, const string format, T args)
+{
+    stderr.writef("%s:%s:", locn, tag);
+    stderr.writefln(format, args);
+    stderr.flush();
+}
+
+void warning(T...)(const CharLocation locn, const string format, T args)
+{
+    message(locn, "Warning", format, args);
+    warning_count++;
+}
+
+void error(T...)(const CharLocation locn, const string format, T args)
+{
+    message(locn, "Error", format, args);
+    error_count++;
+}
+
+GrammarSpecification parse_specification_text(string text, string label="") {
+    auto grammar_specification = new GrammarSpecification();
+%}
+
+%field  Symbol symbol
+%field  SymbolList symbol_list
+%field  Predicate predicate
+%field  SemanticAction semantic_action
+%field  AssociativePrecedence associative_precedence
+%field  ProductionTail production_tail
+%field  ProductionTailList production_tail_list
+%field  StringList string_list
+
+%token  REGEX           (\(.+\)(?=\s))
+%token  LITERAL         ("(\\"|[^"\t\r\n\v\f])*")
+%token  TOKEN           "%token"
+%token  FIELD           "%field"
+%token  LEFT            "%left"
+%token  RIGHT           "%right"
+%token  NONASSOC        "%nonassoc"
+%token  PRECEDENCE      "%prec"
+%token  SKIP            "%skip"
+%token  ERROR           "%error"
+%token  INJECT          "%inject"
+%token  NEWSECTION      "%%"
+%token  COLON           ":"
+%token  VBAR            "|"
+%token  DOT             "."
+%token  IDENT           ([a-zA-Z]+[a-zA-Z0-9_]*)
+%token  FIELDNAME       (<[a-zA-Z]+[a-zA-Z0-9_]*>)
+%token  PREDICATE       (\?\((.|[\n\r])*?\?\))
+%token  ACTION          (!\{(.|[\n\r])*?!\})
+%token  DCODE           (%\{(.|[\n\r])*?%\})
+
+%skip (/\*(.|[\n\r])*?\*/)
+%skip (//[^\n\r]*)
+%skip (\s+)
+
+%right INJECT
+
+%%
+specification: preamble definitions "%%" production_rules coda.
+
+oinjection: !{ // no injection so nothing to do !} | injection .
+
+injection_head: "%inject" LITERAL
+        !{
+            auto file_path = $2.dd_matched_text[1..$ - 1];
+            try {
+                auto text = readText(file_path);
+                if (text.length > 0) {
+                    dd_inject(text, file_path);
+                } else {
+                    warning($2.dd_location, "Injected file \"%s\" is empty.", file_path);
+                }
+            } catch (FileException e) {
+                error($2.dd_location, " Injecting: %s.", e.msg);
+            }
+        !}
+    .
+
+// NB This (including the split) is needed to allow for "look ahead" mechanism.
+// It ensures injection occurs before any meaningful tokens are read
+injection: injection_head "." .
+
+// Preamble
+preamble:
+        !{
+            // no preamble defined so there's nothing to do
+        !}
+    | oinjection DCODE oinjection
+        !{
+            grammar_specification.set_preamble($2.dd_matched_text[2..$ - 2]);
+        !}
+    | oinjection DCODE oinjection DCODE oinjection
+        !{
+            grammar_specification.set_header($2.dd_matched_text[2..$ - 2]);
+            grammar_specification.set_preamble($4.dd_matched_text[2..$ - 2]);
+        !}
+    .
+
+// Coda
+coda:
+        !{
+            // no coda defined so there's nothing to do
+        !}
+    | oinjection DCODE
+        !{
+            grammar_specification.set_coda($2.dd_matched_text[2..$ - 2]);
+        !}
+    .
+
+definitions : field_definitions token_definitions skip_definitions precedence_definitions .
+
+// Field definitions
+field_definitions : // empty production
+        !{
+            // do nothing
+        !}
+    | field_definitions oinjection field_definition oinjection
+    .
+
+field_definition: "%field" field_type field_name
+        !{
+            if (grammar_specification.symbol_table.is_known_field($3.dd_matched_text)) {
+                auto previous = grammar_specification.symbol_table.get_field_defined_at($3.dd_matched_text);
+                error($3.dd_location, "\"%s\" already declared at line %s.", previous.line_number);
+            } else {
+                grammar_specification.symbol_table.new_field($3.dd_matched_text, $2.dd_matched_text, "", $3.dd_location);
+            }
+        !}
+    | "%field" field_type field_name field_conversion_function
+        !{
+            if (grammar_specification.symbol_table.is_known_field($3.dd_matched_text)) {
+                auto previous = grammar_specification.symbol_table.get_field_defined_at($3.dd_matched_text);
+                error($3.dd_location, "\"%s\" already declared at line %s.", previous.line_number);
+            } else {
+                grammar_specification.symbol_table.new_field($3.dd_matched_text, $2.dd_matched_text, $4.dd_matched_text, $3.dd_location);
+            }
+        !}
+    .
+
+field_type: IDENT ?( !is_allowable_name($1.dd_matched_text) ?)
+        !{
+            warning($1.dd_location, "field type name \"%s\" may clash with generated code", $1.dd_matched_text);
+        !}
+    | IDENT
+    .
+
+field_name: IDENT ?( !is_allowable_name($1.dd_matched_text) ?)
+        !{
+            warning($1.dd_location, "field name \"%s\" may clash with generated code", $1.dd_matched_text);
+        !}
+    | IDENT
+    .
+
+field_conversion_function: IDENT ?( !is_allowable_name($1.dd_matched_text) ?)
+        !{
+            warning($1.dd_location, "field conversion function name \"%s\" may clash with generated code", $1.dd_matched_text);
+        !}
+    | IDENT
+    .
+
+// Token definitions
+token_definitions : oinjection token_definition
+    | token_definitions oinjection token_definition oinjection
+    .
+
+token_definition: "%token" new_token_name pattern
+        !{
+            if (grammar_specification.symbol_table.is_known_symbol($2.dd_matched_text)) {
+                auto previous = grammar_specification.symbol_table.get_declaration_point($2.dd_matched_text);
+                error($2.dd_location, "\"%s\" already declared at line %s.", previous.line_number);
+            } else {
+                grammar_specification.symbol_table.new_token($2.dd_matched_text, $3.dd_matched_text, $2.dd_location);
+            }
+        !}
+    | "%token" FIELDNAME new_token_name pattern
+        !{
+            auto field_name = $2.dd_matched_text[1..$ - 1];
+            if (grammar_specification.symbol_table.is_known_symbol($3.dd_matched_text)) {
+                auto previous = grammar_specification.symbol_table.get_declaration_point($3.dd_matched_text);
+                error($3.dd_location, "\"%s\" already declared at line %s.", previous.line_number);
+            } else if (!grammar_specification.symbol_table.is_known_field(field_name)) {
+                error($2.dd_location, "field name \"%s\" is not known.", field_name);
+                grammar_specification.symbol_table.new_token($3.dd_matched_text, $4.dd_matched_text, $3.dd_location);
+            } else {
+                grammar_specification.symbol_table.new_token($3.dd_matched_text, $4.dd_matched_text, $3.dd_location, field_name);
+            }
+        !}
+    .
+
+new_token_name: IDENT ?( !is_allowable_name($1.dd_matched_text) ?)
+        !{
+            warning($1.dd_location, "token name \"%s\" may clash with generated code", $1.dd_matched_text);
+        !}
+    | IDENT
+    .
+
+pattern: REGEX
+    | LITERAL
+    .
+
+// Skip definitions
+skip_definitions : // empty production
+        !{
+            // do nothing
+        !}
+    | skip_definitions oinjection skip_definition oinjection
+    .
+
+skip_definition: "%skip" REGEX
+        !{
+            grammar_specification.symbol_table.add_skip_rule($2.dd_matched_text);
+        !}
+    .
+
+// Precedence definitions
+precedence_definitions : // empty production
+        !{
+            // do nothing
+        !}
+    | precedence_definitions oinjection precedence_definition oinjection
+    .
+
+precedence_definition: "%left" tag_list
+        !{
+            grammar_specification.symbol_table.set_precedences(Associativity.left, $2.symbol_list);
+        !}
+    | "%right" tag_list
+        !{
+            grammar_specification.symbol_table.set_precedences(Associativity.right, $2.symbol_list);
+        !}
+    | "%nonassoc" tag_list
+        !{
+            grammar_specification.symbol_table.set_precedences(Associativity.nonassoc, $2.symbol_list);
+        !}
+    .
+
+tag_list: tag
+        !{
+            if ($1.symbol is null) {
+                $$.symbol_list = [];
+            } else {
+                $$.symbol_list = [$1.symbol];
+            }
+        !}
+    | tag_list tag
+        !{
+            if ($2.symbol is null) {
+                $$.symbol_list = $1.symbol_list;
+            } else {
+                $$.symbol_list = $1.symbol_list ~ $2.symbol;
+            }
+        !}
+    .
+
+tag: LITERAL
+        !{
+            $$.symbol = grammar_specification.symbol_table.get_literal_token($1.dd_matched_text, $1.dd_location);
+            if ($$.symbol is null) {
+                error($1.dd_location, "Literal \"%s\" is not known.", $1.dd_matched_text);
+            }
+        !}
+    | IDENT ?( grammar_specification.symbol_table.is_known_token($1.dd_matched_text) ?)
+        !{
+            $$.symbol = grammar_specification.symbol_table.get_symbol($1.dd_matched_text, $1.dd_location);
+        !}
+    | IDENT ?( grammar_specification.symbol_table.is_known_non_terminal($1.dd_matched_text) ?)
+        !{
+            $$.symbol = null;
+            error($1.dd_location, "Non terminal \"%s\" cannot be used as precedence tag.", $1.dd_matched_text);
+        !}
+    | IDENT
+        !{
+            $$.symbol = grammar_specification.symbol_table.new_tag($1.dd_matched_text, $1.dd_location);
+        !}
+    .
+
+// Production rules
+production_rules: oinjection production_group oinjection
+    | production_rules production_group oinjection
+    .
+
+production_group: production_group_head production_tail_list "."
+        !{
+            foreach (production_tail; $2.production_tail_list) {
+                grammar_specification.new_production(dd_args[1 - 1].symbol, production_tail.right_hand_side, production_tail.predicate, production_tail.action, production_tail.associative_precedence);
+            }
+        !}
+    .
+
+production_group_head: IDENT ":" ?( grammar_specification.symbol_table.is_known_token($1.dd_matched_text) ?)
+        !{
+            auto lineNo = grammar_specification.symbol_table.get_declaration_point($1.dd_matched_text).line_number;
+            error($1.dd_location, "%s: token (defined at line %s) cannot be used as left hand side", $1.dd_matched_text, lineNo);
+            $$.symbol = grammar_specification.symbol_table.get_symbol($1.dd_matched_text, $1.dd_location);
+        !}
+    | IDENT ":" ?( grammar_specification.symbol_table.is_known_tag($1.dd_matched_text) ?)
+        !{
+            auto lineNo = grammar_specification.symbol_table.get_declaration_point($1.dd_matched_text).line_number;
+            error($1.dd_location, "%s: precedence tag (defined at line %s) cannot be used as left hand side", $1.dd_matched_text, lineNo);
+            $$.symbol = grammar_specification.symbol_table.get_symbol($1.dd_matched_text, $1.dd_location);
+        !}
+    | IDENT ":"
+        !{
+            if (!is_allowable_name($1.dd_matched_text)) {
+                warning($1.dd_location, "non terminal symbol name \"%s\" may clash with generated code", $1.dd_matched_text);
+            }
+            $$.symbol = grammar_specification.symbol_table.define_non_terminal($1.dd_matched_text, $1.dd_location);
+        !}
+    .
+
+production_tail_list: production_tail
+        !{
+            $$.production_tail_list = [$1.production_tail];
+        !}
+    | production_tail_list "|" production_tail
+        !{
+            $$.production_tail_list = $1.production_tail_list ~ $3.production_tail;
+        !}
+    .
+
+production_tail:
+        !{
+            $$.production_tail = ProductionTail([], AssociativePrecedence(), null, null);
+        !}
+    | action
+        !{
+            $$.production_tail = ProductionTail([], AssociativePrecedence(), null, $1.semantic_action);
+        !}
+    | predicate action
+        !{
+            $$.production_tail = ProductionTail([], AssociativePrecedence(), $1.predicate, $2.semantic_action);
+        !}
+    | predicate
+        !{
+            $$.production_tail = ProductionTail([], AssociativePrecedence(), $1.predicate, null);
+        !}
+    | symbol_list predicate tagged_precedence action
+        !{
+            $$.production_tail = ProductionTail($1.symbol_list, $3.associative_precedence, $2.predicate, $4.semantic_action);
+        !}
+    | symbol_list predicate tagged_precedence
+        !{
+            $$.production_tail = ProductionTail($1.symbol_list, $3.associative_precedence, $2.predicate, null);
+        !}
+    | symbol_list predicate action
+        !{
+            $$.production_tail = ProductionTail($1.symbol_list, AssociativePrecedence(), $2.predicate, $3.semantic_action);
+        !}
+    | symbol_list predicate
+        !{
+            $$.production_tail = ProductionTail($1.symbol_list, AssociativePrecedence(), $2.predicate, null);
+        !}
+    | symbol_list tagged_precedence action
+        !{
+            $$.production_tail = ProductionTail($1.symbol_list, $2.associative_precedence, null, $3.semantic_action);
+        !}
+    | symbol_list tagged_precedence
+        !{
+            $$.production_tail = ProductionTail($1.symbol_list, $2.associative_precedence);
+        !}
+    | symbol_list action
+        !{
+            $$.production_tail = ProductionTail($1.symbol_list, AssociativePrecedence(), null, $2.semantic_action);
+        !}
+    | symbol_list
+        !{
+            $$.production_tail = ProductionTail($1.symbol_list);
+        !}
+    .
+
+action: ACTION
+        !{
+            $$.semantic_action = $1.dd_matched_text[2..$ - 2];
+        !}
+    .
+
+predicate: PREDICATE
+        !{
+            $$.predicate = $1.dd_matched_text[2..$ - 2];
+        !}
+    .
+
+tagged_precedence: "%prec" IDENT
+        !{
+            auto symbol = grammar_specification.symbol_table.get_symbol($2.dd_matched_text, $2.dd_location, false);
+            if (symbol is null) {
+                error($2.dd_location, "%s: Unknown symbol.", $2.dd_matched_text);
+                $$.associative_precedence = AssociativePrecedence();
+            } else if (symbol.type == SymbolType.non_terminal) {
+                error($2.dd_location, "%s: Illegal precedence tag (must be Token or Tag).", $2.dd_matched_text);
+                $$.associative_precedence = AssociativePrecedence();
+            } else {
+                $$.associative_precedence = symbol.associative_precedence;
+            }
+        !}
+    | "%prec" LITERAL
+        !{
+            auto symbol = grammar_specification.symbol_table.get_literal_token($2.dd_matched_text, $2.dd_location);
+            if (symbol is null) {
+                $$.associative_precedence = AssociativePrecedence();
+                error($2.dd_location, "%s: Unknown literal token.", $2.dd_matched_text);
+            } else {
+                $$.associative_precedence = symbol.associative_precedence;
+            }
+        !}
+    .
+
+symbol_list: symbol
+        !{
+            $$.symbol_list = [$1.symbol];
+        !}
+    | symbol_list symbol
+        !{
+            $$.symbol_list = $1.symbol_list ~ $2.symbol;
+        !}
+    .
+
+symbol: IDENT
+        !{
+            $$.symbol = grammar_specification.symbol_table.get_symbol($1.dd_matched_text, $1.dd_location, true);
+        !}
+    | LITERAL
+        !{
+            $$.symbol = grammar_specification.symbol_table.get_literal_token($1.dd_matched_text, $1.dd_location);
+            if ($$.symbol is null) {
+                error($1.dd_location, "%s: unknown literal token", $1.dd_matched_text);
+            }
+        !}
+    | "%error"
+        !{
+            $$.symbol = grammar_specification.symbol_table.get_special_symbol(SpecialSymbols.parse_error);
+        !}
+    .
+
+%{
+    if (!dd_parse_text(text, label)) return null;
+    return grammar_specification;
+}
+%}

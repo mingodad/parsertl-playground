@@ -125,6 +125,7 @@ const sampleList = [
 	["Doxygen code scanner torture", "code-doxygen.g", "test.c", "ace/mode/c_cpp"],
 	["Dtu parser", "dtu.g", "test.dtu", "ace/mode/text"],
 	["DuckDB SQL parser (be patient)", "duckdb-pgsql.g", "test.duckdb", "ace/mode/sql"],
+	["Dunnart parser", "dunnart.g", "test.dunnart", "ace/mode/text"],
 	["Dynare preprocessor parser (partially working)", "dynare-pp.g", "test.dynare-pp", "ace/mode/javascript"],
 	["Ebnf2bnf parser", "ebnf2bnf.g", "test.ebnf2bnf", "ace/mode/yaml"],
 	["EbnfToBison parser", "ebnftobison.g", "test.ebnftobison", "ace/mode/yaml"],
