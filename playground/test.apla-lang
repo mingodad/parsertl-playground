@@ -1,0 +1,46 @@
+contract FibFor {
+    int a = 1
+    int b = 1
+    int c
+    int n = 10000000
+    for i in 3..n-1 {
+        c = a + b
+		a = b
+		b = c
+    }
+    return b + n
+}
+//==== -1403616748667983518
+contract Over {
+    int i sum
+    while true {
+        i+=1
+        sum += i
+    }
+    return sum
+}
+//==== gas is over
+contract HStr {
+    int i sum
+    while i < 100000 {
+        sum += Len("this is" + "a string")
+        i+=1
+    }
+    return sum
+}
+//==== 1500000
+contract Fib {
+    int a = 1
+    int b = 1
+    int c
+    int n = 10000000
+    int i = 3
+    while i < n {
+        c = a + b
+		a = b
+		b = c
+        i+=1
+    }
+    return b + i
+}
+//==== -1403616748667983518

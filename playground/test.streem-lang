@@ -1,0 +1,73 @@
+# most fundamental Streem program
+
+# build pipeline from stdin to stdout
+stdin | stdout
+# actual stream processing will happen in the event loop
+# that starts after all program execution.
+
+# Array can be a source of Stream pipeline
+["Hello World"] | stdout
+
+# seq(100) returns a stream of numbers from 1 to 100.
+# A function object in pipeline works as a map function.
+# stdout is an output destination.
+seq(100) | map{x->
+  if (x % 15 == 0)     "FizzBuzz"
+  else if (x % 3 == 0) "Fizz"
+  else if (x % 5 == 0) "Buzz"
+  else                 x
+} | stdout
+
+# repeat twice
+seq(100) | map{x-> emit x, x} | stdout
+# output:
+#  1
+#  1
+#  2
+#  2
+#  :
+
+# pick even numbers
+seq(100) | each{x-> if (x % 2 == 0) {emit x}} | stdout
+# output:
+#  2
+#  4
+#  6
+#  :
+
+# pick even numbers
+seq(100) | filter{x-> x % 2 == 0} | stdout
+# output:
+#  2
+#  4
+#  6
+#  :
+
+# simple echo server on port 8007
+tcp_server(8007) | each{s->
+  s | s
+}
+
+s = tcp_socket("localhost", 8007)
+stdin | s
+s | stdout
+
+# channel to broadcast to all clients
+broadcast = chan()
+tcp_server(8008) | each{s->
+  broadcast | s   # connect to broadcast channel
+  s | broadcast   # broadcast incoming message
+}
+
+each2 = {
+  case [], f -> []
+  case [x,*y],f -> f(x); each2(y,f)
+}
+each2([1,2,3,4]) {x-> print(x)}
+
+same = {
+case x,x -> true   # comparison in match
+case _,_ -> false  # fallback
+}
+print(same(1,1))
+print(same(1,2))
