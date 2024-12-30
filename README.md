@@ -63,34 +63,36 @@ The first two sections are equivalent to `yacc/bison` format and the other two s
 Related projects:
 - ANTLR Lab http://lab.antlr.org/
 - Lezer playground https://lezer-playground.vercel.app/
+- JS-based AST explorer https://astexplorer.net/
+- clang visualizer [https://godblot.org](https://godbolt.org/z/dbMoE8nKM)
 - Tree-sitter https://tree-sitter.github.io/tree-sitter/playground
-- Lpegrex/Lua https://mingodad.github.io/lua-wasm-playground/
-- CocoR https://mingodad.github.io/CocoR-Typescript/playground
+- Lpegrex/Lua https://mingodad.github.io/lua-wasm-playground/ (tree-sitter-ebnf are supported. LPEG/dkjson is the default parser of luvit.io)
+- CocoR https://mingodad.github.io/CocoR-Typescript/playground (nice JSON bnf)
 - CHPEG https://chrishixon.github.io/chpeg/playground/
 - Cpp-Peglib https://yhirose.github.io/cpp-peglib/
+- PCRE Regex [https://regex101.com](https://regex101.com/library/tA9pM8) (nice JSON bnf)
+- Pest [https://pest.rs/](https://pest.rs/?g=N4Ig5gTghgtjURALhBA9gdwLzAMZoBsA-ACgB0QAaCo-AgSgCoBfMgOzpwEEBlAYQCSAgPoARAQHEBAFQDUrNlRABLNgAcArgBdkIAIyUATJQDMAAnZKAzgFMCN3FpsATAEob7u9BhDMgA#editor)
 - Jison https://gerhobbelt.github.io/jison/try/
 - PeggyJS https://peggyjs.org/online.html
-- Lark https://www.lark-parser.org/ide/
-- Pest https://pest.rs/
-- Ohm https://ohmjs.org/editor/
-- Owl https://ianh.github.io/owl/try/#example
-- Nearley Parser https://omrelli.ug/nearley-playground/
+- Lark https://www.lark-parser.org/ide/ ([py3 grammar supported](https://github.com/lark-parser/lark/blob/master/lark/grammars/python.lark))
+- Ohm https://ohmjs.org/editor/ ([es5 tree supported](https://github.com/ohmjs/ohm/blob/main/examples/ecmascript/src/es5.ohm))
+- Owl https://ianh.github.io/owl/try/#example (operators infix precedence supported)
+- Nearley Parser https://omrelli.ug/nearley-playground/ (NO web playgrounds below)
 - Lalrpop http://lalrpop.github.io/lalrpop/
-- Lezer https://lezer.codemirror.net/
+- Lezer https://lezer.codemirror.net/examples/basic/
 - Syntax https://github.com/DmitrySoshnikov/syntax
 - Antlr https://github.com/antlr/antlr4
 - Textmapper https://textmapper.org/
-- Railroad generator https://bottlecaps.de/rr/ui
+- Railroad generator https://bottlecaps.de/rr/ui (json.org diagram)
 - Convert (grammar conversion) https://www.bottlecaps.de/convert/
 - Rex parser generator https://www.bottlecaps.de/rex/
 - LALR https://github.com/cwbaker/lalr
-- Ebnf Studio https://github.com/rochus-keller/EbnfStudio
-- Bnf playground https://bnfplayground.pauliankline.com/
+- Ebnf Studio Qt https://github.com/rochus-keller/EbnfStudio
 - Flexcpp https://gitlab.com/fbb-git/flexcpp
 - Reflex https://www.genivia.com/doc/reflex/html/
 - Bison https://www.gnu.org/software/bison/
 - Flex https://github.com/westes/flex
 - Byacc https://www.invisible-island.net/byacc/byacc.html
 - BNF playground https://bnfplayground.pauliankline.com/
-- Lrstar an LR(*) parser generator for C++ http://lrstar.cc/
+- Lrstar an LR(*) parser generator for C++ https://github.com/VestniK/lrstar/blob/master/README.md
 - LangCC "A Next-Generation Compiler Compiler" https://github.com/jzimmerman/langcc
