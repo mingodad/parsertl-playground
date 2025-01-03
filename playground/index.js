@@ -209,6 +209,7 @@ const sampleList = [
 	["Luban parser", "luban.g", "test.luban", "ace/mode/c_cpp"],
 	["LunarML parser (partially working)", "LunarML.g", "test.LunarML", "ace/mode/ocaml"],
 	["Make parser (from anjuta)", "mk-parser.g", "test.mk-parser", "ace/mode/Makefile"],
+	["Mangle (datalog) parser", "mangle.g", "test.mangle", "ace/mode/prolog"],
 	["MangoFix parser", "mangofix.g", "test.mangofix", "ace/mode/c_cpp"],
 	["Matrixone MYSQL parser (be patient)(partially working)", "matrixone-mysql.g", "test.mysql", "ace/mode/sql"],
 	["Menhir fancy parser left recursion", "menhir-fancy-parser-left-rec.g", "menhir-fancy-parser.mly", "ace/mode/yaml"],
