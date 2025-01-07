@@ -1356,10 +1356,10 @@ BinlogStmt :
 	binlog stringLit /*15P*/
 	;
 
-ColumnDefList :
-	ColumnDef
-	| ColumnDefList ',' /*67P*/ ColumnDef
-	;
+//ColumnDefList :
+//	ColumnDef
+//	| ColumnDefList ',' /*67P*/ ColumnDef
+//	;
 
 ColumnDef :
 	ColumnName Type ColumnOptionListOpt
