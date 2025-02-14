@@ -323,6 +323,12 @@ static void dump_parse_tree(const char* data_start, const char* data_end,
 #ifdef WASM_PLAYGROUND
         switch_output(error_output);
 #endif
+                {
+                    parsertl::dfa dfa_;
+                    parsertl::generator::build_dfa(grules, dfa_);
+                    parsertl::debug::dumpStateIdx(dfa_, results.stack.back(),
+                        grules.grammar(), grules.tokens_info().size(), symbols, std::cout);
+                }
                 parser_throw_error("dumping parse tree", iter_lex, data_start);
                 break;
             case parsertl::action::shift:
@@ -388,8 +394,9 @@ static void dump_parse_trace(const char* data_start, const char* data_end,
     play_iterator iter_lex(data_start, data_end, lsm);
     play_match_results results(iter_lex->id, gsm);
     bool parse_done=false;
-    std::cout << "*  action | param:stack.size | data\n";
-    std::cout << "-----------------------------------\n";
+    std::ostream& stream_ = std::cout;
+    stream_ << "*  action | param:stack.size | data\n";
+    stream_ << "-----------------------------------\n";
     for(;;)
     {
         const auto& sm_entry = results.entry;
@@ -400,12 +407,18 @@ static void dump_parse_trace(const char* data_start, const char* data_end,
 #ifdef WASM_PLAYGROUND
         switch_output(error_output);
 #endif
+                {
+                    parsertl::dfa dfa_;
+                    parsertl::generator::build_dfa(grules, dfa_);
+                    parsertl::debug::dumpStateIdx(dfa_, results.stack.back(),
+                        grules.grammar(), grules.tokens_info().size(), symbols, stream_);
+                }
                 parser_throw_error("dumping parse trace", iter_lex, data_start);
                 break;
             case parsertl::action::shift:
             {
                 const std::string str(iter_lex->first, iter_lex->second);
-                std::cout << "\n<- shift " << sm_entry.param << ":" <<
+                stream_ << "\n<- shift " << sm_entry.param << ":" <<
                         results.stack.size() << " <- " <<
                         (str == "\n" ? "\\n" : str) << '\n';
                 break;
@@ -415,32 +428,32 @@ static void dump_parse_trace(const char* data_start, const char* data_end,
                 const parsertl::state_machine::id_type_vector_pair &idv_pair =
                     gsm._rules[sm_entry.param];
 
-                std::cout << "-> reduce " << sm_entry.param << ":" <<
+                stream_ << "-> reduce " << sm_entry.param << ":" <<
                         results.stack.size() << " by " <<
                         symbols[idv_pair._lhs] << " ->";
 
                 if (idv_pair._rhs.empty())
                 {
-                    std::cout << " %empty";
+                    stream_ << " %empty";
                 }
                 else
                 {
                     for (auto iter_ = idv_pair._rhs.cbegin(),
                         end_ = idv_pair._rhs.cend(); iter_ != end_; ++iter_)
                     {
-                        std::cout << ' ' << symbols[*iter_];
+                        stream_ << ' ' << symbols[*iter_];
                     }
                 }
 
-                std::cout << '\n';
+                stream_ << '\n';
                 break;
             }
             case parsertl::action::go_to:
-                std::cout << "=> goto " << sm_entry.param << ":" <<
+                stream_ << "=> goto " << sm_entry.param << ":" <<
                         results.stack.size() << '\n';
                 break;
             case parsertl::action::accept:
-                std::cout << "<> accept " << sm_entry.param << ":" <<
+                stream_ << "<> accept " << sm_entry.param << ":" <<
                         results.stack.size() << "\n";
                 parse_done = true;
                 break;
@@ -2267,6 +2280,14 @@ int main_base(int argc, char* argv[], GlobalState& gs)
             if(gs.verboseOutput) showDiffTime("parse input");
             if (resultsi.entry.action == parsertl::action::error)
             {
+                parsertl::dfa dfa_;
+                parsertl::generator::build_dfa(gs.user_parser.grules, dfa_);
+                parsertl::rules::string_vector symbols_;
+                gs.user_parser.grules.symbols(symbols_);
+                parsertl::debug::dumpStateIdx(dfa_, resultsi.stack.back(),
+                    gs.user_parser.grules.grammar(), 
+                    gs.user_parser.grules.tokens_info().size(),
+                    symbols_, std::cout);
                 parser_throw_error("parsing the input", iter_lexi, gs.input_data);
             }
 #ifndef WASM_PLAYGROUND

@@ -68,7 +68,7 @@ namespace parsertl
                                 map_iter_->second += "\n%token";
                                 line_size = 0;
                             }
-                            
+
                             line_size += symbols_[idx_].size();
                         }
                         map_iter_->second += static_cast<char_type>(' ');
@@ -299,7 +299,8 @@ namespace parsertl
             //stream_ << "UPDATE directives SET wildcard=101;\n";
 
             stream_ << "\nCREATE TABLE rulerhs(\n"
-                "  id INTEGER PRIMARY KEY,  ruleid INTEGER REFERENCES rule(ruleid),\n"
+                "  id INTEGER PRIMARY KEY,\n"
+	        "  ruleid INTEGER REFERENCES rule(ruleid),\n"
                 "  pos INTEGER,\n"
                 "  sym INTEGER REFERENCES symbol(id)\n"
                 ");\n";
@@ -430,6 +431,60 @@ namespace parsertl
                 ;
         }
 
+        static void dumpStateIdx(const dfa& dfa_, std::size_t idx_,
+                const parsertl::rules::production_vector& grammar_,
+                const std::size_t terminals_,
+                const parsertl::rules::string_vector& symbols_,
+                ostream& stream_,
+                bool withIndex=false)
+        {
+            const dfa_state& state_ = dfa_[idx_];
+            const cursor_vector& config_ = state_._closure;
+
+            state(idx_, stream_);
+
+            for (const auto& pair_ : config_)
+            {
+                const production& p_ = grammar_[pair_._id];
+                std::size_t j_ = 0;
+
+                stream_ << static_cast<char_type>('(') <<
+                    pair_._id+rule_idx_offset <<
+                    static_cast<char_type>(')') <<
+                    static_cast<char_type>(' ') <<
+                    static_cast<char_type>(' ') <<
+                    symbols_[terminals_ + p_._lhs] <<
+                    static_cast<char_type>(' ') <<
+                    static_cast<char_type>(':');
+                dump_rhs(j_, p_, terminals_, pair_, symbols_, stream_);
+
+                if (j_ == pair_._index)
+                {
+                    stream_ << static_cast<char_type>(' ') <<
+                        static_cast<char_type>('.');
+                }
+
+                stream_ << static_cast<char_type>('\n');
+            }
+
+            if (!state_._transitions.empty())
+                stream_ << static_cast<char_type>('\n');
+
+            for (const auto& pair_ : state_._transitions)
+            {
+                stream_ << static_cast<char_type>(' ') <<
+                    static_cast<char_type>(' ') <<
+                    symbols_[pair_._id] <<
+                    static_cast<char_type>(' ') <<
+                    static_cast<char_type>('-') <<
+                    static_cast<char_type>('>') <<
+                    static_cast<char_type>(' ') << pair_._index <<
+                    static_cast<char_type>('\n');
+            }
+
+            stream_ << static_cast<char_type>('\n');
+        }
+
         static void dump(const rules& rules_, const dfa& dfa_, ostream& stream_,
                 bool withIndex=false)
         {
@@ -444,51 +499,7 @@ namespace parsertl
             for (std::size_t idx_ = 0, dfa_size_ = dfa_.size();
                 idx_ < dfa_size_; ++idx_)
             {
-                const dfa_state& state_ = dfa_[idx_];
-                const cursor_vector& config_ = state_._closure;
-
-                state(idx_, stream_);
-
-                for (const auto& pair_ : config_)
-                {
-                    const production& p_ = grammar_[pair_._id];
-                    std::size_t j_ = 0;
-
-                    stream_ << static_cast<char_type>('(') <<
-                        pair_._id+rule_idx_offset <<
-                        static_cast<char_type>(')') <<
-                        static_cast<char_type>(' ') <<
-                        static_cast<char_type>(' ') <<
-                        symbols_[terminals_ + p_._lhs] <<
-                        static_cast<char_type>(' ') <<
-                        static_cast<char_type>(':');
-                    dump_rhs(j_, p_, terminals_, pair_, symbols_, stream_);
-
-                    if (j_ == pair_._index)
-                    {
-                        stream_ << static_cast<char_type>(' ') <<
-                            static_cast<char_type>('.');
-                    }
-
-                    stream_ << static_cast<char_type>('\n');
-                }
-
-                if (!state_._transitions.empty())
-                    stream_ << static_cast<char_type>('\n');
-
-                for (const auto& pair_ : state_._transitions)
-                {
-                    stream_ << static_cast<char_type>(' ') <<
-                        static_cast<char_type>(' ') <<
-                        symbols_[pair_._id] <<
-                        static_cast<char_type>(' ') <<
-                        static_cast<char_type>('-') <<
-                        static_cast<char_type>('>') <<
-                        static_cast<char_type>(' ') << pair_._index <<
-                        static_cast<char_type>('\n');
-                }
-
-                stream_ << static_cast<char_type>('\n');
+                dumpStateIdx(dfa_, idx_, grammar_, terminals_, symbols_, stream_, withIndex);
             }
         }
 
