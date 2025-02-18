@@ -609,7 +609,7 @@ Statement :
 	| Print
 	| Require
 	| SetVariable
-	| ExpressionStatement
+	//| ExpressionStatement //invalid statement starting with '='
 	| AddRule
 	| Query
 /* PLugins */
@@ -1577,7 +1577,7 @@ ColumnConstraint :
 	| IDENTITY
 	| DEFAULT PrimitiveValue
 	| DEFAULT LPAR Expression RPAR
-	| DEFAULT FuncValue
+	//| DEFAULT FuncValue //already in PrimitiveValue
 	| NULL
 	| NOT NULL
 	| Check
@@ -1744,11 +1744,11 @@ Help :
 	| HELP
 	;
 */
-
+/*
 ExpressionStatement :
 	EQ Expression
 	;
-
+*/
 Source :
 	SOURCE StringValue
 	;
