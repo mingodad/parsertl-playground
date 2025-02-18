@@ -1,0 +1,310 @@
+/~ -PARSER----------------------------------------------------------------------
+JS/CC LALR(1) Parser Generator
+Copyright (C) 2007-2012 by Phorward Software Technologies, Jan Max Meyer
+http://jscc.phorward-software.com ++ contact<<AT>>phorward-software<<DOT>>com
+
+File:	parse.par
+Author:	Jan Max Meyer
+Usage:	A parser for parsing JS/CC parser definitions; The first versions of
+		JS/CC until v0.14 (had never been released!) worked with a hand-written
+		recursive descent parser.
+
+You may use, modify and distribute this software under the terms and conditions
+of the BSD license. Please see LICENSE for more information.
+----------------------------------------------------------------------------- ~/
+
+
+[*
+(function(root, factory) {
+    /* istanbul ignore next */
+	if (typeof define === 'function' && define.amd) {
+		define(['require', './global', './regex', './tabgen', './log/log', './classes/Production', './enums/ASSOC', './enums/SYM', './enums/SPECIAL'], factory);
+	} else if (typeof module === 'object' && module.exports) {
+		module.exports = factory(require);
+	} else {
+		root.jsccparse = factory(function(mod) {
+		    return root["jscc" + mod.split("/").pop()];
+		});
+	}
+}(this,
+  /**
+   * @param {reqParameter} require
+   * @param {...*} others
+   * @returns {function(string, string=):number}
+   */
+  function(require, others) {
+var log, global = /** @type {jscc.global} */ (require("./global")),
+    compile_regex = /** @type {function(string, number, boolean, number)} */ (require("./regex")),
+    tabgen = /** @type {jscc.tabgen} */ (require("./tabgen")),
+    Production = /** @type {function(new:jscc.classes.Production, ?ProductionOptions=)} */ (require("./classes/Production")),
+    ASSOC = require("./enums/ASSOC"),
+    SYM = require("./enums/SYM"),
+    SPECIAL = require("./enums/SPECIAL");
+
+//>>excludeStart("closure", pragmas.closure);
+var has = /** @type {hasObject} */ (require("./localHas"));
+//>>excludeEnd("closure");
+
+/**
+ * @suppress {uselessCode}
+ */
+(function() {
+    if (has("node")) {
+        log = /** @type {jscc.log} */ (require("./log/logNode"));
+    } else {
+        log = /** @type {jscc.log} */ (require("./log/log"));
+    }
+})();
+
+var		first_lhs;
+var		cur_line;
+
+//Wrapper for semantic errors
+function line_error( line, txt ){
+	log.error( "line " + line + ": " + txt );
+}
+*]
+
+/~
+	Terminal symbol definitions
+~/
+
+	/~ Operators: ~/
+	'##'
+	'<'
+	'>'
+	'^'
+	'!'
+	';'
+	':'
+	'\|'
+	'&'
+	'~'
+	'=>'
+
+	/~ Lexeme: ~/
+	'\[\*([^\*]\]|\*[^\]]|[^\*\]])*\*\]' CODE [*	return %match.substr(2, %match.length - 4 ); *]
+	'\'([^\']|\\\')*\'' STRING_SINGLE
+	'"([^"]|\\")*"' STRING_DOUBLE
+	'[A-Za-z0-9_-]+' IDENT
+
+	/~ Whitespace: ~/
+	'\n' => Continue
+	'/~([^~]/|~[^/]|[^~/])*~/' => Continue
+	'[\t\r ]+' => Continue
+	;
+
+##
+
+
+def: 			header_code token_assocs '##' grammar_defs footer_code
+				;
+
+/~ Token definition part ~/
+header_code: code_opt [* global.code_head += %1; *]
+;
+
+footer_code: code_opt [* global.code_foot += %1; *]
+;
+
+token_assocs:	token_assocs token_assoc
+				| token_assoc
+				/~ | ~ ~/
+				;
+
+token_assoc:	'<' token_defs	';'					[*	global.assoc_level++;
+														for( var i = 0; i < %2.length; i++ ){
+															global.symbols[ %2[i] ].level = global.assoc_level;
+															global.symbols[ %2[i] ].assoc = ASSOC.LEFT;
+														}
+													*]
+				| '>' token_defs ';'				[*	global.assoc_level++;
+														for( var i = 0; i < %2.length; i++ )
+														{
+															global.symbols[ %2[i] ].level = global.assoc_level;
+															global.symbols[ %2[i] ].assoc = ASSOC.RIGHT;
+														}
+													*]
+				| '^' token_defs ';'				[*	global.assoc_level++;
+														for( var i = 0; i < %2.length; i++ ){
+															global.symbols[ %2[i] ].level = global.assoc_level;
+															global.symbols[ %2[i] ].assoc = ASSOC.NOASSOC;
+														}
+													*]
+				| token_defs ';'
+				| '!' string opt_semicolon			[*	if( global.whitespace_token == -1 ){
+															var regex = %2.substr( 1, %2.length - 2 );
+															global.whitespace_token = tabgen.create_symbol( "WHITESPACE", SYM.TERM, SPECIAL.WHITESPACE );
+															compile_regex( regex, global.whitespace_token, %2[0] != '\'', cur_line  );
+														}
+														else
+															line_error( PCB.line, "Multiple whitespace definition" );
+													*]
+				;
+
+
+token_defs:		token_defs token_def 				[*	%1.push(%2); %% = %1; *]
+				| token_def							[*	%% = [%1]; *]
+				;
+token_def:		string identifier code_opt 			[*	%% = tabgen.create_symbol( %2, SYM.TERM, SPECIAL.NONE );
+														var regex = %1.substr( 1, %1.length - 2 );
+														global.symbols[%%].code = %3;
+														compile_regex( regex, global.symbols[ %% ].id, %1.charAt( 0 ) != '\'', cur_line  );
+													*]
+				| string code_opt 					[*	var regex = %1.substr( 1, %1.length - 2 );
+														%% = tabgen.create_symbol( regex.replace( /\\/g, "" ), SYM.TERM, SPECIAL.NONE );
+														global.symbols[%%].code = %2;
+
+														compile_regex( regex, global.symbols[ %% ].id,  %1.charAt( 0 ) != '\'', cur_line );
+													*]
+				;
+
+
+/~ Grammar definition part ~/
+
+grammar_defs:	grammar_defs grammar_def
+				| grammar_def
+				;
+
+grammar_def:	identifier ':' productions ';'		[*
+														var nonterm = tabgen.create_symbol( %1, SYM.NONTERM, SPECIAL.NONE );
+														global.symbols[nonterm].defined = true;
+														for( var i = 0; i < %3.length; i++ ){
+															global.productions[ %3[i] ].lhs = nonterm;
+															global.symbols[nonterm].prods.push( %3[i] );
+														}
+
+														if( first_lhs ){
+															first_lhs = false;
+															global.symbols[0].label = global.symbols[nonterm].label + "\'";
+															global.productions[0].rhs.push( nonterm );
+														}
+													*]
+				| ~ ';'
+				;
+
+productions:	productions '|' rhs					[*	%1.push(%3); %% = %1; *]
+				| rhs								[*	%% = [%1]; *]
+				;
+
+rhs:			sequence_opt rhs_prec code_opt		[*
+														var prod = new Production({
+															id:global.productions.length,
+															lhs:null,
+															rhs:/** @type {Array<number>} */ (%1),
+															level:/** @type {number} */ (%2),
+															code:(%3=="")?global.DEF_PROD_CODE:/** @type {string} */ (%3)
+														});
+														//Get level of the leftmost terminal
+														//as production level.
+														if( prod.level == 0 )
+														{
+															if( prod.rhs.length > 0 )
+																for( var i = prod.rhs.length-1; i >= 0; i-- )
+																	if( global.symbols[prod.rhs[i]] &&
+																		global.symbols[prod.rhs[i]].kind == SYM.TERM )
+																	{
+																		prod.level = global.symbols[prod.rhs[i]].level;
+																		break;
+																	}
+														}
+
+														global.productions.push( prod );
+														%% = prod.id;
+													*]
+				;
+
+rhs_prec:		'&' identifier						[* 	var index;
+														if( ( index = tabgen.find_symbol( %2, SYM.TERM, SPECIAL.NONE ) ) > -1 )
+															%% = global.symbols[index].level;
+														else
+															line_error( PCB.line, "Call to undefined terminal \"" + %2 + "\"" );
+													*]
+				| '&' string						[*	var index;
+														if( ( index = tabgen.find_symbol( %2.substr( 1, %2.length - 2).replace( /\\/g, "" ),
+																		SYM.TERM, SPECIAL.NONE ) ) > -1 )
+															%% = global.symbols[index].level;
+														else
+															line_error(  PCB.line, "Call to undefined terminal \"" + %2 + "\"" );
+													*]
+				|									[*	%% = 0; *]
+				;
+
+sequence_opt:	sequence
+				|									[*	%% = []; *]
+				;
+
+sequence:		sequence symbol						[* %1.push(%2); %% = %1 *]
+				| symbol							[* %% = [%1]; *]
+				;
+
+symbol:			identifier							[*
+														if( ( %% = tabgen.find_symbol( %1, SYM.TERM, SPECIAL.NONE ) ) <= -1 )
+															%% = tabgen.create_symbol( %1, SYM.NONTERM, SPECIAL.NONE );
+													*]
+				| string							[*
+														if( ( %% = tabgen.find_symbol( %1.substr( 1, %1.length - 2).replace( /\\/g, "" ), SYM.TERM, SPECIAL.NONE ) ) <= -1 )
+															line_error(  PCB.line, "Call to undefined terminal " + %1 );
+													*]
+				| '~'								[* %% = tabgen.find_symbol( "ERROR_RESYNC", SYM.TERM,	SPECIAL.ERROR ); *]
+				;
+
+/~ Universal elements ~/
+code_opt: code
+	| '=>' identifier [* %% = "return " + %2 + ".apply(null, arguments);"; *]
+	| '=>' CODE [* %% = "(" + %2 + ").apply(null, arguments);"; *]
+	| [* %% = ""; *]
+;
+
+code:			code CODE							[* %% = %1 + %2; *]
+				| CODE
+				;
+
+string:			STRING_SINGLE
+				| STRING_DOUBLE
+				;
+
+identifier:		IDENT
+				;
+
+opt_semicolon:	';'
+				|									[* %% = ""; *]
+				;
+
+[*
+/**
+ * Parses the specified grammar.
+ * @module {jscc.parse} jscc/parse
+ * @requires module:jscc/global
+ * @requires module:jscc/regex
+ * @requires module:jscc/tabgen
+ * @requires module:jscc/log/log
+ * @param {string} str - The grammar to parse.
+ * @param {string=} filename - The filename being parsed.  Currently unused.
+ * @returns {number} The number of parse errors.
+ */
+function parse_grammar( str, filename ){
+	var error_offsets = [];
+	var error_expects = [];
+	var parse_error = 0;
+
+	first_lhs = true;
+	cur_line = 1;
+
+	//##PREFIX##_dbg_withstepbystep = true;
+	//##PREFIX##_dbg_withtrace = true;
+
+	if( ( parse_error += __parse( str, error_offsets, error_expects ) ) > 0 )
+	{
+		for( var i = 0; i < parse_error; i++ )
+			line_error( ( str.substr( 0, error_offsets[i] ).match( /\n/g ) ?
+				str.substr( 0, error_offsets[i] ).match( /\n/g ).length : 1 ),
+					"Parse error near\n\t"  + str.substr( error_offsets[i], 30 ) +
+						( ( error_offsets[i] + 30 < str.substr( error_offsets[i] ).length ) ?
+							"..." : "" ) + "\n\t" + error_expects[i].join() + " expected" );
+	}
+	return parse_error;
+}
+return parse_grammar;
+}));
+*]
