@@ -1,4 +1,4 @@
-//From: 1faccfeca8d08631c691262cf0a2a5a796a297b0
+//From: 4edab9bf864f76449fbb0a671456b4b9bb2e4080
 /*-----------------------------------------------------------------------
 
   SDCC.y - parser definition file for sdcc
@@ -26,192 +26,172 @@
    what you give them.   Help stamp out software-hoarding!
 -------------------------------------------------------------------------*/
 
+
 /*Tokens*/
-%token IDENTIFIER
-%token TYPE_NAME
-%token ADDRSPACE_NAME
-%token CONSTANT
-%token SIZEOF
-%token OFFSETOF
-%token PTR_OP
-%token INC_OP
-%token DEC_OP
-%token LEFT_OP
-%token RIGHT_OP
-%token LE_OP
-%token GE_OP
-%token EQ_OP
-%token NE_OP
-%token AND_OP
-%token OR_OP
-%token ATTR_START
-%token TOK_SEP
-%token MUL_ASSIGN
-%token DIV_ASSIGN
-%token MOD_ASSIGN
 %token ADD_ASSIGN
-%token SUB_ASSIGN
-%token LEFT_ASSIGN
-%token RIGHT_ASSIGN
+%token ADDRESSMOD
+//%token ADDRESS_OF
+%token ADDRSPACE_NAME
+%token ALIGNAS
+%token ALIGNOF
 %token AND_ASSIGN
-%token XOR_ASSIGN
-%token OR_ASSIGN
-%token TYPEDEF
-%token EXTERN
-%token STATIC
+%token AND_OP
+//%token ARRAYINIT
+%token ASM
+%token AT
+%token ATOMIC
+%token ATTR_START
 %token AUTO
-%token REGISTER
-%token CONSTEXPR
+%token BANKED
+%token BIT
+//%token BITWISEAND
+//%token BLOCK
+%token BREAK
+//%token CALL
+%token CASE
+//%token CAST
 %token CODE
+%token COMPLEX
+%token CONSTANT
+%token CONSTEXPR
+%token CONTINUE
+%token COSMIC
+%token CRITICAL
+%token DATA
+%token DECIMAL128
+%token DECIMAL32
+%token DECIMAL64
+%token DEC_OP
+%token DEFAULT
+%token DIV_ASSIGN
+%token DO
+%token DOUBLE
+//%token DUMMY_READ_VOLATILE
 %token EEPROM
+%token ELLIPSIS
+%token ELSE
+//%token ENDCRITICAL
+//%token ENDFUNCTION
+%token ENUM
+%token EQ_OP
+%token EXTERN
+%token FIXED16X16
+%token FOR
+%token FUNC
+%token GENERIC
+//%token GENERIC_ASSOCIATION
+//%token GENERIC_ASSOC_LIST
+%token GE_OP
+//%token GETABIT
+//%token GETBYTE
+//%token GET_VALUE_AT_ADDRESS
+//%token GETWORD
+%token GOTO
+%token IAR
+%token IDATA
+%token IDENTIFIER
+%token IF
+//%token IFX
+%token IMAGINARY
+%token INC_OP
+%token INLINE
+%token INLINEASM
 %token INTERRUPT
+//%token IPOP
+//%token IPUSH
+//%token IPUSH_VALUE_AT_ADDRESS
+%token JAVANATIVE
+//%token JUMPTABLE
+//%token LABEL
+%token LEFT_ASSIGN
+%token LEFT_OP
+%token LE_OP
+%token MOD_ASSIGN
+%token MUL_ASSIGN
+%token NAKED
+%token NE_OP
+%token NONBANKED
+%token NORETURN
+//%token NULLOP
+%token NULLPTR
+%token OFFSETOF
+%token OR_ASSIGN
+%token OR_OP
+%token OVERLAY
+//%token PARAM
+//%token PCALL
+%token PDATA
+%token PRESERVES_REGS
+%token PTR_OP
+%token RAISONANCE
+//%token RANGE
+//%token RECEIVE
+%token REENTRANT
+%token REGISTER
+%token RESTRICT
+%token RETURN
+%token RIGHT_ASSIGN
+%token RIGHT_OP
+%token ROT
+%token SBIT
+%token SD_BITINT
+%token SD_BOOL
+%token SDCCCALL
+%token SD_CHAR
+%token SD_CONST
+//%token SD_FAR
+%token SD_FLOAT
+%token SD_INT
+%token SD_LONG
+%token SD_SHORT
+%token SD_VOID
+%token SD_WPARAM
+//%token SEND
+//%token SET_VALUE_AT_ADDRESS
 %token SFR
 %token SFR16
 %token SFR32
-%token ADDRESSMOD
-%token AT
-%token SBIT
-%token REENTRANT
-%token USING
-%token XDATA
-%token DATA
-%token IDATA
-%token PDATA
-%token ELLIPSIS
-%token CRITICAL
-%token NONBANKED
-%token BANKED
 %token SHADOWREGS
-%token SD_WPARAM
-%token SD_BOOL
-%token SD_CHAR
-%token SD_SHORT
-%token SD_INT
-%token SD_LONG
 %token SIGNED
-%token UNSIGNED
-%token SD_FLOAT
-%token DOUBLE
-%token FIXED16X16
-%token SD_CONST
-%token VOLATILE
-%token SD_VOID
-%token BIT
-%token COMPLEX
-%token IMAGINARY
-%token STRUCT
-%token UNION
-%token ENUM
-//%token RANGE
-//%token SD_FAR
-%token CASE
-%token DEFAULT
-%token IF
-%token ELSE
-%token SWITCH
-%token WHILE
-%token DO
-%token FOR
-%token GOTO
-%token CONTINUE
-%token BREAK
-%token RETURN
-%token NAKED
-%token JAVANATIVE
-%token OVERLAY
-%token TRAP
-%token STRING_LITERAL
-%token INLINEASM
-%token FUNC
-//%token IFX
-//%token ADDRESS_OF
-//%token GET_VALUE_AT_ADDRESS
-//%token SET_VALUE_AT_ADDRESS
-//%token SPIL
-//%token UNSPIL
-//%token GETABIT
-//%token GETBYTE
-//%token GETWORD
-//%token BITWISEAND
-//%token UNARYMINUS
-//%token IPUSH
-///%token IPUSH_VALUE_AT_ADDRESS
-//%token IPOP
-//%token PCALL
-//%token ENDFUNCTION
-//%token JUMPTABLE
-%token ROT
-//%token CAST
-//%token CALL
-//%token PARAM
-//%token NULLOP
-//%token BLOCK
-//%token LABEL
-//%token RECEIVE
-//%token SEND
-//%token ARRAYINIT
-//%token DUMMY_READ_VOLATILE
-//%token ENDCRITICAL
-%token INLINE
-%token RESTRICT
+%token SIZEOF
 %token SMALLC
-%token RAISONANCE
-%token IAR
-%token COSMIC
-%token SDCCCALL
-%token PRESERVES_REGS
-%token Z88DK_FASTCALL
-%token Z88DK_CALLEE
-%token Z88DK_SHORTCALL
-%token Z88DK_PARAMS_OFFSET
-%token ALIGNAS
-%token ALIGNOF
-%token ATOMIC
-%token GENERIC
-%token NORETURN
+//%token SPIL
+%token STATIC
 %token STATIC_ASSERT
+%token STRING_LITERAL
+%token STRUCT
+%token SUB_ASSIGN
+%token SWITCH
 %token THREAD_LOCAL
 %token TOKEN_FALSE
 %token TOKEN_TRUE
-%token NULLPTR
+%token TOK_SEP
+%token TRAP
+%token TYPEDEF
+%token TYPE_NAME
 %token TYPEOF
 %token TYPEOF_UNQUAL
-%token SD_BITINT
-%token DECIMAL32
-%token DECIMAL64
-%token DECIMAL128
-%token ASM
-//%token GENERIC_ASSOC_LIST
-//%token GENERIC_ASSOCIATION
-%token '('
-%token ')'
-%token ','
-%token ':'
-%token '['
-%token ']'
-%token '.'
-%token '{'
-%token '}'
-%token '&'
-%token '*'
-%token '+'
-%token '-'
-%token '~'
-%token '!'
-%token '/'
-%token '%'
-%token '<'
-%token '>'
-%token '^'
-%token '|'
-%token '?'
-%token '='
-%token ';'
+//%token UNARYMINUS
+%token UNION
+%token UNSIGNED
+//%token UNSPIL
+%token USING
+%token VOLATILE
+%token WHILE
+%token XDATA
+%token XOR_ASSIGN
+%token Z88DK_CALLEE
+%token Z88DK_FASTCALL
+%token Z88DK_PARAMS_OFFSET
+%token Z88DK_SHORTCALL
 
+%right /*1*/ ENUM '{' ':'
 
 %start file
 
 %%
+
+ /* C23 A.2.1 Expressions */
 
 primary_expression :
 	identifier
@@ -229,7 +209,12 @@ predefined_constant :
 	;
 
 generic_selection :
-	GENERIC '(' assignment_expr ',' generic_assoc_list ')'
+	GENERIC '(' generic_controlling_operand ',' generic_assoc_list ')'
+	;
+
+generic_controlling_operand :
+	assignment_expr
+	| type_name
 	;
 
 generic_assoc_list :
@@ -238,8 +223,8 @@ generic_assoc_list :
 	;
 
 generic_association :
-	type_name ':' assignment_expr
-	| DEFAULT ':' assignment_expr
+	type_name ':' /*1R*/ assignment_expr
+	| DEFAULT ':' /*1R*/ assignment_expr
 	;
 
 postfix_expression :
@@ -251,9 +236,9 @@ postfix_expression :
 	| postfix_expression PTR_OP identifier
 	| postfix_expression INC_OP
 	| postfix_expression DEC_OP
-	| '(' type_name ')' '{' initializer_list '}'
-	| '(' type_name ')' '{' initializer_list ',' '}'
-	| '(' type_name ')' '{' '}'
+	| '(' type_name ')' '{' /*1R*/ initializer_list '}'
+	| '(' type_name ')' '{' /*1R*/ initializer_list ',' '}'
+	| '(' type_name ')' '{' /*1R*/ '}'
 	;
 
 argument_expr_list :
@@ -347,7 +332,7 @@ logical_or_expr :
 
 conditional_expr :
 	logical_or_expr
-	| logical_or_expr '?' expression ':' conditional_expr
+	| logical_or_expr '?' expression ':' /*1R*/ conditional_expr
 	;
 
 assignment_expr :
@@ -383,8 +368,15 @@ constant_expr :
 	conditional_expr
 	;
 
+constant_range_expr :
+	constant_expr ELLIPSIS constant_expr
+	;
+
+   /* C23 A.2.2 Declarations */
+
 declaration :
-	declaration_specifiers ';'
+	simple_typed_enum_decl
+	| declaration_specifiers ';'
 	| declaration_specifiers init_declarator_list ';'
 	| static_assert_declaration
 	| attribute_declaration
@@ -427,7 +419,17 @@ storage_class_specifier :
 	| CONSTEXPR
 	;
 
+/* NOTE:
+ * Structs and unions have been factored out to avoid parsing conflicts with
+ * enum-type-specifier, which semantically cannot be a struct or union, anyway.
+ */
+
 type_specifier :
+	type_specifier_without_struct_or_union
+	| struct_or_union_specifier
+	;
+
+type_specifier_without_struct_or_union :
 	SD_VOID
 	| SD_CHAR
 	| SD_SHORT
@@ -444,7 +446,6 @@ type_specifier :
 	| DECIMAL32
 	| DECIMAL64
 	| DECIMAL128
-	| struct_or_union_specifier
 	| enum_specifier
 	| TYPE_NAME
 	| typeof_specifier
@@ -463,7 +464,7 @@ typeof_specifier :
 	;
 
 struct_or_union_specifier :
-	struct_or_union attribute_specifier_sequence_opt opt_stag '{' member_declaration_list '}'
+	struct_or_union attribute_specifier_sequence_opt opt_stag '{' /*1R*/ member_declaration_list '}'
 	| struct_or_union attribute_specifier_sequence_opt stag
 	;
 
@@ -487,6 +488,13 @@ type_specifier_qualifier :
 	| alignment_specifier
 	;
 
+type_specifier_qualifier_without_struct_or_union :
+	type_specifier_without_struct_or_union
+	| struct_or_union
+	| type_qualifier
+	| alignment_specifier
+	;
+
 member_declarator_list :
 	member_declarator
 	| member_declarator_list ',' member_declarator
@@ -494,15 +502,26 @@ member_declarator_list :
 
 member_declarator :
 	declarator
-	| ':' constant_expr
-	| declarator ':' constant_expr
+	| ':' /*1R*/ constant_expr
+	| declarator ':' /*1R*/ constant_expr
 	| /*empty*/
 	;
 
 enum_specifier :
-	ENUM '{' enumerator_list enum_comma_opt '}'
-	| ENUM identifier '{' enumerator_list enum_comma_opt '}'
-	| ENUM identifier
+	ENUM /*1R*/ '{' /*1R*/ enumerator_list enum_comma_opt '}'
+	| ENUM /*1R*/ enum_type_specifier '{' /*1R*/ enumerator_list enum_comma_opt '}'
+	| ENUM /*1R*/ identifier '{' /*1R*/ enumerator_list enum_comma_opt '}'
+	| ENUM /*1R*/ identifier enum_type_specifier '{' /*1R*/ enumerator_list enum_comma_opt '}'
+	| ENUM /*1R*/ identifier
+	;
+
+/* C23:
+ * An enum specifier of the form "enum identifier enum-type-specifier"
+ * may not appear except in a declaration of the form "enum identifier enum-type-specifier ;"
+ */
+
+simple_typed_enum_decl :
+	ENUM /*1R*/ identifier enum_type_specifier ';'
 	;
 
 enum_comma_opt :
@@ -517,6 +536,10 @@ enumerator_list :
 
 enumerator :
 	identifier attribute_specifier_sequence_opt opt_assign_expr
+	;
+
+enum_type_specifier :
+	':' /*1R*/ type_specifier_list_without_struct_or_union
 	;
 
 type_qualifier :
@@ -648,9 +671,9 @@ function_abstract_declarator :
 
 initializer :
 	assignment_expr
-	| '{' '}'
-	| '{' initializer_list '}'
-	| '{' initializer_list ',' '}'
+	| '{' /*1R*/ '}'
+	| '{' /*1R*/ initializer_list '}'
+	| '{' /*1R*/ initializer_list ',' '}'
 	;
 
 initializer_list :
@@ -732,6 +755,8 @@ balanced_token :
 	| CONSTANT
 	;
 
+   /* C23 A.2.3 Statements */
+
 statement :
 	labeled_statement
 	| unlabeled_statement
@@ -760,13 +785,14 @@ labeled_statement :
 	;
 
 label :
-	identifier ':'
-	| attribute_specifier_sequence_opt CASE constant_expr ':'
-	| attribute_specifier_sequence_opt DEFAULT ':'
+	identifier ':' /*1R*/
+	| attribute_specifier_sequence_opt CASE constant_range_expr ':' /*1R*/
+	| attribute_specifier_sequence_opt CASE constant_expr ':' /*1R*/
+	| attribute_specifier_sequence_opt DEFAULT ':' /*1R*/
 	;
 
 start_block :
-	'{'
+	'{' /*1R*/
 	;
 
 end_block :
@@ -794,6 +820,7 @@ else_statement :
 	| /*empty*/
 	;
 
+   /* This gives us an unavoidable shift / reduce conflict, but yacc does the right thing for C */
 selection_statement :
 	IF '(' expression ')' statement else_statement
 	| SWITCH '(' expression ')' secondary_block
@@ -813,6 +840,8 @@ jump_statement :
 	| RETURN ';'
 	| RETURN expression ';'
 	;
+
+   /* C23 A.2.4 External definitions */
 
 translation_unit :
 	external_declaration
@@ -834,6 +863,8 @@ function_body :
 	compound_statement
 	| kr_declaration_list compound_statement
 	;
+
+   /* SDCC-specific stuff */
 
 file :
 	/*empty*/
@@ -921,6 +952,11 @@ type_specifier_list_ :
 	| type_specifier_list_ type_specifier_qualifier
 	;
 
+type_specifier_list_without_struct_or_union :
+	type_specifier_qualifier_without_struct_or_union
+	| type_specifier_list_without_struct_or_union type_specifier_qualifier_without_struct_or_union
+	;
+
 identifier_list :
 	identifier
 	| identifier_list ',' identifier
@@ -957,6 +993,12 @@ declaration_list :
 	declaration
 	| declaration_list declaration
 	;
+
+// The parameter declarations in K&R-style functions need to be handled in a special way to avoid
+// ambiguities in the grammer. We do this by not allowing attributes on the parameter declarations.
+// Otherwise, in e.g.
+//  void f(x) [[attribute]] int x; {}
+// it would be unclear if the attribute applies to the type of f vs. the declaration of x.
 
 kr_declaration :
 	declaration_specifiers init_declarator_list ';'
