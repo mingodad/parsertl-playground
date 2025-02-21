@@ -39,8 +39,9 @@ fun :
 func_body :
 	BEGIN END
 	| BEGIN var_list fun_list statement_list END
-	| RPAREN BEGIN var_list fun_list END
+	| BEGIN var_list fun_list END
 	| BEGIN var_list statement_list END
+	| BEGIN fun_list statement_list END
 	| BEGIN statement_list END
 	| BEGIN var_list END
     ;
