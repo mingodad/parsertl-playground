@@ -320,6 +320,7 @@ const sampleList = [
 	["Thrift nano parser", "thrift-nano.g", "test.thrift-nano", "ace/mode/text"],
 	["Thrift parser", "thrift.g", "test.thrift-nano", "ace/mode/text"],
 	["Tidb SQL parser (be patient)(partially working)", "tidb-sql.g", "test.mysql", "ace/mode/sql"],
+	["Tinycompiler parser", "tinycompiler-parser.g", "test.tinycompiler-parser", "ace/mode/c_cpp"],
 	["TJS parser", "tjs.g", "test.tjs", "ace/mode/c_cpp"],
 	["Toucan cpu/gpu parser", "toucan-gpu-cpu.g", "test.toucan-gpu-cpu", "ace/mode/c_cpp"],
 	["Tradofion SQL parser (be patient)(partially working)", "tradofion-sqlparser.g", "test.tradofion-sql", "ace/mode/sql"],
