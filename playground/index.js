@@ -187,6 +187,7 @@ const sampleList = [
 	["Kitlang parser (partially working)", "kitlang-ghc.g", "test.kitlang-ghc", "ace/mode/c_cpp"],
 	["Koka-lang parser (partially working)", "koka-lang.g", "test.koka-lang", "ace/mode/text"],
 	["LALR parser", "lalr.g", "test.lalr", "ace/mode/yaml"],
+	["Langcc parser", "langcc-meta.g", "test.langcc-meta", "ace/mode/yaml"],
 	["Lark parser expanded", "lark.g", "test.lark", "ace/mode/yaml"],
 	["Lark parser", "lark-00.g", "test.lark", "ace/mode/yaml"],
 	["Left recursion demo", "tree-sitter-lr-dad.g", "test.lr-dad", "ace/mode/yaml"],
