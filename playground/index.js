@@ -200,6 +200,7 @@ const sampleList = [
 	["Little-lang parser (partially working)", "little-lang.g", "test.little-lang", "ace/mode/c_cpp"],
 	["Lox parser", "lox-lalrpop.g", "test.lox", "ace/mode/javascript"],
 	["LPegrex parser (partially working)", "lpegrex.g", "test.lpegrex", "ace/mode/yaml"],
+	["LPG2 parser (partially working)", "lpg2.g", "test.lpg2", "ace/mode/yaml"],
 	["LPython parser (not working)", "lpython.g", "test.python", "ace/mode/python"],
 	["LRSTAR-DFA parser", "lrstar-dfa.g", "test.lrstar-dfa", "ace/mode/yaml"],
 	["LRSTAR-24 parser (partially working)", "lrstar.g", "test.lrstar", "ace/mode/yaml"],
