@@ -111,8 +111,10 @@ ParserDecl :
 	| "prop" '{' ParserProp_list '}'
 	| "prec" '{' PrecItem_list '}'
 	| "attr" '{' AttrClause_list '}'
-	| Id L_AttrReq_opt "<-" ParseExpr ';'
-	| Id L_AttrReq_opt "<=" ParseExpr ';'
+	| Id "<-" ParseExpr ';'
+	| Id '[' L_AttrReq_opt ']' "<-" ParseExpr ';'
+	| Id "<=" ParseExpr ';'
+	| Id '[' L_AttrReq_opt ']' "<=" ParseExpr ';'
 	;
 
 ParserProp_list :
@@ -179,7 +181,7 @@ AttrClause :
 	AttrClauseExpr #Expr
 	//| '{' items:#B[AttrClause::`;`::] '}' #Block
 	| '{' L_AttrClause_opt '}' #Block
-	| '{' L_AttrClause ',' '}' #Block
+	| '{' L_AttrClause ';' '}' #Block
 	//| "match" '{' cases:#B[AttrMatchCase::`,`::] '}' #Match
 	| "match" '{' L_AttrMatchCase_opt '}' #Match
 	| "match" '{' L_AttrMatchCase ',' '}' #Match
@@ -281,7 +283,7 @@ ParseExpr_base :
 	| '(' ParseExpr ')' #Paren
 	| IdBase ':' ParseExpr_base #Name
 	//| ParseExprListType '[' ParseExpr[pr=*] ParseExprListNum ParseExpr[pr=*] (NONE:eps | OPTIONAL:`:?` | SOME:`::`) ']' #List
-	| ParseExprListType '[' ParseExpr_base ParseExprListNum ParseExpr TrailingSepOpt ']' #List
+	| ParseExprListType '[' ParseExpr ParseExprListNum ParseExpr TrailingSepOpt ']' #List
 	| '~' ParseExpr_base #Unfold
 	//| ParseExpr '[' attrs:#L[AttrReq::`,`_] ']' #AttrReq
 	| ParseExpr_base '[' L_AttrReq_opt ']' #AttrReq
@@ -311,7 +313,7 @@ L_AttrReq :
 
 AttrReq :
 	IdBase #Base
-        | "pr" '=' '*' #PrecStar
+    | "pr" '=' '*' #PrecStar
 	;
 
 ParseExprListType :
