@@ -380,17 +380,13 @@ produces    {EQUIVALENCE}|{PRIORITY_EQUIVALENCE}|{ARROW}|{PRIORITY_ARROW}
 "%Include"	INCLUDE_KEY
 "%Recover"	RECOVER_KEY
 "%DisjointPredecessorSets"	DISJOINTPREDECESSORSETS_KEY
-{EQUIVALENCE}	EQUIVALENCE
-{PRIORITY_EQUIVALENCE}	PRIORITY_EQUIVALENCE
-{ARROW}	ARROW
-{PRIORITY_ARROW}	PRIORITY_ARROW
 "|"	OR_MARKER
 
 "/."(?s:.)*?"./"	BLOCK
 "/:"(?s:.)*?":/"	BLOCK
 "/!"(?s:.)*?"!/"	BLOCK
 
-{symbol_lhs}\s+{produces}<LHS>   reject()
+{symbol_lhs}\s*{produces}<LHS>   reject()
 
 <LHS>{
     {symbol_lhs} SYMBOL_LHS
