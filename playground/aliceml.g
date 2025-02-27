@@ -201,7 +201,7 @@ exp_COMMA_list0 :
  	;
 
 exp_COMMA_list1 :
-	 exp COMMA exp_COMMA_list1
+	exp_COMMA_list1 COMMA exp
 	| exp
  	;
 
@@ -210,7 +210,7 @@ exp_COMMA_list2 :
  	;
 
 exp_SEMICOLON_list1 :
-	 exp SEMICOLON exp_SEMICOLON_list1
+	exp_SEMICOLON_list1 SEMICOLON exp
 	| exp
  	;
 
@@ -301,12 +301,8 @@ dec1 :
  	;
 
 dec1_sq :
-	 dec1_sq_sq
-	| LOCAL dec IN dec END
- 	;
-
-dec1_sq_sq :
-	 VAL valbind
+	LOCAL dec IN dec END
+	| VAL valbind
 	| VAL tyvarseq1 valbind
 	| FUN fvalbind
 	| FUN tyvarseq1 fvalbind
@@ -350,12 +346,12 @@ WITHTYPE_typbind_opt :
  	;
 
 vid_list1 :
-	 vid vid_list1
+	vid_list1 vid
 	| vid
  	;
 
 longstrid_list1 :
-	 longstrid longstrid_list1
+	longstrid_list1 longstrid
 	| longstrid
  	;
 
@@ -497,7 +493,7 @@ pat_COMMA_list0 :
  	;
 
 pat_COMMA_list1 :
-	 pat COMMA pat_COMMA_list1
+	pat_COMMA_list1 COMMA pat
 	| pat
  	;
 
@@ -507,7 +503,7 @@ pat_COMMA_list2 :
 
 pat_BAR_list2 :
 	 pat BAR pat
-	| pat BAR pat_BAR_list2
+	| pat_BAR_list2 BAR pat
 	;
 
 patrow :
@@ -557,7 +553,7 @@ pat :
 
 ty :
 	 tupty
-	| tupty ARROW ty
+	| ty ARROW tupty
  	;
 
 tupty :
@@ -565,7 +561,7 @@ tupty :
  	;
 
 ty_STAR_list :
-	 consty STAR ty_STAR_list
+	 ty_STAR_list STAR consty
 	| consty
  	;
 
@@ -605,7 +601,7 @@ tyseq :
  	;
 
 ty_COMMA_list2 :
-	 ty COMMA ty_COMMA_list2
+	ty_COMMA_list2 COMMA ty
 	| ty COMMA ty
 	;
 
@@ -620,7 +616,7 @@ tyvarseq1 :
  	;
 
 tyvar_COMMA_list1 :
-	 tyvar COMMA tyvar_COMMA_list1
+	tyvar_COMMA_list1 COMMA tyvar
 	| tyvar
 	;
 
@@ -635,7 +631,7 @@ longtyconseq1 :
  	;
 
 longtycon_COMMA_list1 :
-	 longtycon COMMA longtycon_COMMA_list1
+	longtycon_COMMA_list1 COMMA longtycon
 	| longtycon
 	;
 
@@ -650,7 +646,7 @@ longvidseq1 :
  	;
 
 longvid_COMMA_list1 :
-	 longvid COMMA longvid_COMMA_list1
+	longvid_COMMA_list1 COMMA longvid
 	| longvid
 	;
 
@@ -872,7 +868,7 @@ funbind :
 
 atstrpat_list1 :
 	 atstrpat
-	| atstrpat atstrpat_list1
+	| atstrpat_list1 atstrpat
  	;
 
 AND_funbind_opt :
@@ -971,7 +967,7 @@ WITHTYPE_typdesc_opt :
  	;
 
 longtycon_EQUALS_list1 :
-	 longtycon EQUALS longtycon_EQUALS_list1
+	longtycon_EQUALS_list1 EQUALS longtycon
 	| longtycon
  	;
 
@@ -980,7 +976,7 @@ longtycon_EQUALS_list2 :
  	;
 
 longsigid_EQUALS_list1 :
-	 longsigid EQUALS longsigid_EQUALS_list1
+	longsigid_EQUALS_list1 EQUALS longsigid
 	| longsigid
  	;
 
@@ -989,7 +985,7 @@ longsigid_EQUALS_list2 :
  	;
 
 longstrid_EQUALS_list1 :
-	 longstrid EQUALS longstrid_EQUALS_list1
+	longstrid_EQUALS_list1 EQUALS longstrid
 	| longstrid
  	;
 
