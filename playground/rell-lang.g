@@ -336,6 +336,7 @@ ExpressionRef:
 
 Expression:
 	  UnaryExpr BinaryExprOperand_zom
+	////| tkLPAR Expression tkRPAR
 	;
 
 BinaryExprOperand_zom:
@@ -533,7 +534,8 @@ CreateExprArg_oom:
 
 CreateExprArg:
 	  CallArgValue
-	//|  Name tkASSIGN CallArgValue
+	|  Name
+	|  Name tkASSIGN CallArgValue
 	|  tkDOT Name tkASSIGN CallArgValue
 	;
 
