@@ -1,0 +1,46 @@
+entity city { key name: text; }
+entity person { name: text; city; street: text; house: integer; score: integer; }
+
+object some_state {
+    mutable x: integer = 5;
+}
+
+operation try_insert_cities(city_a: text, city_b: text) {
+    fun_insert_city(city_a);
+    try_call(fun_insert_city(city_a, *));
+    fun_insert_city(city_b);
+}
+
+function fun_insert_city(name: text) {
+    create city (name);
+}
+
+operation insert_city(name: text) {
+    create city (name);
+}
+
+operation insert_person(name: text, city, street: text, house: integer, score: integer) {
+    create person(name, city, street, house, score);
+}
+
+operation op_integer_division(a: integer, b: integer) {
+    print(a / b);
+}
+
+query get_all_cities() = city @* {};
+query get_all_city_names() = city @* {}.name;
+query get_city_by_name(name: text) = city @ { name };
+query get_persons_by_city(city) = person @* { city };
+query integer_division(a: integer, b: integer) = a / b;
+
+query get_persons_by_city_set(cities: set<text>): list<text> {
+    val persons = list<text>();
+    for (locCity in cities) persons.add_all(person @* { person.city.name == locCity }.name);
+    return persons;
+}
+
+query get_state() = some_state.x;
+
+operation set_state(x: integer) {
+    update some_state(x = x);
+}

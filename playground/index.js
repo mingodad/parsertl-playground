@@ -296,6 +296,7 @@ const sampleList = [
 	["ReasonML parser (partially working)", "reason_parser.g", "test.reason", "ace/mode/javascript"],
 	["R parser (partially working)", "r-parser.g", "test.r-parser", "ace/mode/r"],
 	["Re2c parser (partially working)", "re2cr.g", "test.re2c", "ace/mode/text"],
+	["Rell-lang parser (partially working)", "rell-lang.g", "test.rell-lang", "ace/mode/text"],
 	["Ruby parser (partially working)", "ruby-0bced53a.g", "test.ruby", "ace/mode/ruby"],
 	["Rune parser", "rune-deparse.g", "test.rune-deparse", "ace/mode/text"],
 	["Rust parser", "rust.g", "test.rs.txt", "ace/mode/rust"], /*github send ext '.rs' as application/rls-services+xml */
