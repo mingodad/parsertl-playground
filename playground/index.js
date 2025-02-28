@@ -212,6 +212,7 @@ const sampleList = [
 	["Lua parser", "lua.g", "test.lua", "ace/mode/lua"],
 	["LuaPP parser (partially working)", "luapp.g", "test.luapp", "ace/mode/lua"],
 	["Luban parser", "luban.g", "test.luban", "ace/mode/c_cpp"],
+	["Lucid-lang parser (partially working)", "lucid-parser.g", "test.lucid-parser", "ace/mode/c_cpp"],
 	["LunarML parser (partially working)", "LunarML.g", "test.LunarML", "ace/mode/ocaml"],
 	["Make parser (from anjuta)", "mk-parser.g", "test.mk-parser", "ace/mode/Makefile"],
 	["Mangle (datalog) parser", "mangle.g", "test.mangle", "ace/mode/prolog"],
