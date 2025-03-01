@@ -1,0 +1,360 @@
+################################
+#### BELOW IS TESTING-STUFF ####
+################################
+parsername "try_tagselect": ( )
+start
+  print("try tagselect syntax");
+
+  print("****************************************");
+
+  print("===== data ==========================");
+  recall("BASEDOC");
+  tagselect("h1"| data );
+  #tagselect("ul","li","a"|data);
+  print;
+  show_type;
+  show_match;
+
+  print("===== dataslurp =====================");
+  recall("BASEDOC");
+  tagselect("h1"| data );
+  #tagselect("table","tr","td"|dataslurp);
+  print;
+  show_type;
+  show_match;
+
+
+  print("===== tag ===========================");
+  recall("BASEDOC");
+  tagselect(."align"|tag);
+  print;
+  show_type;
+  show_match;
+
+
+  print("===== argpairs =======================");
+  recall("BASEDOC");
+  tagselect("img"."src"|argpairs);
+  print;
+  show_type;
+  show_match;
+
+
+  print("===== argkeys =======================");
+  recall("BASEDOC");
+  tagselect("img"."src"|argkeys);
+  print;
+  show_type;
+  show_match;
+
+  print("===== argvals =======================");
+
+  recall("BASEDOC");
+  tagselect("img"."src"|argvals);
+  print;
+  show_type;
+  show_match;
+
+
+  print("===== arg(\"src\") ======================");
+  recall("BASEDOC");
+  tagselect("img"."src"| arg("src") );
+  print;
+  show_type;
+  show_match;
+
+
+  print("===== arg(\"alt\") ======================");
+  recall("BASEDOC");
+  tagselect("img"."src"| arg("alt") );
+  print;
+  show_type;
+  show_match;
+
+
+  # --------- SELECTION LIST ---------------------------------------------
+  print("===== arg(\"src\"), arg(\"alt\") ======================");
+  recall("BASEDOC");
+  tagselect("img"."src" | arg("src"), arg("alt") );
+  print;
+  show_type;
+  show_match;
+
+  # --------- transposing ---------
+  print(" *************** TRANSPOSE DATA ***************\n" );
+  transpose;
+  print;
+  show_type;
+  show_match;
+  print(" *************** -------------- ***************\n" );
+  # --------- -------------- ---------------------------------------------
+
+
+  print("===== dump =====================");
+  recall("BASEDOC");
+  tagselect("table","tr","td"|dump);
+  print;
+  show_type;
+  #show_match;
+
+
+  print("===== htmlstring ======================");
+  recall("BASEDOC");
+  tagselect("img"."src"| htmlstring );
+  print;
+  show_type;
+  #show_match;
+
+
+#  print("===== doclist ======================");
+#  recall("BASEDOC");
+#  tagselect("img"."src"| doclist );
+#  print;
+#  show_type;
+#  #show_match;
+
+
+
+
+exitparse;
+  print("****************************************");
+  tagselect("table","a","img"."align"="top"|dump);
+  print("****************************************");
+  tagselect(.="top"|dump);
+  tagselect("meta"."property"|dump);
+  print("****************************************");
+  print("Now with \"data\" and \"print()\"");
+  tagselect("title"|dataslurp);
+  print;
+  recall("BASEDOC");
+  print("****************************************");
+  tagselect("script"|dump);
+  print("****************************************");
+end
+
+
+parsername "tbl2csv": ( )
+start
+  tagselect("table"|dump);
+  show_match;
+  print;
+end
+
+
+parsername "uniq-test": ( )
+start
+  match("<H1>");
+  show_match;
+  print;
+
+  print("============ UNIQ: ============");
+
+  uniq;
+  show_match;
+  print;
+
+
+end
+
+
+# some stuff to experiment with
+# -----------------------------
+parsername "anytag_tags": ( )
+start
+  tagselect( anytag | tag );
+
+  show_match;
+end
+
+
+# some stuff to experiment with
+# -----------------------------
+parsername "anytag_tags_uniq": ( )
+start
+  tagselect( anytag | tag );
+
+  transpose;
+  uniq; # removes multiple rows (e.g. many empty rows)
+  transpose;
+
+  show_match;
+end
+
+# some stuff to experiment with
+# -----------------------------
+parsername "anytag_argpairs": ( )
+start
+  tagselect( anytag | argpairs );
+
+  show_match;
+end
+
+
+parsername "teststorerecall": ( )
+start
+  store("doc");
+  linkextract;
+  store("links");
+
+  recall("doc");
+  print;
+
+  recall("links");
+  print;
+end
+
+parsername "testassign": ( )
+start
+  linkextract;
+  print;
+  print("--------");
+  store("links");
+
+  # Mit Assignments
+  print("Jetzt mit Assigments");
+  recall("BASEDOC");
+  linksa = linkextract;
+print_string("DIREKT:");
+print;
+  #show_match;
+  #show_type;
+  #show_variables;
+#print;
+  print("PRINT_linksa als $linksa");
+  print($linksa);
+  #print($linksa);
+
+  print("linksa - RECALLED");
+  recall("linksa");
+  show_type;
+  print;
+end
+
+
+parsername "testdummy": ( )
+start
+  dummy;
+end
+
+parsername "testemptydummy": ( )
+start
+  emptydummy;
+end
+
+parsername "testifthenelse": ( )
+start
+  linkextract;
+  store("links");
+
+
+  ifnotempty( emptydummy; )
+  then
+      print("Not empty");
+  else
+      print("Empty");
+  fi
+
+end
+
+
+
+# TEST While-Loop
+# ===============
+parsername "while-empty": ( )
+start
+  print("while ( emptydummy ) - should not print dots");
+  while( emptydummy; )
+  do
+    print(".");
+  done
+  print("ready! Success, if no dots printed.");
+end
+
+
+# TEST While-Loop
+# ===============
+parsername "while-endless": ( )
+start
+  print("should print dots - use Ctrl-C to stop!" );
+  while( dummy; )
+  do
+    print_string(".");
+  done
+end
+
+
+
+
+
+parsername "macro-test": ( )
+start
+  call("mymacro");
+end
+
+defmacro "mymacro":
+start
+  print("Macro was called successfully!");
+end
+
+
+
+# ===============================
+# Testparser for the post-command
+# ===============================
+# The test-url does not accept get-requests,
+# it's only accepting POST-requests.
+# So it can / have to be called directly,
+# without any other pages to be parsed.
+# This means, that this URl should not be used as command-line
+# argument to any-dl, because the initial, impicit get-command
+# would yield in an error.
+#
+# So, for testing, you should give any other
+# valid URL to the command line, for example:
+#  $ any-dl -f testparsers.adl -p post http://www.w3.org
+# ------------------------------------------------------
+parsername "post" : ( )
+start
+  # Set the POST-Data
+  # =================
+  paste("Germany"); store("country");
+  paste("Berlin"); store("city");
+
+  paste("http://httpbin.org/post"); # This URL will be accessed with POST-request
+  makeurl;
+
+  post("country", "city"); # Post uses "country" and "city" variables
+  print;
+
+end
+
+
+
+
+# --------------------------------------------------------
+# print a json-string directly and again after prettifying
+# --------------------------------------------------------
+parsername "jsonpp": ( "http://www.arte.tv/guide/de/057372-010/x-enius?autoplay=1" )
+start
+  tagselect( "script"."id"="json-config", ."type"="application/json" | data );
+  to_string;
+  print;
+  json_prettify;
+  print("-------------------------");
+  print;
+
+end
+
+
+# --------------------------------------------
+# parse html-table and convert to Match_result
+# --------------------------------------------
+parsername "tabletomatchres": ( )
+start
+  tagselect( "table" | htmlstring );
+show_type;
+to_string;
+  table_to_matchres;
+#exitparse;
+  show_match;
+end

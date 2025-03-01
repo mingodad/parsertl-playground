@@ -58,6 +58,7 @@ const sampleList = [
 	["Aliceml parser (partially working)", "aliceml.g", "test.aliceml", "ace/mode/ocaml"],
 	["AM parser", "am-parser.g", "test.am-parser", "ace/mode/Makefile"],
 	["Anna parser ", "anna-parser.g", "test.anna", "ace/mode/Go"],
+	["Any-dl parser ", "any-dl-klartext.g", "test.any-dl-klartext", "ace/mode/text"],
 	["Ansi C11 parser (partially working)", "c11-ansi-c.g", "test.c", "ace/mode/c_cpp"],
 	["Ansi C18 parser (partially working)", "c18-ansi.g", "test.c", "ace/mode/c_cpp"],
 	["Ansi C parser", "cparser.g", "test.c", "ace/mode/c_cpp"],
