@@ -1,0 +1,67 @@
+fun main(argv: [string]) => i32 {
+    for i in 0..10 {
+        for j in i..=10 by 2 {
+            if i+j > 6 {
+                break;
+            }
+            else {
+                print("hello world");
+            }
+        }
+    }
+    return 1;
+}
+
+fun inferrable(a: i32) => i32 {
+    return a + 5;
+}
+
+fun main(argv: [string]) => i32 {
+    let x = inferrable(10);
+    return x;
+}
+
+fun main() => void {
+    let A = [[1,2,3],[4,5,6],[7,8,9]];
+    let x = [4, 8, 1];
+    let b: [i32] = A*x;
+    print("result is {b}");
+    return 0;
+}
+
+fun main(argv: [string]) => u64 {
+    const x: u16 = 5+3*4;
+    return x;
+}
+
+fun right_bound(i: u8) => u8 {
+    return 10;
+}
+
+
+fun main(argv: [string]) => i32 {
+    let x: u32 = 0;
+    for i in 0..right_bound(x) by 2 {
+        x += i;
+    }
+    print(x);
+    return 0;
+}
+
+fun summation(start: i8, end: i8) => i8 {
+    let s = 0;
+    for n in start..end+1 {
+        s += n;
+    }
+    return s;
+}
+
+fun main(argv: [string]) => i32 {
+    let sum = summation(0, argv[1]);
+    if sum < 100 {
+        print("hi");
+    } else {
+        print("bye");
+    }
+
+}

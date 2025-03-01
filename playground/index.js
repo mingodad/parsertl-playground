@@ -79,6 +79,7 @@ const sampleList = [
 	["Bison strict parser", "bison-strict.g", "carbon-lang.y", "ace/mode/yaml"],
 	["Blawn parser", "blawn-parser.g", "test.blawn", "ace/mode/python"],
 	["Blech parser (partially working)", "blech-parser.g", "test.blech-parser", "ace/mode/text"],
+	["Blink GPU-lang parser", "blink-robertfeliciano.g", "test.blink-robertfeliciano", "ace/mode/text"],
 	["Blog-lang parser", "blog-lang.g", "test.blog-lang", "ace/mode/text"],
 	["BNFC parser", "bnfc.g", "test.bnfc", "ace/mode/yaml"],
 	["BNFGen parser", "bnfgen.g", "test.bnfgen", "ace/mode/yaml"],
