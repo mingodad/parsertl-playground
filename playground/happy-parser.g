@@ -156,13 +156,20 @@ optCode :
 
 %%
 
-%x CODE
+%x CODE LCOMMENT
 
 ident	[A-Za-z_][0-9A-Za-z_]*
 
 %%
 
 [ \t\r\n]+	skip()
+"--".*  skip()
+"{-"<>LCOMMENT>
+<LCOMMENT>{
+    "{-"<>LCOMMENT>
+    "-}"<<> skip()
+    .|\n<.>
+}
 
 //Forn non "literate script" grammars comment the two rules bellow
 ^[^>].*	skip()
@@ -194,8 +201,6 @@ ident	[A-Za-z_][0-9A-Za-z_]*
 "%shift"	spec_shift
 "%token"	spec_token
 "%tokentype"	spec_tokentype
-
-"{-"(?s:.)+"-}"	skip()
 
 "{"<>CODE>
 <CODE> {
