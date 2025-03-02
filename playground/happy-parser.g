@@ -163,6 +163,8 @@ ident	[A-Za-z_][0-9A-Za-z_]*
 %%
 
 [ \t\r\n]+	skip()
+
+//Forn non "literate script" grammars comment the two rules bellow
 ^[^>].*	skip()
 ^">"[ \t]+ skip()
 
