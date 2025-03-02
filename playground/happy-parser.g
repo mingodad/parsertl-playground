@@ -8,6 +8,13 @@ The parser.
 (c) 1993-2000 Andy Gill, Simon Marlow
 -----------------------------------------------------------------------------
 */
+/******
+Notice that this grammar accepts "literate script" (lines starting with '<').
+For non "literate script" you'll need to comment the following LEX rules
+as shown bellow:
+//^[^>].*	skip()
+//^">"[ \t]+ skip()
+******/
 
 %token code
 %token id
