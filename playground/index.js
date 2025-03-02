@@ -112,6 +112,7 @@ const sampleList = [
 	["C parser (coccinelle) (partially working)", "coccinelle-parser_c.g", "test.frama-c", "ace/mode/c_cpp"],
 	["Cpp-semgrep parser (partially working)", "cpp-semgrep.g", "test.c", "ace/mode/c_cpp"],
 	["Cpp5-v2 parser (not working)", "cpp5-v2.g", "test.cpp", "ace/mode/c_cpp"],
+	["Cryptol parser (partially working)", "cryptol-GaloisInc.g", "test.cryptol-GaloisInc", "ace/mode/text"],
 	["CSS parser from VLC", "CSSGrammar-vlc.g", "style.css", "ace/mode/css"],
 	["CSS parser from Webkit", "css-webkit.g", "style.css", "ace/mode/css"],
 	["CSS parser from Webkit NO-WHITESPACE", "css-webkit-no-whitespace.g", "style.css", "ace/mode/css"],
