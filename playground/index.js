@@ -135,6 +135,7 @@ const sampleList = [
 	["EbnfToBison parser", "ebnftobison.g", "test.ebnftobison", "ace/mode/yaml"],
 	["Ecere parser (not working)", "ecere.g", "test.ecere", "ace/mode/c_cpp"],
 	["Eiffel parser (partially working)", "eiffel_parser.g", "test.eiffel_parser", "ace/mode/eiffel"],
+	["Epic EpiVM parser (partially working)", "EpiVM-epic.g", "test.EpiVM-epic", "ace/mode/haskell"],
 	["Estree parser", "estree.g", "test.estree", "ace/mode/txt"],
 	["Event comiler parser", "event-compiler.g", "test.event-compiler", "ace/mode/txt"],
 	["Expr-lang parser", "expr-lang.g", "test.expr-lang", "ace/mode/txt"],
