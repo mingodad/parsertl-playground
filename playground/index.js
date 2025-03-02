@@ -298,6 +298,7 @@ const sampleList = [
 	["Protocompile parser", "protocompile.g", "test.protocompile", "ace/mode/c_cpp"],
 	["Qasm parser (be patient) (partially working)", "QasmParser.g", "test.QasmParser", "ace/mode/text"],
 	["Qlalr QT LALR parser", "qlalr.g", "test.qlalr", "ace/mode/text"],
+	["Qqmljs parser (partially working)", "qqmljs.g", "test.qqmljs", "ace/mode/actionscript"],
 	["Quakeforge QC parser (partially working)", "quakeforge-qc-parse.g", "test.quakeforge-qc-parse", "ace/mode/c_cpp"],
 	["RCL config language parser (partially working)", "rcl-config-lang.g", "test.rcl-config-lang", "ace/mode/txt"],
 	["ReasonML parser (partially working)", "reason_parser.g", "test.reason", "ace/mode/javascript"],
