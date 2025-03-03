@@ -353,6 +353,7 @@ const sampleList = [
 	["XMC parser", "xmc-model-checker.g", "test.xmc-model-checker", "ace/mode/text"],
 	["XML parser", "xml.g", "test.xml.txt", "ace/mode/xml"],
 	["XML parser Eiffel", "xml_eiffel_parser.g", "test.xml_eiffel_parser", "ace/mode/xml"],
+	["Yaep parser", "yaep.g", "test.yaep", "ace/mode/yaml"],
 	["Yecc parser erlang", "yecc.g", "test.yecc", "ace/mode/erlang"],
 	["Z80 assembler parser", "z80-asm.g", "test.z80-asm", "ace/mode/assembly_x86"],
 	["ZScript parser", "ffscript.g", "test.ffscript", "ace/mode/c_cpp"],
