@@ -155,7 +155,7 @@ WITH	reserved_word
 reserved_symbol	reserved_symbol
 "#"{var} reserved_symbol
 "#"{atom} reserved_symbol
-"<<>>"  reserved_symbol
+"<<"[^> ]*">>"  reserved_symbol
 
 "Erlang"[ \t]+"code"[ \t]*"."(?s:.)*  erlang_code
 
