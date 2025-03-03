@@ -173,6 +173,7 @@ const sampleList = [
 	["Influxql parser", "influxql-sql.g", "test.influxql-sql", "ace/mode/sql"],
 	["Island parser example", "island-example-koopa.g", "test.island-example-koopa", "ace/mode/text"],
 	["Ispc parser", "ispc.g", "test.ispc", "ace/mode/c_cpp"],
+	["Ixml parser (partially working)", "ixml.g", "test.ixml", "ace/mode/yaml"],
 	["Jacc parser", "jacc-grammar.g", "test.jacc-grammar", "ace/mode/yaml"],
 	["Jaime Gaza Syntax parser", "jaimegarza-syntax.g", "test.jaimegarza-syntax", "ace/mode/yaml"],
 	["Java11 parser", "java11.g", "test.java", "ace/mode/java"],
