@@ -164,6 +164,7 @@ const sampleList = [
 	["Happy parser (literate script)", "happy-parser.g", "test.happy-parser", "ace/mode/yaml"],
 	["Happy parser", "happy-parser2.g", "test.happy-parser2", "ace/mode/yaml"],
 	["Hawq SQL parser (be patient)", "hawq-sql.g", "test.sql", "ace/mode/sql"],
+	["Hare-ang parser (partially working)", "hare-lang.g", "test.hare-lang", "ace/mode/c_cpp"],
 	["Hime parser", "hime-grammar.g", "test.hime-grammar", "ace/mode/yaml"],
 	["HQL (ECL) parser (be patient)", "hqlgram.g", "test.hqlgram", "ace/mode/pascal"],
 	["HTML parser", "html-parser.g", "index.html", "ace/mode/html"],
