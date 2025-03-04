@@ -231,6 +231,7 @@ const sampleList = [
 	["Menhir stage1 parser", "menhir-stage1-parser.g", "menhir-stage1-parser.mly", "ace/mode/yaml"],
 	["MetaDSL parser", "MetaDSL.g", "test.MetaDSL", "ace/mode/txt"],
 	["Mewa parser", "mewa-grammar.g", "test.mewa-grammar", "ace/mode/txt"],
+	["Mgmt-config parser", "mgmt-purpleidea.g", "test.mgmt-purpleidea", "ace/mode/txt"],
 	["Mimosa http request parser", "mimosa_http_request.g", "test.mimosa_http_request", "ace/mode/yaml"],
 	["Minic parser", "minic.g", "test.minic", "ace/mode/c_cpp"],
 	["Minilog parser", "minilog.g", "test.minilog", "ace/mode/text"],
