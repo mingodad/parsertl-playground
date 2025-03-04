@@ -241,6 +241,7 @@ const sampleList = [
 	["Mocc QSS-Solver parser (partially working)", "qss-solver-mocc.g", "test.qss-solver-mocc", "ace/mode/txt"],
 	["Monetdb SQL parser (partially working)", "monetdb-sql_parser.g", "test.monetdb-sql_parser", "ace/mode/sql"],
 	["Mono CSHarp parser (partially working)", "cs-parser.g", "test.cs", "ace/mode/csharp"],
+	["Monyacc parser", "moonyacc.g", "test.moonyacc", "ace/mode/yaml"],
 	["Mosml parser (partially working)", "mosml-lr.g", "test.mosml", "ace/mode/ocaml"],
 	["MSTA parser", "msta.g", "test.msta", "ace/mode/yaml"],
 	["mtail parser", "mtail.g", "test.mtail", "ace/mode/yaml"],
