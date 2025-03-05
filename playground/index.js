@@ -119,6 +119,7 @@ const sampleList = [
 	["CSS parser from Webkit", "css-webkit.g", "style.css", "ace/mode/css"],
 	["CSS parser from Webkit NO-WHITESPACE", "css-webkit-no-whitespace.g", "style.css", "ace/mode/css"],
 	["Cup parser", "java-cup.g", "test.java-cup", "ace/mode/txt"],
+	["Cx parser (partially working)", "cxpartialparsing.g", "test.cxpartialparsing", "ace/mode/c_cpp"],
 	["Cxx parser (not working)", "CxxParser.g", "test.cpp", "ace/mode/c_cpp"],
 	["Cyclone parser (partially working)", "cyclone.g", "test.cyclone", "ace/mode/c_cpp"],
 	["Cycipt parser (be patient) (partially working)", "cycriptC.g", "test.cycriptC", "ace/mode/javascript"],
