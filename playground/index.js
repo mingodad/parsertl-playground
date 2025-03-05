@@ -141,6 +141,7 @@ const sampleList = [
 	["Estree parser", "estree.g", "test.estree", "ace/mode/txt"],
 	["Event comiler parser", "event-compiler.g", "test.event-compiler", "ace/mode/txt"],
 	["Expr-lang parser", "expr-lang.g", "test.expr-lang", "ace/mode/txt"],
+	["Fakego parser", "fakego-esrrhs.g", "test.fakego-esrrhs", "ace/mode/golang"],
 	["Fault-lang parser (partially working)", "fault-lang-ext.g", "test.fault-lang", "ace/mode/txt"],
 	["Faust parser", "faustparser.g", "test.faustparser", "ace/mode/txt"],
 	["Firebird DSQL parser", "firebird-dsql.g", "test.firebird-dsql", "ace/mode/sql"],

@@ -1,0 +1,118 @@
+package mypackage
+
+func test_bind1(a, b)
+    ret := bind_func1(a, b)
+    return ret
+end
+
+func test_for1(a, b)
+    ret := 0
+    for var i = a, i < b, i++ then
+        ret += a
+    end
+    return ret
+end
+
+func test_for2(a, b)
+    ret := 0
+    for var i = a, i < b, i++ then
+        ret += i
+    end
+    return ret
+end
+
+func test_for3(a, b)
+    ret := 0
+    for var i = a -> b, 1 then
+        ret += a
+    end
+    return ret
+end
+
+func test_for4(a, b)
+    ret := 0
+    for var i = a -> b, 1 then
+        ret += i
+    end
+    return ret
+end
+
+func test_funccall_son1(a)
+    return a * a
+end
+
+func test_funccall_son2(a)
+    return a + a
+end
+
+func test_funccall1(a, b)
+    newa := test_funccall_son1(a)
+    newb := test_funccall_son2(b)
+    return newa - newb
+end
+
+func test_if_value1(a, b)
+    if a == 1 then
+        return "yes"
+    end
+    return "no"
+end
+
+func test_if_value2(a, b)
+    if a > 1 then
+        return "yes"
+    end
+    return "no"
+end
+
+func test_if_value3(a, b)
+    if a >= 1 then
+        return "yes"
+    end
+    return "no"
+end
+
+func test_if_value4(a, b)
+    if a < 1 then
+        return "yes"
+    end
+    return "no"
+end
+
+func test_if_value5(a, b)
+    if a <= 1 then
+        return "yes"
+    end
+    return "no"
+end
+
+func test_if_value6(a, b)
+    if a != 1 then
+        return "yes"
+    end
+    return "no"
+end
+
+
+func test_print1(a, b)
+    return print(a, b)
+end
+
+func test_return_value1(a, b)
+    return a
+end
+
+func test_return_value2(a, b)
+    return 1, "a"
+end
+
+func test_switch1(a, b)
+    switch a
+        case 1 then
+            return a
+        case "a" then
+            return b
+        default
+            return a + b
+    end
+end
