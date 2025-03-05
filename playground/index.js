@@ -109,6 +109,7 @@ const sampleList = [
 	["CoqPP parser", "coqpp_parse.g", "test.coqpp", "ace/mode/yaml"],
 	["Cowgol parser", "cowgol-cowfe.g", "test.cowgol-cowfe", "ace/mode/ada"],
 	["C lexer Puma", "clexer-puma.g", "test.frama-c", "ace/mode/c_cpp"],
+	["CC C99 parser (partially working)", "cc-parser-cznic.g", "test.frama-c", "ace/mode/c_cpp"],
 	["C parser frama-c (partially working)", "cparser-frama-c.g", "test.frama-c", "ace/mode/c_cpp"],
 	["C parser (c-to-json) (partially working)", "c-to-json.g", "test.frama-c", "ace/mode/c_cpp"],
 	["C parser (coccinelle) (partially working)", "coccinelle-parser_c.g", "test.frama-c", "ace/mode/c_cpp"],
