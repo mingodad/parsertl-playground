@@ -6,65 +6,42 @@
 // Requires lua.l, lua.y, lua.hpp
 
 /*Tokens*/
-%token NAME
-%token INTEGER
-%token FLOAT
-%token STRING
 %token AND
 %token BREAK
+%token CAT
+%token COLS
+%token DIV
 %token DO
+%token DOTS
 %token ELSE
 %token ELSEIF
 %token END
+%token EQU
 %token FALSE
+%token FLOAT
 %token FOR
 %token FUNCTION
 %token GOTO
+%token GTE
 %token IF
 %token IN
+%token INTEGER
 %token LOCAL
+%token LTE
+%token NAME
+%token NEQ
 %token NIL
 %token NOT
 %token OR
 %token REPEAT
 %token RETURN
+%token SHL
+%token SHR
+%token STRING
 %token THEN
 %token TRUE
 %token UNTIL
 %token WHILE
-%token EQU
-%token NEQ
-%token LTE
-%token GTE
-%token CAT
-%token SHL
-%token SHR
-%token DIV
-%token DOTS
-%token COLS
-%token '#'
-%token '%'
-%token '&'
-%token '('
-%token ')'
-%token '*'
-%token '+'
-%token ','
-%token '-'
-%token '.'
-%token '/'
-%token ':'
-%token ';'
-%token '<'
-%token '='
-%token '>'
-%token '['
-%token ']'
-%token '^'
-%token '{'
-%token '|'
-%token '}'
-%token '~'
 
 %left /*1*/ OR
 %left /*2*/ AND
@@ -112,12 +89,12 @@ stat :
 	| IF conds END
 	| WHILE exp DO block END
 	| REPEAT block UNTIL exp
-	| FOR NAME '=' explist23 DO block END
-	| FOR namelist IN expr_comma_list DO block END
+	| FOR NAME '=' explist_2_or_3 DO block END
+	| FOR namelist IN exprlist DO block END
 	| FUNCTION funcname funcbody
 	| GOTO NAME
 	| label
-	| setlist '=' expr_comma_list
+	| setlist '=' exprlist
 	| funccall
 	//| error DO
 	//| error IF
@@ -151,7 +128,7 @@ cond :
 laststat :
 	BREAK
 	| RETURN
-	| RETURN expr_comma_list
+	| RETURN exprlist
 	;
 
 label :
@@ -160,7 +137,7 @@ label :
 
 binding :
 	LOCAL namelist
-	| LOCAL namelist '=' expr_comma_list
+	| LOCAL namelist '=' exprlist
 	| LOCAL FUNCTION NAME funcbody
 	;
 
@@ -179,12 +156,12 @@ namelist :
 	| namelist ',' NAME
 	;
 
-expr_comma_list :
+exprlist :
 	exp
-	| expr_comma_list ',' exp
+	| exprlist ',' exp
 	;
 
-explist23 :
+explist_2_or_3 :
 	exp ',' exp
 	| exp ',' exp ',' exp
 	;
@@ -255,7 +232,7 @@ funccall :
 
 args :
 	'(' ')'
-	| '(' expr_comma_list ')'
+	| '(' exprlist ')'
 	| table
 	| STRING
 	;
@@ -314,7 +291,7 @@ longbracket                     \[=*\[
 %%
 
 [[:space:]]+                    skip() /* skip white space */
-<INITIAL>"--"{longbracket}<LONGCOMMENT>
+"--"{longbracket}<LONGCOMMENT>
 "--".*                          skip() /* ignore inline comment */
 
 "and"	AND
@@ -340,7 +317,7 @@ longbracket                     \[=*\[
 "until"	UNTIL
 "while"	WHILE
 
-<INITIAL>{longbracket}<LONGSTRING>
+{longbracket}<LONGSTRING>
 "=="                            EQU
 "~="                            NEQ
 "<="                            LTE

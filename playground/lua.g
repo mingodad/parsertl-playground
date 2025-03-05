@@ -3,60 +3,38 @@
 /*Tokens*/
 %token AND
 %token BREAK
+%token CONCAT
 %token DO
+%token ELLIPSES
 %token ELSE
 %token ELSEIF
 %token END
+%token EQ
 %token FALSE
 %token FOR
 %token FUNCTION
+%token GE
+%token IDENTIFIER
 %token IF
 %token IN
+%token LE
 %token LOCAL
+%token NE
 %token NIL
 %token NOT
+%token NUMBER
 %token OR
 %token REPEAT
 %token RETURN
-%token THEN
-%token TRUE
-%token UNTIL
-%token WHILE
-%token CONCAT
-%token ELLIPSES
-%token EQ
-%token GE
-%token LE
-%token NE
 %token SPECIAL
 //%token SPECIAL_CONST
 //%token SPECIAL_NUMBER
-%token NUMBER
 %token STRING
-%token IDENTIFIER
-%token '<'
-%token '>'
-%token '+'
-%token '-'
-%token '*'
-%token '/'
-%token '%'
+%token THEN
+%token TRUE
 %token UNARY_OPERATOR
-%token '^'
-%token ';'
-%token '='
-%token ','
-%token ':'
-%token '.'
-%token '('
-%token ')'
-%token '#'
-%token '['
-%token ']'
-%token '{'
-%token '}'
-
-%token ILLEGAL_CHARACTER
+%token UNTIL
+%token WHILE
 
 //declared to eliminate/silence the 2 shift reduce conflicts
 %right '('
@@ -92,59 +70,51 @@ opt_block_statements :
 	| statement_list last_statement
 	;
 
-class_1_statement :
-	nobr_function_call
-	;
-
-class_2_statement :
-	br_function_call
-	;
-
-class_3_statement :
+nobr_stmt_or_call :
 	nobr_statement opt_special
 	| nobr_statement ';' opt_special
 	| nobr_function_call ';'
 	;
 
-class_4_statement :
+br_stmt_or_call :
 	br_statement
 	| br_statement ';'
 	| br_function_call ';'
 	;
 
 statement_list :
-	statement_list_1
-	| statement_list_2
-	| statement_list_3
-	| statement_list_4
+	nobr_function_call_list_oom
+	| br_function_call_list_oom
+	| nobr_stmt_or_call_list_oom
+	| br_stmt_or_call_list_oom
 	;
 
-statement_list_1 :
-	class_1_statement
-	| statement_list_1 class_1_statement
-	| statement_list_2 class_1_statement
-	| statement_list_3 class_1_statement
-	| statement_list_4 class_1_statement
+nobr_function_call_list_oom :
+	nobr_function_call
+	| nobr_function_call_list_oom nobr_function_call
+	| br_function_call_list_oom nobr_function_call
+	| nobr_stmt_or_call_list_oom nobr_function_call
+	| br_stmt_or_call_list_oom nobr_function_call
 	;
 
-statement_list_2 :
-	class_2_statement
-	| statement_list_3 class_2_statement
-	| statement_list_4 class_2_statement
+br_function_call_list_oom :
+	br_function_call
+	| nobr_stmt_or_call_list_oom br_function_call
+	| br_stmt_or_call_list_oom br_function_call
 	;
 
-statement_list_3 :
-	class_3_statement
-	| statement_list_1 class_3_statement
-	| statement_list_2 class_3_statement
-	| statement_list_3 class_3_statement
-	| statement_list_4 class_3_statement
+nobr_stmt_or_call_list_oom :
+	nobr_stmt_or_call
+	| nobr_function_call_list_oom nobr_stmt_or_call
+	| br_function_call_list_oom nobr_stmt_or_call
+	| nobr_stmt_or_call_list_oom nobr_stmt_or_call
+	| br_stmt_or_call_list_oom nobr_stmt_or_call
 	;
 
-statement_list_4 :
-	class_4_statement
-	| statement_list_3 class_4_statement
-	| statement_list_4 class_4_statement
+br_stmt_or_call_list_oom :
+	br_stmt_or_call
+	| nobr_stmt_or_call_list_oom br_stmt_or_call
+	| br_stmt_or_call_list_oom br_stmt_or_call
 	;
 
 nobr_statement :
@@ -393,8 +363,6 @@ while	WHILE
 0[xX][a-fA-F0-9]+|[0-9]+([Ee][+-]?[0-9]+)?|[0-9]*\.[0-9]+([Ee][+-]?[0-9]+)?	NUMBER
 \"(\\.|[^\"\n\r\\])*\"|'(\\.|[^'\n\r\\])*'	STRING
 "--@"	SPECIAL
-
-.	ILLEGAL_CHARACTER
 
 {whitespace}	skip()
 {line_comment}	skip() //need be the last to not shadow SPECIAL
