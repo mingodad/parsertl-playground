@@ -1,0 +1,36 @@
+import "fmt"
+
+func filter(list, fn) {
+    sublist = []
+    for _, elem = range list {
+        if fn(elem) {
+            sublist.Push(elem)
+            fmt.Println(sublist)
+        }
+    }
+    return sublist
+}
+
+func qsort(list) {
+    if list.Length() <= 1 {
+        return list
+    }
+
+    pivot = list[0]
+    list = list[1:]
+
+	fmt.Println("==========================")
+    left = filter(list, func (x) { return x <= pivot })
+    fmt.Println("left", left)
+    right = filter(list, func (x) { return x > pivot })
+    fmt.Println("right", right)
+    fmt.Println("pivot", pivot)
+	fmt.Println("^^^^^^^^^^^^^^^^^^^^^^^^^")
+
+    return qsort(left) + [pivot] + qsort(right)
+}
+
+lst = [200,299,199,3,4,1,2,7,8,5,6,100,2229]
+a = qsort(lst)
+fmt.Println(a)
+fmt.Println(a)
