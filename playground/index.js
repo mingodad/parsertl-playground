@@ -155,6 +155,7 @@ const sampleList = [
 	["FsLex parser", "fslex.g", "test.fslex", "ace/mode/yaml"],
 	["FsYacc parser", "fsyacc.g", "test.fsyacc", "ace/mode/yaml"],
 	["Futhark parser (partially working)", "futhark.g", "test.futhark", "ace/mode/txt"],
+	["GAEA-QL parser (be patient)(partially working)", "Gaea-ql.g", "test.Gaea-ql", "ace/mode/sql"],
 	["GameMonkey parser", "gmscript.g", "test.gmscript", "ace/mode/javascript"],
 	["GGML parser", "ggml.g", "test.ggml", "ace/mode/yaml"],
 	["Glcpp parser (partially working)", "glcpp-parse.g", "test.glcpp-parse", "ace/mode/c_cpp"],

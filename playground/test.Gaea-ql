@@ -1,0 +1,25 @@
+start transaction;
+create table b(id integer primary key, x real, y real, z real, w real);
+/*
+equal((x:=11.12345678910737373),(11.12345678910737373))
+equal((y:=22.12345678910737373),(22.12345678910737373))
+equal((z:=33.12345678910737373),(33.12345678910737373))
+equal((w:=44.12345678910737373),(44.12345678910737373))
+*/
+insert into b values(11.12345678910737373, 22.12345678910737373, 33.12345678910737373, 44.12345678910737373);
+
+create table t(id integer primary key, rc boolean not null);
+/*
+equal(\([^)]+)\),\(.+\)
+insert into t(rc) select \1 = (\2;
+*/
+insert into t select (000000001.003727171046591100000000000000) = (((((x+y)/z)))) from b;
+insert into t select (000001101.252705279183400000000000000000) = (((((x+y)*z)))) from b;
+insert into t select (000000000.123456789107372340000000000000) = (((((x+y)-z)))) from b;
+insert into t select (000000066.370370367322124000000000000000) = (((((x+y)+z)))) from b;
+insert into t select (-00000000.332090942984469560000000000000) = (((((x-y)/z)))) from b;
+insert into t select (-00000364.358024680181020000000000000000) = (((((x-y)*z)))) from b;
+
+select count(*) cnt, sum(rc) as passed from t;
+
+commit; -- transaction;
