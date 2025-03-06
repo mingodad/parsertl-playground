@@ -519,6 +519,8 @@ FeatureName:
 
 %%
 
+%x IN_REGEX IN_CLASS
+
 %%
 
 [ \t\r\n]+	skip()
@@ -576,8 +578,20 @@ FeatureName:
 "|"	'|'
 "}"	'}'
 
+"/"<IN_REGEX>
+<IN_REGEX>{
+	"/"[a-z]*<INITIAL>	RegexLiteral
+	\\.<.>
+	"["<>IN_CLASS>
+	[^/\\]<.>
+}
+<IN_CLASS>{
+	"]"<<>
+	\\.<.>
+	[^\]\\]<.>
+}
+
 NaN|"-"?((\d*\.\d+|\d+)([Ee][+-]?\d+)?|Infinity)	NUMBER
-"/"(\\.|[^/\r\n\\])+"/"[a-z]*	RegexLiteral
 \"(\\.|[^"\\])*\"|'(\\.|[^'\\])*'	STRING
 
 "^"?[_a-zA-Z][\w_]*	ID
