@@ -163,6 +163,7 @@ const sampleList = [
 	["Gocc parser", "gocc.g", "test.gocc", "ace/mode/yaml"],
 	["Go-amanda parser (partially working)", "go-amanda.g", "test.go", "ace/mode/golang"],
 	["Go-semgrep parser (partially working)", "go-semgrep.g", "test.go", "ace/mode/golang"],
+	["Grain-lang parser (partially working)", "grain-lang.g", "test.grain-lang", "ace/mode/text"],
 	["GramGrep parser", "gram_grep.g", "calculator.g", "ace/mode/yaml"],
 	["Graphql parser", "libgraphql.g", "test.libgraphql", "ace/mode/yaml"],
 	["Gringo-Clingo parser non grounding (partially working)", "gringo-ngp.g", "test.gringo-ngp", "ace/mode/text"],
