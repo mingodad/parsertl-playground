@@ -1,0 +1,5 @@
+let a = 4;
+let re1 = /[^\u0130\u0131\u00DFa-z0-9\\/:\-_\. ]+/g;
+let re2 = /\\/g
+let b = a / 2;
+//notice right now we need a new line to corretly recognize the previous line

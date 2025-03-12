@@ -1,0 +1,502 @@
+//Typescript
+
+%token AbstractKeyword
+%token AccessorKeyword
+%token AmpersandAmpersandEqualsToken
+%token AmpersandAmpersandToken
+%token AmpersandEqualsToken
+%token AmpersandToken
+%token AnyKeyword
+%token AsKeyword
+%token AssertKeyword
+%token AssertsKeyword
+%token AsteriskAsteriskEqualsToken
+%token AsteriskAsteriskToken
+%token AsteriskEqualsToken
+%token AsteriskToken
+%token AsyncKeyword
+%token AtToken
+%token AwaitKeyword
+%token BacktickToken
+%token BarBarEqualsToken
+%token BarBarToken
+%token BarEqualsToken
+%token BarToken
+%token BigIntKeyword
+%token BooleanKeyword
+%token BreakKeyword
+%token CaretEqualsToken
+%token CaretToken
+%token CaseKeyword
+%token CatchKeyword
+%token ClassKeyword
+%token CloseBraceToken
+%token CloseBracketToken
+%token CloseParenToken
+%token ColonToken
+%token CommaToken
+%token ConstKeyword
+%token ConstructorKeyword
+%token ContinueKeyword
+%token DebuggerKeyword
+%token DeclareKeyword
+%token DefaultKeyword
+%token DeleteKeyword
+%token DoKeyword
+%token DotDotDotToken
+%token DotToken
+%token ElseKeyword
+%token EnumKeyword
+%token EqualsEqualsEqualsToken
+%token EqualsEqualsToken
+%token EqualsGreaterThanToken
+%token EqualsToken
+%token ExclamationEqualsEqualsToken
+%token ExclamationEqualsToken
+%token ExclamationToken
+%token ExportKeyword
+%token ExtendsKeyword
+%token FalseKeyword
+%token FinallyKeyword
+%token ForKeyword
+%token FromKeyword
+%token FunctionKeyword
+%token GetKeyword
+%token GlobalKeyword
+%token GreaterThanEqualsToken
+%token GreaterThanGreaterThanEqualsToken
+%token GreaterThanGreaterThanGreaterThanEqualsToken
+%token GreaterThanGreaterThanGreaterThanToken
+%token GreaterThanGreaterThanToken
+%token GreaterThanToken
+%token HashToken
+%token IdentToken
+%token IfKeyword
+%token ImplementsKeyword
+%token ImportKeyword
+%token InKeyword
+%token InferKeyword
+%token InstanceOfKeyword
+%token InterfaceKeyword
+%token IntrinsicKeyword
+%token IsKeyword
+%token KeyOfKeyword
+%token LessThanEqualsToken
+%token LessThanLessThanEqualsToken
+%token LessThanLessThanToken
+%token LessThanSlashToken
+%token LessThanToken
+%token LetKeyword
+%token MinusEqualsToken
+%token MinusMinusToken
+%token MinusToken
+%token ModuleKeyword
+%token NamespaceKeyword
+%token NeverKeyword
+%token NewKeyword
+%token NullKeyword
+%token NumberKeyword
+%token NumberToken
+%token ObjectKeyword
+%token OfKeyword
+%token OpenBraceToken
+%token OpenBracketToken
+%token OpenParenToken
+%token OutKeyword
+%token OverrideKeyword
+%token PackageKeyword
+%token PercentEqualsToken
+%token PercentToken
+%token PlusEqualsToken
+%token PlusPlusToken
+%token PlusToken
+%token PrivateKeyword
+%token ProtectedKeyword
+%token PublicKeyword
+%token QuestionDotToken
+%token QuestionQuestionEqualsToken
+%token QuestionQuestionToken
+%token QuestionToken
+%token ReadonlyKeyword
+%token RegexToken
+%token RequireKeyword
+%token ReturnKeyword
+%token SatisfiesKeyword
+%token SemicolonToken
+%token SetKeyword
+%token SlashEqualsToken
+%token SlashToken
+%token StaticKeyword
+%token StringKeyword
+%token StringToken
+%token SuperKeyword
+%token SwitchKeyword
+%token SymbolKeyword
+%token ThisKeyword
+%token ThrowKeyword
+%token TildeToken
+%token TrueKeyword
+%token TryKeyword
+%token TypeKeyword
+%token TypeOfKeyword
+%token UndefinedKeyword
+%token UniqueKeyword
+%token UnknownKeyword
+%token UsingKeyword
+%token VarKeyword
+%token VoidKeyword
+%token WhileKeyword
+%token WithKeyword
+%token YieldKeyword
+
+%%
+
+input :
+	%empty
+	| tokens
+	;
+
+tokens :
+	token
+	| tokens token
+	;
+
+token :
+	AbstractKeyword
+	| AccessorKeyword
+	| AmpersandAmpersandEqualsToken
+	| AmpersandAmpersandToken
+	| AmpersandEqualsToken
+	| AmpersandToken
+	| AnyKeyword
+	| AsKeyword
+	| AssertKeyword
+	| AssertsKeyword
+	| AsteriskAsteriskEqualsToken
+	| AsteriskAsteriskToken
+	| AsteriskEqualsToken
+	| AsteriskToken
+	| AsyncKeyword
+	| AtToken
+	| AwaitKeyword
+	| BacktickToken
+	| BarBarEqualsToken
+	| BarBarToken
+	| BarEqualsToken
+	| BarToken
+	| BigIntKeyword
+	| BooleanKeyword
+	| BreakKeyword
+	| CaretEqualsToken
+	| CaretToken
+	| CaseKeyword
+	| CatchKeyword
+	| ClassKeyword
+	| CloseBraceToken
+	| CloseBracketToken
+	| CloseParenToken
+	| ColonToken
+	| CommaToken
+	| ConstKeyword
+	| ConstructorKeyword
+	| ContinueKeyword
+	| DebuggerKeyword
+	| DeclareKeyword
+	| DefaultKeyword
+	| DeleteKeyword
+	| DoKeyword
+	| DotDotDotToken
+	| DotToken
+	| ElseKeyword
+	| EnumKeyword
+	| EqualsEqualsEqualsToken
+	| EqualsEqualsToken
+	| EqualsGreaterThanToken
+	| EqualsToken
+	| ExclamationEqualsEqualsToken
+	| ExclamationEqualsToken
+	| ExclamationToken
+	| ExportKeyword
+	| ExtendsKeyword
+	| FalseKeyword
+	| FinallyKeyword
+	| ForKeyword
+	| FromKeyword
+	| FunctionKeyword
+	| GetKeyword
+	| GlobalKeyword
+	| GreaterThanEqualsToken
+	| GreaterThanGreaterThanEqualsToken
+	| GreaterThanGreaterThanGreaterThanEqualsToken
+	| GreaterThanGreaterThanGreaterThanToken
+	| GreaterThanGreaterThanToken
+	| GreaterThanToken
+	| HashToken
+	| IdentToken
+	| IfKeyword
+	| ImplementsKeyword
+	| ImportKeyword
+	| InKeyword
+	| InferKeyword
+	| InstanceOfKeyword
+	| InterfaceKeyword
+	| IntrinsicKeyword
+	| IsKeyword
+	| KeyOfKeyword
+	| LessThanEqualsToken
+	| LessThanLessThanEqualsToken
+	| LessThanLessThanToken
+	| LessThanSlashToken
+	| LessThanToken
+	| LetKeyword
+	| MinusEqualsToken
+	| MinusMinusToken
+	| MinusToken
+	| ModuleKeyword
+	| NamespaceKeyword
+	| NeverKeyword
+	| NewKeyword
+	| NullKeyword
+	| NumberKeyword
+	| NumberToken
+	| ObjectKeyword
+	| OfKeyword
+	| OpenBraceToken
+	| OpenBracketToken
+	| OpenParenToken
+	| OutKeyword
+	| OverrideKeyword
+	| PackageKeyword
+	| PercentEqualsToken
+	| PercentToken
+	| PlusEqualsToken
+	| PlusPlusToken
+	| PlusToken
+	| PrivateKeyword
+	| ProtectedKeyword
+	| PublicKeyword
+	| QuestionDotToken
+	| QuestionQuestionEqualsToken
+	| QuestionQuestionToken
+	| QuestionToken
+	| ReadonlyKeyword
+	| RegexToken
+	| RequireKeyword
+	| ReturnKeyword
+	| SatisfiesKeyword
+	| SemicolonToken
+	| SetKeyword
+	| SlashEqualsToken
+	| SlashToken
+	| StaticKeyword
+	| StringKeyword
+	| StringToken
+	| SuperKeyword
+	| SwitchKeyword
+	| SymbolKeyword
+	| ThisKeyword
+	| ThrowKeyword
+	| TildeToken
+	| TrueKeyword
+	| TryKeyword
+	| TypeKeyword
+	| TypeOfKeyword
+	| UndefinedKeyword
+	| UniqueKeyword
+	| UnknownKeyword
+	| UsingKeyword
+	| VarKeyword
+	| VoidKeyword
+	| WhileKeyword
+	| WithKeyword
+	| YieldKeyword
+	;
+
+%%
+
+%x IN_REGEX IN_REGEX2 BACK_DIV
+
+// charCodeToRegExpFlag
+ReHasIndices d
+ReGlobal g
+ReIgnoreCase i
+ReMultiline m
+ReDotAll s
+ReUnicode u
+ReUnicodeSets v
+ReSticky y
+
+%%
+
+[ \t\r\n]+	skip()
+"//".*	skip()
+"/*"(?s:.)*?"*/"	skip()
+
+// ToKeyword
+"abstract" AbstractKeyword
+"accessor" AccessorKeyword
+"any" AnyKeyword
+"as" AsKeyword
+"asserts" AssertsKeyword
+"assert" AssertKeyword
+"bigint" BigIntKeyword
+"boolean" BooleanKeyword
+"break" BreakKeyword
+"case" CaseKeyword
+"catch" CatchKeyword
+"class" ClassKeyword
+"continue" ContinueKeyword
+"const" ConstKeyword
+"constructor" ConstructorKeyword
+"debugger" DebuggerKeyword
+"declare" DeclareKeyword
+"default" DefaultKeyword
+"delete" DeleteKeyword
+"do" DoKeyword
+"else" ElseKeyword
+"enum" EnumKeyword
+"export" ExportKeyword
+"extends" ExtendsKeyword
+"false" FalseKeyword
+"finally" FinallyKeyword
+"for" ForKeyword
+"from" FromKeyword
+"function" FunctionKeyword
+"get" GetKeyword
+"if" IfKeyword
+"implements" ImplementsKeyword
+"import" ImportKeyword
+"in" InKeyword
+"infer" InferKeyword
+"instanceof" InstanceOfKeyword
+"interface" InterfaceKeyword
+"intrinsic" IntrinsicKeyword
+"is" IsKeyword
+"keyof" KeyOfKeyword
+"let" LetKeyword
+"module" ModuleKeyword
+"namespace" NamespaceKeyword
+"never" NeverKeyword
+"new" NewKeyword
+"null" NullKeyword
+"number" NumberKeyword
+"object" ObjectKeyword
+"package" PackageKeyword
+"private" PrivateKeyword
+"protected" ProtectedKeyword
+"public" PublicKeyword
+"override" OverrideKeyword
+"out" OutKeyword
+"readonly" ReadonlyKeyword
+"require" RequireKeyword
+"global" GlobalKeyword
+"return" ReturnKeyword
+"satisfies" SatisfiesKeyword
+"set" SetKeyword
+"static" StaticKeyword
+"string" StringKeyword
+"super" SuperKeyword
+"switch" SwitchKeyword
+"symbol" SymbolKeyword
+"this" ThisKeyword
+"throw" ThrowKeyword
+"true" TrueKeyword
+"try" TryKeyword
+"type" TypeKeyword
+"typeof" TypeOfKeyword
+"undefined" UndefinedKeyword
+"unique" UniqueKeyword
+"unknown" UnknownKeyword
+"using" UsingKeyword
+"var" VarKeyword
+"void" VoidKeyword
+"while" WhileKeyword
+"with" WithKeyword
+"yield" YieldKeyword
+"async" AsyncKeyword
+"await" AwaitKeyword
+"of" OfKeyword
+
+// textToToken
+"{"  OpenBraceToken
+"}"  CloseBraceToken
+"("  OpenParenToken
+")"  CloseParenToken
+"["  OpenBracketToken
+"]"  CloseBracketToken
+"."  DotToken
+"..."  DotDotDotToken
+";"  SemicolonToken
+","  CommaToken
+"<"  LessThanToken
+">"  GreaterThanToken
+"<="  LessThanEqualsToken
+">="  GreaterThanEqualsToken
+"=="  EqualsEqualsToken
+"!="  ExclamationEqualsToken
+"==="  EqualsEqualsEqualsToken
+"!=="  ExclamationEqualsEqualsToken
+"=>"  EqualsGreaterThanToken
+"+"  PlusToken
+"-"  MinusToken
+"**"  AsteriskAsteriskToken
+"*"  AsteriskToken
+"/"  SlashToken
+"%"  PercentToken
+"++"  PlusPlusToken
+"--"  MinusMinusToken
+"<<"  LessThanLessThanToken
+"</"  LessThanSlashToken
+">>"  GreaterThanGreaterThanToken
+">>>"  GreaterThanGreaterThanGreaterThanToken
+"&"  AmpersandToken
+"|"  BarToken
+"^"  CaretToken
+"!"  ExclamationToken
+"~"  TildeToken
+"&&"  AmpersandAmpersandToken
+"||"  BarBarToken
+"?"  QuestionToken
+"??"  QuestionQuestionToken
+"?."  QuestionDotToken
+":"  ColonToken
+"="  EqualsToken
+"+="  PlusEqualsToken
+"-="  MinusEqualsToken
+"*="  AsteriskEqualsToken
+"**="  AsteriskAsteriskEqualsToken
+"/="  SlashEqualsToken
+"%="  PercentEqualsToken
+"<<="  LessThanLessThanEqualsToken
+">>="  GreaterThanGreaterThanEqualsToken
+">>>="  GreaterThanGreaterThanGreaterThanEqualsToken
+"&="  AmpersandEqualsToken
+"|="  BarEqualsToken
+"^="  CaretEqualsToken
+"||="  BarBarEqualsToken
+"&&="  AmpersandAmpersandEqualsToken
+"??="  QuestionQuestionEqualsToken
+"@"  AtToken
+"#"  HashToken
+"`"  BacktickToken
+
+"/"[^*/\t\r\n]<IN_REGEX> reject()
+<IN_REGEX>{
+    "/"<IN_REGEX2>
+}
+<IN_REGEX2>{
+	"/"({ReHasIndices}|{ReGlobal}|{ReIgnoreCase}|{ReMultiline}|{ReDotAll}|{ReUnicode}|{ReUnicodeSets}|{ReSticky})*<INITIAL>	RegexToken
+	"["(\\.|[^\]\r\n\\])+"]"<.>
+	\\.|.<.>
+	\n<BACK_DIV>    reject() //hack to bactrack and try as SlashToken
+}
+<BACK_DIV>"/"<INITIAL>  SlashToken
+
+[0-9]+("."[0-9]+)?	NumberToken
+\"(\\.|[^"\r\n\\])*\"	StringToken
+'("\\\\/"|\\.|[^'\r\n\\])*'	StringToken
+"`"(\\.|[^`\r\n\\])*"`"	StringToken
+
+[$A-Za-z_][A-Za-z0-9_]*	IdentToken
+
+%%

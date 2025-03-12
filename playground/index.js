@@ -356,6 +356,7 @@ const sampleList = [
 	["Treelang parser", "treelang.g", "test.treelang", "ace/mode/c_cpp"],
 	["Typedmoon parser", "typedmoon.g", "test.typedmoon", "ace/mode/lua"],
 	["Typeling parser", "typeling.g", "test.typeling", "ace/mode/rust"],
+	["Typescript lexer", "typescript-dad.g", "test.typescript-dad", "ace/mode/typescript"],
 	["Unicc parser", "unicc.g", "test.unicc", "ace/mode/yaml"],
 	["Urweb parser (partially working)", "urweb.g", "test.urweb", "ace/mode/text"],
 	["Vitess SQL parser (be patient)(partially working)", "sql-vitess.g", "test.sql-vitess", "ace/mode/sql"],
