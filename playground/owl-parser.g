@@ -43,15 +43,10 @@ decls :
 	;
 
 decl :
-	rules
+	rule
 	| comment_token
 	| custom_token
 	| whitespace
-	;
-
-rules :
-	rule
-	| rules rule
 	;
 
 rule :
