@@ -8,12 +8,12 @@
 %token upperId
 %token atLowerId
 
-%left "implies"
-%left "and"
+%nonassoc "implies"
 %left "or"
+%left "and"
+%left '=' "!=" '<' '>' "<=" ">="
 %left "not"
 %left "instanceof"
-%left '=' "!=" '<' '>' "<=" ">="
 %left "in"
 %left '+' '-'
 %left '*' '/' '%'
