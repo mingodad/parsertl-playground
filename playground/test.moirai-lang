@@ -1,0 +1,70 @@
+script my.library
+
+record R(val x: Int, val l: List<Int, 5>)
+
+def f(r: R): Int {
+    mutable res = 0
+    for(r.l) {
+        res = res + (r.x * it)
+    }
+    res
+}
+
+plugin def simplePlugin {
+    signature (Int, Int) -> Int
+    cost Sum(5, 5)
+}
+
+def f(x: Int): Option<Int> {
+    Some(x)
+}
+
+val o = f(13)
+match(x in o) {
+    case Some { 10 }
+    case None { 5 }
+    case None { 6 }
+}
+
+val x = MutableList<Int, 10>(1, 2, 3, 4, 5)
+x[1] = 9
+val y = x.toList()
+val d = Dictionary(1 to 2, 3 to 4, 5 to 6)
+val m = MutableDictionary<Int, Int, 50>(1 to 2, 3 to 4, 5 to 6)
+m[1] = 3
+
+val list = List(4, 7, 2, 1, 9, 8)
+mutable max = 0
+for(item in list) {
+    if(item > max) {
+        max = item
+    }
+}
+
+def f(x: Int, y: Int): Int {
+    x + y
+}
+
+f(1, 2)
+
+def second<T>(x: T, y: T): T {
+    y
+}
+
+second<Int>(1, 2)
+
+def f(g: (Int, Int) -> Int, x: Int, y: Int): Int {
+    g(x + y, x - y)
+}
+
+def h(x: Int, y: Int): Int {
+    x * y
+}
+
+val x = 2
+val y = 3
+val z = if(y > x) {
+    7
+} else {
+    8
+}
