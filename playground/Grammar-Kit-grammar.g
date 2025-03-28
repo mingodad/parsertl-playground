@@ -44,6 +44,7 @@ grammar:
 grammar_element:
 	  attrs
 	| rule
+	| grammar_element attrs
 	| grammar_element rule
 	;
 
