@@ -23,6 +23,16 @@
 %token RIGHT_PAREN
 %token SEMICOLON
 
+%token TK_external
+%token TK_fake
+%token TK_inner
+%token TK_left
+%token TK_meta
+%token TK_private
+%token TK_upper
+
+%fallback id TK_left
+
 %token RULE_NAME
 
 %%
@@ -61,13 +71,13 @@ modifier_zom:
 	;
 
 modifier:
-	  "private"
-	| "external"
-	| "meta"
-	| "inner"
-	| "left"
-	| "upper"
-	| "fake"
+	  TK_private
+	| TK_external
+	| TK_meta
+	| TK_inner
+	| TK_left
+	| TK_upper
+	| TK_fake
 	;
 
 attrs:
@@ -241,13 +251,13 @@ OP_IS   "::="
 "?"	OP_OPT
 "["	LEFT_BRACKET
 "]"	RIGHT_BRACKET
-"external"	"external"
-"fake"	"fake"
-"inner"	"inner"
-"left"	"left"
-"meta"	"meta"
-"private"	"private"
-"upper"	"upper"
+"external"	TK_external
+"fake"	TK_fake
+"inner"	TK_inner
+"left"	TK_left
+"meta"	TK_meta
+"private"	TK_private
+"upper"	TK_upper
 "{"	LEFT_BRACE
 "|"	OP_OR
 "}"	RIGHT_BRACE
