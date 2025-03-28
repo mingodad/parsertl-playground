@@ -168,6 +168,7 @@ const sampleList = [
 	["Go lexer (partially working)", "go-lexer.g", "test.go", "ace/mode/golang"],
 	["Goyacc-cznic parser", "goyacc-cznic.g", "test.goyacc-cznic", "ace/mode/yaml"],
 	["Grain-lang parser (partially working)", "grain-lang.g", "test.grain-lang", "ace/mode/text"],
+	["Grammar-Kit parser", "Grammar-Kit-grammar.g", "test.Grammar-Kit-grammar", "ace/mode/yaml"],
 	["GramGrep parser", "gram_grep.g", "calculator.g", "ace/mode/yaml"],
 	["Graphql parser", "libgraphql.g", "test.libgraphql", "ace/mode/yaml"],
 	["Gringo-Clingo parser non grounding (partially working)", "gringo-ngp.g", "test.gringo-ngp", "ace/mode/text"],
