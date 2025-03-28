@@ -253,8 +253,8 @@ OP_IS   "::="
 "}"	RIGHT_BRACE
 
 \d+	number
-'(\\.|[^'\r\n\\])+'	string
-\"(\\.|[^"\r\n\\])+\"	string
+'(\\.|[^'\r\n\\])*'	string
+\"(\\.|[^"\r\n\\])*\"	string
 //parseGrammar	parseGrammar
 
 {ID}\s*{OP_IS}<RULE_NAME>    reject()
