@@ -297,6 +297,7 @@ const sampleList = [
 	["Peg2 parser (partially working)", "peg2.g", "test.peg", "ace/mode/yaml"],
 	["Peggy parser", "peggy-eaburns.g", "test.peggy-eaburns", "ace/mode/yaml"],
 	["Pegjs parser", "pegjs.g", "test.pegjs", "ace/mode/yaml"],
+	["Peglib (cpp-peglib) parser", "cpp-peglib.g", "test.cpp-peglib", "ace/mode/yaml"],
 	["Pest peg parser", "pest-peg.g", "test.pest-peg", "ace/mode/yaml"],
 	["PHP-8.2 parser (partially working)", "php-8.2.g", "test.php", "ace/mode/php"],
 	["Pikchr parser", "pikchr.g", "test.pikchr", "ace/mode/text"],
