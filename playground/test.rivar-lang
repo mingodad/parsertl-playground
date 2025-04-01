@@ -1,0 +1,45 @@
+class ACCOUNT
+
+feature
+    balance: INTEGER
+
+    deposit(amount: INTEGER)
+        require amount > 0
+        do
+            this->balance = this->balance + amount
+        ensure
+            this->balance == old this->balance + amount
+        end
+
+    withdraw(amount: INTEGER): BOOLEAN
+        require this->balance >= amount
+        do
+            this->balance = this->balance - amount
+            return true
+        ensure
+            this->balance == old this->balance - amount
+        end
+end
+
+class GREETER
+
+feature
+    name: STRING
+
+    set_name(new_name: STRING)
+        require new_name != ""
+        do
+            this->name = new_name
+        ensure
+            this->name != old this->name
+        end
+
+    greet()
+        require this->name != ""
+        do
+            print(this->name)
+        ensure
+            result == true
+        end
+
+end
