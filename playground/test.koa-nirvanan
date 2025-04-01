@@ -1,0 +1,18 @@
+/*
+*
+* Original Javascript version by David Hedbor(http://www.bagley.org/~doug/shootout/)
+*
+*/
+
+int fib(int n)
+{
+    if (n < 2) return 1;
+    return fib(n-2) + fib(n-1);
+}
+
+int main()
+{
+    int result = fib(32);
+    print(result);
+    return 0;
+}

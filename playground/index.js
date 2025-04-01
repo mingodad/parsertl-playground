@@ -207,6 +207,7 @@ const sampleList = [
 	["Kinx parser (partially working)", "kinx.g", "test.kinx", "ace/mode/c_cpp"],
 	["Kitlang parser (partially working)", "kitlang-ghc.g", "test.kitlang-ghc", "ace/mode/c_cpp"],
 	["Koka-lang parser (partially working)", "koka-lang.g", "test.koka-lang", "ace/mode/text"],
+	["Koa-lang parser", "koa-nirvanan.g", "test.koa-nirvanan", "ace/mode/c_cpp"],
 	["Kotlin lexer (partially working)", "kotlin-lexer.g", "test.kotlin", "ace/mode/kotlin"],
 	["LALR parser", "lalr.g", "test.lalr", "ace/mode/yaml"],
 	["Langcc parser (partially working)", "langcc-meta.g", "test.langcc-meta", "ace/mode/yaml"],
