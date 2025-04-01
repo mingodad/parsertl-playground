@@ -338,6 +338,7 @@ const sampleList = [
 	["SC-im spreadsheet parser", "sc-im.g", "test.sc-im", "ace/mode/text"],
 	["SDCC C parser (partially working)", "sdcc.g", "test.c", "ace/mode/c_cpp"],
 	["SLK parser", "slk-parser.g", "test.slk-parser", "ace/mode/yaml"],
+	["Smalltalk parser", "smalltalk-shikantaza.g", "test.smalltalk", "ace/mode/text"],
 	["SMLSharp parser", "smlsharp-iml.g", "test.smlsharp-iml", "ace/mode/ocaml"],
 	["Souffle parser", "souffle.g", "test.souffle", "ace/mode/prolog"],
 	["SQLite3 PIPES modified parser (partially working)", "sqlite3-pipe-dad.g", "test.sqlite3-pipe-dad", "ace/mode/sql"],
