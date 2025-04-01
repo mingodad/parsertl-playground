@@ -31,6 +31,14 @@ type-specifier:
 	"bool"
 	| "char"
 	| "int"
+	| "int8"
+	| "uint8"
+	| "int16"
+	| "uint16"
+	| "int32"
+	| "uint32"
+	| "int64"
+	| "uint64"
 	| "long"
 	| "float"
 	| "double"
@@ -40,6 +48,7 @@ type-specifier:
 	| "func"
 	| "struct" identifier
 	| "union" identifier
+	| "void"
 	;
 
 struct-specifier:
@@ -407,11 +416,20 @@ try-statement:
 "float"	"float"
 "func"	"func"
 "int"	"int"
+"int8"	"int8"
+"uint8"	"uint8"
+"int16"	"int16"
+"uint16"	"uint16"
+"int32"	"int32"
+"uint32"	"uint32"
+"int64"	"int64"
+"uint64"	"uint64"
 "long"	"long"
 "str"	"str"
 "struct"	"struct"
 "union"	"union"
 "vec"	"vec"
+"void"	"void"
 
 [0-9]+	constant
 [0-9]+"."[0-9]+	constant
