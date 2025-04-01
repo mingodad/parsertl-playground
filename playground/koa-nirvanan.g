@@ -431,6 +431,9 @@ try-statement:
 "vec"	"vec"
 "void"	"void"
 
+"null"	constant
+"true"	constant
+"false"	constant
 [0-9]+	constant
 [0-9]+"."[0-9]+	constant
 
