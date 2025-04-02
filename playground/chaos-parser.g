@@ -206,7 +206,7 @@ alias_expr :
 
 alias_expr_list :
 	alias_expr
-	| alias_expr T_COMMA alias_expr_list
+	| alias_expr_list T_COMMA alias_expr
 	;
 
 index_expr :
@@ -215,8 +215,8 @@ index_expr :
 
 expr_list :
 	expr
-	| expr T_COMMA expr_list
-	| expr T_COMMA T_NEWLINE expr_list
+	| expr_list T_COMMA expr
+	| expr_list T_COMMA T_NEWLINE expr
 	;
 
 key_value_expr :
@@ -225,8 +225,8 @@ key_value_expr :
 
 key_value_list :
 	key_value_expr
-	| key_value_expr T_COMMA key_value_list
-	| key_value_expr T_COMMA T_NEWLINE key_value_list
+	| key_value_list T_COMMA key_value_expr
+	| key_value_list T_COMMA T_NEWLINE key_value_expr
 	;
 
 composite_lit :
@@ -266,11 +266,16 @@ default_expr :
 	| T_DEFAULT T_COLON break_stmt
 	;
 
-decision_expr_list :
+decision_expr0_list :
 	decision_expr
-	| default_expr
-	| decision_expr T_COMMA decision_expr_list
-	| decision_expr T_COMMA T_NEWLINE decision_expr_list
+	| decision_expr0_list T_COMMA decision_expr
+	| decision_expr0_list T_COMMA T_NEWLINE decision_expr
+	;
+
+decision_expr_list :
+	decision_expr0_list
+	| decision_expr0_list T_COMMA default_expr
+	| decision_expr0_list T_COMMA T_NEWLINE default_expr
 	;
 
 stmt :
@@ -286,10 +291,9 @@ stmt :
 	;
 
 stmt_list :
-	stmt
-	//| /*empty*/
-	| stmt stmt_list
-	| T_NEWLINE stmt_list
+	/*empty*/
+	| stmt_list stmt
+	| stmt_list T_NEWLINE
 	;
 
 assign_stmt :
@@ -404,14 +408,14 @@ import :
 
 module_selector :
 	ident
-	| ident T_PERIOD module_selector
-	| ident T_QUO /*2L*/ module_selector
-	| ident T_BACKSLASH module_selector
+	| module_selector T_PERIOD ident
+	| module_selector T_QUO /*2L*/ ident
+	| module_selector T_BACKSLASH ident
 	| parent_dir_spec
-	| parent_dir_spec T_PERIOD module_selector
-	| parent_dir_spec T_QUO /*2L*/ module_selector
-	| parent_dir_spec T_BACKSLASH module_selector
-	| parent_dir_spec module_selector
+	| module_selector T_PERIOD parent_dir_spec
+	| module_selector T_QUO /*2L*/ parent_dir_spec
+	| module_selector T_BACKSLASH parent_dir_spec
+	| module_selector parent_dir_spec
 	;
 
 parent_dir_spec :
@@ -440,8 +444,8 @@ field_list_spec :
 
 optional_field_list_spec :
 	optional_field_spec
-	| optional_field_spec T_COMMA optional_field_list_spec
-	| optional_field_spec T_COMMA T_NEWLINE optional_field_list_spec
+	| optional_field_list_spec T_COMMA optional_field_spec
+	| optional_field_list_spec T_COMMA T_NEWLINE optional_field_spec
 	;
 
 func_type :
