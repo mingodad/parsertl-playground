@@ -64,31 +64,10 @@
 %token PIPE
 %token PLACEHOLDER
 %token PIPEBIND
-%token '?'
-%token '~'
-%token '+'
-%token '-'
-%token '*'
-%token '/'
 %token SPECIAL
-%token ':'
-%token UMINUS
-%token UPLUS
-%token '^'
-%token '$'
-%token '@'
-%token '('
-%token '['
 %token NL
-%token ';'
-%token '{'
-%token '}'
-%token ')'
-%token '!'
-%token '\\'
-%token ']'
-%token ','
 
+%precedence SHIFT_HERE
 %left /*1*/ '?'
 %left /*2*/ FOR WHILE REPEAT LOW
 %right /*3*/ IF
@@ -99,14 +78,14 @@
 %left /*8*/ '~' TILDE
 %left /*9*/ OR OR2
 %left /*10*/ AND AND2
-%left /*11*/ UNOT NOT
+%left /*11*/ UNOT //NOT
 %nonassoc /*12*/ GT GE LT LE EQ NE
 %left /*13*/ '+' '-'
 %left /*14*/ '*' '/'
 %left /*15*/ PIPE SPECIAL
 %left /*16*/ PIPEBIND
 %left /*17*/ ':'
-%left /*18*/ UMINUS UPLUS
+%left /*18*/ UMINUS //UPLUS
 %right /*19*/ '^'
 %left /*20*/ '$' '@'
 %left /*21*/ NS_GET NS_GET_INT
@@ -123,13 +102,18 @@ prog :
 
 command :
 	NL
-	| expr_or_assign_or_help NL
-	| expr_or_assign_or_help ';'
+	| expr_or_assign_or_help command_sep
 	//| error
     ;
 
+command_sep :
+    NL
+    | ';'
+    ;
+
 expr_or_assign_or_help :
-	expr
+	//to fix/suppress shift/reduce conflicts in favor of shift the default behavior
+	expr %prec SHIFT_HERE
 	| expr_or_assign_or_help EQ_ASSIGN /*6R*/ expr_or_assign_or_help
 	| expr_or_assign_or_help '?' /*1L*/ expr_or_assign_or_help
 	;
@@ -215,10 +199,8 @@ forcond :
 exprlist :
 	/*empty*/
 	| expr_or_assign_or_help
-	| exprlist ';' expr_or_assign_or_help
-	| exprlist ';'
-	| exprlist NL expr_or_assign_or_help
-	| exprlist NL
+	| exprlist command_sep expr_or_assign_or_help
+	| exprlist command_sep
 	;
 
 sublist :
