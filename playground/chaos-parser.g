@@ -48,6 +48,7 @@
 %token T_RBRACE
 %token T_COMMA
 %token T_PERIOD
+%token T_DOTDOT
 %token T_COLON
 %token T_ARROW
 %token T_NEWLINE
@@ -286,7 +287,7 @@ stmt :
 
 stmt_list :
 	stmt
-	| /*empty*/
+	//| /*empty*/
 	| stmt stmt_list
 	| T_NEWLINE stmt_list
 	;
@@ -414,7 +415,7 @@ module_selector :
 	;
 
 parent_dir_spec :
-	T_PERIOD T_PERIOD
+	T_DOTDOT
 	;
 
 asterisk_spec :
@@ -479,6 +480,7 @@ decision_block :
 "}"                             T_RBRACE
 ","                             T_COMMA
 "."                             T_PERIOD
+".."                            T_DOTDOT
 "=="                            T_EQL
 "!="                            T_NEQ
 ">"                             T_GTR
