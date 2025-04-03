@@ -280,6 +280,7 @@ const sampleList = [
 	["Octave parser (partially working)", "oct-parse.g", "test.oct-parse", "ace/mode/matlab"],
 	["OctoSQL parser (partially working)", "OctoSQL-parser.g", "test.OctoSQL-parser", "ace/mode/sql"],
 	["Openddl parser", "openddl-spec.g", "test.openddl-spec", "ace/mode/text"],
+	["OpenModelica parser", "open-modelica.g", "test.open-modelica", "ace/mode/text"],
 	["Openscad parser (partially working)", "openscad.g", "test.openscad", "ace/mode/text"],
 	["OpenShadingLanguage parser (partially working)", "OpenShadingLanguage.g", "test.OpenShadingLanguage", "ace/mode/c_cpp"],
 	["OpenUSD parser", "openUSD-textFileFormat.g", "test.openUSD-textFileFormat", "ace/mode/c_cpp"],
