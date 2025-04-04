@@ -3,7 +3,8 @@
 %token BOM
 %token IDENT
 %token STRING
-%token UNSIGNED_NUMBER
+%token UNSIGNED_INTEGER
+%token UNSIGNED_REAL
 
 %%
 
@@ -396,12 +397,12 @@ short_class_definition:
 	;
 
 equation_section:
-	  initial_opt "equation" equation_semi_zom
+	  initial_opt "equation" equation_semi_oom
 	;
 
-equation_semi_zom:
-	  %empty
-	| equation_semi_zom equation ';'
+equation_semi_oom:
+	  equation ';'
+	| equation_semi_oom equation ';'
 	;
 
 initial_opt:
@@ -410,12 +411,12 @@ initial_opt:
 	;
 
 algorithm_section:
-	  initial_opt "algorithm" statement_semi_zom
+	  initial_opt "algorithm" statement_semi_oom
 	;
 
-statement_semi_zom:
-	  %empty
-	| statement_semi_zom statement ';'
+statement_semi_oom:
+	  statement ';'
+	| statement_semi_oom statement ';'
 	;
 
 equation:
@@ -447,39 +448,39 @@ statement_kind:
 	;
 
 if_equation:
-	  "if" expression "then" equation_semi_zom elseif_equation_zom else_equation_opt "end" "if"
+	  "if" expression "then" equation_semi_oom elseif_equation_zom else_equation_opt "end" "if"
 	;
 
 else_equation_opt:
 	  %empty
-	| "else" equation_semi_zom
+	| "else" equation_semi_oom
 	;
 
 elseif_equation_zom:
 	  %empty
-	| elseif_equation_zom "elseif" expression "then" equation_semi_zom
+	| elseif_equation_zom "elseif" expression "then" equation_semi_oom
 	;
 
 if_statement:
-	  "if" expression "then" statement_semi_zom elseif_statement_zom else_statement_opt "end" "if"
+	  "if" expression "then" statement_semi_oom elseif_statement_zom else_statement_opt "end" "if"
 	;
 
 else_statement_opt:
 	  %empty
-	| "else" statement_semi_zom
+	| "else" statement_semi_oom
 	;
 
 elseif_statement_zom:
 	  %empty
-	| elseif_statement_zom "elseif" expression "then" statement_semi_zom
+	| elseif_statement_zom "elseif" expression "then" statement_semi_oom
 	;
 
 for_equation:
-	  "for" for_indices "loop" equation_semi_zom "end" "for"
+	  "for" for_indices "loop" equation_semi_oom "end" "for"
 	;
 
 for_statement:
-	  "for" for_indices "loop" statement_semi_zom "end" "for"
+	  "for" for_indices "loop" statement_semi_oom "end" "for"
 	;
 
 for_indices:
@@ -493,25 +494,25 @@ for_index:
 	;
 
 while_statement:
-	  "while" expression "loop" statement_semi_zom "end" "while"
+	  "while" expression "loop" statement_semi_oom "end" "while"
 	;
 
 when_equation:
-	  "when" expression "then" equation_semi_zom elsewhen_equation_zom "end" "when"
+	  "when" expression "then" equation_semi_oom elsewhen_equation_zom "end" "when"
 	;
 
 elsewhen_equation_zom:
 	  %empty
-	| elsewhen_equation_zom "elsewhen" expression "then" equation_semi_zom
+	| elsewhen_equation_zom "elsewhen" expression "then" equation_semi_oom
 	;
 
 when_statement:
-	  "when" expression "then" statement_semi_zom elsewhen_statement_zom "end" "when"
+	  "when" expression "then" statement_semi_oom elsewhen_statement_zom "end" "when"
 	;
 
 elsewhen_statement_zom:
 	  %empty
-	| elsewhen_statement_zom "elsewhen" expression "then" statement_semi_zom
+	| elsewhen_statement_zom "elsewhen" expression "then" statement_semi_oom
 	;
 
 connect_clause:
@@ -520,22 +521,22 @@ connect_clause:
 
 expression:
 	  simple_expression
-	| "if" expression "then" expression elseif_elseif_zom "else" expression
+	| "if" expression "then" expression elseif_expression_zom "else" expression
 	;
 
-elseif_elseif_zom:
+elseif_expression_zom:
 	  %empty
-	| elseif_elseif_zom "elseif" expression "then" expression
+	| elseif_expression_zom "elseif" expression "then" expression
 	;
 
 simple_expression:
-	  logical_expression
-	| logical_expression ':' logical_expression semi_logical_expression_zom
+	  logical_expression semi_logical_expression_opt
 	;
 
-semi_logical_expression_zom:
+semi_logical_expression_opt:
 	  %empty
 	| ':' logical_expression
+	| ':' logical_expression ':' logical_expression
 	;
 
 logical_expression:
@@ -568,13 +569,9 @@ relational_operator:
 	;
 
 arithmetic_expression:
-	  term add_operator_term_zom
-	| add_operator term add_operator_term_zom
-	;
-
-add_operator_term_zom:
-	  %empty
-	| add_operator_term_zom add_operator term
+	  term
+	| add_operator term
+	| arithmetic_expression add_operator term
 	;
 
 add_operator:
@@ -631,6 +628,11 @@ function_call_args_kind:
 	| "pure"
 	;
 
+UNSIGNED_NUMBER:
+	  UNSIGNED_INTEGER
+	| UNSIGNED_REAL
+	;
+
 type_specifier:
 	  name
 	| '.' name
@@ -661,7 +663,7 @@ function_arguments_opt:
 	;
 
 function_arguments:
-      expression
+	  expression
 	| expression ',' function_arguments_non_first
 	| expression "for" for_indices
 	| function_partial_application comma_function_arguments_non_first_opt
@@ -769,6 +771,7 @@ annotation_comment:
 
 DIGIT	[0-9]
 EXPONENT	[eE][+-]?{DIGIT}+
+UNSIGNED_INTEGER	{DIGIT}+
 
 %%
 
@@ -866,7 +869,11 @@ EXPONENT	[eE][+-]?{DIGIT}+
 "}"	'}'
 
 \"(\\.|[^"\\])*\"	STRING
-{DIGIT}+("."{DIGIT}*)?{EXPONENT}?	UNSIGNED_NUMBER
+{UNSIGNED_INTEGER}	UNSIGNED_INTEGER
+{UNSIGNED_INTEGER}"."{UNSIGNED_INTEGER}?	UNSIGNED_REAL
+{UNSIGNED_INTEGER}("."{UNSIGNED_INTEGER}?)?{EXPONENT}	UNSIGNED_REAL
+"."{UNSIGNED_INTEGER}{EXPONENT}?	UNSIGNED_REAL
+
 '(\\.|[^'\r\n\\])+'	IDENT
 [A-Za-z_][A-Za-z0-9_]*	IDENT
 
