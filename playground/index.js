@@ -318,6 +318,7 @@ const sampleList = [
 	["Polyglot parser", "ppg_parser.g", "test.ppg_parser", "ace/mode/text"],
 	["Postgresql parser (be patient)", "postgres16.g", "test.sql", "ace/mode/sql"],
 	["Postgresql parser with fallback", "postgres16-fallback.g", "test.sql", "ace/mode/sql"],
+	["Preprocessor (concon) parser", "cpp-concom.g", "test.cpp-concom", "ace/mode/c_cpp"],
 	["Preprocessor parser (not working)", "pp.g", "test.pp", "ace/mode/c_cpp"],
 	["Prolog0 parser", "prolog-parser0.g", "test.prolog-parser0", "ace/mode/text"],
 	["Prolog1 parser", "prolog-parser1.g", "test.prolog-parser1", "ace/mode/text"],

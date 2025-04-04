@@ -1,0 +1,26 @@
+#define		MAXNESTING		128
+#define	YYSTYPE			char_ptr
+#ifdef	DEBUG
+#define	YYDEBUG	1
+#define	ERR	DBG0
+#else
+#define	YYDEBUG	0
+//#define	ERR(x)	{ err x; }
+#endif
+#define	printf	err
+
+//#define	ISFALSE(x) ((x==0) || (x[0]=='\0') || ((x[0]=='0') && (x[1]=='\0')))
+
+#ifndef	IGNOREENV
+
+#ifdef	IGNORECOMMENT
+//static	void			ignore_comment ();
+#endif
+#ifdef	IGNORECASE
+//static	int			compare ();
+#else
+#define				compare		strcmp
+#endif
+
+#ifdef	IGNORECOMMENT
+#endif	/*IGNORECOMMENT*/
