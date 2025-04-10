@@ -280,6 +280,7 @@ const sampleList = [
 	["Ocaml parser from rescript (partially working)", "rescript-ocaml-parser.g", "test.ocaml", "ace/mode/ocaml"],
 	["Octave parser (partially working)", "oct-parse.g", "test.oct-parse", "ace/mode/matlab"],
 	["OctoSQL parser (partially working)", "OctoSQL-parser.g", "test.OctoSQL-parser", "ace/mode/sql"],
+	["Ohm-js parser (partially working)", "ohm-js.g", "test.ohm-js", "ace/mode/text"],
 	["Openddl parser", "openddl-spec.g", "test.openddl-spec", "ace/mode/text"],
 	["OpenModelica parser", "open-modelica.g", "test.open-modelica", "ace/mode/text"],
 	["Openscad parser (partially working)", "openscad.g", "test.openscad", "ace/mode/text"],
