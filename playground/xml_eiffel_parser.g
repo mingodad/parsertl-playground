@@ -793,6 +793,7 @@ public_id :
 
 APOS [']
 QUOT ["]
+LINE_CONT "\\\n"
 SPACECHAR [\r\n\t ]
 
 NOSPASCIICHAR [\x21-\x7F]
@@ -815,10 +816,12 @@ UTF8CHAR (([\xC2-\xDF][\x80-\xBF])|(\xE0[\xA0-\xBF][\x80-\xBF])|([\xE1-\xEF][\x8
 
 XMLENCODING [a-zA-Z0-9\x2D]+
 
-CONTENTCHARASCII [\x21-\x25\x27-\x3B\x3D-\X5C\x5E-\x7F]
+//CONTENTCHARASCII [\x21-\x25\x27-\x3B\x3D-\X5C\x5E-\x7F\\\[\]]
+CONTENTCHARASCII [^&< \t\r\n]
 //-- = NOSPASCIICHAR less &<]
 
-PIASCIICHAR [\x21-\x3E\x40-\x7F]
+//PIASCIICHAR [\x21-\x3E\x40-\x7F]
+PIASCIICHAR [^ \t\r\n?]
 //-- = NOSPASCIICHAR less "?" = \x3F
 
 CDATAASCIICHAR [\t\x20-\x5C\x5E-\x7F]
@@ -827,10 +830,12 @@ CDATAASCIICHAR [\t\x20-\x5C\x5E-\x7F]
 COMMENTASCIICHAR [\x20-\x2C\x2E-\x7F]
 //-- = NOSPASCIICHAR less -, " "
 
-ATTRIBUTECHAR [\x21\x23-\x25\x28-\x3B\x3D-\x7F]
+//ATTRIBUTECHAR [\x21\x23-\x25\x28-\x3B\x3D-\x7F]
+ATTRIBUTECHAR [^ \t\r\n"&'<]
 //-- = NOSPASCIICHAR less " & ' <
 
-ENTITYCHAR [\x21\x23\x24\x28-\x7F]
+//ENTITYCHAR [\x21\x23\x24\x28-\x7F]
+ENTITYCHAR [^ \t\r\n"%&']
 //-- = NOSPASCIICHAR less " % & '
 
 NAMECHAR [:A-Za-z0-9._\-]
@@ -1193,12 +1198,15 @@ xDOCTYPE_NAMEx	DOCTYPE_NAME
 //-- XML1.0:14 ]]> not allowed in markup.
 "]]>" CONTENT_CONDITIONAL_END
 
+//-- Line continuation
+"\\\n"  SPACE
+
 //-- End of line handling XML1.0:2.11.
-\r\n SPACE
+"\r\n" SPACE
 
-\r SPACE
+[\r] SPACE
 
-\n SPACE
+[\n] SPACE
 
 //-- Space not matched by newline normalization.
 [ \t]+ SPACE
