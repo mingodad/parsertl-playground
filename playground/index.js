@@ -338,6 +338,7 @@ const sampleList = [
 	["Rell-lang parser (partially working)", "rell-lang.g", "test.rell-lang", "ace/mode/text"],
 	["Rivar-lang parser", "rivar-lang.g", "test.rivar-lang", "ace/mode/text"],
 	["Ruby parser (not working)", "ruby-0bced53a.g", "test.ruby", "ace/mode/ruby"],
+	["Rulekit parser", "rulekit-qpoint.g", "test.rulekit-qpoint", "ace/mode/text"],
 	["Rune parser", "rune-deparse.g", "test.rune-deparse", "ace/mode/text"],
 	["Rust parser", "rust.g", "test.rs.txt", "ace/mode/rust"], /*github send ext '.rs' as application/rls-services+xml */
 	["SableCC parser", "sablecc3x.g", "test.sablecc3x", "ace/mode/text"],

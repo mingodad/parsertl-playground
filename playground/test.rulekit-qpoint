@@ -1,0 +1,5 @@
+--domain matches /example\.com$/ and port == 8080
+ip in [192.168.1.0/24] and method == "POST"
+--status_code >= 400 and status_code < 500
+--user_agent contains "Mozilla" and not path matches /\.(jpg|png|gif)$/
+--request_count > 100 and response_time > 500
