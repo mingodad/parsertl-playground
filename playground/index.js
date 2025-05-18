@@ -335,6 +335,7 @@ const sampleList = [
 	["ReasonML parser (partially working)", "reason_parser.g", "test.reason", "ace/mode/javascript"],
 	["R parser (partially working)", "r-parser.g", "test.r-parser", "ace/mode/r"],
 	["Re2c parser (partially working)", "re2c.g", "test.re2c", "ace/mode/text"],
+	["RE-flex parser (partially working)", "re-flex.g", "test.re-flex", "ace/mode/text"],
 	["Rell-lang parser (partially working)", "rell-lang.g", "test.rell-lang", "ace/mode/text"],
 	["Rivar-lang parser", "rivar-lang.g", "test.rivar-lang", "ace/mode/text"],
 	["Ruby parser (not working)", "ruby-0bced53a.g", "test.ruby", "ace/mode/ruby"],
