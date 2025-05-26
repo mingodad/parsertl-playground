@@ -1,117 +1,187 @@
-//From: https://github.com/moonbitlang/moonyacc/blob/fd1930879f5ee8f9b8b134616992384d43460b0f/src/lib/parser/parser.mbty
+//From: https://github.com/moonbitlang/moonyacc/blob/3c101b087254bac23fb747d04342a5e955d10f3d/src/lib/parser/parser.mbty
 
-%token ARROW_CODE
 %token IDENT
 %token LANGLE_CODE_RANGLE
 %token LBRACE_CODE_RBRACE
 %token PERCENT_LBRACE_CODE_PERCENT_RBRACE
-//%token PERCENT_PERCENT_CODE_EOF
+%token PKG_AND_IDENT
 %token STRING
 
 %%
 
 spec
-    : header decl_list "%%" rule_list trailer //EOF
-    ;
-
-header
-    : PERCENT_LBRACE_CODE_PERCENT_RBRACE
-    | %empty
-    ;
-
-trailer
-    : PERCENT_LBRACE_CODE_PERCENT_RBRACE
-    | "%%" //PERCENT_PERCENT_CODE_EOF
-    | %empty
-    ;
+  : decl_list "%%" rule_list trailer //EOF
+  ;
 
 decl_list
-    : decl_list decl
-    | %empty
-    ;
+  : decl_list decl
+  | %empty
+  ;
 
 decl
-    : "%start" nonempty_symbol_list
-    | "%token" opt_type nonempty_symbol_list
-    | "%token" opt_type symbol STRING
-    | "%type" LANGLE_CODE_RANGLE nonempty_symbol_list
-    | "%position" LANGLE_CODE_RANGLE
-    | "%left" nonempty_symbol_list
-    | "%right" nonempty_symbol_list
-    | "%nonassoc" nonempty_symbol_list
-    | "%derive" LANGLE_CODE_RANGLE IDENT
-    ;
-
-opt_type
-    : LANGLE_CODE_RANGLE
-    | %empty
-    ;
+  : PERCENT_LBRACE_CODE_PERCENT_RBRACE
+  | "%start" nonempty_symbol_list
+  | "%start" LANGLE_CODE_RANGLE nonempty_symbol_list
+  | "%token" nonempty_symbol_list
+  | "%token" LANGLE_CODE_RANGLE nonempty_symbol_list
+  | "%token" symbol STRING
+  | "%token" LANGLE_CODE_RANGLE symbol STRING
+  | "%type" LANGLE_CODE_RANGLE nonempty_symbol_list
+  | "%position" LANGLE_CODE_RANGLE
+  | "%left" nonempty_prec_symbol_list
+  | "%right" nonempty_prec_symbol_list
+  | "%nonassoc" nonempty_prec_symbol_list
+  | "%derive" LANGLE_CODE_RANGLE IDENT
+  ;
 
 rule_list
-    : rule
-    | rule_list rule
-    ;
+  : rule
+  | rule_list rule
+  ;
+
+trailer
+  : PERCENT_LBRACE_CODE_PERCENT_RBRACE
+  | "%%" //PERCENT_PERCENT_CODE_EOF
+  | %empty
+  ;
 
 rule
-    : rule_no_modifiers
-    | "%inline" rule_no_modifiers
-    ;
+  : rule_no_modifiers
+  | "%inline" rule_no_modifiers
+  ;
 
 rule_no_modifiers
-    : symbol rule_type ":" clause_list ";"
-    ;
+  : symbol opt_rule_return_type ':' clause_list ';'
+  | symbol opt_rule_generic_params '(' nonempty_rule_param_list ')' opt_rule_return_type ':' clause_list ';'
+  ;
 
-rule_type
-    : ARROW_CODE
-    | %empty
-    ;
+opt_rule_return_type
+  : "->" type_expr
+  | %empty
+  ;
+
+nonempty_rule_param_list
+  : IDENT
+  | IDENT ':' type_expr
+  | IDENT ',' nonempty_rule_param_list
+  | IDENT ':' type_expr ',' nonempty_rule_param_list
+  ;
+
+opt_rule_generic_params
+  : %empty
+  | '[' nonempty_comma_ident_list ']'
+  ;
+
+nonempty_comma_ident_list
+  : IDENT
+  | nonempty_comma_ident_list ',' IDENT
+  ;
+
+type_expr
+  : postfix_type_expr
+  | '(' ')' "->" type_expr
+  | '(' type_expr ')' "->" type_expr
+  | '(' type_expr ',' ')' "->" type_expr
+  | '(' type_expr ',' nonempty_type_expr_list ')' "->" type_expr
+  ;
+
+postfix_type_expr
+  : basic_type_expr
+  | postfix_type_expr '?'
+  ;
+
+basic_type_expr
+  : IDENT
+  | PKG_AND_IDENT
+  | IDENT '[' nonempty_type_expr_list ']'
+  | PKG_AND_IDENT '[' nonempty_type_expr_list ']'
+  | '(' type_expr ',' nonempty_type_expr_list ')'
+  | '(' type_expr ')'
+  ;
+
+nonempty_type_expr_list
+  : type_expr
+  | nonempty_type_expr_list ',' type_expr
+  ;
 
 clause_list
-    : clause
-    | clause_list "|" clause
-    ;
+  : '|' nonempty_clause_list
+  | nonempty_clause_list
+  ;
 
-clause
-    : item_list rule_prec clause_action
-    ;
+nonempty_clause_list
+  : clause_without_action clause_action
+  | nonempty_clause_list '|' clause_without_action clause_action
+  | nonempty_clause_list '|' nonempty_clause_without_action
+  ;
+
+clause_without_action
+  : empty_clause_without_action
+  | nonempty_clause_without_action
+  ;
+
+empty_clause_without_action
+  : rule_prec
+  ;
+
+nonempty_clause_without_action
+  : nonempty_item_list rule_prec
+  ;
 
 clause_action
-    : LBRACE_CODE_RBRACE
-    | %empty
-    ;
+  : LBRACE_CODE_RBRACE
+  ;
 
 rule_prec
-    : "%prec" symbol
-    | %empty
-    ;
+  : "%prec" prec_symbol
+  | %empty
+  ;
 
-item_list
-    : item_list item
-    | %empty
-    ;
+nonempty_item_list
+  : item
+  | nonempty_item_list item
+  ;
 
 item
-    : item_symbol
-    | IDENT "=" item_symbol
-    ;
+  : term
+  | IDENT '=' term
+  ;
 
-item_symbol
-    : symbol
-    | STRING
-    ;
+term
+  : symbol
+  | symbol '(' nonempty_comma_term_list ')'
+  | STRING
+  ;
+
+nonempty_comma_term_list
+  : term
+  | nonempty_comma_term_list ',' term
+  ;
 
 nonempty_symbol_list
-    : symbol
-    | nonempty_symbol_list symbol
-    ;
+  : symbol
+  | nonempty_symbol_list symbol
+  ;
+
+nonempty_prec_symbol_list
+  : prec_symbol
+  | nonempty_prec_symbol_list prec_symbol
+  ;
+
+prec_symbol
+  : symbol
+  | STRING
+  ;
 
 symbol
-    : IDENT
-    ;
+  : IDENT
+  ;
 
 %%
 
 %x ANGLE_CODE BRACE_CODE
+
+ident [A-Za-z_][A-Za-z0-9_]*
 
 %%
 
@@ -130,12 +200,18 @@ symbol
 "%start"	"%start"
 "%token"	"%token"
 "%type"	"%type"
-":"	":"
-";"	";"
-"="	"="
-"|"	"|"
+":"	':'
+";"	';'
+"="	'='
+"|"	'|'
+"("	'('
+")"	')'
+","	','
+"->"	"->"
+"?"	'?'
+"["	'['
+"]"	']'
 
-"->"\s*[^\s:]+	ARROW_CODE
 "<"<>ANGLE_CODE>
 <ANGLE_CODE>{
 	">"<<>	LANGLE_CODE_RANGLE
@@ -153,6 +229,7 @@ symbol
 
 \"(\\.|[^"\r\n\\])+\"	STRING
 
-[A-Za-z_][A-Za-z0-9_]*	IDENT
+"@"({ident}("/"{ident})*)"."{ident} PKG_AND_IDENT
+{ident}	IDENT
 
 %%
