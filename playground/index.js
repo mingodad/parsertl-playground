@@ -194,6 +194,7 @@ const sampleList = [
 	["Java-codinuum parser (partially working)", "java-parser-codinuum.g", "test.java", "ace/mode/java"],
 	["Java-semgrep parser (partially working)", "java-semgrep.g", "test.java", "ace/mode/java"],
 	["Javascript-database parser", "javascript-database-js.g", "test.js.txt", "ace/mode/javascript"],
+	["Javascript-jslang parser", "jslang.g", "test.js.txt", "ace/mode/javascript"],
 	["JavascriptCore parser", "javascript-core.g", "test.js.txt", "ace/mode/javascript"],
 	["Javascript-pff parser", "javascript-pff.g", "test.js-ts", "ace/mode/typescript"],
 	["Javascript-semgrep parser", "javascript-semgrep.g", "test.js-ts", "ace/mode/typescript"],
