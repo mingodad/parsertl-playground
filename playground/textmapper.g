@@ -1,4 +1,4 @@
-//From: https://github.com/inspirer/textmapper/blob/b52f6146454080ec6d66ba695f89d260c685d3df/parsers/tm/tm.y
+//From: https://github.com/inspirer/textmapper/blob/01184f907850c5ce59064117f2cb4a5c18c9575f/parsers/tm/textmapper.tm
 //for fn in `find textmapper -name '*.tm'`; do echo $fn:1:1; ./parsertl-playground textmapper3.g $fn; done
 /*Tokens*/
 %token OR
@@ -225,8 +225,9 @@ lexer_section :
 	;
 
 parser_section :
-	//COLONCOLON /*.recoveryScope*/ PARSER grammar_parts
+	//COLONCOLON .recoveryScope PARSER (LALR LPAREN lookahead=integer_literal RPAREN)? grammar_parts ;
 	PARSER_SECTION grammar_parts
+	| PARSER_SECTION LALR LPAREN integer_literal RPAREN grammar_parts
 	;
 
 import_ :
