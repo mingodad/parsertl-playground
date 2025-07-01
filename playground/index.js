@@ -136,6 +136,8 @@ const sampleList = [
 	["DMEngine parser", "dmengine-dm.g", "test.dmengine-dm", "ace/mode/sh"],
 	["Dparser (partially working)", "dparser.g", "test.dparser", "ace/mode/text"],
 	["Doby parser", "doby-jxwr.g", "test.doby-jxwr", "ace/mode/golang"],
+	["Doltgresql parser (partially working)(be patient)", "doltgresql.g", "test.doltgresql", "ace/mode/sql"],
+	["Doltgresql-fallback parser (partially working)", "doltgresql-fallback.g", "test.doltgresql", "ace/mode/sql"],
 	["Doxygen code scanner torture", "code-doxygen.g", "test.c", "ace/mode/c_cpp"],
 	["Dtu parser", "dtu.g", "test.dtu", "ace/mode/text"],
 	["DuckDB SQL parser (be patient)", "duckdb-pgsql.g", "test.duckdb", "ace/mode/sql"],
