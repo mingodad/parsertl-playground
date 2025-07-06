@@ -104,6 +104,7 @@ const sampleList = [
 	["CIL C parser old", "cil-cparser-origin.g", "test.c", "ace/mode/c_cpp"],
 	["CLanguage parser", "clanguage.g", "test.clanguage", "ace/mode/c_cpp"],
 	["CLaro-lang parser", "claro-lang.g", "test.claro-lang", "ace/mode/c_cpp"],
+	["Classp parser", "classp.g", "test.classp", "ace/mode/text"],
 	["CleverLang  parser", "clever-parser.g", "test.clever-parser", "ace/mode/c_cpp"],
 	["CocoR parser (partially working)", "cocor.g", "test.cocor", "ace/mode/yaml"],
 	["Codeql parser (partially working)", "codeql.g", "test.codeql", "ace/mode/java"],
