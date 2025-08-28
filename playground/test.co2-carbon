@@ -1,0 +1,134 @@
+/*
+ * carbon Compiler and programming language for libco2
+ *
+ * Copyright (C) 2011,2012 Peterpaul Taekele Klein Haneveld
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+include co2/HashMap
+include co2/RefObject
+include co2/IScope
+include co2/Error
+
+class Scope : RefObject, IScope {
+	ScopeType type;
+	Token name;
+	Scope parent;
+	HashMap map;
+
+	Scope (ScopeType type, Token name) {
+		super ();
+		self.type = type;
+		self.name = (Token) name?.retain ();
+		parent = current_scope;
+		map = new HashMap (1027);
+		current_scope = self;
+	}
+
+	~Scope () {
+		name?.release ();
+		// delete map; // TODO uncomment
+	}
+
+	IScope get_parent () {
+		return parent;
+	}
+
+	IScope set_parent (IScope parent_scope) {
+		return parent = parent_scope;
+	}
+
+	void _log (Token token, char *action) {
+		/*
+		if (type == global_scope_type) {
+			fprintf (stderr, "GLOBAL_SCOPE: %s.%s\t%s: %s\n", type.name.data, name ? name.name.data : null, action, token.name.data);
+		} else {
+			fprintf (stderr, "local scope: %s.%s\t%s: %s\n", type.name.data, name ? name.name.data : null, action, token.name.data);
+		}
+		*/
+	}
+
+	Declaration declare (Declaration decl) {
+		_log (decl.name, "declare");
+		if (map.get (decl.name.name) != null) {
+			error_already_declared (decl.name);
+		} else {
+			map.put (decl.name.name, decl);
+		}
+		decl.set_scope (self);
+		return decl;
+	}
+
+	void leave () {
+		current_scope = parent;
+	}
+
+	Declaration lookup_in_this_scope (Token token) {
+		_log (token, "lookup_in_this_scope");
+		map.get (token.name);
+	}
+
+	Declaration lookup (Token token) {
+		_log (token, "lookup");
+		Declaration result = lookup_in_this_scope (token);
+		if (!result) {
+			if (!parent) {
+				error_not_found (token);
+			} else {
+				result = parent.lookup (token);
+			}
+		}
+		return result;
+	}
+
+	Declaration find_type_in_this_scope (Token token, Class type) {
+		Declaration result = (Declaration) map.get (token.name);
+		if (result != null && result is_of type) {
+			return result;
+		}
+		return null;
+	}
+
+	Declaration find_type (Token token, Class type) {
+		Declaration result = find_type_in_this_scope (token, type);
+		if (!result && parent != null) {
+			result = parent.find_type (token, type);
+		}
+		return result;
+	}
+
+	Bool exists_in_this_scope (Token token) {
+		return map.get (token.name) != null;
+	}
+
+	Bool exists (Token token) {
+		Bool result = exists_in_this_scope (token);
+		if (result == false && parent != null) {
+			result = parent.exists (token);
+		}
+		return result;
+	}
+
+	void error_not_found (Token token) {
+		error (token, "'%s' not declared.\n", token.name.data);
+	}
+
+	void error_already_declared (Token token) {
+		error (token, "'%s' already declared.\n", token.name.data);
+	}
+
+	ScopeType get_type () {
+		return type;
+	}
+}
