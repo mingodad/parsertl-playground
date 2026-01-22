@@ -1,7 +1,7 @@
 //From: https://www.codeproject.com/articles/1089463/convert-ebnf-to-bnf-using-parsertl-lexertl
 //adapted to parse GGML for https://github.com/ggerganov/llama.cpp/tree/master/grammars
 
-%token NON_TERMINAL LHS TERMINAL CHARSET NEG_CHARSET RUSEP
+%token NON_TERMINAL LHS TERMINAL CHARSET NEG_CHARSET RUSEP NUM
 
 %%
 
@@ -45,6 +45,8 @@ rhs :
 	| rhs '?' #rhs_ooz
 	| rhs '*' #rhs_zom
 	| rhs '+' #rhs_oom
+	| rhs '{' NUM  ',' NUM '}' #rhs_min_max
+	| rhs '{' NUM  '}' #rhs_nrep
 	| '(' rhs_or ')'
 	;
 
@@ -68,6 +70,9 @@ INNER_CHRSET    (\\.|[^\]\n\r\\])+
 [)]	')'
 [|]	'|'
 [+]	'+'
+[{]	'{'
+[}]	'}'
+[,]	','
 
 "[^"{INNER_CHRSET}"]"    NEG_CHARSET
 //order in simportant NEG_CHARSET comes before CHARSET
@@ -81,6 +86,8 @@ INNER_CHRSET    (\\.|[^\]\n\r\\])+
 }
 
 ["](\\.|[^"\n\r\\])+["]	TERMINAL
+
+[0-9]+  NUM
 
 {NAME}	NON_TERMINAL
 
