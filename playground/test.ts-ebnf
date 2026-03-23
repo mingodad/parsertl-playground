@@ -1,0 +1,132 @@
+//
+// From src/grammar.json
+//
+// TS-EBNF
+//
+%name tebnf
+%extras {  r"\\s",  comment }
+%word identifier
+
+%%
+
+grammar :
+	 directive* "%%" rule* ( "%%" rule* )?
+	;
+
+directive :
+	 "%name" identifier
+	| "%extras" "{" expression_list? "}"
+	| "%externals" "{" expression_list? "}"
+	| "%precedences" "{" precedence_list? "}"
+	| "%inline" "{" identifier_list? "}"
+	| "%supertypes" "{" identifier_list? "}"
+	| "%word" identifier
+	| "%reserved" "{" reserved_body? "}"
+	| "%conflicts" "{" conflict_list? "}"
+	;
+
+reserved_body :
+	 expression_list
+	| wordset_list
+	;
+
+wordset_list :
+	 wordset ( "," wordset )* ","?
+	;
+
+wordset :
+	 identifier "{" expression_list? "}"
+	;
+
+rule :
+	 identifier ":" expression ";"
+	;
+
+expression :
+	 choice
+	;
+
+choice :
+	 sequence ( "|" sequence )*
+	;
+
+sequence :
+	 postfix+
+	;
+
+postfix :
+	 ( identifier "=" )? primary ( "*" | "+" | "?" | decorator )*
+	;
+
+decorator :
+	 "@as" "(" id_or_str ")"
+	| "@prec" "(" prec_arg ")"
+	| "@prec.left" "(" prec_arg? ")"
+	| "@prec.right" "(" prec_arg? ")"
+	| "@prec.dynamic" "(" prec_arg ")"
+	| "@token"
+	| "@token.immediate"
+	| "@immediate"
+	| "@reserved" "(" id_or_str ")"
+	;
+
+prec_arg :
+	 number
+	| string
+	;
+
+primary :
+	 identifier
+	| string
+	| regex
+	| "(" expression ")"
+	;
+
+expression_list :
+	 expression ( "," expression )* ","?
+	;
+
+precedence_list :
+	 precedence_group ( "," precedence_group )* ","?
+	;
+
+precedence_group :
+	 "(" ( id_or_str ( ","? id_or_str )* )? ")"
+	;
+
+conflict_list :
+	 conflict_group ( "," conflict_group )* ","?
+	;
+
+conflict_group :
+	 "(" identifier_list? ")"
+	;
+
+identifier_list :
+	 identifier ( "," identifier )* ","?
+	;
+
+id_or_str :
+	 identifier
+	| string
+	;
+
+identifier :
+	 r"[a-zA-Z_][a-zA-Z0-9_]*"
+	;
+
+string :
+	 r"('([^'\\\\]|\\\\.)*'|\"([^\"\\\\]|\\\\.)*\")i?"
+	;
+
+regex :
+	 r"(r'([^'\\\\]|\\\\.)*'|r\"([^\"\\\\]|\\\\.)*\")i?"
+	;
+
+number :
+	 r"-?\\d+"
+	;
+
+comment :
+	 r"//.*|/\\*([^*]|\\*[^/])*\\*/"
+	;

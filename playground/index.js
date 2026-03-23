@@ -382,6 +382,7 @@ const sampleList = [
 	["Tradofion SQL parser (be patient)(partially working)", "tradofion-sqlparser.g", "test.tradofion-sql", "ace/mode/sql"],
 	["Tradofion SQL parser fallback (be patient)(partially working)", "tradofion-sqlparser-fallback.g", "test.tradofion-sql", "ace/mode/sql"],
 	["Treelang parser", "treelang.g", "test.treelang", "ace/mode/c_cpp"],
+	["TS-EBNF parser", "ts-ebnf.g", "test.ts-ebnf", "ace/mode/yaml"],
 	["Typedmoon parser", "typedmoon.g", "test.typedmoon", "ace/mode/lua"],
 	["Typeling parser", "typeling.g", "test.typeling", "ace/mode/rust"],
 	["Typescript lexer", "typescript-dad.g", "test.typescript-dad", "ace/mode/typescript"],
