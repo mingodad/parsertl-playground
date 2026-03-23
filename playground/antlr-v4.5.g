@@ -407,7 +407,7 @@ element:
 	;
 
 labeledElement:
-	  identifier assing atomOrBlock
+	  identifier assign atomOrBlock
 	;
 
 atomOrBlock:
@@ -415,7 +415,7 @@ atomOrBlock:
 	| block
 	;
 
-assing:
+assign:
 	  ASSIGN
 	| PLUS_ASSIGN
 	;
@@ -875,8 +875,10 @@ channels { OFF_CHANNEL , COMMENT }
 */
 
 /* Order matter if identifier comes before keywords they are classified as identifier */
-{ID}	TOKEN_REF
+//{ID}	TOKEN_REF
 //{ID}	RULE_REF //FIXME
+[A-Z][A-Za-z0-9_]+	TOKEN_REF
+[a-z][A-Za-z0-9_]+	RULE_REF //FIXME
 {LBrack}([^\]\\]|{EscAny})+{RBrack}	LEXER_CHAR_SET
 
 /* Order matter if ILLEGAL_CHARACTER comes before identifier one letter identifer is classified as ILLEGAL_CHARACTER */
